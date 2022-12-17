@@ -2,12 +2,36 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Asset, CurrencySymbol, TokenName, Value } from "./types.ts";
 import { equal } from "./utils.ts";
 
-function arithMaps<T>(
-  f: (x: T, y: T) => T,
-  a: Map<string, T>,
-  b: Map<string, T>,
-): Map<string, T> {
-  const c = new Map<string, T>();
+function compareMaps<X, Y, Z>(
+  a: Map<string, X>,
+  b: Map<string, Y>,
+  f: (x: X, y: Y) => boolean,
+): boolean {
+  for (const key in a) {
+    const aVal = a.get(key);
+    const bVal = b.get(key);
+    if (aVal && bVal && !f(aVal, bVal)) return false;
+  }
+  return true;
+}
+
+export function compareValues(
+  a: Value,
+  b: Value,
+  f: (x: bigint, y: bigint) => boolean,
+): boolean {
+  function compareTokens(a: Map<TokenName, bigint>, b: Map<TokenName, bigint>) {
+    return compareMaps(a, b, f);
+  }
+  return compareMaps(a, b, compareTokens);
+}
+
+function arithMaps<X, Y, Z>(
+  a: Map<string, X>,
+  b: Map<string, Y>,
+  f: (x: X, y: Y) => Z,
+): Map<string, Z> {
+  const c = new Map<string, Z>();
   for (const key in a) {
     const aVal = a.get(key);
     assert(aVal, "value not in first map");
@@ -28,16 +52,16 @@ export function arithValues(
   f: (x: bigint, y: bigint) => bigint,
 ): Value {
   function arithTokens(a: Map<TokenName, bigint>, b: Map<TokenName, bigint>) {
-    return arithMaps(f, a, b);
+    return arithMaps(a, b, f);
   }
-  return arithMaps(arithTokens, a, b);
+  return arithMaps(a, b, arithTokens);
 }
 
 function unionMaps<T>(
-  f: (x: T, y: T) => T,
-  def: T,
   a: Map<string, T>,
   b: Map<string, T>,
+  def: T,
+  f: (x: T, y: T) => T,
 ): Map<string, T> {
   const c = new Map<string, T>();
   for (const key in a) {
@@ -61,10 +85,10 @@ export function unionValues(
   f: (x: bigint, y: bigint) => bigint,
 ): Value {
   function unionTokens(a: Map<TokenName, bigint>, b: Map<TokenName, bigint>) {
-    return unionMaps(f, 0n, a, b);
+    return unionMaps(a, b, 0n, f);
   }
   const emptyTokens = new Map<TokenName, bigint>();
-  return unionMaps(unionTokens, emptyTokens, a, b);
+  return unionMaps(a, b, emptyTokens, unionTokens);
 }
 
 export function addValues(a: Value, b: Value): Value {
@@ -256,4 +280,36 @@ export function numAssets(value: Value): number {
     num += tkns.size;
   }
   return num;
+}
+
+export function isSubSet(sub: Value, set: Value): boolean {
+  for (const [ccy, tkns] of sub) {
+    const tkns_ = set.get(ccy);
+    if (!tkns_) return false;
+    for (const [tkn, amnt] of tkns) {
+      assert(amnt != 0n, "zeroed amount");
+      if (!tkns_.has(tkn)) return false;
+      assert(tkns_.get(tkn) != 0n, "zeroed amount_");
+    }
+  }
+  return true;
+}
+
+export function sameAssets(a: Value, b: Value): boolean {
+  return isSubSet(a, b) && isSubSet(b, a);
+}
+
+export function positive(value: Value): boolean {
+  for (const [_, tkns] of value) {
+    assert(tkns.size > 0, "empty token map");
+    for (const [_, amnt] of tkns) {
+      assert(amnt != 0n, "zeroed amount");
+      if (amnt < 0n) return false;
+    }
+  }
+  return value.size > 0;
+}
+
+export function leq(a: Value, b: Value): boolean {
+  return compareValues(a, b, (x, y) => x <= y);
 }

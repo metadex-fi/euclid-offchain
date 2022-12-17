@@ -6,6 +6,13 @@ import {
   PRecord,
   PSum,
 } from "../../refactor_parse/lucid/src/plutus/parse.ts";
+import {
+assertContractCurrency,
+  assertNonEmpty,
+  assertNotADA,
+  assertPositive,
+mkDiracAsserts,
+} from "./asserts.ts";
 
 export type EuclidData =
   | Amount
@@ -28,7 +35,7 @@ export type Amount = bigint;
 export type CurrencySymbol = string;
 export type TokenName = string;
 
-export const PAmount = new PInteger();
+export const PAmount = new PInteger([assertPositive]);
 export const PCurrencySymbol = new PByteString();
 export const PTokenName = new PByteString();
 export const PPaymentKeyHash = new PByteString();
@@ -48,7 +55,13 @@ export const PAsset = new PRecord(
   },
   Asset,
 );
-export const PIdNFT = PAsset;
+export const PIdNFT = new PRecord(
+  {
+    "currencySymbol": new PByteString([assertContractCurrency]),
+    "tokenName": new PByteString([assertNotADA]),
+  },
+  Asset,
+);
 
 export type Value = Map<string, Map<string, bigint>>;
 export const emptyValue: Value = new Map<string, Map<string, bigint>>();
@@ -59,7 +72,11 @@ export type JumpSizes = Value;
 
 export const PValue = new PMap(
   PCurrencySymbol,
-  new PMap(PTokenName, new PInteger()),
+  new PMap(PTokenName, new PInteger([assertPositive]), undefined, [
+    assertNonEmpty,
+  ]),
+  undefined,
+  [assertNonEmpty],
 );
 export const PPrices = PValue;
 export const PAmounts = PValue;
@@ -90,7 +107,7 @@ export class Param {
   ) {}
 }
 
-export const PDirac = new PRecord(
+export const mkPDirac = (param: Param) => new PRecord<Dirac>(
   {
     "owner": PPaymentKeyHash,
     "threadNFT": PIdNFT,
@@ -100,6 +117,7 @@ export const PDirac = new PRecord(
     "jumpStorage": PActiveAssets,
   },
   Dirac,
+  mkDiracAsserts(param)
 );
 
 export const PParam = new PRecord(

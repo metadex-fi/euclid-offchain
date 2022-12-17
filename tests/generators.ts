@@ -58,7 +58,7 @@ const dropChance = 0.5;
 const maxJumps = 2n; // per direction, so 1 + 2 * maxJumps per dimension
 const minTicks = 1; // per dimension
 const maxTicks = 5; // per dimension
-const contractCurrency = "cc"; // TODO replace with actual
+export const contractCurrency = "cc"; // TODO replace with actual
 const maxJumpStores = 10;
 const maxThreadNFTs = 10;
 
