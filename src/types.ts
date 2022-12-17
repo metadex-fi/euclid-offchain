@@ -1,14 +1,37 @@
 import { PaymentKeyHash } from "../../refactor_parse/lucid/mod.ts";
-import { PByteString, PInteger, PMap, PRecord, PSum } from "../../refactor_parse/lucid/src/plutus/parse.ts";
+import {
+  PByteString,
+  PInteger,
+  PMap,
+  PRecord,
+  PSum,
+} from "../../refactor_parse/lucid/src/plutus/parse.ts";
+
+export type EuclidData =
+  | Amount
+  | CurrencySymbol
+  | TokenName
+  | Asset
+  | IdNFT
+  | Value
+  | Prices
+  | Amounts
+  | JumpSizes
+  | ActiveAssets
+  | Dirac
+  | Param
+  | DiracDatum
+  | ParamDatum
+  | EuclidDatum;
 
 export type Amount = bigint;
 export type CurrencySymbol = string;
 export type TokenName = string;
 
-export const PAmount = new PInteger()
-export const PCurrencySymbol = new PByteString()
-export const PTokenName = new PByteString()
-export const PPaymentKeyHash = new PByteString()
+export const PAmount = new PInteger();
+export const PCurrencySymbol = new PByteString();
+export const PTokenName = new PByteString();
+export const PPaymentKeyHash = new PByteString();
 
 export class Asset {
   constructor(
@@ -19,13 +42,13 @@ export class Asset {
 export type IdNFT = Asset;
 
 export const PAsset = new PRecord(
-    {
-        "currencySymbol": PCurrencySymbol,
-        "tokenName": PTokenName
-    },
-    Asset
-)
-export const PIdNFT = PAsset
+  {
+    "currencySymbol": PCurrencySymbol,
+    "tokenName": PTokenName,
+  },
+  Asset,
+);
+export const PIdNFT = PAsset;
 
 export type Value = Map<string, Map<string, bigint>>;
 export const emptyValue: Value = new Map<string, Map<string, bigint>>();
@@ -34,13 +57,16 @@ export type Prices = Value;
 export type Amounts = Value;
 export type JumpSizes = Value;
 
-export const PValue = new PMap(PCurrencySymbol, new PMap(PTokenName, new PInteger()))
-export const PPrices = PValue
-export const PAmounts = PValue
-export const PJumpSizes = PValue
+export const PValue = new PMap(
+  PCurrencySymbol,
+  new PMap(PTokenName, new PInteger()),
+);
+export const PPrices = PValue;
+export const PAmounts = PValue;
+export const PJumpSizes = PValue;
 
 export type ActiveAssets = Map<Prices, Asset>;
-export const PActiveAssets = new PMap(PPrices, PAsset)
+export const PActiveAssets = new PMap(PPrices, PAsset);
 
 export class Dirac {
   constructor(
@@ -73,8 +99,8 @@ export const PDirac = new PRecord(
     "activeAmnts": PAmounts,
     "jumpStorage": PActiveAssets,
   },
-  Dirac
-)
+  Dirac,
+);
 
 export const PParam = new PRecord(
   {
@@ -85,38 +111,38 @@ export const PParam = new PRecord(
     "upperPriceBounds": PPrices,
     "baseAmountA0": PAmount,
   },
-  Param
-)
+  Param,
+);
 
 export class DiracDatum {
   constructor(
-    public _0: Dirac
+    public _0: Dirac,
   ) {}
 }
 
 export class ParamDatum {
   constructor(
-    public _0: Param
+    public _0: Param,
   ) {}
 }
 
 export const PDiracDatum = new PRecord(
   {
-    "_0": PDirac
+    "_0": PDirac,
   },
-  DiracDatum
-)
+  DiracDatum,
+);
 
 export const PParamDatum = new PRecord(
   {
-    "_0": PParam
+    "_0": PParam,
   },
-  ParamDatum
-)
+  ParamDatum,
+);
 
-export type EuclidDatum = DiracDatum | ParamDatum
+export type EuclidDatum = DiracDatum | ParamDatum;
 
 export const PEuclidDatum = new PSum([
   PDiracDatum,
-  PParamDatum
-])
+  PParamDatum,
+]);

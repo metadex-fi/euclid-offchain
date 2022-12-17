@@ -5,7 +5,6 @@ import {
 } from "https://deno.land/std@0.145.0/testing/asserts.ts";
 import { Data, genInteger } from "../../lucid-data-parse/lucid/mod.ts";
 
-
 Deno.test("metatest", async () => {
   assertEquals(2, 2);
 });
