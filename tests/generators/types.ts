@@ -1,46 +1,50 @@
-import { genNumber, PaymentKeyHash } from "../../lucid-data-parse/lucid/mod.ts";
 import {
   fromHex,
-  genByteString,
-  genInteger,
+  genNonNegative,
+  genNumber,
+  PaymentKeyHash,
   PType,
   randomChoice,
   sha256,
   toHex,
-} from "../../refactor_parse/lucid/mod.ts";
+} from "../../../refactor_parse/lucid/src/mod.ts";
+import { Asset, IdNFT, PAsset, PIdNFT } from "../../src/types/asset.ts";
 import {
   ActiveAssets,
-  Amount,
-  Asset,
-  CurrencySymbol,
   Dirac,
   DiracDatum,
+  PActiveAssets,
+  PDirac,
+} from "../../src/types/dirac.ts";
+import {
   EuclidData,
   EuclidDatum,
-  IdNFT,
-  PActiveAssets,
-  PAmount,
-  PAmounts,
+  PEuclidDatum,
+} from "../../src/types/euclid.ts";
+import {
   Param,
   ParamDatum,
-  PAsset,
-  PCurrencySymbol,
-  PDirac,
-  PDiracDatum,
-  PEuclidDatum,
-  PIdNFT,
-  PJumpSizes,
   PParam,
   PParamDatum,
+} from "../../src/types/param.ts";
+import {
+  Amount,
+  CurrencySymbol,
+  PAmount,
+  PCurrencySymbol,
   PPaymentKeyHash,
+  PTokenName,
+  TokenName,
+} from "../../src/types/primitive.ts";
+import {
+  PAmounts,
+  PJumpSizes,
   PPrices,
   Prices,
-  PTokenName,
   PValue,
-  TokenName,
   Value,
-} from "../src/types.ts";
-import { contains } from "../src/utils.ts";
+} from "../../src/types/value.ts";
+import { contains } from "../../src/utils.ts";
 import {
   addAssetAmount,
   addValues,
@@ -51,7 +55,7 @@ import {
   mapAmounts,
   newValue,
   setAssetAmount,
-} from "../src/value.ts";
+} from "../../src/value.ts";
 
 const maxNumAssets = 5;
 const dropChance = 0.5;
@@ -70,6 +74,13 @@ export function randomSubset<T>(set: T[]): T[] {
     }
   });
   return subset;
+}
+
+export function genWithinRange(
+  lowerBound: number = 0,
+  upperBound?: number,
+): number {
+  return lowerBound + genNonNegative(upperBound);
 }
 
 export function genEuclidData(ptype: PType): EuclidData {
@@ -128,33 +139,6 @@ export function genPoolDatums(): EuclidDatum[] {
   ];
 }
 
-export function genAmount(lowerBound?: bigint, upperBound?: bigint): Amount {
-  const lower = lowerBound ?? 0n;
-  const offset = upperBound
-    ? BigInt(genNumber(Number(upperBound)))
-    : genInteger();
-  return lower + offset;
-}
-
-export function genCurrencySymbol(): CurrencySymbol {
-  return genByteString();
-}
-
-export function genTokenName(): TokenName {
-  return genByteString();
-}
-
-export function genPaymentKeyHash(): PaymentKeyHash {
-  return genByteString();
-}
-
-export function genAsset(ccy?: CurrencySymbol, tkn?: TokenName): Asset {
-  return new Asset(
-    ccy ?? genCurrencySymbol(),
-    tkn ?? genTokenName(),
-  );
-}
-
 export function genAssets(): Asset[] {
   const numAssets = genNumber(maxNumAssets);
   const assets: Asset[] = [];
@@ -163,10 +147,6 @@ export function genAssets(): Asset[] {
     if (!contains(assets, asset)) assets.push(asset);
   }
   return assets;
-}
-
-export function genIdNFT(tkn?: TokenName): IdNFT {
-  return genAsset(contractCurrency, tkn);
 }
 
 export function nextThreadNFT(threadNFT: IdNFT): IdNFT {
