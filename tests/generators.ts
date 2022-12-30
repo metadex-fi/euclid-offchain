@@ -2,49 +2,27 @@ import {
   fromHex,
   genNonNegative,
   genNumber,
-  PaymentKeyHash,
   PType,
   randomChoice,
   sha256,
   toHex,
-} from "../../../refactor_parse/lucid/src/mod.ts";
-import { Asset, IdNFT, PAsset, PIdNFT } from "../../src/types/asset.ts";
+} from "../../refactor_parse/lucid/src/mod.ts";
+import { Asset, PAsset } from "../src/types/asset.ts";
 import {
   ActiveAssets,
   Dirac,
   DiracDatum,
   PActiveAssets,
   PDirac,
-} from "../../src/types/dirac.ts";
+} from "../src/types/dirac.ts";
+import { Param, ParamDatum, PParam, PParamDatum } from "../src/types/param.ts";
 import {
-  EuclidData,
-  EuclidDatum,
-  PEuclidDatum,
-} from "../../src/types/euclid.ts";
-import {
-  Param,
-  ParamDatum,
-  PParam,
-  PParamDatum,
-} from "../../src/types/param.ts";
-import {
-  Amount,
-  CurrencySymbol,
-  PAmount,
   PCurrencySymbol,
   PPaymentKeyHash,
   PTokenName,
-  TokenName,
-} from "../../src/types/primitive.ts";
-import {
-  PAmounts,
-  PJumpSizes,
-  PPrices,
-  Prices,
-  PValue,
-  Value,
-} from "../../src/types/value.ts";
-import { contains } from "../../src/utils.ts";
+} from "../src/types/primitive.ts";
+import { PValue, Value } from "../src/types/value.ts";
+import { contains } from "../src/utils.ts";
 import {
   addAssetAmount,
   addValues,
@@ -55,7 +33,7 @@ import {
   mapAmounts,
   newValue,
   setAssetAmount,
-} from "../../src/value.ts";
+} from "../src/value.ts";
 
 const maxNumAssets = 5;
 const dropChance = 0.5;
@@ -74,13 +52,6 @@ export function randomSubset<T>(set: T[]): T[] {
     }
   });
   return subset;
-}
-
-export function genWithinRange(
-  lowerBound: number = 0,
-  upperBound?: number,
-): number {
-  return lowerBound + genNonNegative(upperBound);
 }
 
 export function genEuclidData(ptype: PType): EuclidData {
@@ -152,53 +123,6 @@ export function genAssets(): Asset[] {
 export function nextThreadNFT(threadNFT: IdNFT): IdNFT {
   return genIdNFT(toHex(sha256(fromHex(threadNFT.tokenName))));
 }
-
-export function genValue(
-  assets: Asset[],
-  lowerBounds?: Value,
-  upperBounds?: Value,
-): Value {
-  let value: Value = newValue();
-  assets.forEach((asset) => {
-    const lower = lowerBounds ? amountOfAsset(lowerBounds, asset) : undefined;
-    const upper = upperBounds ? amountOfAsset(upperBounds, asset) : undefined;
-    value = addValues(value, assetSingleton(asset, genAmount(lower, upper)));
-  });
-  return value;
-}
-
-export function genPrices(
-  assets: Asset[],
-  lowerBounds?: Prices,
-  upperBounds?: Prices,
-): Prices {
-  let lowerBounds_ = newValue();
-  assets.forEach((asset) => {
-    const lower = lowerBounds ? (amountOfAsset(lowerBounds, asset) ?? 1n) : 1n;
-    lowerBounds_ = setAssetAmount(lowerBounds_, asset, lower);
-  });
-  return genValue(assets, lowerBounds_, upperBounds);
-}
-
-export function genAmounts(baseAmountA0: bigint, prices: Prices): Value {
-  const assets = assetsOf(prices);
-  const denom = assets[0];
-  const nonzero = randomSubset(assets);
-  const p0 = amountOfAsset(prices, denom)!;
-  let amounts = newValue();
-  let amountA0 = baseAmountA0;
-  nonzero.slice(1).forEach((asset) => {
-    const tradedA0 = BigInt(genNumber(Number(amountA0)));
-    amountA0 -= tradedA0;
-    const p = amountOfAsset(prices, asset)!;
-    amounts = setAssetAmount(amounts, asset, (tradedA0 * p) / p0);
-  });
-  const p = amountOfAsset(prices, nonzero[0])!;
-  amounts = setAssetAmount(amounts, nonzero[0], (amountA0 * p) / p0);
-  return amounts;
-}
-
-export const genJumpSizes = genPrices;
 
 // TODO this might lead to some paradoxes, let's see, we might learn something
 export function genActiveAssets(

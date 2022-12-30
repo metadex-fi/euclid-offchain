@@ -30,7 +30,7 @@ export function assertNotADA(a: Asset) {
 }
 
 export const mkAssertWithinRange =
-  (lowerBound?: number, upperBound?: number) => (i: bigint) => {
+  (lowerBound?: bigint, upperBound?: bigint) => (i: bigint) => {
     assert(!lowerBound || lowerBound <= i, "too small");
     assert(!upperBound || i < upperBound, "too big");
   };

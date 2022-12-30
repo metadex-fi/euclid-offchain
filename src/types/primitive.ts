@@ -1,4 +1,5 @@
 import {
+  genNonNegative,
   genPositive,
   PByteString,
   PConstraint,
@@ -31,11 +32,18 @@ export const PPositive: PPositive = new PConstraint<PInteger>(
   },
 );
 
+function genWithinRange(
+  lowerBound = 0n,
+  upperBound?: bigint,
+): bigint {
+  return lowerBound + BigInt(genNonNegative(Number(upperBound)));
+}
+
 export type Amount = bigint;
 export type PAmount = PConstraint<PPositive>;
 export const mkPAmount = (
-  lowerBound?: number,
-  upperBound?: number,
+  lowerBound?: bigint,
+  upperBound?: bigint,
 ): PAmount => {
   return new PConstraint<PPositive>(
     PPositive,

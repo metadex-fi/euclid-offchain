@@ -8,13 +8,24 @@ import {
   PRecord,
   PType,
 } from "../../../refactor_parse/lucid/src/mod.ts";
-import { Asset, IdNFT, PAsset, PIdNFT } from "./asset.ts";
+import { Asset, Assets, IdNFT, PAsset, PIdNFT } from "./asset.ts";
 import { PPaymentKeyHash } from "./primitive.ts";
-import { Amounts, PAmounts, PPrices, Prices, Value } from "./value.ts";
+import {
+  Amounts,
+  mkPPrices,
+  PAmounts,
+  PPrices,
+  Prices,
+  Value,
+} from "./value.ts";
 
 export type ActiveAssets = Map<Prices, Asset>;
 export type PActiveAssets = PMap<PPrices, PAsset>;
-export const PActiveAssets = new PMap(PPrices, PAsset);
+export const mkPActiveAssets = (
+  assets: Assets,
+  lowerBounds?: Value,
+  upperBounds?: Value,
+) => new PMap(mkPPrices(assets, lowerBounds, upperBounds), mkPAsset(assets));
 
 export class Dirac {
   constructor(
