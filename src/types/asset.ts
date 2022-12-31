@@ -1,13 +1,14 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
+  PConstraint,
   PMap,
   PObject,
   PRecord,
   randomChoice,
 } from "../../../refactor_parse/lucid/src/mod.ts";
 import { randomSubset } from "../../tests/generators.ts";
-import { mkPNonEmptyList, PNonEmptyList } from "./nonEmptyList.ts";
-import { mkPNonEmptyMap, PNonEmptyMap } from "./nonEmptyMap.ts";
+import { newPNonEmptyList, PNonEmptyList } from "./nonEmptyList.ts";
+import { newPNonEmptyMap, PNonEmptyMap } from "./nonEmptyMap.ts";
 import {
   CurrencySymbol,
   PCurrencySymbol,
@@ -32,7 +33,26 @@ export const PAsset: PAsset = new PObject(
   Asset,
 );
 
-const NonEmptyTokenList = mkPNonEmptyList(PTokenName);
+export type PAssetOf = PConstraint<PAsset>;
+export const newPAssetOf = (assets: Assets): PAssetOf => {
+  return new PConstraint<PAsset>(
+    PAsset,
+    [newAssertAssetOf(assets)],
+    () => {
+      return randomAssetOf(assets);
+    },
+  );
+};
+
+const newAssertAssetOf = (assets: Assets) => (asset: Asset): void => {
+  assert(assets.has(asset.currencySymbol), "currencySymbol not in assets");
+  assert(
+    assets.get(asset.currencySymbol)!.includes(asset.tokenName),
+    "tokenName not in assets",
+  );
+};
+
+const NonEmptyTokenList = newPNonEmptyList(PTokenName);
 
 export type Assets = Map<CurrencySymbol, TokenName[]>;
 export type PAssets = PMap<PCurrencySymbol, PNonEmptyList<PTokenName>>;
@@ -45,7 +65,7 @@ export type PNonEmptyAssets = PNonEmptyMap<
   PCurrencySymbol,
   PNonEmptyList<PTokenName>
 >;
-export const PNonEmptyAssets: PNonEmptyAssets = mkPNonEmptyMap(
+export const PNonEmptyAssets: PNonEmptyAssets = newPNonEmptyMap(
   PCurrencySymbol,
   NonEmptyTokenList,
 );
@@ -76,13 +96,13 @@ export function tailAssets(assets: Assets): Assets {
   return tail;
 }
 
-export function randomAsset(assets: Assets): Asset {
+export function randomAssetOf(assets: Assets): Asset {
   const ccy = randomChoice([...assets.keys()]);
   const tkn = randomChoice(assets.get(ccy)!);
   return new Asset(ccy, tkn);
 }
 
-export function randomAssets(assets: Assets): Assets {
+export function randomAssetsOf(assets: Assets): Assets {
   const assets_ = new Map();
   const ccys = randomSubset([...assets.keys()]);
   for (const ccy of ccys) {
@@ -91,3 +111,21 @@ export function randomAssets(assets: Assets): Assets {
   }
   return assets_;
 }
+
+export function numAssets(assets: Assets): number {
+  let n = 0;
+  for (const tkns of assets.values()) {
+    n += tkns.length;
+  }
+  return n;
+}
+
+// export function flattenAssets(assets: Assets): Asset[] {
+//   const assets_ = [];
+//   for (const [ccy, tkns] of assets) {
+//     for (const tkn of tkns) {
+//       assets_.push(new Asset(ccy, tkn));
+//     }
+//   }
+//   return assets_;
+// }

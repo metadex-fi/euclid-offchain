@@ -1,6 +1,7 @@
 import { PSum } from "../../../refactor_parse/lucid/src/mod.ts";
-import { Asset, IdNFT } from "./asset.ts";
+import { Asset } from "./asset.ts";
 import { ActiveAssets, Dirac, DiracDatum, PDiracDatum } from "./dirac.ts";
+import { IdNFT } from "./idnft.ts";
 import { Param, ParamDatum, PParamDatum } from "./param.ts";
 import { Amount, CurrencySymbol, TokenName } from "./primitive.ts";
 import { Amounts, JumpSizes, Prices, Value } from "./value.ts";

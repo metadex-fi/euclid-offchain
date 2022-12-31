@@ -1,19 +1,18 @@
 import {
   PaymentKeyHash,
-  PlutusOf,
   PObject,
   PRecord,
-  PType,
 } from "../../../refactor_parse/lucid/src/mod.ts";
-import { Amount, PAmount, PPaymentKeyHash } from "./primitive.ts";
+import { PAssets, randomAssetsOf } from "./asset.ts";
 import {
-  JumpSizes,
-  mkPJumpSizes,
-  PJumpSizes,
-  PPrices,
-  Prices,
-} from "./value.ts";
+  Amount,
+  newPAmount,
+  newPPaymentKeyHashLiteral,
+  PPaymentKeyHash,
+} from "./primitive.ts";
+import { JumpSizes, newPJumpSizes, newPPrices, Prices } from "./value.ts";
 
+// TODO assertions about lower < initial < upper prices
 export class Param {
   constructor(
     public owner: PaymentKeyHash,
@@ -24,32 +23,31 @@ export class Param {
     public baseAmountA0: Amount,
   ) {}
 }
+export type PParam = PObject<Param>;
+export const genPParam = (): PParam => {
+  const assets = PAssets.genData();
+  const lowerBoundedAssets = randomAssetsOf(assets);
+  const upperBoundedAssets = randomAssetsOf(assets);
 
-export class PParam
-  implements PType<Array<PlutusOf<Param[keyof Param]>>, Param> {
-  plift(data: string | Value | Map<Value, string>): Param {
-    throw new Error("Method not implemented.");
-  }
-  pconstant(data: Param): string | Value | Map<Value, string> {
-    throw new Error("Method not implemented.");
-  }
-  genData(): Param {
-    throw new Error("Method not implemented.");
-  }
-  genPlutusData(): string | Value | Map<Value, string> {
-    throw new Error("Method not implemented.");
-  }
-}
+  const powner = newPPaymentKeyHashLiteral(PPaymentKeyHash.genData());
+  const pjumpSizes = newPJumpSizes(assets);
+  const plowerPriceBounds = newPPrices(lowerBoundedAssets);
+  const pupperPriceBounds = newPPrices(upperBoundedAssets);
 
-export const mkPParam = (assets: Assets) => {
+  const lowerPriceBounds = plowerPriceBounds.genData();
+  const upperPriceBounds = pupperPriceBounds.genData();
+
+  const pinitialPrices = newPPrices(assets, lowerPriceBounds, upperPriceBounds);
+  const pbaseAmountA0 = newPAmount();
+
   return new PObject(
     new PRecord({
-      "owner": PPaymentKeyHash,
-      "jumpSizes": mkPJumpSizes,
-      "initialPrices": PPrices,
-      "lowerPriceBounds": PPrices,
-      "upperPriceBounds": PPrices,
-      "baseAmountA0": PAmount,
+      "owner": powner,
+      "jumpSizes": pjumpSizes,
+      "initialPrices": pinitialPrices,
+      "lowerPriceBounds": plowerPriceBounds,
+      "upperPriceBounds": pupperPriceBounds,
+      "baseAmountA0": pbaseAmountA0,
     }),
     Param,
   );
@@ -60,10 +58,12 @@ export class ParamDatum {
     public _0: Param,
   ) {}
 }
-
-export const PParamDatum = new PObject(
-  new PRecord({
-    "_0": PParam,
-  }),
-  ParamDatum,
-);
+export type PParamDatum = PObject<ParamDatum>;
+export const genPParamDatum = (): PParamDatum => {
+  return new PObject(
+    new PRecord({
+      "_0": genPParam(),
+    }),
+    ParamDatum,
+  );
+};

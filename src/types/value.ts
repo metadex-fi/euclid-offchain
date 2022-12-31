@@ -5,32 +5,25 @@ import {
   PType,
 } from "../../../refactor_parse/lucid/src/mod.ts";
 import {
-  amountOf,
-  amountOfAsset,
+  Asset,
+  Assets,
   firstAsset,
-  newValue,
-  setAmount,
-  setAssetAmount,
-} from "../value.ts";
-import { Assets, randomAssets, tailAssets } from "./asset.ts";
+  randomAssetsOf,
+  tailAssets,
+} from "./asset.ts";
 import {
   Amount,
   CurrencySymbol,
-  mkPAmount,
+  newPAmount,
   PAmount,
   TokenName,
 } from "./primitive.ts";
 
 export type Value = Map<CurrencySymbol, Map<TokenName, Amount>>;
-export const emptyValue: Value = new Map<string, Map<string, bigint>>();
-
-export function assetsOf(value: Value): Assets {
-  const assets = new Map<CurrencySymbol, TokenName[]>();
-  for (const [currencySymbol, tokens] of value) {
-    assets.set(currencySymbol, [...tokens.keys()]);
-  }
-  return assets;
-}
+// export const emptyValue: Value = new Map<string, Map<string, bigint>>();
+export const newValue = (): Value => {
+  return new Map<string, Map<string, bigint>>();
+};
 
 export class PValue implements PType<Value, Value> {
   public pamounts: Map<CurrencySymbol, Map<TokenName, PAmount>>;
@@ -56,7 +49,7 @@ export class PValue implements PType<Value, Value> {
             ? globalLowerBound
             : tknLowerBound;
         const tknUpperBound = ccyUpperBounds?.get(tokenName);
-        const pamount = mkPAmount(tknLowerBound_, tknUpperBound);
+        const pamount = newPAmount(tknLowerBound_, tknUpperBound);
         tokenAmounts.set(tokenName, pamount);
       }
       pamounts.set(currencySymbol, tokenAmounts);
@@ -115,57 +108,221 @@ export class PValue implements PType<Value, Value> {
     }
     return value;
   };
-
-  public genPlutusData = (): Value => {
-    return this.genData();
-  };
 }
 
-export type Prices = Value;
-export type PPrices = PValue;
-export const mkPPrices = (
-  assets: Assets,
-  lowerBounds?: Value,
-  upperBounds?: Value,
-): PValue => {
-  return new PValue(assets, lowerBounds, upperBounds, 1n);
-};
-
-function genAmounts(baseAmountA0: bigint, prices: Prices): Value {
-  const assets = assetsOf(prices);
-  const denom = firstAsset(assets)!;
-  const nonzero = randomAssets(assets);
-  const p0 = amountOfAsset(prices, denom)!;
-  let amounts = newValue();
-  let amountA0 = baseAmountA0;
-  for (const [ccy, tkns] of tailAssets(nonzero)) {
-    for (const tkn of tkns) {
-      const tradedA0 = BigInt(genNumber(Number(amountA0)));
-      amountA0 -= tradedA0;
-      const p = amountOf(prices, ccy, tkn)!;
-      amounts = setAmount(amounts, ccy, tkn, (tradedA0 * p) / p0);
-    }
-  }
-  const p = amountOfAsset(prices, firstAsset(nonzero))!;
-  amounts = setAssetAmount(amounts, firstAsset(nonzero), (amountA0 * p) / p0);
-  return amounts;
-}
-
-export type Amounts = Prices;
-export type PAmounts = PConstraint<PPrices>;
-export const mkPAmounts = (baseAmountA0: bigint, prices: Prices): PAmounts => {
-  const assets = assetsOf(prices);
+export type Amounts = Value;
+export type PAmounts = PConstraint<PValue>;
+export const newPAmounts = (
+  baseAmountA0: bigint,
+  pprices: PPrices,
+): PAmounts => {
+  const assets = assetsOf(pprices.pamounts);
   const pinner = new PValue(assets);
   // const asserts = []; // TODO asserts, ideally inverse to the other stuff
 
   return new PConstraint(
     pinner,
     [],
-    () => genAmounts(baseAmountA0, prices),
-    () => genAmounts(baseAmountA0, prices),
+    newGenAmounts(baseAmountA0, pprices),
   );
 };
 
+const newGenAmounts = (baseAmountA0: bigint, pprices: PPrices) => (): Value => {
+  const prices = pprices.genData();
+  return genAmounts(baseAmountA0, prices);
+};
+
+export function genAmounts(
+  baseAmountA0: bigint,
+  prices: Prices,
+): Value {
+  const assets = assetsOf(prices);
+  const denom = firstAsset(assets)!;
+  const nonzero = randomAssetsOf(assets);
+  const p0 = amountOf(prices, denom)!;
+  const amounts = newValue();
+  let amountA0 = baseAmountA0;
+  for (const [ccy, tkns] of tailAssets(nonzero)) {
+    for (const tkn of tkns) {
+      const asset = new Asset(ccy, tkn);
+      const tradedA0 = BigInt(genNumber(Number(amountA0)));
+      amountA0 -= tradedA0;
+      const p = amountOf(prices, asset)!;
+      setAmountOf(amounts, asset, (tradedA0 * p) / p0);
+    }
+  }
+  const p = amountOf(prices, firstAsset(nonzero))!;
+  setAmountOf(amounts, firstAsset(nonzero), (amountA0 * p) / p0);
+  return amounts;
+}
+
 export type JumpSizes = Prices;
 export type PJumpSizes = PPrices;
-export const mkPJumpSizes = mkPPrices;
+export const newPJumpSizes = newPPrices;
+
+export function assetsOf(
+  value: Map<CurrencySymbol, Map<TokenName, unknown>>,
+): Assets {
+  const assets = new Map<CurrencySymbol, TokenName[]>();
+  for (const [currencySymbol, tokens] of value) {
+    assets.set(currencySymbol, [...tokens.keys()]);
+  }
+  return assets;
+}
+
+export function amountOf(
+  value: Value,
+  asset: Asset,
+  defaultAmnt?: Amount,
+): Amount {
+  const amount = value.get(asset.currencySymbol)?.get(asset.tokenName) ??
+    defaultAmnt;
+  assert(amount, `amount not found for asset ${asset}`);
+  return amount;
+}
+
+export function setAmountOf(value: Value, asset: Asset, amount: Amount): void {
+  const tokens = value.get(asset.currencySymbol);
+  assert(tokens, `tokens not found for asset ${asset}`);
+  assert(tokens.has(asset.tokenName), `amount not found for asset ${asset}`);
+  tokens.set(asset.tokenName, amount);
+}
+
+export function singleton(asset: Asset, amount: Amount): Value {
+  const value = newValue();
+  const tokens = new Map<TokenName, Amount>();
+  tokens.set(asset.tokenName, amount);
+  value.set(asset.currencySymbol, tokens);
+  return value;
+}
+
+const newUnionWith = (
+  op: (a: Amount, b: Amount) => Amount,
+  defaultOut?: Amount,
+  defaultA?: Amount,
+  defaultB?: Amount,
+) =>
+(
+  a: Value,
+  b: Value,
+): Value => {
+  const assets = assetsOf(a);
+  const value = newValue();
+  for (const [currencySymbol, tokens] of assets) {
+    for (const tokenName of tokens) {
+      const asset = new Asset(currencySymbol, tokenName);
+      const amountA = amountOf(a, asset, defaultA);
+      const amountB = amountOf(b, asset, defaultB);
+      const amountOut = op(amountA, amountB);
+      if (amountOut !== defaultOut) {
+        setAmountOf(value, asset, op(amountA, amountB));
+      }
+    }
+  }
+  return value;
+};
+
+export const addStrict = newUnionWith((a, b) => a + b, 0n);
+export const subStrict = newUnionWith((a, b) => a - b, 0n);
+export const mulStrict = newUnionWith((a, b) => a * b, 0n);
+export const divStrict = newUnionWith((a, b) => a / b, 0n);
+
+export const lSubValues = newUnionWith((a, b) => a > b ? a - b : 0n, 0n);
+
+export const addValues = newUnionWith((a, b) => a + b, 0n, 0n, 0n);
+export const subValues = newUnionWith((a, b) => a - b, 0n, 0n, 0n);
+export const mulValues = newUnionWith((a, b) => a * b, 0n, 0n, 0n);
+export const divValues = newUnionWith((a, b) => a / b, 0n, 0n);
+
+export const minValues = newUnionWith(
+  (a, b) => a === 0n ? b : b === 0n ? a : a < b ? a : b,
+  0n,
+  0n,
+  0n,
+);
+
+
+export const addAmount = (v: Value, asset: Asset, amount: Amount): Value => {
+  const add = newUnionWith((a, b) => a + b, 0n, undefined, 0n);
+  const value = add(v, singleton(asset, amount));
+  return value;
+};
+
+function mapAmounts(
+  value: Value,
+  f: (amount: Amount) => Amount,
+): Value {
+  const value_ = newValue();
+  for (const [ccy, tknAmnts] of value) {
+    const tknAmnts_ = new Map<TokenName, Amount>();
+    for (const [tkn, amnt] of tknAmnts) {
+      tknAmnts_.set(tkn, f(amnt));
+    }
+    value_.set(ccy, tknAmnts_);
+  }
+  return value_;
+}
+
+export function setAmounts(value: Value, amount: Amount): Value {
+  return mapAmounts(value, () => amount);
+}
+
+export function mulAmounts(value: Value, factor: Amount): Value {
+  return mapAmounts(value, (amount) => amount * factor);
+}
+
+export function maxAmounts(value: Value, max: Amount): Value {
+  return mapAmounts(value, (amnt: Amount) => max > amnt ? amnt : max);
+}
+
+export function negate(value: Value): Value {
+  return mapAmounts(value, (amount) => -amount);
+}
+
+export function numAssetsInValue(v: Value): number {
+  let n = 0;
+  for (const tkns of v.values()) {
+    n += tkns.size;
+  }
+  return n;
+}
+
+export function firstAssetInValue(v: Value): Asset {
+  for (const [currencySymbol, tokens] of v) {
+    for (const tokenName in tokens) {
+      return new Asset(currencySymbol, tokenName);
+    }
+  }
+  throw new Error("no assets in value");
+}
+
+export function firstAmount(v: Value): Amount {
+  for (const [_, tokens] of v) {
+    for (const [_, amount] of tokens) {
+      return amount;
+    }
+  }
+  throw new Error("no assets in value");
+}
+
+export function tailValue(v: Value): Value {
+  assert(v.size > 0, "empty values tell no tails");
+  const tail = new Map();
+  let first = true;
+  for (const [ccy, tkns] of v) {
+    if (first) {
+      assert(tkns.size > 0, "empty token map");
+      if (tkns.size > 1) {
+        const tail_ = new Map<TokenName, Amount>();
+        let first_ = true;
+        for (const [tkn, amnt] of tkns) {
+          if (first_) first_ = false;
+          else tail_.set(tkn, amnt);
+        }
+        tail.set(ccy, tail_);
+      }
+      first = false;
+    } else tail.set(ccy, tkns);
+  }
+  return tail;
+}
