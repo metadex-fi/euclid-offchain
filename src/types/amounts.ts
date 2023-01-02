@@ -1,55 +1,49 @@
-import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   genNumber,
   PConstraint,
 } from "../../../refactor_parse/lucid/src/mod.ts";
-import { Asset, firstAsset, randomAssetsOf, tailAssets } from "./asset.ts";
+import {
+  Asset,
+  Assets,
+  firstAsset,
+  randomAssetsOf,
+  tailAssets,
+} from "./asset.ts";
 import { PPrices, Prices } from "./prices.ts";
 import { Amount } from "./primitive.ts";
 import {
   amountOf,
   assetsOf,
-  mulValues,
   newPPositiveValue,
   newValue,
   PPositiveValue,
   setAmountOf,
-  sumAmounts,
   Value,
 } from "./value.ts";
 
 export type Amounts = Value;
 export type PAmounts = PConstraint<PPositiveValue>;
-export const genPAmounts = (
+export const newPAmounts = (
+  assets: Assets,
   baseAmountA0: bigint,
   pprices: PPrices,
 ): PAmounts => {
-  const prices = pprices.genData();
-  const assets = assetsOf(prices);
   const pinner = newPPositiveValue(assets);
 
   return new PConstraint(
     pinner,
-    [newAssertAmountsCongruent(baseAmountA0, prices)], // TODO only looking at Datums, add Values
-    newGenAmounts(baseAmountA0, prices),
+    [], //[newAssertAmountsCongruent(baseAmountA0, pprices)], // TODO only looking at Datums, add Values
+    newGenAmounts(baseAmountA0, pprices),
   );
 };
 
-// TODO consider fees
-const newAssertAmountsCongruent =
-  (baseAmountA0: Amount, prices: Prices) => (amounts: Amounts): void => {
-    const total = sumAmounts(mulValues(amounts, prices));
-    assert(
-      total === baseAmountA0,
-      `total ${total} !== baseAmountA0 ${baseAmountA0}`,
-    );
-  };
-
 const newGenAmounts = (
   baseAmountA0: Amount,
-  prices: Prices,
+  pprices: PPrices,
 ) =>
-(): Value => {
+(): Value => genAmounts(baseAmountA0, pprices.genData());
+
+export const genAmounts = (baseAmountA0: Amount, prices: Prices): Amounts => {
   const assets = assetsOf(prices);
   const denom = firstAsset(assets)!;
   const nonzero = randomAssetsOf(assets);

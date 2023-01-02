@@ -6,8 +6,12 @@ import {
   PObject,
   PRecord,
 } from "../../../refactor_parse/lucid/src/mod.ts";
-import { genActiveAssets } from "../../tests/generators.ts";
-import { ActiveAssets, newPActiveAssets } from "./activeAssets.ts";
+import {
+  ActiveAssets,
+  newGenActiveAssets,
+  newPActiveAssets,
+} from "./activeAssets.ts";
+import { Amounts, genAmounts, newPAmounts } from "./amounts.ts";
 import { Asset, numAssets } from "./asset.ts";
 import {
   gMaxHashes,
@@ -18,17 +22,14 @@ import {
   nextThreadNFT,
 } from "./idnft.ts";
 import { Param } from "./param.ts";
+import { newPPrices, Prices } from "./prices.ts";
 import { Amount, newPAmount, newPPaymentKeyHashLiteral } from "./primitive.ts";
 import {
   addAmount,
   amountOf,
-  Amounts,
   assetsOf,
-  genAmounts,
-  newPAmounts,
-  newPPrices,
-  PPrices,
-  Prices,
+  mulValues,
+  sumAmounts,
 } from "./value.ts";
 
 export class Dirac {
@@ -56,37 +57,28 @@ export const newPDirac = (param: Param): PDirac => {
       "threadNFT": newPThreadNFT(param.owner),
       "paramNFT": newPParamNFT(param.owner),
       "prices": pprices,
-      "activeAmnts": newPAmounts(param.baseAmountA0, pprices),
-      "jumpStorage": newPActiveAssets(
-        assets,
-        param.initialPrices,
-        param.lowerPriceBounds,
-        param.upperPriceBounds,
-        param.jumpSizes,
-      ),
+      "activeAmnts": newPAmounts(assets, param.baseAmountA0, pprices),
+      "jumpStorage": newPActiveAssets(param.initialPrices, pprices),
     }),
     Dirac,
   );
 
   return new PConstraint(
     pinner,
-    [], // TODO asserts
-    newGenDirac(param, pinner),
+    [newAssertAmountsCongruent(param.baseAmountA0)],
+    pinner.genData,
   );
 };
 
-const newGenDirac = (param: Param, pinner: PObject<Dirac>) => (): Dirac => {
-  const inner = pinner.genData();
-
-  return new Dirac(
-    inner.owner,
-    inner.threadNFT,
-    inner.paramNFT,
-    inner.prices,
-    genAmounts(param.baseAmountA0, inner.prices),
-    genActiveAssets(inner.prices, param.jumpSizes),
-  );
-};
+// TODO consider fees here
+const newAssertAmountsCongruent =
+  (baseAmountA0: Amount) => (dirac: Dirac): void => {
+    const total = sumAmounts(mulValues(dirac.prices, dirac.activeAmnts));
+    assert(
+      total === baseAmountA0,
+      `total ${total} !== baseAmountA0 ${baseAmountA0}`,
+    );
+  };
 
 export type PDiracs = PConstraint<PList<PDirac>>;
 export const newPDiracs = (param: Param): PDiracs => {
@@ -110,17 +102,29 @@ const newGenAllDiracs = (param: Param) => (): Dirac[] => {
   const numDiracs = Number(numTicks) ** numAssets(assets);
   assert(numDiracs <= gMaxHashes, "too many diracs");
 
-  let threadNFT = nextThreadNFT(paramNFT);
-  const prices = param.initialPrices;
-  let diracs = [
-    new Dirac(
+  function genDiracForPrices(prices: Prices): Dirac {
+    const pprices = newPPrices(
+      assets,
+      param.lowerPriceBounds,
+      param.upperPriceBounds,
+      prices,
+      param.jumpSizes,
+    );
+    const genActiveAssets = newGenActiveAssets(prices, pprices);
+    return new Dirac(
       param.owner,
-      threadNFT,
+      nextThreadNFT(paramNFT),
       paramNFT,
       prices,
       genAmounts(param.baseAmountA0, prices),
-      genActiveAssets(prices, param.jumpSizes),
-    ),
+      genActiveAssets(),
+    );
+  }
+
+  let threadNFT = nextThreadNFT(paramNFT);
+  const prices = param.initialPrices;
+  let diracs = [
+    genDiracForPrices(prices),
   ];
   // for each asset and for each existing dirac, "spread" that dirac
   // in that asset's dimension. "spread" means: add all other tick
@@ -136,14 +140,7 @@ const newGenAllDiracs = (param: Param) => (): Dirac[] => {
           threadNFT = nextThreadNFT(threadNFT);
           const prices = addAmount(dirac.prices, asset, offset);
           diracs_.push(
-            new Dirac(
-              param.owner,
-              threadNFT,
-              paramNFT,
-              prices,
-              genAmounts(param.baseAmountA0, prices),
-              genActiveAssets(prices, param.jumpSizes),
-            ),
+            genDiracForPrices(prices),
           );
         }
       });

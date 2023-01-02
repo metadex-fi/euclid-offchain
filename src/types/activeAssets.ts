@@ -1,51 +1,68 @@
-import { PConstraint, PMap } from "../../../refactor_parse/lucid/src/mod.ts";
-import { Asset, Assets, newPAssetOf, PAsset } from "./asset.ts";
-import { Amount } from "./primitive.ts";
+import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
+  genNumber,
+  PConstraint,
+  PMap,
+} from "../../../refactor_parse/lucid/src/mod.ts";
+import { Asset, PAsset, randomAssetOf } from "./asset.ts";
+import { PPrices, Prices } from "./prices.ts";
+import {
+  assetsOf,
   firstAmount,
   firstAssetInValue,
-  JumpSizes,
   lSubValues,
   mulAmounts,
-  newPPrices,
   numAssetsInValue,
-  PPrices,
-  Prices,
   tailValue,
-  Value,
 } from "./value.ts";
 
 export type ActiveAssets = Map<Prices, Asset>;
 export type PActiveAssets = PConstraint<PMap<PPrices, PAsset>>;
 export const newPActiveAssets = (
-  assets: Assets,
-  initialPrices: Prices,
-  lowerPriceBounds: Prices,
-  upperPriceBounds: Prices,
-  jumpSizes: JumpSizes,
+  initialPs: Prices,
+  pprices: PPrices,
 ): PActiveAssets => {
   const pinner = new PMap(
-    newPPrices(assets, lowerBounds, upperBounds),
-    newPAssetOf(assets),
+    pprices,
+    PAsset,
   );
   return new PConstraint(
     pinner,
-    [], // TODO extra asserts (i.e. default active asset)
-    newGenActiveAssets(assets, lowerBounds, upperBounds),
+    [newAssertNotDefault(initialPs)],
+    newGenActiveAssets(initialPs, pprices),
   );
 };
 
-const newAssertDefaultAsset = () => (activeAssets: ActiveAssets) => {
-};
+const newAssertNotDefault =
+  (initialPs: Prices) => (activeAssets: ActiveAssets) => {
+    for (const [location, asset] of activeAssets) {
+      const defaultAsset = defaultActiveAsset(initialPs, location);
+      assert(
+        asset !== defaultAsset,
+        `default asset ${defaultAsset} should not be stored at location ${location}`,
+      );
+    }
+  };
 
-const newAssertJumpSizes = () => (activeAssets: ActiveAssets) => {
-};
-
-const newGenActiveAssets = (
-  assets: Assets,
-  lowerBounds: Value,
-  upperBounds: Value,
-): () => ActiveAssets => {
+// TODO this might lead to some paradoxes, let's see, we might learn something
+const maxJumpStores = 2;
+export const newGenActiveAssets = (
+  initialPs: Prices,
+  pprices: PPrices,
+) =>
+(): ActiveAssets => {
+  const assets = assetsOf(initialPs);
+  const storeSize = genNumber(maxJumpStores);
+  const activeAssets = new Map<Prices, Asset>();
+  const locations: Prices[] = PMap.genKeys(pprices, storeSize);
+  for (const location of locations) {
+    const defaultAsset = defaultActiveAsset(initialPs, location);
+    const asset = randomAssetOf(assets);
+    if (asset !== defaultAsset) {
+      activeAssets.set(location, asset);
+    }
+  }
+  return activeAssets;
 };
 
 function defaultActiveAsset(initPs: Prices, currentPs: Prices): Asset {
@@ -66,43 +83,4 @@ function defaultActiveAsset(initPs: Prices, currentPs: Prices): Asset {
       return defaultActiveAsset(initPs_, currentPs_);
     }
   }
-}
-
-// NOTE just copypasted from generators
-// TODO this might lead to some paradoxes, let's see, we might learn something
-export function genActiveAssets(
-  initialPrices: Value,
-  jumpSizes: Value,
-): ActiveAssets {
-  const assets = assetsOf(initialPrices);
-  const storeSize = genNumber(maxJumpStores);
-  const maxJumps = maxJumpStores;
-  const activeAssets = new Map<Prices, Asset>();
-  const jumpLogs = new Map<string, bigint[]>();
-
-  for (let i = 0; i < storeSize; i++) {
-    let collides = true;
-    const storedPrices = mapAmounts(initialPrices, (amnt, ccy, tkn) => {
-      const assetName = ccy! + tkn!;
-      const jump = randomChoice([-1n, 1n]) * BigInt(genNumber(maxJumps));
-      let jumpLog = jumpLogs.get(assetName);
-      if (jumpLog) {
-        if (!jumpLog.includes(jump)) {
-          jumpLog.push(jump);
-          collides = false;
-        }
-      } else {
-        jumpLog = [jump];
-        jumpLogs.set(assetName, jumpLog);
-        collides = false;
-      }
-      return amnt + jump * amountOf(jumpSizes, ccy!, tkn!)!;
-    });
-    if (!collides) {
-      const storedAsset = randomChoice(assets);
-      activeAssets.set(storedPrices, storedAsset);
-    }
-  }
-
-  return activeAssets;
 }

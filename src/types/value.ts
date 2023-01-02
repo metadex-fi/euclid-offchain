@@ -6,7 +6,6 @@ import {
   RecordOf,
 } from "../../../refactor_parse/lucid/src/mod.ts";
 import { Asset, Assets } from "./asset.ts";
-import { newPPrices, PPrices, Prices } from "./prices.ts";
 import {
   Amount,
   CurrencySymbol,
@@ -163,17 +162,18 @@ export const newCompareWith = (
     defaultIns.length <= op.arguments.length,
     "more defaultIns than op arguments",
   );
-  return (arg: Value, ...args: Array<Value>): boolean => {
+  return (arg = newValue(), ...args: Array<Value | undefined>): boolean => {
     assert(
       1 + args.length === op.arguments.length,
       "args length must match op arguments length",
     );
-    const assets = assetsOf(arg, ...args);
+    const args_ = args.map((v) => v ?? newValue());
+    const assets = assetsOf(arg, ...args_);
     for (const [currencySymbol, tokens] of assets) {
       for (const tokenName of tokens) {
         const asset = new Asset(currencySymbol, tokenName);
         const amountsIn = new Array<Amount>();
-        [arg, ...args].forEach((v, i) => {
+        [arg, ...args_].forEach((v, i) => {
           const defaultIn = defaultIns[i];
           const amountIn = amountOf(v, asset, defaultIn);
           amountsIn.push(amountIn);
@@ -214,18 +214,22 @@ export const newUnionWith = (
     defaultIns.length <= op.arguments.length,
     "more defaultIns than op arguments",
   );
-  return (arg: Value, ...args: Array<Value>): Value => {
+  return (
+    arg: Value = newValue(),
+    ...args: Array<Value | undefined>
+  ): Value => {
     assert(
       1 + args.length === op.arguments.length,
       "args length must match op arguments length",
     );
-    const assets = assetsOf(arg, ...args);
+    const args_ = args.map((v) => v ?? newValue());
+    const assets = assetsOf(arg, ...args_);
     const value = newValue();
     for (const [currencySymbol, tokens] of assets) {
       for (const tokenName of tokens) {
         const asset = new Asset(currencySymbol, tokenName);
         const amountsIn = new Array<Amount>();
-        [arg, ...args].forEach((v, i) => {
+        [arg, ...args_].forEach((v, i) => {
           const defaultIn = defaultIns[i];
           amountsIn.push(amountOf(v, asset, defaultIn));
         });
@@ -267,6 +271,10 @@ export function zeroAmounts(): (value: Value) => Value {
 
 export function infAmounts(): (value: Value) => Value {
   return setAmounts(BigInt(maxInteger));
+}
+
+export function mulAmounts(value: Value, amount: Amount): Value {
+  return newMapAmounts((a) => a * amount)(value);
 }
 
 export function numAssetsInValue(v: Value): number {

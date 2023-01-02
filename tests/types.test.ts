@@ -1,21 +1,22 @@
-import {
-  assert,
-  assertEquals,
-  assertNotEquals,
-} from "https://deno.land/std@0.145.0/testing/asserts.ts";
-import { Data, genInteger } from "../../lucid-data-parse/lucid/mod.ts";
+import { Generators,PInteger,PByteString,PList,PMap,PConstr,PRecord,PMapRecord,PObject } from "../../refactor_parse/lucid/src/mod.ts";
+import { propertyTestPTypesParsing } from "../../refactor_parse/lucid/tests/plutus.types.test.ts";
 
-Deno.test("metatest", async () => {
-  assertEquals(2, 2);
-});
-
-Deno.test("metatest", async () => {
-  const i = genInteger(5);
-  assertEquals(i[0], i[1]);
-});
-
-Deno.test("diracs", async () => {
-  const dirac = genDirac();
-  const data = Data.to(dirac);
-  assertEquals(dirac, Data.from(data, DiracShape));
+Deno.test("parsing property tests", () => {
+  const gen = new Generators(
+    [
+      // PData.genPType,
+      PInteger.genPType,
+      PByteString.genPType,
+    ],
+    [
+      PList.genPType,
+      PMap.genPType,
+      PConstr.genPType,
+      PRecord.genPType,
+      PMapRecord.genPType,
+      // PSum.genPType,
+      PObject.genPType,
+    ],
+  );
+  propertyTestPTypesParsing(gen);
 });
