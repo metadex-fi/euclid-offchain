@@ -22,6 +22,7 @@ export const newValue = (): Value => {
   return new Map<string, Map<string, bigint>>();
 };
 
+// @ts-ignore TODO consider fixing this, or leaving as is
 export type PValue<A extends PNum> = PMapRecord<PMapRecord<PBounded<A>>>;
 export const newNewPValue =
   <PAmnt extends PNum>(I: PAmnt) =>
@@ -120,14 +121,29 @@ export function amountOf(
 ): Amount {
   const amount = value.get(asset.currencySymbol)?.get(asset.tokenName) ??
     defaultAmnt;
-  assert(amount, `amount not found for asset ${asset}`);
+  assert(
+    amount,
+    `amountOf: amount not found for asset ${JSON.stringify(asset)} in ${
+      showValue(value)
+    }`,
+  );
   return amount;
 }
 
 export function setAmountOf(value: Value, asset: Asset, amount: Amount): void {
   const tokens = value.get(asset.currencySymbol);
-  assert(tokens, `tokens not found for asset ${asset}`);
-  assert(tokens.has(asset.tokenName), `amount not found for asset ${asset}`);
+  assert(
+    tokens,
+    `setAmountOf: tokens not found for asset ${JSON.stringify(asset)} in ${
+      showValue(value)
+    }`,
+  );
+  assert(
+    tokens.has(asset.tokenName),
+    `setAmountOf: amount not found for asset ${JSON.stringify(asset)} in ${
+      showValue(value)
+    }`,
+  );
   tokens.set(asset.tokenName, amount);
 }
 
@@ -136,7 +152,9 @@ export function initAmountOf(value: Value, asset: Asset, amount: Amount): void {
   if (tokens) {
     assert(
       !tokens.has(asset.tokenName),
-      `amount already set for asset ${asset}`,
+      `initAmountOf: amount already set for asset ${JSON.stringify(asset)} in ${
+        showValue(value)
+      }`,
     );
     tokens.set(asset.tokenName, amount);
   } else {
@@ -158,15 +176,15 @@ export const newCompareWith = (
   op: (arg: Amount, ...args: Array<Amount>) => boolean,
   ...defaultIns: Array<Amount | undefined>
 ) => {
-  assert(
-    defaultIns.length <= op.arguments.length,
-    "more defaultIns than op arguments",
-  );
+  // assert( // TODO FIXME
+  //   defaultIns.length <= op.arguments.length,
+  //   "more defaultIns than op arguments",
+  // );
   return (arg = newValue(), ...args: Array<Value | undefined>): boolean => {
-    assert(
-      1 + args.length === op.arguments.length,
-      "args length must match op arguments length",
-    );
+    // assert( // TODO FIXME
+    //   1 + args.length === op.arguments.length,
+    //   "args length must match op arguments length",
+    // );
     const args_ = args.map((v) => v ?? newValue());
     const assets = assetsOf(arg, ...args_);
     for (const [currencySymbol, tokens] of assets) {
@@ -187,15 +205,16 @@ export const newCompareWith = (
   };
 };
 
+// TODO better "infinity" values. Maybe use onchain maximum?
 export const lt = newCompareWith(
   (a, b) => a < b,
-  -BigInt(Infinity),
-  BigInt(Infinity),
+  -BigInt(maxInteger),
+  BigInt(maxInteger),
 );
 export const leq = newCompareWith(
   (a, b) => a <= b,
-  -BigInt(Infinity),
-  BigInt(Infinity),
+  -BigInt(maxInteger),
+  BigInt(maxInteger),
 );
 
 export const newAmountsCheck = (op: (arg: Amount) => boolean) =>
@@ -210,18 +229,18 @@ export const newUnionWith = (
   defaultOut?: Amount,
   ...defaultIns: Array<Amount | undefined>
 ) => {
-  assert(
-    defaultIns.length <= op.arguments.length,
-    "more defaultIns than op arguments",
-  );
+  // assert( // TODO FIXME
+  //   defaultIns.length <= op.arguments.length,
+  //   "more defaultIns than op arguments",
+  // );
   return (
     arg: Value = newValue(),
     ...args: Array<Value | undefined>
   ): Value => {
-    assert(
-      1 + args.length === op.arguments.length,
-      "args length must match op arguments length",
-    );
+    // assert( TODO FIXME
+    //   1 + args.length === op.arguments.length,
+    //   "args length must match op arguments length",
+    // );
     const args_ = args.map((v) => v ?? newValue());
     const assets = assetsOf(arg, ...args_);
     const value = newValue();
@@ -333,4 +352,16 @@ export function sumAmounts(v: Value): Amount {
     }
   }
   return sum;
+}
+
+export function showValue(value: Value): string {
+  const value_ = new Map<CurrencySymbol, Map<TokenName, number>>();
+  for (const [ccy, tokens] of value) {
+    const tokens_ = new Map<TokenName, number>();
+    for (const [tkn, amount] of tokens) {
+      tokens_.set(tkn, Number(amount));
+    }
+    value_.set(ccy, tokens_);
+  }
+  return JSON.stringify(value_);
 }

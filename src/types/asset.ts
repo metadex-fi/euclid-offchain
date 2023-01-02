@@ -12,9 +12,7 @@ import { newPNonEmptyMap, PNonEmptyMap } from "./nonEmptyMap.ts";
 import {
   CurrencySymbol,
   PCurrencySymbol,
-  PCurrencySymbolLiteral,
   PTokenName,
-  PTokenNameLiteral,
   TokenName,
 } from "./primitive.ts";
 

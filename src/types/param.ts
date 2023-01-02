@@ -4,13 +4,14 @@ import {
   PRecord,
 } from "../../../refactor_parse/lucid/src/mod.ts";
 import { PAssets, randomAssetsOf } from "./asset.ts";
+import { newPPrices, Prices } from "./prices.ts";
 import {
   Amount,
   newPAmount,
   newPPaymentKeyHashLiteral,
   PPaymentKeyHash,
 } from "./primitive.ts";
-import { JumpSizes, newPJumpSizes, newPPrices, Prices } from "./value.ts";
+import { JumpSizes, newPJumpSizes, newPPositiveValue } from "./value.ts";
 
 // TODO assertions about lower < initial < upper prices
 export class Param {
@@ -31,8 +32,8 @@ export const genPParam = (): PParam => {
 
   const powner = newPPaymentKeyHashLiteral(PPaymentKeyHash.genData());
   const pjumpSizes = newPJumpSizes(assets);
-  const plowerPriceBounds = newPPrices(lowerBoundedAssets);
-  const pupperPriceBounds = newPPrices(upperBoundedAssets);
+  const plowerPriceBounds = newPPositiveValue(lowerBoundedAssets);
+  const pupperPriceBounds = newPPositiveValue(upperBoundedAssets);
 
   const lowerPriceBounds = plowerPriceBounds.genData();
   const upperPriceBounds = pupperPriceBounds.genData();
