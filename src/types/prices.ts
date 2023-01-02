@@ -1,23 +1,14 @@
 import {
+  genNonNegative,
+  genNumber,
+  genPositive,
+  maxInteger,
   PConstraint,
   randomChoice,
 } from "../../../refactor_parse/lucid/src/mod.ts";
 import { Assets } from "./asset.ts";
 import { Amount } from "./primitive.ts";
-import {
-
-divStrict,
-divValues,
-JumpSizes,
-lSubValues,
-minValues,
-negate,
-newValue,
-PValue,
-  setAmounts,
-  subValues,
-  Value,
-} from "./value.ts";
+import { JumpSizes, newUnionWith, newValue, PValue, Value } from "./value.ts";
 
 export type Prices = Value;
 export type PPrices = PConstraint<PValue>;
@@ -40,7 +31,7 @@ export const newPPrices = (
     ),
   );
 };
-export const gMaxJumps = 3n;
+export const gMaxJumps = 3;
 const newGenPrices = (
   pinner: PValue,
   initialPrices?: Prices,
@@ -48,18 +39,49 @@ const newGenPrices = (
 ) =>
 (): Prices => {
   if (initialPrices && jumpSizes) {
-    const max = setAmounts(initialPrices, gMaxJumps);
-    const init = divStrict(initialPrices, jumpSizes);
+    
+    // jump the price of each asset from initial price,
+    // a random number of times,
+    // with the respective jump size,
+    // while respecting the bounds
+    const jumpOne = (
+      lowerBound: Amount,
+      upperBound: Amount,
+      initP: Amount,
+      jumpSize: Amount,
+    ): Amount => {
+      function jumps(): Amount {
+        const direction = randomChoice([-1n, 0n, 1n]);
+        switch (direction) {
+          case 1n: {
+            const maxJumps = Math.min(
+              gMaxJumps,
+              Number((upperBound - initP) / jumpSize),
+            );
+            return BigInt(genPositive(maxJumps));
+          }
+          case -1n: {
+            const maxJumps = Math.min(
+              gMaxJumps,
+              Number((initP - lowerBound) / jumpSize),
+            );
+            return -BigInt(genPositive(maxJumps));
+          }
+          default:
+            return 0n;
+        }
+      }
+      return initP + jumpSize * jumps();
+    };
 
-    let up = divValues(pinner.upperBounds ?? newValue(), jumpSizes);
-    up = lSubValues(up, init);
-    up = minValues(up, max);
+    const jumpAll = newUnionWith(jumpOne, undefined, 1n, BigInt(maxInteger));
 
-    let down = divValues(pinner.lowerBounds ?? newValue(), jumpSizes);
-    down = negate(lSubValues(down, init));
-    down = minValues(down, max);
-
-    //TODO continue here
+    return jumpAll(
+      pinner.lowerBounds ?? newValue(),
+      pinner.upperBounds ?? newValue(),
+      initialPrices,
+      jumpSizes,
+    );
 
   } else return pinner.genData();
 };

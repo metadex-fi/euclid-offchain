@@ -1,6 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   genNumber,
+  maxInteger,
   PConstraint,
   PType,
 } from "../../../refactor_parse/lucid/src/mod.ts";
@@ -161,11 +162,14 @@ export type PJumpSizes = PPrices;
 export const newPJumpSizes = newPPrices;
 
 export function assetsOf(
-  value: Map<CurrencySymbol, Map<TokenName, unknown>>,
+  ...values: Array<Map<CurrencySymbol, Map<TokenName, unknown>>>
 ): Assets {
   const assets = new Map<CurrencySymbol, TokenName[]>();
-  for (const [currencySymbol, tokens] of value) {
-    assets.set(currencySymbol, [...tokens.keys()]);
+  for (const value of values) {
+    for (const [currencySymbol, tokenMap] of value) {
+      const tokens = assets.get(currencySymbol) ?? [];
+      assets.set(currencySymbol, [...tokens, ...tokenMap.keys()]);
+    }
   }
   return assets;
 }
@@ -188,6 +192,21 @@ export function setAmountOf(value: Value, asset: Asset, amount: Amount): void {
   tokens.set(asset.tokenName, amount);
 }
 
+export function initAmountOf(value: Value, asset: Asset, amount: Amount): void {
+  const tokens = value.get(asset.currencySymbol);
+  if (tokens) {
+    assert(
+      !tokens.has(asset.tokenName),
+      `amount already set for asset ${asset}`,
+    );
+    tokens.set(asset.tokenName, amount);
+  } else {
+    const tokens = new Map<TokenName, Amount>();
+    tokens.set(asset.tokenName, amount);
+    value.set(asset.currencySymbol, tokens);
+  }
+}
+
 export function singleton(asset: Asset, amount: Amount): Value {
   const value = newValue();
   const tokens = new Map<TokenName, Amount>();
@@ -196,51 +215,46 @@ export function singleton(asset: Asset, amount: Amount): Value {
   return value;
 }
 
-const newUnionWith = (
-  op: (a: Amount, b: Amount) => Amount,
+export const newUnionWith = (
+  op: (arg: Amount, ...args: Array<Amount>) => Amount,
   defaultOut?: Amount,
-  defaultA?: Amount,
-  defaultB?: Amount,
-) =>
-(
-  a: Value,
-  b: Value,
-): Value => {
-  const assets = assetsOf(a);
-  const value = newValue();
-  for (const [currencySymbol, tokens] of assets) {
-    for (const tokenName of tokens) {
-      const asset = new Asset(currencySymbol, tokenName);
-      const amountA = amountOf(a, asset, defaultA);
-      const amountB = amountOf(b, asset, defaultB);
-      const amountOut = op(amountA, amountB);
-      if (amountOut !== defaultOut) {
-        setAmountOf(value, asset, op(amountA, amountB));
+  ...defaultIns: Array<Amount | undefined>
+) => {
+  assert(
+    defaultIns.length <= op.arguments.length,
+    "more defaultIns than op arguments",
+  );
+  return (arg: Value, ...args: Array<Value>): Value => {
+    assert(
+      1 + args.length === op.arguments.length,
+      "args length must match op arguments length",
+    );
+    const assets = assetsOf(arg, ...args);
+    const value = newValue();
+    for (const [currencySymbol, tokens] of assets) {
+      for (const tokenName of tokens) {
+        const asset = new Asset(currencySymbol, tokenName);
+        const amountsIn = new Array<Amount>();
+        [arg, ...args].forEach((v, i) => {
+          const defaultIn = defaultIns[i];
+          amountsIn.push(amountOf(v, asset, defaultIn));
+        });
+        const amountOut = op(amountsIn[0], ...amountsIn.slice(1));
+        if (amountOut !== defaultOut) {
+          initAmountOf(value, asset, amountOut);
+        }
       }
     }
-  }
-  return value;
+    return value;
+  };
 };
 
-export const addStrict = newUnionWith((a, b) => a + b, 0n);
-export const subStrict = newUnionWith((a, b) => a - b, 0n);
-export const mulStrict = newUnionWith((a, b) => a * b, 0n);
-export const divStrict = newUnionWith((a, b) => a / b, 0n);
+export const addValues = newUnionWith((a, b) => a + b);
+export const subValues = newUnionWith((a, b) => a - b);
+export const mulValues = newUnionWith((a, b) => a * b);
+export const divValues = newUnionWith((a, b) => a / b);
 
 export const lSubValues = newUnionWith((a, b) => a > b ? a - b : 0n, 0n);
-
-export const addValues = newUnionWith((a, b) => a + b, 0n, 0n, 0n);
-export const subValues = newUnionWith((a, b) => a - b, 0n, 0n, 0n);
-export const mulValues = newUnionWith((a, b) => a * b, 0n, 0n, 0n);
-export const divValues = newUnionWith((a, b) => a / b, 0n, 0n);
-
-export const minValues = newUnionWith(
-  (a, b) => a === 0n ? b : b === 0n ? a : a < b ? a : b,
-  0n,
-  0n,
-  0n,
-);
-
 
 export const addAmount = (v: Value, asset: Asset, amount: Amount): Value => {
   const add = newUnionWith((a, b) => a + b, 0n, undefined, 0n);
@@ -248,35 +262,21 @@ export const addAmount = (v: Value, asset: Asset, amount: Amount): Value => {
   return value;
 };
 
-function mapAmounts(
-  value: Value,
-  f: (amount: Amount) => Amount,
-): Value {
-  const value_ = newValue();
-  for (const [ccy, tknAmnts] of value) {
-    const tknAmnts_ = new Map<TokenName, Amount>();
-    for (const [tkn, amnt] of tknAmnts) {
-      tknAmnts_.set(tkn, f(amnt));
-    }
-    value_.set(ccy, tknAmnts_);
-  }
-  return value_;
+export const newMapAmounts = (op: (arg: Amount) => Amount) =>
+  newUnionWith(
+    (a) => op(a),
+  );
+
+export function setAmounts(amount: Amount): (value: Value) => Value {
+  return newMapAmounts(() => amount);
 }
 
-export function setAmounts(value: Value, amount: Amount): Value {
-  return mapAmounts(value, () => amount);
+export function zeroAmounts(): (value: Value) => Value {
+  return setAmounts(0n);
 }
 
-export function mulAmounts(value: Value, factor: Amount): Value {
-  return mapAmounts(value, (amount) => amount * factor);
-}
-
-export function maxAmounts(value: Value, max: Amount): Value {
-  return mapAmounts(value, (amnt: Amount) => max > amnt ? amnt : max);
-}
-
-export function negate(value: Value): Value {
-  return mapAmounts(value, (amount) => -amount);
+export function infAmounts(): (value: Value) => Value {
+  return setAmounts(BigInt(maxInteger));
 }
 
 export function numAssetsInValue(v: Value): number {
