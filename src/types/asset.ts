@@ -12,7 +12,9 @@ import { newPNonEmptyMap, PNonEmptyMap } from "./nonEmptyMap.ts";
 import {
   CurrencySymbol,
   PCurrencySymbol,
+  PCurrencySymbolLiteral,
   PTokenName,
+  PTokenNameLiteral,
   TokenName,
 } from "./primitive.ts";
 
@@ -119,13 +121,3 @@ export function numAssets(assets: Assets): number {
   }
   return n;
 }
-
-// export function flattenAssets(assets: Assets): Asset[] {
-//   const assets_ = [];
-//   for (const [ccy, tkns] of assets) {
-//     for (const tkn of tkns) {
-//       assets_.push(new Asset(ccy, tkn));
-//     }
-//   }
-//   return assets_;
-// }
