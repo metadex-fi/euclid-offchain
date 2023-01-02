@@ -1,18 +1,11 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
-  genNumber,
   maxInteger,
-  PConstraint,
+  PInteger,
   PMapRecord,
   RecordOf,
 } from "../../../refactor_parse/lucid/src/mod.ts";
-import {
-  Asset,
-  Assets,
-  firstAsset,
-  randomAssetsOf,
-  tailAssets,
-} from "./asset.ts";
+import { Asset, Assets } from "./asset.ts";
 import { newPPrices, PPrices, Prices } from "./prices.ts";
 import {
   Amount,
@@ -20,6 +13,7 @@ import {
   newPBounded,
   PBounded,
   PNum,
+  PPositive,
   TokenName,
 } from "./primitive.ts";
 
@@ -29,31 +23,52 @@ export const newValue = (): Value => {
   return new Map<string, Map<string, bigint>>();
 };
 
-export type PValue<A extends PNum> = 
-  PMapRecord<PMapRecord<PBounded<A>>>
+export type PValue<A extends PNum> = PMapRecord<PMapRecord<PBounded<A>>>;
 export const newNewPValue =
-  <A extends PNum>(A: A) =>
-  (assets: Assets, lowerBounds?: Value, upperBounds?: Value): PValue<A> => {
+  <PAmnt extends PNum>(I: PAmnt) =>
+  (assets: Assets, lowerBounds?: Value, upperBounds?: Value): PValue<PAmnt> => {
     assert(
       !lowerBounds || !upperBounds || lt(lowerBounds, upperBounds),
       "lowerBounds must be less than upperBounds",
     );
-    const value: RecordOf<PMapRecord<PBounded<A>>> = {};
+    assert(
+      !lowerBounds || onlyAssetsOf(assets, lowerBounds),
+      "lowerBounds has unknown asset",
+    );
+    assert(
+      !upperBounds || onlyAssetsOf(assets, upperBounds),
+      "upperBounds has unknown asset",
+    );
+    const value: RecordOf<PMapRecord<PBounded<PAmnt>>> = {};
     for (const [currencySymbol, tokens] of assets) {
-      const pamounts: RecordOf<PBounded<A>> = {};
+      const pamounts: RecordOf<PBounded<PAmnt>> = {};
       for (const tokenName of tokens) {
         const lowerBound = lowerBounds?.get(currencySymbol)?.get(tokenName);
         const upperBound = upperBounds?.get(currencySymbol)?.get(tokenName);
-        pamounts[tokenName] = newPBounded(A, lowerBound, upperBound);
+        pamounts[tokenName] = newPBounded(I, lowerBound, upperBound);
       }
       value[currencySymbol] = new PMapRecord(pamounts);
     }
     return new PMapRecord(value);
   };
+export const newPValue = newNewPValue(new PInteger());
 
-export type JumpSizes = Prices;
-export type PJumpSizes = PPrices;
-export const newPJumpSizes = newPPrices;
+export type PPositiveValue = PValue<PPositive>;
+export const newPPositiveValue = (
+  assets: Assets,
+  lowerBounds?: Value,
+  upperBounds?: Value,
+): PPositiveValue => {
+  assert(
+    !lowerBounds || allPositive(lowerBounds),
+    "lowerBounds must be positive",
+  );
+  return newNewPValue(PPositive)(assets, lowerBounds, upperBounds);
+};
+
+export type JumpSizes = Value;
+export type PJumpSizes = PPositiveValue;
+export const newPJumpSizes = newPPositiveValue;
 
 export function assetsOf(
   ...values: Array<Map<CurrencySymbol, Map<TokenName, unknown>>>
@@ -66,6 +81,37 @@ export function assetsOf(
     }
   }
   return assets;
+}
+
+export function onlyAssetsOf(assets: Assets, value: Value): boolean {
+  for (const [currencySymbol, tokens] of value) {
+    if (!assets.has(currencySymbol)) {
+      return false;
+    }
+    for (const tokenName of tokens.keys()) {
+      if (!assets.get(currencySymbol)?.includes(tokenName)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+export function exactAssetsOf(assets: Assets, value: Value): boolean {
+  for (const [currencySymbol, tokens] of value) {
+    if (!assets.has(currencySymbol)) {
+      return false;
+    }
+    if (assets.get(currencySymbol)?.length !== tokens.size) {
+      return false;
+    }
+    for (const tokenName of tokens.keys()) {
+      if (!assets.get(currencySymbol)?.includes(tokenName)) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 export function amountOf(
@@ -146,6 +192,18 @@ export const lt = newCompareWith(
   -BigInt(Infinity),
   BigInt(Infinity),
 );
+export const leq = newCompareWith(
+  (a, b) => a <= b,
+  -BigInt(Infinity),
+  BigInt(Infinity),
+);
+
+export const newAmountsCheck = (op: (arg: Amount) => boolean) =>
+  newCompareWith(
+    (a) => op(a),
+  );
+
+export const allPositive = newAmountsCheck((a) => a > 0n);
 
 export const newUnionWith = (
   op: (arg: Amount, ...args: Array<Amount>) => Amount,

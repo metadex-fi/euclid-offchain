@@ -1,6 +1,5 @@
+import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
-  genNonNegative,
-  genNumber,
   genPositive,
   maxInteger,
   PConstraint,
@@ -8,12 +7,22 @@ import {
 } from "../../../refactor_parse/lucid/src/mod.ts";
 import { Assets } from "./asset.ts";
 import { Amount } from "./primitive.ts";
-import { JumpSizes, newUnionWith, newValue, PValue, Value } from "./value.ts";
+import {
+  exactAssetsOf,
+  JumpSizes,
+  leq,
+  newCompareWith,
+  newPPositiveValue,
+  newUnionWith,
+  newValue,
+  PPositiveValue,
+  Value,
+} from "./value.ts";
 
 export const gMaxJumps = 3;
 
 export type Prices = Value;
-export type PPrices = PConstraint<PValue>;
+export type PPrices = PConstraint<PPositiveValue>;
 export const newPPrices = (
   assets: Assets,
   lowerBounds?: Prices,
@@ -21,29 +30,78 @@ export const newPPrices = (
   initialPrices?: Prices,
   jumpSizes?: JumpSizes,
 ): PPrices => {
-  const pinner = new PValue(assets, lowerBounds, upperBounds, 1n);
+  if (initialPrices) {
+    assert(
+      !lowerBounds || leq(lowerBounds, initialPrices),
+      "lowerBounds must be less than or equal to initialPrices",
+    );
+    assert(
+      !upperBounds || leq(initialPrices, upperBounds),
+      "initialPrices must be less than or equal to upperBounds",
+    );
+    assert(
+      exactAssetsOf(assets, initialPrices),
+      "initialPrices misaligned with assets",
+    );
+    assert(jumpSizes, "jumpSizes must be defined if initialPrices is defined");
+    assert(
+      exactAssetsOf(assets, jumpSizes),
+      "jumpSizes misaligned with assets",
+    );
+  } else {
+    assert(
+      !jumpSizes,
+      "jumpSizes must be undefined if initialPrices is undefined",
+    );
+  }
 
-  return new PConstraint<PValue>(
+  const pinner = newPPositiveValue(assets, lowerBounds, upperBounds);
+
+  return new PConstraint<PPositiveValue>(
     pinner,
-    [], // TODO asserts
+    [newAssertPricesCongruent(initialPrices, jumpSizes)],
     newGenPrices(
       pinner,
+      lowerBounds,
+      upperBounds,
       initialPrices,
       jumpSizes,
     ),
   );
 };
 
+const newAssertPricesCongruent =
+  (initPs?: Prices, jumpSizes?: JumpSizes) => (currentPs: Prices): void => {
+    if (!initPs || !jumpSizes) {
+      return;
+    } else {
+      const singlePriceCongruent = (
+        initP: Amount,
+        currentP: Amount,
+        jumpSize: Amount,
+      ): boolean => {
+        return (currentP - initP) % jumpSize === 0n;
+      };
+      const allPricesCongruent = newCompareWith(singlePriceCongruent);
+      assert(
+        allPricesCongruent(initPs, currentPs, jumpSizes),
+        "prices out of whack",
+      );
+    }
+  };
+
 const newGenPrices = (
-  pinner: PValue,
+  pinner: PPositiveValue,
+  lowerBounds?: Prices,
+  upperBounds?: Prices,
   initialPrices?: Prices,
   jumpSizes?: JumpSizes,
 ) =>
 (): Prices => {
   return (initialPrices && jumpSizes)
     ? jumpPrices(
-      pinner.lowerBounds ?? newValue(),
-      pinner.upperBounds ?? newValue(),
+      lowerBounds ?? newValue(),
+      upperBounds ?? newValue(),
       initialPrices,
       jumpSizes,
     )
@@ -60,7 +118,7 @@ const jumpPrices = (
   // a random number of times,
   // with the respective jump size,
   // while respecting the bounds
-  const jumpOne = (
+  const jumpSingleAsset = (
     lowerBound: Amount,
     upperBound: Amount,
     initP: Amount,
@@ -90,9 +148,14 @@ const jumpPrices = (
     return initP + jumpSize * jumps();
   };
 
-  const jumpAll = newUnionWith(jumpOne, undefined, 1n, BigInt(maxInteger));
+  const jumpAllAssets = newUnionWith(
+    jumpSingleAsset,
+    undefined,
+    1n,
+    BigInt(maxInteger),
+  );
 
-  return jumpAll(
+  return jumpAllAssets(
     lowerBounds,
     upperBounds,
     initialPrices,
