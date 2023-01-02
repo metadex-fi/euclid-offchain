@@ -316,3 +316,13 @@ export function tailValue(v: Value): Value {
   }
   return tail;
 }
+
+export function sumAmounts(v: Value): Amount {
+  let sum = 0n;
+  for (const [_, tokens] of v) {
+    for (const [_, amount] of tokens) {
+      sum += amount;
+    }
+  }
+  return sum;
+}

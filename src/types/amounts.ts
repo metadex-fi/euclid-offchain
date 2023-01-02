@@ -2,58 +2,54 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   genNumber,
   PConstraint,
-  PType,
 } from "../../../refactor_parse/lucid/src/mod.ts";
-import {
-  Asset,
-  Assets,
-  firstAsset,
-  randomAssetsOf,
-  tailAssets,
-} from "./asset.ts";
+import { Asset, firstAsset, randomAssetsOf, tailAssets } from "./asset.ts";
 import { PPrices, Prices } from "./prices.ts";
-import {
-  Amount,
-  CurrencySymbol,
-  newPAmount,
-  PAmount,
-  TokenName,
-} from "./primitive.ts";
+import { Amount } from "./primitive.ts";
 import {
   amountOf,
   assetsOf,
+  mulValues,
+  newPPositiveValue,
   newValue,
-  PValue,
+  PPositiveValue,
   setAmountOf,
+  sumAmounts,
   Value,
 } from "./value.ts";
 
 export type Amounts = Value;
-export type PAmounts = PConstraint<PValue>;
-export const newPAmounts = (
+export type PAmounts = PConstraint<PPositiveValue>;
+export const genPAmounts = (
   baseAmountA0: bigint,
   pprices: PPrices,
 ): PAmounts => {
-  const assets = assetsOf(pprices.pamounts);
-  const pinner = new PValue(assets, undefined, undefined, 1n);
-  // const asserts = []; // TODO asserts, ideally inverse to the other stuff
+  const prices = pprices.genData();
+  const assets = assetsOf(prices);
+  const pinner = newPPositiveValue(assets);
 
   return new PConstraint(
     pinner,
-    [],
-    newGenAmounts(baseAmountA0, pprices),
+    [newAssertAmountsCongruent(baseAmountA0, prices)], // TODO only looking at Datums, add Values
+    newGenAmounts(baseAmountA0, prices),
   );
 };
 
-const newGenAmounts = (baseAmountA0: bigint, pprices: PPrices) => (): Value => {
-  const prices = pprices.genData();
-  return genAmounts(baseAmountA0, prices);
-};
+// TODO consider fees
+const newAssertAmountsCongruent =
+  (baseAmountA0: Amount, prices: Prices) => (amounts: Amounts): void => {
+    const total = sumAmounts(mulValues(amounts, prices));
+    assert(
+      total === baseAmountA0,
+      `total ${total} !== baseAmountA0 ${baseAmountA0}`,
+    );
+  };
 
-export function genAmounts(
-  baseAmountA0: bigint,
+const newGenAmounts = (
+  baseAmountA0: Amount,
   prices: Prices,
-): Value {
+) =>
+(): Value => {
   const assets = assetsOf(prices);
   const denom = firstAsset(assets)!;
   const nonzero = randomAssetsOf(assets);
@@ -72,8 +68,4 @@ export function genAmounts(
   const p = amountOf(prices, firstAsset(nonzero))!;
   setAmountOf(amounts, firstAsset(nonzero), (amountA0 * p) / p0);
   return amounts;
-}
-
-export type JumpSizes = Amounts;
-export type PJumpSizes = PAmounts;
-export const newPJumpSizes = newPAmounts;
+};
