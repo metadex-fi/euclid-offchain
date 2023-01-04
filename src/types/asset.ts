@@ -1,14 +1,14 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
-  PConstraint,
+  f,
   PMap,
   PObject,
   PRecord,
   randomChoice,
+  t,
 } from "../../../refactor_parse/lucid/src/mod.ts";
 import { randomSubset } from "../../tests/generators.ts";
-import { newPNonEmptyList, PNonEmptyList } from "./nonEmptyList.ts";
-import { newPNonEmptyMap, PNonEmptyMap } from "./nonEmptyMap.ts";
+import { PNonEmptyList } from "./nonEmptyList.ts";
 import {
   CurrencySymbol,
   PCurrencySymbol,
@@ -22,100 +22,144 @@ export class Asset {
     public tokenName: TokenName,
   ) {}
 }
-export type PAsset = PObject<Asset>;
-export const PAsset: PAsset = new PObject(
-  new PRecord(
-    {
-      "currencySymbol": PCurrencySymbol,
-      "tokenName": PTokenName,
-    },
-  ),
-  Asset,
-);
-
-export type PAssetOf = PConstraint<PAsset>;
-export const newPAssetOf = (assets: Assets): PAssetOf => {
-  return new PConstraint<PAsset>(
-    PAsset,
-    [newAssertAssetOf(assets)],
-    () => {
-      return randomAssetOf(assets);
-    },
-  );
-};
-
-const newAssertAssetOf = (assets: Assets) => (asset: Asset): void => {
-  assert(assets.has(asset.currencySymbol), "currencySymbol not in assets");
-  assert(
-    assets.get(asset.currencySymbol)!.includes(asset.tokenName),
-    "tokenName not in assets",
-  );
-};
-
-const NonEmptyTokenList = newPNonEmptyList(PTokenName);
-
-export type Assets = Map<CurrencySymbol, TokenName[]>;
-export type PAssets = PMap<PCurrencySymbol, PNonEmptyList<PTokenName>>;
-export const PAssets: PAssets = new PMap(
-  PCurrencySymbol,
-  NonEmptyTokenList,
-);
-
-export type PNonEmptyAssets = PNonEmptyMap<
-  PCurrencySymbol,
-  PNonEmptyList<PTokenName>
->;
-export const PNonEmptyAssets: PNonEmptyAssets = newPNonEmptyMap(
-  PCurrencySymbol,
-  NonEmptyTokenList,
-);
-
-export function firstAsset(assets: Assets): Asset {
-  for (const [ccy, tkns] of assets) {
-    for (const tkn in tkns) {
-      return new Asset(ccy, tkn);
-    }
+export class PAsset extends PObject<Asset> {
+  constructor() {
+    super(
+      new PRecord(
+        {
+          "currencySymbol": PCurrencySymbol,
+          "tokenName": PTokenName,
+        },
+      ),
+      Asset,
+    );
   }
-  throw new Error("unexpected empty Value");
+
+  static ptype = new PAsset();
+  static genPType(): PObject<Asset> {
+    return PAsset.ptype;
+  }
 }
 
-export function tailAssets(assets: Assets): Assets {
-  assert(assets.size > 0, "empty assets tell no tails");
-  const tail = new Map();
-  let first = true;
-  for (const [ccy, tkns] of assets) {
-    if (first) {
-      assert(tkns.length > 0, "empty token map");
-      if (tkns.length > 1) {
-        const tail_ = tkns.slice(1);
-        tail.set(ccy, tail_);
+// export class PAssetOf extends PConstraint<PAsset> {
+//   constructor(assets: Assets) {
+//     assert(assets.size > 0, "assets must be non-empty");
+//     super(
+//       PAsset.ptype,
+//       [newAssertAssetOf(assets)],
+//       () => {
+//         return randomAssetOf(assets);
+//       },
+//     );
+//   }
+
+//   static genPType(): PConstraint<PAsset> {
+//     const timeout = 1000;
+//     for (let i = 0; i < timeout; i++) {
+//       const assets = PAssets.genPType().genData();
+//       if (assets.size > 0) {
+//         return new PAssetOf(assets);
+//       }
+//     }
+//     throw new Error("failed to generate non-empty assets");
+//   }
+// }
+
+// const newAssertAssetOf = (assets: Assets) => (asset: Asset): void => {
+//   assert(assets.has(asset.currencySymbol), "currencySymbol not in assets");
+//   assert(
+//     assets.get(asset.currencySymbol)!.includes(asset.tokenName),
+//     "tokenName not in assets",
+//   );
+// };
+
+const PNonEmptyTokenList = new PNonEmptyList(PTokenName);
+
+export class Assets {
+  constructor(
+    public assets: Map<CurrencySymbol, Array<TokenName>> = new Map(),
+  ) {}
+
+  public show = (tabs = ""): string => {
+    const ttf = tabs + t + f;
+    const ttftf = ttf + t + f;
+    let s = `Assets:\n`;
+    for (const [currencySymbol, tokens] of this.assets) {
+      s += `${ttf}${currencySymbol}:\n`;
+      for (const tokenName of tokens) {
+        s += `${ttftf}${tokenName},\n`;
       }
-      first = false;
-    } else tail.set(ccy, tkns);
-  }
-  return tail;
+    }
+    return s;
+  };
+
+  public head = (): Asset => {
+    for (const [ccy, tkns] of this.assets) {
+      for (const tkn in tkns) {
+        return new Asset(ccy, tkn);
+      }
+    }
+    throw new Error("unexpected empty Asset");
+  };
+
+  public tail = (): Assets => {
+    assert(this.assets.size > 0, "empty assets tell no tails");
+    const tail = new Assets();
+    let first = true;
+    for (const [ccy, tkns] of this.assets) {
+      if (first) {
+        assert(tkns.length > 0, "empty token map");
+        if (tkns.length > 1) {
+          const tail_ = tkns.slice(1);
+          tail.assets.set(ccy, tail_);
+        }
+        first = false;
+      } else tail.assets.set(ccy, tkns);
+    }
+    return tail;
+  };
+
+  public randomAsset = (): Asset => {
+    const ccy = randomChoice([...this.assets.keys()]);
+    const tkn = randomChoice(this.assets.get(ccy)!);
+    return new Asset(ccy, tkn);
+  };
+
+  public randomAssets = (): Assets => {
+    const assets_ = new Assets();
+    const ccys = randomSubset([...this.assets.keys()]);
+    for (const ccy of ccys) {
+      const tkns = randomSubset(this.assets.get(ccy)!);
+      assets_.assets.set(ccy, tkns);
+    }
+    return assets_;
+  };
+
+  public numAssets = (): number => {
+    let n = 0;
+    for (const tkns of this.assets.values()) {
+      n += tkns.length;
+    }
+    return n;
+  };
 }
 
-export function randomAssetOf(assets: Assets): Asset {
-  const ccy = randomChoice([...assets.keys()]);
-  const tkn = randomChoice(assets.get(ccy)!);
-  return new Asset(ccy, tkn);
-}
-
-export function randomAssetsOf(assets: Assets): Assets {
-  const assets_ = new Map();
-  const ccys = randomSubset([...assets.keys()]);
-  for (const ccy of ccys) {
-    const tkns = randomSubset(assets.get(ccy)!);
-    assets_.set(ccy, tkns);
+export class PAssets extends PMap<PCurrencySymbol, PNonEmptyList<PTokenName>> {
+  constructor() {
+    super(PCurrencySymbol, PNonEmptyTokenList);
   }
-  return assets_;
-}
 
-export function numAssets(assets: Assets): number {
-  let n = 0;
-  for (const tkns of assets.values()) {
-    n += tkns.length;
+  static ptype = new PAssets();
+  static genPType(): PMap<PCurrencySymbol, PNonEmptyList<PTokenName>> {
+    return PAssets.ptype;
   }
-  return n;
+
+  // static genAssets(): Assets {
+  //   const timeout = 1000;
+  //   for (let i = 0; i < timeout; i++) {
+  //     const assets = PAssets.genPType().genData();
+  //     if (assets.size > 0) return assets
+  //   }
+  //   throw new Error("failed to generate non-empty assets");
+  // }
 }

@@ -1,27 +1,40 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
+  Generators,
   genPositive,
   gMaxLength,
+  maybeNdef,
   PConstraint,
   PData,
   PList,
 } from "../../../refactor_parse/lucid/src/mod.ts";
 
-export type PNonEmptyList<PElem extends PData> = PConstraint<
+export class PNonEmptyList<PElem extends PData> extends PConstraint<
   PList<PElem>
->;
-export function newPNonEmptyList<PElem extends PData>(
-  pelem: PElem,
-  length?: number,
-): PNonEmptyList<PElem> {
-  assert(!length || length > 0, "empty list");
-  const pinner = new PList(pelem, length);
+> {
+  constructor(
+    pelem: PElem,
+    length?: bigint,
+  ) {
+    assert(!length || length > 0, "empty list");
 
-  return new PConstraint<PList<PElem>>(
-    pinner,
-    [assertNonEmptyList],
-    () => PList.genList(pelem.genData, length ?? genPositive(gMaxLength)),
-  );
+    super(
+      new PList(pelem, length),
+      [assertNonEmptyList],
+      () => PList.genList(pelem.genData, length ?? genPositive(gMaxLength)),
+    );
+  }
+
+  static genPType(
+    gen: Generators,
+    maxDepth: bigint,
+  ): PConstraint<
+    PList<PData>
+  > {
+    const length = maybeNdef(genPositive(gMaxLength));
+    const pelem = gen.generate(maxDepth);
+    return new PNonEmptyList(pelem, length);
+  }
 }
 
 function assertNonEmptyList<T>(l: Array<T>) {

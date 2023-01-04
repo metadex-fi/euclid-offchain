@@ -1,8 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   genNonNegative,
-  genNumber,
-  genPositive,
+  gMaxLength,
   maxInteger,
   maybeNdef,
   PaymentKeyHash,
@@ -10,7 +9,6 @@ import {
   PConstraint,
   PInteger,
   PLifted,
-  randomChoice,
 } from "../../../refactor_parse/lucid/src/mod.ts";
 import { PLiteral } from "../../../refactor_parse/lucid/src/plutus/types/literal.ts";
 
@@ -38,70 +36,82 @@ export const PPaymentKeyHash = new PByteString();
 export type PPaymentKeyHashLiteral = PByteStringLiteral;
 export const newPPaymentKeyHashLiteral = newPByteStringLiteral;
 
-function assertPositive(i: bigint) {
-  assert(i > 0n, `encountered nonpositive: ${i}`);
-}
-
 // @ts-ignore TODO consider fixing this, or leaving as is
 export type PNum = PInteger | PConstraint<PNum>;
 
-export type PBounded<T extends PNum> = PConstraint<T>;
-export const newPBounded = <T extends PNum>(
-  pinner: T,
-  lowerBound?: bigint,
-  upperBound?: bigint,
-): PBounded<T> => {
-  return new PConstraint<T>(
-    // @ts-ignore TODO consider fixing this, or leaving as is
-    pinner,
-    [newAssertInRange(lowerBound, upperBound)],
-    newGenInRange(pinner, lowerBound, upperBound),
+export class PBounded extends PConstraint<PInteger> {
+  static pinner = new PInteger();
+  constructor(
+    public lowerBound = -maxInteger,
+    public upperBound = maxInteger,
+  ) {
+    assert(lowerBound < upperBound, "PBounded: lowerBound >= upperBound");
+    super(
+      PBounded.pinner,
+      [newAssertInRange(lowerBound, upperBound)],
+      newGenInRange(lowerBound, upperBound),
+    );
+  }
+
+  static genPType(): PConstraint<PInteger> {
+    return genPBounded();
+  }
+}
+
+export class PPositive extends PBounded {
+  constructor(
+    public lowerBound = 1n,
+    public upperBound = maxInteger,
+  ) {
+    assert(lowerBound > 0n, "PPositive: lowerBound <= 0");
+    super(lowerBound, upperBound);
+  }
+
+  static genPType(): PPositive {
+    return genPBounded(1n);
+  }
+}
+
+const genPBounded = (
+  minLowerBound?: bigint,
+  maxLowerBound?: bigint,
+  minRange?: bigint,
+  maxRange?: bigint,
+): PBounded => {
+  assert(!minRange || minRange > 0n, "minRange <= 0");
+  assert(!maxRange || maxRange > gMaxLength, "maxRange <= gMaxLength");
+  assert(!maxRange || !minRange || minRange <= maxRange, "minRange > maxRange");
+  assert(
+    !maxLowerBound || !minLowerBound || minLowerBound <= maxLowerBound,
+    "minLowerBound > maxLowerBound",
   );
-};
-export const genPBounded = () => {
-  const inner = randomChoice([new PInteger(), PPositive]);
-  const lowerBound = maybeNdef(inner.genData());
-  const upperBound = maybeNdef(
-    lowerBound ? lowerBound + PPositive.genData() : inner.genData(),
-  );
-  return newPBounded(inner, lowerBound, upperBound);
+  const genLowerBound = newGenInRange(minLowerBound, maxLowerBound);
+  const genRange = newGenInRange(minRange ?? gMaxLength, maxRange);
+  const lowerBound = genLowerBound();
+  const upperBound = lowerBound + genRange();
+  const maybeLowerBound = minLowerBound || maxLowerBound
+    ? lowerBound
+    : maybeNdef(lowerBound);
+  const maybeUpperBound = minRange || maxRange
+    ? upperBound
+    : maybeNdef(upperBound);
+  return new PBounded(maybeLowerBound, maybeUpperBound);
 };
 
-const newGenInRange = <T extends PNum>(
-  pinner: T,
-  lowerBound = -BigInt(maxInteger), // TODO better infinity, maybe from chain
-  upperBound = BigInt(maxInteger),
+const newGenInRange = (
+  lowerBound = -maxInteger,
+  upperBound = maxInteger,
 ) =>
-(): PLifted<T> => {
-  const inner = pinner.genData();
-  
+(): PLifted<PInteger> => {
+  assert(lowerBound < upperBound, "newGenInRange: lowerBound >= upperBound");
+  return lowerBound + genNonNegative(upperBound - lowerBound);
 };
 
 const newAssertInRange =
   (lowerBound?: bigint, upperBound?: bigint) => (i: bigint) => {
     assert(!lowerBound || lowerBound <= i, `too small: ${i} < ${lowerBound}`);
-    assert(!upperBound || i < upperBound, `too big: ${i} >= ${upperBound}`);
+    assert(!upperBound || i <= upperBound, `too big: ${i} > ${upperBound}`);
   };
 
-  export type PPositive = PBounded<PInteger>;
-export const PPositive: PPositive = newPBounded(
-  new PInteger,
-  1n,
-  undefined,
-);
-
-export type PBoundedInteger = PBounded<PInteger>;
-const PInteger_ = new PInteger();
-export const newPBoundedInteger = (
-  lowerBound?: bigint,
-  upperBound?: bigint,
-): PBoundedInteger => {
-  return newPBounded(PInteger_, lowerBound, upperBound);
-};
-
 export type Amount = bigint;
-export type PAmount = PBounded<PPositive>;
-export const newPAmount = (lowerBound = 1n, upperBound?: bigint): PAmount => {
-  assertPositive(lowerBound);
-  return newPBounded(PPositive, lowerBound, upperBound);
-};
+export type PAmount = PPositive;

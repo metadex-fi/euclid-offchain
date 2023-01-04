@@ -14,7 +14,7 @@ import { maxTicks, minTicks } from "./dirac.ts";
 
 // 4 ** 4 = 256
 // TODO prod: derive this from observed number of diracs in pool
-export const gMaxHashes = gMaxLength ** Number(maxTicks - minTicks);
+export const gMaxHashes = gMaxLength ** (maxTicks - minTicks);
 
 export type IdNFT = Asset;
 export const newIdNFT = (hash: string): IdNFT => {
@@ -24,24 +24,37 @@ export function nextThreadNFT(threadNFT: IdNFT): IdNFT {
   return newIdNFT(toHex(sha256(fromHex(threadNFT.tokenName))));
 }
 
-export type PIdNFT = PConstraint<PAsset>;
-const newNewPIdNFT =
-  (maxHashes?: number) => (owner: PaymentKeyHash): PIdNFT => {
-    return new PConstraint<PAsset>(
-      PAsset,
+export class PIdNFT extends PConstraint<PAsset> {
+  constructor(
+    public owner: PaymentKeyHash,
+    public maxHashes = 0n,
+  ) {
+    super(
+      new PAsset(),
       [assertContractCurrency, newAssertOwnersToken(owner, maxHashes)],
       newGenIdNFT(owner, maxHashes),
     );
-  };
-export const newPParamNFT = newNewPIdNFT();
-export const newPThreadNFT = newNewPIdNFT(gMaxHashes);
+  }
+
+  static genPType(): PConstraint<PAsset> {
+    return new PConstraint(
+      PAsset.genPType(),
+      [assertContractCurrency],
+      newGenIdNFT(contractCurrency),
+    );
+  }
+}
+
+export const newPParamNFT = (owner: PaymentKeyHash) => new PIdNFT(owner);
+export const newPThreadNFT = (owner: PaymentKeyHash) =>
+  new PIdNFT(owner, gMaxHashes);
 
 function assertContractCurrency(a: Asset) {
   assert(a.currencySymbol === contractCurrency, "not contract-currency");
 }
 
 const newAssertOwnersToken =
-  (owner: PaymentKeyHash, maxHashes = 0) => (a: Asset): void => {
+  (owner: PaymentKeyHash, maxHashes = 0n) => (a: Asset): void => {
     let hash = owner;
     for (let i = 0; i < maxHashes; i++) {
       if (a.tokenName === hash) {
@@ -53,7 +66,7 @@ const newAssertOwnersToken =
   };
 
 const newGenIdNFT =
-  (owner: PaymentKeyHash, maxHashes?: number) => (): IdNFT => {
+  (owner: PaymentKeyHash, maxHashes?: bigint) => (): IdNFT => {
     let hash = owner;
     if (maxHashes) {
       const hashes = genPositive(maxHashes);

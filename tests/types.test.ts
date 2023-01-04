@@ -2,29 +2,22 @@ import {
   Generators,
   PByteString,
   PConstr,
-  PData,
+  PConstraint,
   PInteger,
   PList,
   PMap,
   PMapRecord,
   PObject,
   PRecord,
-} from "../../refactor_parse/lucid/src/mod.ts";
-import {
-  lucidContainerGenerators,
-  lucidPrimitiveGenerators,
   propertyTestPTypesParsing,
-} from "../../refactor_parse/lucid/tests/plutus.types.test.ts";
-import { Asset, PAsset, PAssets } from "../src/types/asset.ts";
-import { genPParam } from "../src/types/param.ts";
-import { genPBounded, newPBounded, PPositive } from "../src/types/primitive.ts";
-import {
-  newNewPValue,
-  newPJumpSizes,
-  newPPositiveValue,
-} from "../src/types/value.ts";
+} from "../../refactor_parse/lucid/src/mod.ts";
+import { PLiteral } from "../../refactor_parse/lucid/src/plutus/types/literal.ts";
+import { PAsset, PAssets } from "../src/types/asset.ts";
+import { PNonEmptyList } from "../src/types/nonEmptyList.ts";
+import { PBounded, PPositive } from "../src/types/primitive.ts";
+import { PValue } from "../src/types/value.ts";
 
-Deno.test("parsing property tests", () => {
+Deno.test("euclid data/types tests", () => {
   const gen = new Generators(
     [
       ...lucidPrimitiveGenerators,
@@ -32,22 +25,42 @@ Deno.test("parsing property tests", () => {
     ],
     [
       ...lucidContainerGenerators,
-      // ...euclidContainerGenerators,
+      ...euclidContainerGenerators,
     ],
   );
-  propertyTestPTypesParsing(gen, 100);
+  propertyTestPTypesParsing(gen, 500);
 });
 
+export const lucidPrimitiveGenerators = [
+  // PAny.genPType,
+  PInteger.genPType,
+  PByteString.genPType,
+];
+
+export const lucidContainerGenerators = [
+  PList.genPType,
+  PMap.genPType,
+  PConstr.genPType,
+  PRecord.genPType,
+  PMapRecord.genPType,
+  // PSum.genPType,
+  PObject.genPType,
+  PLiteral.genPType,
+  PConstraint.genPType,
+];
+
 const euclidPrimitiveGenerators = [
-  () => PAsset,
-  () => PAssets,
-  () => PPositive,
-  genPBounded,
+  PAsset.genPType,
+  // PAssetOf.genPType,
+  PAssets.genPType,
+  PBounded.genPType,
+  PPositive.genPType,
+  PValue.genPType,
   // () => newPPositiveValue(PAssets.genData()),
   // genPParam,
 ];
 
 const euclidContainerGenerators = [
-  PList.genPType,
+  PNonEmptyList.genPType,
   // newNewPValue(new PInteger()),
 ];

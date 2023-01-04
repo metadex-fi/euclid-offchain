@@ -1,31 +1,45 @@
-import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  genPositive,
-  gMaxLength,
-  PConstraint,
-  PData,
-  PMap,
-} from "../../../refactor_parse/lucid/src/mod.ts";
+// import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+// import {
+//   Generators,
+//   genPositive,
+//   gMaxLength,
+//   maybeNdef,
+//   PConstraint,
+//   PData,
+//   PMap,
+// } from "../../../refactor_parse/lucid/src/mod.ts";
 
-export type PNonEmptyMap<PKey extends PData, PValue extends PData> =
-  PConstraint<
-    PMap<PKey, PValue>
-  >;
-export function newPNonEmptyMap<PKey extends PData, PValue extends PData>(
-  pkey: PKey,
-  pvalue: PValue,
-  size?: number,
-): PNonEmptyMap<PKey, PValue> {
-  assert(!size || size > 0, "empty map");
-  const pinner = new PMap(pkey, pvalue, size);
+// export class PNonEmptyMap<PKey extends PData, PValue extends PData>
+//   extends PConstraint<
+//     PMap<PKey, PValue>
+//   > {
+//   constructor(
+//     pkey: PKey,
+//     pvalue: PValue,
+//     size?: bigint,
+//   ) {
+//     assert(!size || size > 0, "empty map");
 
-  return new PConstraint<PMap<PKey, PValue>>(
-    pinner,
-    [assertNonEmptyMap],
-    () => PMap.genMap(pkey, pvalue, size ?? genPositive(gMaxLength)),
-  );
-}
+//     super(
+//       new PMap(pkey, pvalue, size),
+//       [assertNonEmptyMap],
+//       () => PMap.genMap(pkey, pvalue, size ?? genPositive(gMaxLength)),
+//     );
+//   }
 
-function assertNonEmptyMap<K, V>(m: Map<K, V>) {
-  assert(m.size > 0, "encountered empty Map");
-}
+//   static genPType(
+//     gen: Generators,
+//     maxDepth: bigint,
+//   ): PConstraint<
+//     PMap<PData, PData>
+//   > { // additional maxDepth - 1n intentional
+//     const pkey = gen.generate(maxDepth - 1n);
+//     const pvalue = gen.generate(maxDepth - 1n);
+//     const size = maybeNdef(genPositive(gMaxLength));
+//     return new PNonEmptyMap(pkey, pvalue, size);
+//   }
+// }
+
+// function assertNonEmptyMap<K, V>(m: Map<K, V>) {
+//   assert(m.size > 0, "encountered empty Map");
+// }

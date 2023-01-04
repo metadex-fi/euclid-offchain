@@ -1,57 +1,256 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
+  f,
   maxInteger,
-  PInteger,
+  maybeNdef,
   PMapRecord,
   RecordOf,
+  t,
 } from "../../../refactor_parse/lucid/src/mod.ts";
-import { Asset, Assets } from "./asset.ts";
+import { Asset, Assets, PAssets } from "./asset.ts";
 import {
   Amount,
   CurrencySymbol,
-  newPBounded,
   PBounded,
   PNum,
   PPositive,
   TokenName,
 } from "./primitive.ts";
 
-export type Value = Map<CurrencySymbol, Map<TokenName, bigint>>;
-// export const emptyValue: Value = new Map<string, Map<string, bigint>>();
-export const newValue = (): Value => {
-  return new Map<string, Map<string, bigint>>();
-};
+export class Value {
+  constructor(
+    public value: Map<CurrencySymbol, Map<TokenName, bigint>> = new Map(),
+  ) {}
+
+  public show = (tabs = ""): string => {
+    const ttf = tabs + t + f;
+    const ttftf = ttf + t + f;
+    let s = `Value:\n`;
+    for (const [currencySymbol, tokenMap] of this.value) {
+      s += `${ttf}${currencySymbol}:\n`;
+      for (const [tokenName, amount] of tokenMap) {
+        s += `${ttftf}${tokenName}: ${amount},\n`;
+      }
+    }
+    return s;
+  };
+
+  public zeroed = (): Value => {
+    return setAmounts(0n)(this);
+  };
+
+  public maxxed = (): Value => {
+    return setAmounts(BigInt(maxInteger))(this);
+  };
+
+  public scaled = (amount: Amount): Value => {
+    return newMapAmounts((a) => a * amount)(this);
+  };
+
+  public numAssets = (): number => {
+    let n = 0;
+    for (const tkns of this.value.values()) {
+      n += tkns.size;
+    }
+    return n;
+  };
+
+  public firstAsset = (): Asset => {
+    for (const [currencySymbol, tokens] of this.value) {
+      for (const tokenName in tokens) {
+        return new Asset(currencySymbol, tokenName);
+      }
+    }
+    throw new Error("no assets in value");
+  };
+
+  public firstAmount = (): Amount => {
+    for (const [_, tokens] of this.value) {
+      for (const [_, amount] of tokens) {
+        return amount;
+      }
+    }
+    throw new Error("no assets in value");
+  };
+
+  public tail = (): Value => {
+    assert(this.value.size > 0, "empty values tell no tails");
+    const tail = new Value();
+    let first = true;
+    for (const [ccy, tkns] of this.value) {
+      if (first) {
+        assert(tkns.size > 0, "empty token map");
+        if (tkns.size > 1) {
+          const tail_ = new Map<TokenName, Amount>();
+          let first_ = true;
+          for (const [tkn, amnt] of tkns) {
+            if (first_) first_ = false;
+            else tail_.set(tkn, amnt);
+          }
+          tail.value.set(ccy, tail_);
+        }
+        first = false;
+      } else tail.value.set(ccy, tkns);
+    }
+    return tail;
+  };
+
+  public sumAmounts = (): bigint => {
+    let sum = 0n;
+    for (const [_, tokens] of this.value) {
+      for (const [_, amount] of tokens) {
+        sum += amount;
+      }
+    }
+    return sum;
+  };
+
+  public unknownAssetsOf = (assets: Assets): Assets => {
+    const unknownAssets = new Assets();
+    for (const [currencySymbol, tokens] of this.value) {
+      if (!assets.assets.has(currencySymbol)) {
+        unknownAssets.assets.set(currencySymbol, [...tokens.keys()]);
+      } else {
+        const unknownTokens = [...tokens.keys()].filter((tokenName) =>
+          !assets.assets.get(currencySymbol)?.includes(tokenName)
+        );
+        if (unknownTokens.length > 0) {
+          unknownAssets.assets.set(currencySymbol, unknownTokens);
+        }
+      }
+    }
+    return unknownAssets;
+  };
+
+  public exactAssets = (assets: Assets): boolean => {
+    for (const [currencySymbol, tokens] of this.value) {
+      if (!assets.assets.has(currencySymbol)) {
+        return false;
+      }
+      if (assets.assets.get(currencySymbol)?.length !== tokens.size) {
+        return false;
+      }
+      for (const tokenName of tokens.keys()) {
+        if (!assets.assets.get(currencySymbol)?.includes(tokenName)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
+  public amountOf = (
+    asset: Asset,
+    defaultAmnt?: Amount,
+  ): Amount => {
+    const amount = this.value.get(asset.currencySymbol)?.get(asset.tokenName) ??
+      defaultAmnt;
+    assert(
+      amount,
+      `amountOf: amount not found for asset ${
+        JSON.stringify(asset)
+      } in ${this.show()}`,
+    );
+    return amount;
+  };
+
+  public setAmountOf = (asset: Asset, amount: Amount): void => {
+    const tokens = this.value.get(asset.currencySymbol);
+    assert(
+      tokens,
+      `setAmountOf: tokens not found for asset ${
+        JSON.stringify(asset)
+      } in ${this.show()}`,
+    );
+    assert(
+      tokens.has(asset.tokenName),
+      `setAmountOf: amount not found for asset ${
+        JSON.stringify(asset)
+      } in ${this.show()}`,
+    );
+    tokens.set(asset.tokenName, amount);
+  };
+
+  public initAmountOf = (asset: Asset, amount: Amount): void => {
+    const tokens = this.value.get(asset.currencySymbol);
+    if (tokens) {
+      assert(
+        !tokens.has(asset.tokenName),
+        `initAmountOf: amount already set for asset ${
+          JSON.stringify(asset)
+        } in ${this.show()}`,
+      );
+      tokens.set(asset.tokenName, amount);
+    } else {
+      const tokens = new Map<TokenName, Amount>();
+      tokens.set(asset.tokenName, amount);
+      this.value.set(asset.currencySymbol, tokens);
+    }
+  };
+}
 
 // @ts-ignore TODO consider fixing this, or leaving as is
-export type PValue<A extends PNum> = PMapRecord<PMapRecord<PBounded<A>>>;
-export const newNewPValue =
-  <PAmnt extends PNum>(I: PAmnt) =>
-  (assets: Assets, lowerBounds?: Value, upperBounds?: Value): PValue<PAmnt> => {
+export class PValue<N extends PNum> extends PMapRecord<PMapRecord<N>> {
+  constructor(
+    public PNum: new (lowerBound?: bigint, upperBound?: bigint) => N,
+    public assets: Assets,
+    public lowerBounds?: Value,
+    public upperBounds?: Value,
+  ) {
     assert(
       !lowerBounds || !upperBounds || lt(lowerBounds, upperBounds),
       "lowerBounds must be less than upperBounds",
     );
-    assert(
-      !lowerBounds || onlyAssetsOf(assets, lowerBounds),
-      "lowerBounds has unknown asset",
-    );
-    assert(
-      !upperBounds || onlyAssetsOf(assets, upperBounds),
-      "upperBounds has unknown asset",
-    );
-    const value: RecordOf<PMapRecord<PBounded<PAmnt>>> = {};
-    for (const [currencySymbol, tokens] of assets) {
-      const pamounts: RecordOf<PBounded<PAmnt>> = {};
+    if (lowerBounds) {
+      const unknownLowerBounds = lowerBounds.unknownAssetsOf(assets);
+      assert(
+        unknownLowerBounds.assets.size === 0,
+        `lowerBounds has unknown ${unknownLowerBounds.show()}
+  ${assets.show()}
+  lower bounds ${lowerBounds.show()}`,
+      );
+    }
+
+    if (upperBounds) {
+      const unknownUpperBounds = upperBounds.unknownAssetsOf(assets);
+      assert(
+        unknownUpperBounds.assets.size === 0,
+        `upperBounds has unknown ${unknownUpperBounds.show()}
+  ${assets.show()}
+  upper bounds ${upperBounds.show()}`,
+      );
+    }
+
+    const value: RecordOf<PMapRecord<N>> = {};
+    for (const [currencySymbol, tokens] of assets.assets) {
+      const pamounts: RecordOf<N> = {};
       for (const tokenName of tokens) {
-        const lowerBound = lowerBounds?.get(currencySymbol)?.get(tokenName);
-        const upperBound = upperBounds?.get(currencySymbol)?.get(tokenName);
-        pamounts[tokenName] = newPBounded(I, lowerBound, upperBound);
+        const lowerBound = lowerBounds?.value.get(currencySymbol)?.get(
+          tokenName,
+        );
+        const upperBound = upperBounds?.value.get(currencySymbol)?.get(
+          tokenName,
+        );
+        pamounts[tokenName] = new PNum(lowerBound, upperBound);
       }
       value[currencySymbol] = new PMapRecord(pamounts);
     }
-    return new PMapRecord(value);
-  };
-export const newPValue = newNewPValue(new PInteger());
+    super(value);
+  }
+
+  static genPType(): PMapRecord<PMapRecord<PBounded>> {
+    const assets = new Assets(PAssets.genPType().genData());
+    const lowerBounds = maybeNdef(() =>
+      new Value(new PValue(PBounded, assets.randomAssets())
+        .genData())
+    )?.();
+    const upperBounds = maybeNdef(() =>
+      new Value(new PValue(PBounded, assets.randomAssets(), lowerBounds)
+        .genData())
+    )?.();
+    return new PValue(PBounded, assets, lowerBounds, upperBounds);
+  }
+}
 
 export type PPositiveValue = PValue<PPositive>;
 export const newPPositiveValue = (
@@ -63,7 +262,7 @@ export const newPPositiveValue = (
     !lowerBounds || allPositive(lowerBounds),
     "lowerBounds must be positive",
   );
-  return newNewPValue(PPositive)(assets, lowerBounds, upperBounds);
+  return new PValue(PPositive, assets, lowerBounds, upperBounds);
 };
 
 export type JumpSizes = Value;
@@ -71,104 +270,23 @@ export type PJumpSizes = PPositiveValue;
 export const newPJumpSizes = newPPositiveValue;
 
 export function assetsOf(
-  ...values: Array<Map<CurrencySymbol, Map<TokenName, unknown>>>
+  ...values: Value[]
 ): Assets {
-  const assets = new Map<CurrencySymbol, TokenName[]>();
+  const assets = new Assets();
   for (const value of values) {
-    for (const [currencySymbol, tokenMap] of value) {
-      const tokens = assets.get(currencySymbol) ?? [];
-      assets.set(currencySymbol, [...tokens, ...tokenMap.keys()]);
+    for (const [currencySymbol, tokenMap] of value.value) {
+      const tokens = assets.assets.get(currencySymbol) ?? [];
+      assets.assets.set(currencySymbol, [...tokens, ...tokenMap.keys()]);
     }
   }
   return assets;
 }
 
-export function onlyAssetsOf(assets: Assets, value: Value): boolean {
-  for (const [currencySymbol, tokens] of value) {
-    if (!assets.has(currencySymbol)) {
-      return false;
-    }
-    for (const tokenName of tokens.keys()) {
-      if (!assets.get(currencySymbol)?.includes(tokenName)) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-export function exactAssetsOf(assets: Assets, value: Value): boolean {
-  for (const [currencySymbol, tokens] of value) {
-    if (!assets.has(currencySymbol)) {
-      return false;
-    }
-    if (assets.get(currencySymbol)?.length !== tokens.size) {
-      return false;
-    }
-    for (const tokenName of tokens.keys()) {
-      if (!assets.get(currencySymbol)?.includes(tokenName)) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-export function amountOf(
-  value: Value,
-  asset: Asset,
-  defaultAmnt?: Amount,
-): Amount {
-  const amount = value.get(asset.currencySymbol)?.get(asset.tokenName) ??
-    defaultAmnt;
-  assert(
-    amount,
-    `amountOf: amount not found for asset ${JSON.stringify(asset)} in ${
-      showValue(value)
-    }`,
-  );
-  return amount;
-}
-
-export function setAmountOf(value: Value, asset: Asset, amount: Amount): void {
-  const tokens = value.get(asset.currencySymbol);
-  assert(
-    tokens,
-    `setAmountOf: tokens not found for asset ${JSON.stringify(asset)} in ${
-      showValue(value)
-    }`,
-  );
-  assert(
-    tokens.has(asset.tokenName),
-    `setAmountOf: amount not found for asset ${JSON.stringify(asset)} in ${
-      showValue(value)
-    }`,
-  );
-  tokens.set(asset.tokenName, amount);
-}
-
-export function initAmountOf(value: Value, asset: Asset, amount: Amount): void {
-  const tokens = value.get(asset.currencySymbol);
-  if (tokens) {
-    assert(
-      !tokens.has(asset.tokenName),
-      `initAmountOf: amount already set for asset ${JSON.stringify(asset)} in ${
-        showValue(value)
-      }`,
-    );
-    tokens.set(asset.tokenName, amount);
-  } else {
-    const tokens = new Map<TokenName, Amount>();
-    tokens.set(asset.tokenName, amount);
-    value.set(asset.currencySymbol, tokens);
-  }
-}
-
 export function singleton(asset: Asset, amount: Amount): Value {
-  const value = newValue();
+  const value = new Value();
   const tokens = new Map<TokenName, Amount>();
   tokens.set(asset.tokenName, amount);
-  value.set(asset.currencySymbol, tokens);
+  value.value.set(asset.currencySymbol, tokens);
   return value;
 }
 
@@ -180,20 +298,20 @@ export const newCompareWith = (
   //   defaultIns.length <= op.arguments.length,
   //   "more defaultIns than op arguments",
   // );
-  return (arg = newValue(), ...args: Array<Value | undefined>): boolean => {
+  return (arg = new Value(), ...args: Array<Value | undefined>): boolean => {
     // assert( // TODO FIXME
     //   1 + args.length === op.arguments.length,
     //   "args length must match op arguments length",
     // );
-    const args_ = args.map((v) => v ?? newValue());
+    const args_ = args.map((v) => v ?? new Value());
     const assets = assetsOf(arg, ...args_);
-    for (const [currencySymbol, tokens] of assets) {
+    for (const [currencySymbol, tokens] of assets.assets) {
       for (const tokenName of tokens) {
         const asset = new Asset(currencySymbol, tokenName);
         const amountsIn = new Array<Amount>();
         [arg, ...args_].forEach((v, i) => {
           const defaultIn = defaultIns[i];
-          const amountIn = amountOf(v, asset, defaultIn);
+          const amountIn = v.amountOf(asset, defaultIn);
           amountsIn.push(amountIn);
         });
         if (!op(amountsIn[0], ...amountsIn.slice(1))) {
@@ -234,27 +352,27 @@ export const newUnionWith = (
   //   "more defaultIns than op arguments",
   // );
   return (
-    arg: Value = newValue(),
+    arg: Value = new Value(),
     ...args: Array<Value | undefined>
   ): Value => {
     // assert( TODO FIXME
     //   1 + args.length === op.arguments.length,
     //   "args length must match op arguments length",
     // );
-    const args_ = args.map((v) => v ?? newValue());
+    const args_ = args.map((v) => v ?? new Value());
     const assets = assetsOf(arg, ...args_);
-    const value = newValue();
-    for (const [currencySymbol, tokens] of assets) {
+    const value = new Value();
+    for (const [currencySymbol, tokens] of assets.assets) {
       for (const tokenName of tokens) {
         const asset = new Asset(currencySymbol, tokenName);
         const amountsIn = new Array<Amount>();
         [arg, ...args_].forEach((v, i) => {
           const defaultIn = defaultIns[i];
-          amountsIn.push(amountOf(v, asset, defaultIn));
+          amountsIn.push(v.amountOf(asset, defaultIn));
         });
         const amountOut = op(amountsIn[0], ...amountsIn.slice(1));
         if (amountOut !== defaultOut) {
-          initAmountOf(value, asset, amountOut);
+          value.initAmountOf(asset, amountOut);
         }
       }
     }
@@ -282,86 +400,4 @@ export const newMapAmounts = (op: (arg: Amount) => Amount) =>
 
 export function setAmounts(amount: Amount): (value: Value) => Value {
   return newMapAmounts(() => amount);
-}
-
-export function zeroAmounts(): (value: Value) => Value {
-  return setAmounts(0n);
-}
-
-export function infAmounts(): (value: Value) => Value {
-  return setAmounts(BigInt(maxInteger));
-}
-
-export function mulAmounts(value: Value, amount: Amount): Value {
-  return newMapAmounts((a) => a * amount)(value);
-}
-
-export function numAssetsInValue(v: Value): number {
-  let n = 0;
-  for (const tkns of v.values()) {
-    n += tkns.size;
-  }
-  return n;
-}
-
-export function firstAssetInValue(v: Value): Asset {
-  for (const [currencySymbol, tokens] of v) {
-    for (const tokenName in tokens) {
-      return new Asset(currencySymbol, tokenName);
-    }
-  }
-  throw new Error("no assets in value");
-}
-
-export function firstAmount(v: Value): Amount {
-  for (const [_, tokens] of v) {
-    for (const [_, amount] of tokens) {
-      return amount;
-    }
-  }
-  throw new Error("no assets in value");
-}
-
-export function tailValue(v: Value): Value {
-  assert(v.size > 0, "empty values tell no tails");
-  const tail = new Map();
-  let first = true;
-  for (const [ccy, tkns] of v) {
-    if (first) {
-      assert(tkns.size > 0, "empty token map");
-      if (tkns.size > 1) {
-        const tail_ = new Map<TokenName, Amount>();
-        let first_ = true;
-        for (const [tkn, amnt] of tkns) {
-          if (first_) first_ = false;
-          else tail_.set(tkn, amnt);
-        }
-        tail.set(ccy, tail_);
-      }
-      first = false;
-    } else tail.set(ccy, tkns);
-  }
-  return tail;
-}
-
-export function sumAmounts(v: Value): Amount {
-  let sum = 0n;
-  for (const [_, tokens] of v) {
-    for (const [_, amount] of tokens) {
-      sum += amount;
-    }
-  }
-  return sum;
-}
-
-export function showValue(value: Value): string {
-  const value_ = new Map<CurrencySymbol, Map<TokenName, number>>();
-  for (const [ccy, tokens] of value) {
-    const tokens_ = new Map<TokenName, number>();
-    for (const [tkn, amount] of tokens) {
-      tokens_.set(tkn, Number(amount));
-    }
-    value_.set(ccy, tokens_);
-  }
-  return JSON.stringify(value_);
 }
