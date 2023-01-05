@@ -29,7 +29,7 @@ Deno.test("euclid data/types tests", () => {
       ...euclidContainerGenerators,
     ],
   );
-  proptestPTypes(gen, 1000);
+  proptestPTypes(gen, 5000);
 });
 
 export const lucidPrimitiveGenerators = [

@@ -31,7 +31,11 @@ export class Value {
       const t = [];
       for (const [tokenName, amount] of tokenMap) {
         t.push(
-          `${ttff}${tokenName === "" ? "lovelace" : tokenName}: ${amount}`,
+          `${ttff}${
+            tokenName === ""
+              ? currencySymbol === "" ? "lovelace" : "_"
+              : tokenName
+          }: ${amount}`,
         );
       }
       ccys.push(t.join(",\n"));
@@ -43,9 +47,17 @@ export class Value {
     return newSetAmounts(0n)(this);
   };
 
-  public maxxed = (): Value => {
-    return newSetAmounts(BigInt(maxInteger))(this);
+  public unit = (): Value => {
+    return newSetAmounts(1n)(this);
   };
+
+  public maxxed = (): Value => {
+    return newSetAmounts(maxInteger)(this);
+  };
+
+  // public minned = (): Value => {
+  //   return newSetAmounts(-maxInteger)(this);
+  // };
 
   public scaled = (amount: Amount): Value => {
     return newMapAmounts((a) => a * amount)(this);
@@ -103,15 +115,19 @@ export class Value {
     return tail;
   };
 
-  public sumAmounts = (): bigint => {
-    let sum = 0n;
-    for (const [_, tokens] of this.value) {
-      for (const [_, amount] of tokens) {
-        sum += amount;
+  public foldWith =
+    (init: bigint, op: (a: bigint, b: bigint) => bigint) => (): bigint => {
+      let agg = init;
+      for (const [_, tokens] of this.value) {
+        for (const [_, amount] of tokens) {
+          agg = op(agg, amount);
+        }
       }
-    }
-    return sum;
-  };
+      return agg;
+    };
+
+  public sumAmounts = this.foldWith(0n, (a, b) => a + b);
+  public mulAmounts = this.foldWith(1n, (a, b) => a * b);
 
   public unknownAssetsOf = (assets: Assets): Assets => {
     const unknownAssets = new Assets();
@@ -149,15 +165,15 @@ export class Value {
 
   public amountOf = (
     asset: Asset,
-    defaultAmnt?: Amount,
+    defaultAmnt?: bigint,
   ): Amount => {
     const amount = this.value.get(asset.currencySymbol)?.get(asset.tokenName) ??
       defaultAmnt;
     assert(
-      amount,
-      `amountOf: amount not found for asset ${
+      amount !== undefined,
+      `amountOf: amount not found for asset\n${
         JSON.stringify(asset)
-      } in ${this.show()}`,
+      }\nin ${this.show()}`,
     );
     return amount;
   };
@@ -433,10 +449,10 @@ export const newUnionWith = (
   };
 };
 
-export const addValues = newUnionWith((a, b) => a + b);
-export const subValues = newUnionWith((a, b) => a - b);
-export const mulValues = newUnionWith((a, b) => a * b);
-export const divValues = newUnionWith((a, b) => a / b);
+export const addValues = newUnionWith((a, b) => a + b, 0n, 0n, 0n);
+// export const subValues = newUnionWith((a, b) => a - b);
+// export const mulValues = newUnionWith((a, b) => a * b);
+// export const divValues = newUnionWith((a, b) => a / b);
 
 export const lSubValues = newUnionWith((a, b) => a > b ? a - b : 0n, 0n);
 

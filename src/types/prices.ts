@@ -1,8 +1,8 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
+  abs,
   f,
   genNonNegative,
-  genPositive,
   maxInteger,
   min,
   PConstraint,
@@ -10,8 +10,9 @@ import {
   t,
 } from "../../../refactor_parse/lucid/src/mod.ts";
 import { Assets } from "./asset.ts";
-import { Amount, CurrencySymbol, TokenName } from "./primitive.ts";
+import { CurrencySymbol, TokenName } from "./primitive.ts";
 import {
+  addValues,
   JumpSizes,
   newCompareWith,
   newUnionWith,
@@ -33,6 +34,18 @@ export class PPrices extends PConstraint<PPositiveValue> {
     public lowerBounds?: Prices,
     public upperBounds?: Prices,
   ) {
+    const maxJumpsUp = maxJumps(
+      initialPrices,
+      jumpSizes,
+      maxInteger,
+      upperBounds,
+    );
+    const maxJumpsDown = maxJumps(
+      initialPrices,
+      jumpSizes,
+      1n,
+      lowerBounds,
+    );
     super(
       new PPositiveValue(
         assets,
@@ -43,9 +56,17 @@ export class PPrices extends PConstraint<PPositiveValue> {
       newGenPrices(
         initialPrices,
         jumpSizes,
-        lowerBounds,
-        upperBounds,
+        maxJumpsUp,
+        maxJumpsDown,
       ),
+    );
+    this.population = Number(
+      addValues(initialPrices.value.unit(), addValues(maxJumpsUp, maxJumpsDown))
+        .mulAmounts(),
+    );
+    assert(
+      this.population > 0,
+      `Population not positive in ${this.showPType()}`,
     );
   }
 
@@ -53,7 +74,8 @@ export class PPrices extends PConstraint<PPositiveValue> {
     const tt = tabs + t;
     const ttf = tt + f;
 
-    return `Prices(
+    return `Prices (
+${ttf}population: ${this.population}, 
 ${ttf}assets = ${this.assets.show(ttf)}, 
 ${ttf}initialPrices = ${this.initialPrices.value.show(ttf)}, 
 ${ttf}jumpSizes = ${this.jumpSizes.value.show(ttf)}, 
@@ -97,11 +119,42 @@ const newAssertPricesCongruent =
     );
   };
 
+const maxJumps = (
+  initialPrices: Prices,
+  jumpSizes: JumpSizes,
+  gBoundary: bigint,
+  bounds?: Prices,
+): Value => {
+  // jump the price of each asset from initial price,
+  // a random number of times,
+  // with the respective jump size,
+  // while respecting the bounds
+  const maxSingleAsset = (
+    boundary: bigint,
+    initialPrice: bigint,
+    jumpSize: bigint,
+  ): bigint =>
+    min(
+      gMaxJumps,
+      abs(initialPrice - boundary) / jumpSize,
+    );
+  const maxAllAssets = newUnionWith(
+    maxSingleAsset,
+    0n,
+    gBoundary,
+  );
+  return maxAllAssets(
+    bounds?.value,
+    initialPrices.value,
+    jumpSizes.value,
+  );
+};
+
 const newGenPrices = (
   initialPrices: Prices,
   jumpSizes: JumpSizes,
-  lowerBounds?: Prices,
-  upperBounds?: Prices,
+  maxJumpsUp: Value,
+  maxJumpsDown: Value,
 ) =>
 (): Map<CurrencySymbol, Map<TokenName, bigint>> => {
   // jump the price of each asset from initial price,
@@ -109,45 +162,25 @@ const newGenPrices = (
   // with the respective jump size,
   // while respecting the bounds
   const jumpSingleAsset = (
-    lowerBound: Amount,
-    upperBound: Amount,
-    initP: Amount,
-    jumpSize: Amount,
-  ): Amount => {
-    function jumps(): Amount {
-      const direction = randomChoice([-1n, 0n, 1n]);
-      switch (direction) {
-        case 1n: {
-          const maxJumps = min(
-            gMaxJumps,
-            (upperBound - initP) / jumpSize,
-          );
-          return BigInt(genNonNegative(maxJumps));
-        }
-        case -1n: {
-          const maxJumps = min(
-            gMaxJumps,
-            (initP - lowerBound) / jumpSize,
-          );
-          return -BigInt(genNonNegative(maxJumps));
-        }
-        default:
-          return 0n;
-      }
-    }
-    return initP + jumpSize * jumps();
+    maxJumpsUp: bigint,
+    maxJumpsDown: bigint,
+    initP: bigint,
+    jumpSize: bigint,
+  ): bigint => {
+    const direction = randomChoice([-1n, 1n]);
+    const maxJumps = direction === 1n ? maxJumpsUp : maxJumpsDown;
+    return initP + jumpSize * direction * genNonNegative(maxJumps);
   };
 
   const jumpAllAssets = newUnionWith(
     jumpSingleAsset,
     undefined,
-    1n,
-    BigInt(maxInteger),
+    0n,
+    0n,
   );
-
   return jumpAllAssets(
-    lowerBounds?.value,
-    upperBounds?.value,
+    maxJumpsUp,
+    maxJumpsDown,
     initialPrices.value,
     jumpSizes.value,
   ).value;

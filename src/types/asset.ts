@@ -80,7 +80,13 @@ export class Assets {
       ccys.push(`${ttf}${currencySymbol === "" ? "ADA" : currencySymbol}:`);
       const tkns = [];
       for (const tokenName of tokens) {
-        tkns.push(`${ttff}${tokenName === "" ? "lovelace" : tokenName}`);
+        tkns.push(
+          `${ttff}${
+            tokenName === ""
+              ? currencySymbol === "" ? "lovelace" : "_"
+              : tokenName
+          }`,
+        );
       }
       ccys.push(tkns.join(",\n"));
     }
