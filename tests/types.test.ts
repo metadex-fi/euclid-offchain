@@ -14,6 +14,7 @@ import {
 import { PLiteral } from "../../refactor_parse/lucid/src/plutus/types/literal.ts";
 import { PAsset, PAssets } from "../src/types/asset.ts";
 import { PNonEmptyList } from "../src/types/nonEmptyList.ts";
+import { PPrices } from "../src/types/prices.ts";
 import { PBounded, PPositive } from "../src/types/primitive.ts";
 import { PValue } from "../src/types/value.ts";
 
@@ -55,6 +56,7 @@ const euclidPrimitiveGenerators = [
   PBounded.genPType,
   PPositive.genPType,
   PValue.genPType,
+  // PPrices.genPType,
   // () => newPPositiveValue(PAssets.genData()),
   // genPParam,
 ];

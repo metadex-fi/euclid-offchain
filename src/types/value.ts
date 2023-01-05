@@ -216,7 +216,7 @@ export class Value {
 // @ts-ignore TODO consider fixing this, or leaving as is
 export class PValue<N extends PNum> extends PMapRecord<PMapRecord<N>> {
   constructor(
-    public PNum: new (lowerBound?: bigint, upperBound?: bigint) => N,
+    public pnum: new (lowerBound?: bigint, upperBound?: bigint) => N,
     public assets: Assets,
     public lowerBounds?: Value,
     public upperBounds?: Value,
@@ -256,25 +256,28 @@ maxInteger: ${maxInteger}`,
         const upperBound = upperBounds?.value.get(currencySymbol)?.get(
           tokenName,
         );
-        pamounts[tokenName] = new PNum(lowerBound, upperBound);
+        pamounts[tokenName] = new pnum(lowerBound, upperBound);
       }
       value[currencySymbol] = new PMapRecord(pamounts);
     }
     super(value);
   }
 
-  static genPType(): PMapRecord<PMapRecord<PBounded>> {
+  static newGenPValue = <N extends PNum>(
+    pnum: new (lowerBound?: bigint, upperBound?: bigint) => N,
+  ) =>
+  (): PMapRecord<PMapRecord<PBounded>> => {
     const assets = new Assets(PAssets.genPType().genData());
     const lowerBoundedAssets = assets.randomSubset();
     const upperBoundedAssets = assets.randomSubset();
     const lowerBounds = maybeNdef(() =>
-      new Value(new PValue(PBounded, lowerBoundedAssets)
+      new Value(new PValue(pnum, lowerBoundedAssets)
         .genData())
     )?.();
     const upperBounds = maybeNdef(() =>
       new Value(
         new PValue(
-          PBounded,
+          pnum,
           upperBoundedAssets,
           lowerBounds?.ofAssets(upperBoundedAssets),
         )
@@ -282,25 +285,31 @@ maxInteger: ${maxInteger}`,
       )
     )?.();
     return new PValue(PBounded, assets, lowerBounds, upperBounds);
-  }
+  };
+
+  static genPType = PValue.newGenPValue(PBounded);
 }
 
-export type PPositiveValue = PValue<PPositive>;
-export const newPPositiveValue = (
-  assets: Assets,
-  lowerBounds?: Value,
-  upperBounds?: Value,
-): PPositiveValue => {
-  assert(
-    !lowerBounds || allPositive(lowerBounds),
-    "lowerBounds must be positive",
-  );
-  return new PValue(PPositive, assets, lowerBounds, upperBounds);
-};
+export class PPositiveValue extends PValue<PPositive> {
+  constructor(
+    public assets: Assets,
+    public lowerBounds?: Value,
+    public upperBounds?: Value,
+  ) {
+    assert(
+      !lowerBounds || allPositive(lowerBounds),
+      "lowerBounds must be positive",
+    );
+    super(PPositive, assets, lowerBounds, upperBounds);
+  }
 
-export type JumpSizes = Value;
-export type PJumpSizes = PPositiveValue;
-export const newPJumpSizes = newPPositiveValue;
+  static genPType = PValue.newGenPValue(PPositive);
+}
+
+export class JumpSizes {
+  constructor(public value: Value) {}
+}
+export class PJumpSizes extends PPositiveValue {}
 
 export function assetsOf(
   ...values: Value[]
