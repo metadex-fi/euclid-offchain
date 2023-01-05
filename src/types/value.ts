@@ -266,11 +266,12 @@ maxInteger: ${maxInteger}`,
   static newGenPValue = <N extends PNum>(
     pnum: new (lowerBound?: bigint, upperBound?: bigint) => N,
   ) =>
-  (): PMapRecord<PMapRecord<PBounded>> => {
+  (): PValue<N> => {
     const assets = new Assets(PAssets.genPType().genData());
     const lowerBoundedAssets = assets.randomSubset();
     const upperBoundedAssets = assets.randomSubset();
     const lowerBounds = maybeNdef(() =>
+      // @ts-ignore TODO consider fixing this, or leaving as is
       new Value(new PValue(pnum, lowerBoundedAssets)
         .genData())
     )?.();
@@ -284,7 +285,7 @@ maxInteger: ${maxInteger}`,
           .genData(),
       )
     )?.();
-    return new PValue(PBounded, assets, lowerBounds, upperBounds);
+    return new PValue(pnum, assets, lowerBounds, upperBounds);
   };
 
   static genPType = PValue.newGenPValue(PBounded);

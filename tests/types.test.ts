@@ -16,7 +16,7 @@ import { PAsset, PAssets } from "../src/types/asset.ts";
 import { PNonEmptyList } from "../src/types/nonEmptyList.ts";
 import { PPrices } from "../src/types/prices.ts";
 import { PBounded, PPositive } from "../src/types/primitive.ts";
-import { PValue } from "../src/types/value.ts";
+import { PPositiveValue, PValue } from "../src/types/value.ts";
 
 Deno.test("euclid data/types tests", () => {
   const gen = new Generators(
@@ -56,6 +56,7 @@ const euclidPrimitiveGenerators = [
   PBounded.genPType,
   PPositive.genPType,
   PValue.genPType,
+  PPositiveValue.genPType,
   // PPrices.genPType,
   // () => newPPositiveValue(PAssets.genData()),
   // genPParam,

@@ -47,17 +47,17 @@ export class PPrices extends PConstraint<PPositiveValue> {
     );
   }
 
-  // genPType(): PPrices {
-  //   const pvalue = PValue.genPType() as PValue<PPositiveValue>;
+  genPType(): PPrices {
+    const pvalue = PValue.genPType();
 
-  //   return new PPrices(
-  //     pvalue.assets,
-  //     this.initialPrices,
-  //     this.jumpSizes,
-  //     this.lowerBounds,
-  //     this.upperBounds,
-  //   );
-  // }
+    return new PPrices(
+      pvalue.assets,
+      this.initialPrices,
+      this.jumpSizes,
+      this.lowerBounds,
+      this.upperBounds,
+    );
+  }
 }
 
 // this also implicitly checks that assets match
