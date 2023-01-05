@@ -265,9 +265,9 @@ maxInteger: ${maxInteger}`,
 
   static newGenPValue = <N extends PNum>(
     pnum: new (lowerBound?: bigint, upperBound?: bigint) => N,
+    assets = new Assets(PAssets.genPType().genData()),
   ) =>
   (): PValue<N> => {
-    const assets = new Assets(PAssets.genPType().genData());
     const lowerBoundedAssets = assets.randomSubset();
     const upperBoundedAssets = assets.randomSubset();
     const lowerBounds = maybeNdef(() =>
@@ -304,6 +304,9 @@ export class PPositiveValue extends PValue<PPositive> {
     super(PPositive, assets, lowerBounds, upperBounds);
   }
 
+  static genOfAssets(assets: Assets) {
+    return PValue.newGenPValue(PPositive, assets)();
+  }
   static genPType = PValue.newGenPValue(PPositive);
 }
 
@@ -318,8 +321,15 @@ export function assetsOf(
   const assets = new Assets();
   for (const value of values) {
     for (const [currencySymbol, tokenMap] of value.value) {
-      const tokens = assets.assets.get(currencySymbol) ?? [];
-      assets.assets.set(currencySymbol, [...tokens, ...tokenMap.keys()]);
+      if (!assets.assets.has(currencySymbol)) {
+        assets.assets.set(currencySymbol, []);
+      }
+      for (const tokenName of tokenMap.keys()) {
+        const tokens = assets.assets.get(currencySymbol)!;
+        if (!tokens.includes(tokenName)) {
+          tokens.push(tokenName);
+        }
+      }
     }
   }
   return assets;

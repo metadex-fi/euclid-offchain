@@ -1,5 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
+  genNonNegative,
   genPositive,
   maxInteger,
   min,
@@ -13,7 +14,6 @@ import {
   newCompareWith,
   newUnionWith,
   PPositiveValue,
-  PValue,
   Value,
 } from "./value.ts";
 
@@ -47,15 +47,19 @@ export class PPrices extends PConstraint<PPositiveValue> {
     );
   }
 
-  genPType(): PPrices {
-    const pvalue = PValue.genPType();
+  static genPType(): PConstraint<PPositiveValue> {
+    const pvalue = PPositiveValue.genPType();
+    const initialPrices = new Prices(new Value(pvalue.genData()));
+    const jumpSizes = new JumpSizes(
+      new Value(PPositiveValue.genOfAssets(pvalue.assets).genData()),
+    ); // TODO not sure about congruency here
 
     return new PPrices(
       pvalue.assets,
-      this.initialPrices,
-      this.jumpSizes,
-      this.lowerBounds,
-      this.upperBounds,
+      initialPrices,
+      jumpSizes,
+      pvalue.lowerBounds ? new Prices(pvalue.lowerBounds) : undefined,
+      pvalue.upperBounds ? new Prices(pvalue.upperBounds) : undefined,
     );
   }
 }
@@ -103,14 +107,14 @@ const newGenPrices = (
             gMaxJumps,
             (upperBound - initP) / jumpSize,
           );
-          return BigInt(genPositive(maxJumps));
+          return BigInt(genNonNegative(maxJumps));
         }
         case -1n: {
           const maxJumps = min(
             gMaxJumps,
             (initP - lowerBound) / jumpSize,
           );
-          return -BigInt(genPositive(maxJumps));
+          return -BigInt(genNonNegative(maxJumps));
         }
         default:
           return 0n;
