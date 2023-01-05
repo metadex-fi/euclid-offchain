@@ -10,6 +10,7 @@ import {
 import { Asset, Assets, PAssets } from "./asset.ts";
 import {
   Amount,
+  bothExtreme,
   CurrencySymbol,
   PBounded,
   PNum,
@@ -21,30 +22,37 @@ export class Value {
   constructor(
     public value: Map<CurrencySymbol, Map<TokenName, bigint>> = new Map(),
   ) {}
-
   public show = (tabs = ""): string => {
     const ttf = tabs + t + f;
     const ttftf = ttf + t + f;
     let s = `Value:\n`;
     for (const [currencySymbol, tokenMap] of this.value) {
-      s += `${ttf}${currencySymbol}:\n`;
+      s += `${ttf}${currencySymbol === "" ? "ADA" : currencySymbol}:\n`;
+      const t = [];
       for (const [tokenName, amount] of tokenMap) {
-        s += `${ttftf}${tokenName}: ${amount},\n`;
+        t.push(
+          `${ttftf}${tokenName === "" ? "lovelace" : tokenName}: ${amount}`,
+        );
       }
+      s += t.join(",\n") + "\n";
     }
     return s;
   };
 
   public zeroed = (): Value => {
-    return setAmounts(0n)(this);
+    return newSetAmounts(0n)(this);
   };
 
   public maxxed = (): Value => {
-    return setAmounts(BigInt(maxInteger))(this);
+    return newSetAmounts(BigInt(maxInteger))(this);
   };
 
   public scaled = (amount: Amount): Value => {
     return newMapAmounts((a) => a * amount)(this);
+  };
+
+  public increment = (): Value => {
+    return newMapAmounts((a) => a + 1n)(this);
   };
 
   public numAssets = (): number => {
@@ -187,6 +195,22 @@ export class Value {
       this.value.set(asset.currencySymbol, tokens);
     }
   };
+
+  public ofAssets = (assets: Assets): Value => {
+    const value = new Value();
+    for (const [currencySymbol, tokens] of this.value) {
+      if (assets.assets.has(currencySymbol)) {
+        const tokens_ = new Map<TokenName, Amount>();
+        for (const tokenName of tokens.keys()) {
+          if (assets.assets.get(currencySymbol)?.includes(tokenName)) {
+            tokens_.set(tokenName, tokens.get(tokenName)!);
+          }
+        }
+        value.value.set(currencySymbol, tokens_);
+      }
+    }
+    return value;
+  };
 }
 
 // @ts-ignore TODO consider fixing this, or leaving as is
@@ -199,7 +223,8 @@ export class PValue<N extends PNum> extends PMapRecord<PMapRecord<N>> {
   ) {
     assert(
       !lowerBounds || !upperBounds || lt(lowerBounds, upperBounds),
-      "lowerBounds must be less than upperBounds",
+      `lowerBounds ${lowerBounds?.show()} must be less than upperBounds ${upperBounds?.show()}
+maxInteger: ${maxInteger}`,
     );
     if (lowerBounds) {
       const unknownLowerBounds = lowerBounds.unknownAssetsOf(assets);
@@ -240,13 +265,21 @@ export class PValue<N extends PNum> extends PMapRecord<PMapRecord<N>> {
 
   static genPType(): PMapRecord<PMapRecord<PBounded>> {
     const assets = new Assets(PAssets.genPType().genData());
+    const lowerBoundedAssets = assets.randomSubset();
+    const upperBoundedAssets = assets.randomSubset();
     const lowerBounds = maybeNdef(() =>
-      new Value(new PValue(PBounded, assets.randomAssets())
+      new Value(new PValue(PBounded, lowerBoundedAssets)
         .genData())
     )?.();
     const upperBounds = maybeNdef(() =>
-      new Value(new PValue(PBounded, assets.randomAssets(), lowerBounds)
-        .genData())
+      new Value(
+        new PValue(
+          PBounded,
+          upperBoundedAssets,
+          lowerBounds?.ofAssets(upperBoundedAssets).increment(),
+        )
+          .genData(),
+      )
     )?.();
     return new PValue(PBounded, assets, lowerBounds, upperBounds);
   }
@@ -325,7 +358,7 @@ export const newCompareWith = (
 
 // TODO better "infinity" values. Maybe use onchain maximum?
 export const lt = newCompareWith(
-  (a, b) => a < b,
+  (a, b) => a < b || bothExtreme(a, b),
   -BigInt(maxInteger),
   BigInt(maxInteger),
 );
@@ -398,6 +431,6 @@ export const newMapAmounts = (op: (arg: Amount) => Amount) =>
     (a) => op(a),
   );
 
-export function setAmounts(amount: Amount): (value: Value) => Value {
+export function newSetAmounts(amount: Amount): (value: Value) => Value {
   return newMapAmounts(() => amount);
 }

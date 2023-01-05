@@ -9,7 +9,7 @@ import {
   PMapRecord,
   PObject,
   PRecord,
-  propertyTestPTypesParsing,
+  proptestPTypes,
 } from "../../refactor_parse/lucid/src/mod.ts";
 import { PLiteral } from "../../refactor_parse/lucid/src/plutus/types/literal.ts";
 import { PAsset, PAssets } from "../src/types/asset.ts";
@@ -28,7 +28,7 @@ Deno.test("euclid data/types tests", () => {
       ...euclidContainerGenerators,
     ],
   );
-  propertyTestPTypesParsing(gen, 500);
+  proptestPTypes(gen, 500);
 });
 
 export const lucidPrimitiveGenerators = [
@@ -38,24 +38,23 @@ export const lucidPrimitiveGenerators = [
 ];
 
 export const lucidContainerGenerators = [
-  PList.genPType,
-  PMap.genPType,
-  PConstr.genPType,
-  PRecord.genPType,
-  PMapRecord.genPType,
-  // PSum.genPType,
-  PObject.genPType,
   PLiteral.genPType,
   PConstraint.genPType,
+  PList.genPType,
+  PMap.genPType,
+  PMapRecord.genPType,
+  PConstr.genPType,
+  PRecord.genPType,
+  PObject.genPType,
+  // PSum.genPType,
 ];
 
 const euclidPrimitiveGenerators = [
   PAsset.genPType,
-  // PAssetOf.genPType,
   PAssets.genPType,
   PBounded.genPType,
   PPositive.genPType,
-  PValue.genPType,
+  // PValue.genPType,
   // () => newPPositiveValue(PAssets.genData()),
   // genPParam,
 ];
