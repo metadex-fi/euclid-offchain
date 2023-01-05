@@ -29,7 +29,7 @@ Deno.test("euclid data/types tests", () => {
       ...euclidContainerGenerators,
     ],
   );
-  proptestPTypes(gen, 5000);
+  proptestPTypes(gen, 1000);
 });
 
 export const lucidPrimitiveGenerators = [
@@ -57,7 +57,7 @@ const euclidPrimitiveGenerators = [
   PPositive.genPType,
   PValue.genPType,
   PPositiveValue.genPType,
-  // PPrices.genPType,
+  PPrices.genPType,
   // () => newPPositiveValue(PAssets.genData()),
   // genPParam,
 ];

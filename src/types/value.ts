@@ -24,19 +24,19 @@ export class Value {
   ) {}
   public show = (tabs = ""): string => {
     const ttf = tabs + t + f;
-    const ttftf = ttf + t + f;
-    let s = `Value:\n`;
+    const ttff = ttf + f;
+    const ccys = [`Value:`];
     for (const [currencySymbol, tokenMap] of this.value) {
-      s += `${ttf}${currencySymbol === "" ? "ADA" : currencySymbol}:\n`;
+      ccys.push(`${ttf}${currencySymbol === "" ? "ADA" : currencySymbol}:`);
       const t = [];
       for (const [tokenName, amount] of tokenMap) {
         t.push(
-          `${ttftf}${tokenName === "" ? "lovelace" : tokenName}: ${amount}`,
+          `${ttff}${tokenName === "" ? "lovelace" : tokenName}: ${amount}`,
         );
       }
-      s += t.join(",\n") + "\n";
+      ccys.push(t.join(",\n"));
     }
-    return s;
+    return ccys.join(`\n`);
   };
 
   public zeroed = (): Value => {

@@ -74,17 +74,17 @@ export class Assets {
 
   public show = (tabs = ""): string => {
     const ttf = tabs + t + f;
-    const ttftf = ttf + t + f;
-    let s = `Assets:\n`;
+    const ttff = ttf + f;
+    const ccys = [`Assets:`];
     for (const [currencySymbol, tokens] of this.assets) {
-      s += `${ttf}${currencySymbol === "" ? "ADA" : currencySymbol}:\n`;
-      const t = [];
+      ccys.push(`${ttf}${currencySymbol === "" ? "ADA" : currencySymbol}:`);
+      const tkns = [];
       for (const tokenName of tokens) {
-        t.push(`${ttftf}${tokenName === "" ? "lovelace" : tokenName}`);
+        tkns.push(`${ttff}${tokenName === "" ? "lovelace" : tokenName}`);
       }
-      s += t.join(",\n") + "\n";
+      ccys.push(tkns.join(",\n"));
     }
-    return s;
+    return ccys.join(`\n`);
   };
 
   public head = (): Asset => {

@@ -1,11 +1,13 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
+  f,
   genNonNegative,
   genPositive,
   maxInteger,
   min,
   PConstraint,
   randomChoice,
+  t,
 } from "../../../refactor_parse/lucid/src/mod.ts";
 import { Assets } from "./asset.ts";
 import { Amount, CurrencySymbol, TokenName } from "./primitive.ts";
@@ -46,6 +48,19 @@ export class PPrices extends PConstraint<PPositiveValue> {
       ),
     );
   }
+
+  public showPType = (tabs = ""): string => {
+    const tt = tabs + t;
+    const ttf = tt + f;
+
+    return `Prices(
+${ttf}assets = ${this.assets.show(ttf)}, 
+${ttf}initialPrices = ${this.initialPrices.value.show(ttf)}, 
+${ttf}jumpSizes = ${this.jumpSizes.value.show(ttf)}, 
+${ttf}lowerBounds? = ${this.lowerBounds?.value.show(ttf)}, 
+${ttf}upperBounds? =  ${this.upperBounds?.value.show(ttf)}
+${tt})`;
+  };
 
   static genPType(): PConstraint<PPositiveValue> {
     const pvalue = PPositiveValue.genPType();
