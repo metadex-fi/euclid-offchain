@@ -222,8 +222,8 @@ export class PValue<N extends PNum> extends PMapRecord<PMapRecord<N>> {
     public upperBounds?: Value,
   ) {
     assert(
-      !lowerBounds || !upperBounds || lt(lowerBounds, upperBounds),
-      `lowerBounds ${lowerBounds?.show()} must be less than upperBounds ${upperBounds?.show()}
+      !lowerBounds || !upperBounds || leq(lowerBounds, upperBounds),
+      `lowerBounds ${lowerBounds?.show()} must be leq upperBounds ${upperBounds?.show()}
 maxInteger: ${maxInteger}`,
     );
     if (lowerBounds) {
@@ -276,7 +276,7 @@ maxInteger: ${maxInteger}`,
         new PValue(
           PBounded,
           upperBoundedAssets,
-          lowerBounds?.ofAssets(upperBoundedAssets).increment(),
+          lowerBounds?.ofAssets(upperBoundedAssets),
         )
           .genData(),
       )

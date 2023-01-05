@@ -54,7 +54,7 @@ const euclidPrimitiveGenerators = [
   PAssets.genPType,
   PBounded.genPType,
   PPositive.genPType,
-  // PValue.genPType,
+  PValue.genPType,
   // () => newPPositiveValue(PAssets.genData()),
   // genPParam,
 ];
