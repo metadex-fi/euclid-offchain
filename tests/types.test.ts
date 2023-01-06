@@ -1,5 +1,7 @@
 import {
   Generators,
+  PAsset,
+  PAssets,
   PBounded,
   PByteString,
   PConstr,
@@ -12,17 +14,21 @@ import {
   PNonEmptyList,
   PObject,
   PPositive,
+  PPositiveValue,
+  PPrices,
   PRecord,
+  proptestPTypes,
+  PValue,
 } from "../src/mod.ts";
-import { proptestPTypes } from "../src/utils/testing/proptests.ts";
 
 Deno.test("euclid data/types tests", () => {
   // @ts-ignore TODO consider fixing this or leaving as is
   const gen = new Generators(
+    // @ts-ignore TODO consider fixing this or leaving as is
     [
       ...fundamentalPrimitiveGenerators,
       ...derivedPrimitiveGenerators,
-      // ...euclidPrimitiveGenerators,
+      ...euclidPrimitiveGenerators,
     ],
     [
       ...fundamentalContainerGenerators,
@@ -60,19 +66,15 @@ const derivedContainerGenerators = [
   PNonEmptyList.genPType,
 ];
 
-// const euclidPrimitiveGenerators = [
-//   PAsset.genPType,
-//   PAssets.genPType,
-//   PBounded.genPType,
-//   PPositive.genPType,
-//   PValue.genPType,
-//   PPositiveValue.genPType,
-//   PPrices.genPType,
-//   // () => newPPositiveValue(PAssets.genData()),
-//   // genPParam,
-// ];
+const euclidPrimitiveGenerators = [
+  PAsset.genPType,
+  PAssets.genPType,
+  PValue.genPType,
+  PPositiveValue.genPType,
+  PPrices.genPType,
+  // () => newPPositiveValue(PAssets.genData()),
+  // genPParam,
+];
 
 // const euclidContainerGenerators = [
-//   PNonEmptyList.genPType,
-//   // newNewPValue(new PInteger()),
 // ];

@@ -6,16 +6,14 @@ import { PList } from "./list.ts";
 import { PMap } from "./map.ts";
 import {
   f,
-  PConstanted,
   PData,
-  PLifted,
   PlutusOf,
+  PRecord,
   PType,
   PTypeOf,
   RecordOf,
   t,
 } from "./mod.ts";
-import { PRecord } from "./record.ts";
 
 type PFieldsOf<O> = PTypeOf<O[keyof O]>;
 

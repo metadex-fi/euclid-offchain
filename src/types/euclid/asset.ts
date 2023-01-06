@@ -6,6 +6,7 @@ import {
   randomChoice,
   randomSubset,
 } from "../../mod.ts";
+import { PObject } from "../general/mod.ts";
 import {
   CurrencySymbol,
   f,
@@ -14,7 +15,6 @@ import {
   PLifted,
   PMap,
   PNonEmptyList,
-  PObject,
   PRecord,
   PTokenName,
   t,
@@ -39,6 +39,7 @@ export class Asset {
     public tokenName: TokenName,
   ) {}
 }
+// @ts-ignore TODO consider fixing this, or leaving as is
 export class PAsset extends PConstraint<PObject<Asset>> {
   constructor() {
     super(
