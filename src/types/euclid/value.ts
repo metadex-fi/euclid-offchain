@@ -1,7 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { maxInteger, maybeNdef } from "../../utils/testing/generators.ts";
 import {
-  Amount,
   bothExtreme,
   f,
   PBounded,
@@ -65,7 +64,7 @@ export class Value {
   //   return newSetAmounts(-maxInteger)(this);
   // };
 
-  public scaled = (amount: Amount): Value => {
+  public scaled = (amount: bigint): Value => {
     return newMapAmounts((a) => a * amount)(this);
   };
 
@@ -98,7 +97,7 @@ export class Value {
     throw new Error("no assets in value");
   };
 
-  public firstAmount = (): Amount => {
+  public firstAmount = (): bigint => {
     for (const [_, tokens] of this.value) {
       for (const [_, amount] of tokens) {
         return amount;
@@ -115,7 +114,7 @@ export class Value {
       if (first) {
         assert(tkns.size > 0, "empty token map");
         if (tkns.size > 1) {
-          const tail_ = new Map<TokenName, Amount>();
+          const tail_ = new Map<TokenName, bigint>();
           let first_ = true;
           for (const [tkn, amnt] of tkns) {
             if (first_) first_ = false;
@@ -147,14 +146,14 @@ export class Value {
     return this.assets().equals(assets);
   };
 
-  public maybeAmountOf = (asset: Asset): Amount | undefined => {
+  public maybeAmountOf = (asset: Asset): bigint | undefined => {
     return this.value.get(asset.currencySymbol)?.get(asset.tokenName);
   };
 
   public amountOf = (
     asset: Asset,
     defaultAmnt?: bigint,
-  ): Amount => {
+  ): bigint => {
     const amount = this.maybeAmountOf(asset) ??
       defaultAmnt;
     assert(
@@ -166,7 +165,7 @@ export class Value {
     return amount;
   };
 
-  public setAmountOf = (asset: Asset, amount: Amount): void => {
+  public setAmountOf = (asset: Asset, amount: bigint): void => {
     const tokens = this.value.get(asset.currencySymbol);
     assert(
       tokens,
@@ -183,7 +182,7 @@ export class Value {
     tokens.set(asset.tokenName, amount);
   };
 
-  public initAmountOf = (asset: Asset, amount: Amount): void => {
+  public initAmountOf = (asset: Asset, amount: bigint): void => {
     const tokens = this.value.get(asset.currencySymbol);
     if (tokens) {
       assert(
@@ -194,7 +193,7 @@ export class Value {
       );
       tokens.set(asset.tokenName, amount);
     } else {
-      const tokens = new Map<TokenName, Amount>();
+      const tokens = new Map<TokenName, bigint>();
       tokens.set(asset.tokenName, amount);
       this.value.set(asset.currencySymbol, tokens);
     }
@@ -205,7 +204,7 @@ export class Value {
     for (const [currencySymbol, tokens] of this.value) {
       const assets_ = assets.toMap();
       if (assets_.has(currencySymbol)) {
-        const tokens_ = new Map<TokenName, Amount>();
+        const tokens_ = new Map<TokenName, bigint>();
         for (const tokenName of tokens.keys()) {
           if (assets_.get(currencySymbol)?.includes(tokenName)) {
             tokens_.set(tokenName, tokens.get(tokenName)!);
@@ -324,7 +323,7 @@ export class PositiveValue {
     assert(allPositive(value), "value must be positive");
   }
 
-  public initAmountOf = (asset: Asset, amount: Amount): void => {
+  public initAmountOf = (asset: Asset, amount: bigint): void => {
     assert(
       amount >= 0n,
       `initAmountOf: amount must be positive, got ${amount} for asset ${
@@ -366,7 +365,7 @@ export class JumpSizes {
   constructor(public value: Value) {}
 }
 export class PJumpSizes extends PPositiveValue {
-  private constructor(
+  constructor(
     public assets: Assets,
     public lowerBounds?: Value,
     public upperBounds?: Value,
@@ -378,35 +377,34 @@ export class PJumpSizes extends PPositiveValue {
 export function assetsOf(
   ...values: Value[]
 ): Assets {
-  const assets = new Assets();
+  const assets = new Map<CurrencySymbol, TokenName[]>();
   for (const value of values) {
     for (const [currencySymbol, tokenMap] of value.toMap()) {
-      const assets_ = assets.toMap();
-      if (!assets_.has(currencySymbol)) {
-        assets_.set(currencySymbol, []);
+      if (!assets.has(currencySymbol)) {
+        assets.set(currencySymbol, []);
       }
       for (const tokenName of tokenMap.keys()) {
-        const tokens = assets_.get(currencySymbol)!;
+        const tokens = assets.get(currencySymbol)!;
         if (!tokens.includes(tokenName)) {
           tokens.push(tokenName);
         }
       }
     }
   }
-  return assets;
+  return new Assets(assets);
 }
 
-export function singleton(asset: Asset, amount: Amount): Value {
+export function singleton(asset: Asset, amount: bigint): Value {
   const value = new Map<CurrencySymbol, Map<TokenName, bigint>>();
-  const tokens = new Map<TokenName, Amount>();
+  const tokens = new Map<TokenName, bigint>();
   tokens.set(asset.tokenName, amount);
   value.set(asset.currencySymbol, tokens);
   return new Value(value);
 }
 
 export const newCompareWith = (
-  op: (arg: Amount, ...args: Array<Amount>) => boolean,
-  ...defaultIns: Array<Amount | undefined>
+  op: (arg: bigint, ...args: Array<bigint>) => boolean,
+  ...defaultIns: Array<bigint | undefined>
 ) => {
   // assert( // TODO FIXME
   //   defaultIns.length <= op.arguments.length,
@@ -422,7 +420,7 @@ export const newCompareWith = (
     for (const [currencySymbol, tokens] of assets.toMap()) {
       for (const tokenName of tokens) {
         const asset = new Asset(currencySymbol, tokenName);
-        const amountsIn = new Array<Amount>();
+        const amountsIn = new Array<bigint>();
         [arg, ...args_].forEach((v, i) => {
           const defaultIn = defaultIns[i];
           const amountIn = v.amountOf(asset, defaultIn);
@@ -449,7 +447,7 @@ export const leq = newCompareWith(
   BigInt(maxInteger),
 );
 
-export const newAmountsCheck = (op: (arg: Amount) => boolean) =>
+export const newAmountsCheck = (op: (arg: bigint) => boolean) =>
   newCompareWith(
     (a) => op(a),
   );
@@ -457,9 +455,9 @@ export const newAmountsCheck = (op: (arg: Amount) => boolean) =>
 export const allPositive = newAmountsCheck((a) => a > 0n);
 
 export const newUnionWith = (
-  op: (arg: Amount, ...args: Array<Amount>) => Amount,
-  defaultOut?: Amount,
-  ...defaultIns: Array<Amount | undefined>
+  op: (arg: bigint, ...args: Array<bigint>) => bigint,
+  defaultOut?: bigint,
+  ...defaultIns: Array<bigint | undefined>
 ) => {
   // assert( // TODO FIXME
   //   defaultIns.length <= op.arguments.length,
@@ -479,7 +477,7 @@ export const newUnionWith = (
     for (const [currencySymbol, tokens] of assets.toMap()) {
       for (const tokenName of tokens) {
         const asset = new Asset(currencySymbol, tokenName);
-        const amountsIn = new Array<Amount>();
+        const amountsIn = new Array<bigint>();
         [arg, ...args_].forEach((v, i) => {
           const defaultIn = defaultIns[i];
           amountsIn.push(v.amountOf(asset, defaultIn));
@@ -501,17 +499,17 @@ export const addValues = newUnionWith((a, b) => a + b, 0n, 0n, 0n);
 
 export const lSubValues = newUnionWith((a, b) => a > b ? a - b : 0n, 0n);
 
-export const addAmount = (v: Value, asset: Asset, amount: Amount): Value => {
+export const addAmount = (v: Value, asset: Asset, amount: bigint): Value => {
   const add = newUnionWith((a, b) => a + b, 0n, undefined, 0n);
   const value = add(v, singleton(asset, amount));
   return value;
 };
 
-export const newMapAmounts = (op: (arg: Amount) => Amount) =>
+export const newMapAmounts = (op: (arg: bigint) => bigint) =>
   newUnionWith(
     (a) => op(a),
   );
 
-export function newSetAmounts(amount: Amount): (value: Value) => Value {
+export function newSetAmounts(amount: bigint): (value: Value) => Value {
   return newMapAmounts(() => amount);
 }

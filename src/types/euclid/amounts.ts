@@ -1,37 +1,49 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { genNumber, genPositive } from "../../utils/testing/generators.ts";
+import {
+  genNonNegative,
+  genPositive,
+  maxInteger,
+} from "../../utils/testing/generators.ts";
 import {
   Amount,
   Asset,
-  assetsOf,
+  f,
   PConstraint,
   PositiveValue,
   PPositiveValue,
   PPrices,
   Prices,
+  t,
 } from "../mod.ts";
-import { Assets, PAssets } from "./asset.ts";
 
 export type Amounts = PositiveValue;
 export class PAmounts extends PConstraint<PPositiveValue> {
   private constructor(
-    public assets: Assets,
     public baseAmountA0: bigint,
     public pprices: PPrices,
   ) {
     super(
-      new PPositiveValue(assets),
+      new PPositiveValue(pprices.assets),
       [], // TODO only looking at datums, include values
       newGenAmounts(baseAmountA0, pprices),
     );
   }
 
+  public showPType = (tabs = ""): string => {
+    const tt = tabs + t;
+    const ttf = tt + f;
+    return `PAmounts (
+${ttf}population: ${this.population},
+${ttf}baseAmountA0: ${this.baseAmountA0},
+${ttf}pprices: ${this.pprices.showPType(ttf)}
+${tt})`;
+  };
+
   static genPType(): PConstraint<PPositiveValue> {
     const baseAmountA0 = genPositive();
     const pprices = PPrices.genPType() as PPrices;
-    const assets = pprices.assets;
 
-    return new PAmounts(assets, baseAmountA0, pprices);
+    return new PAmounts(baseAmountA0, pprices);
   }
 }
 
@@ -42,25 +54,36 @@ const newGenAmounts = (
 () => genAmounts(baseAmountA0, pprices.genPrices()).toMap();
 
 const genAmounts = (baseAmountA0: Amount, prices: Prices): Amounts => {
-  if (prices.value.size() === 0) {
-    return new PositiveValue();
-  }
-  const assets = assetsOf(prices.value);
-  const denom = assets.head()!;
-  const nonzero = assets.randomSubset();
+  assert(
+    prices.value.size() >= 2n,
+    `genAmounts: less than two assets in ${prices.value.show()}`,
+  );
+  const assets = prices.value.assets();
+  const denom = assets.head();
+  const nonzero = assets.nonEmptySubset();
   const p0 = prices.value.amountOf(denom);
   const amounts = new PositiveValue();
   let amountA0 = baseAmountA0;
   for (const [ccy, tkns] of nonzero.tail().toMap()) {
     for (const tkn of tkns) {
       const asset = new Asset(ccy, tkn);
-      const tradedA0 = BigInt(genNumber(amountA0));
-      amountA0 -= tradedA0;
       const p = prices.value.amountOf(asset);
-      amounts.initAmountOf(asset, (tradedA0 * p) / p0);
+      const tradedA0 = genNonNegative(amountA0);
+      const received = (tradedA0 * p) / p0;
+      if (received <= maxInteger && received > 0n) {
+        amountA0 -= tradedA0;
+        amounts.initAmountOf(asset, received);
+      }
     }
   }
   const p = prices.value.amountOf(nonzero.head())!;
-  amounts.initAmountOf(nonzero.head(), (amountA0 * p) / p0);
+  const firstAmnt = (amountA0 * p) / p0;
+  // if the amount of the first asset is too large, use the
+  // base amount, as we know that to be within global bounds
+  if (firstAmnt <= maxInteger && firstAmnt > 0n) {
+    amounts.initAmountOf(nonzero.head(), firstAmnt);
+  } else if (amountA0 > 0n) {
+    amounts.initAmountOf(denom, amountA0);
+  }
   return amounts;
 };

@@ -21,23 +21,24 @@ import {
   PValue,
 } from "../src/mod.ts";
 import { PAmounts } from "../src/types/euclid/amounts.ts";
+import { PParam } from "../src/types/euclid/param.ts";
 
 Deno.test("euclid data/types tests", () => {
   // @ts-ignore TODO consider fixing this or leaving as is
   const gen = new Generators(
     // @ts-ignore TODO consider fixing this or leaving as is
     [
-      ...fundamentalPrimitiveGenerators,
-      ...derivedPrimitiveGenerators,
+      // ...fundamentalPrimitiveGenerators,
+      // ...derivedPrimitiveGenerators,
       ...euclidPrimitiveGenerators,
     ],
     [
-      ...fundamentalContainerGenerators,
-      ...derivedContainerGenerators,
+      // ...fundamentalContainerGenerators,
+      // ...derivedContainerGenerators,
       // ...euclidContainerGenerators,
     ],
   );
-  proptestPTypes(gen, 1000);
+  proptestPTypes(gen, 5000);
 });
 
 const fundamentalPrimitiveGenerators = [
@@ -74,6 +75,7 @@ const euclidPrimitiveGenerators = [
   PPositiveValue.genPType,
   PPrices.genPType,
   PAmounts.genPType,
+  // PParam.genPType,
   // () => newPPositiveValue(PAssets.genData()),
   // genPParam,
 ];

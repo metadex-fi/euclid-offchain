@@ -92,7 +92,7 @@ ${tt})`;
   static genPType(
     gen: Generators,
     maxDepth: bigint,
-  ) {
+  ): PObject<any> {
     const precord = new PRecord<PData>(
       {
         s: PByteString.genPType(),

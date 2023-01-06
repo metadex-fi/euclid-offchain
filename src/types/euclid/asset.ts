@@ -7,7 +7,7 @@ import {
   randomChoice,
   randomSubset,
 } from "../../mod.ts";
-import { PObject } from "../general/mod.ts";
+import { newGenInRange, PObject, PPositive } from "../general/mod.ts";
 import {
   CurrencySymbol,
   f,
@@ -130,13 +130,15 @@ export class Assets {
   };
 
   public head = (): Asset => {
-    for (const [ccy, tkns] of this.assets) {
-      assert(tkns.length > 0, "empty token map");
-      for (const tkn in tkns) {
-        return new Asset(ccy, tkn);
+    {
+      for (const [ccy, tkns] of this.assets) {
+        assert(tkns.length > 0, "empty token map");
+        for (const tkn of tkns) {
+          return new Asset(ccy, tkn);
+        }
       }
+      throw new Error("unexpected empty Assets");
     }
-    throw new Error("unexpected empty Assets");
   };
 
   public tail = (): Assets => {
@@ -166,6 +168,16 @@ export class Assets {
   public randomSubset = (): Assets => {
     const assets_ = new Assets();
     const ccys = randomSubset([...this.assets.keys()]);
+    for (const ccy of ccys) {
+      const tkns = nonEmptySubSet(this.assets.get(ccy)!);
+      assets_.assets.set(ccy, tkns);
+    }
+    return assets_;
+  };
+
+  public nonEmptySubset = (): Assets => {
+    const assets_ = new Assets();
+    const ccys = nonEmptySubSet([...this.assets.keys()]);
     for (const ccy of ccys) {
       const tkns = nonEmptySubSet(this.assets.get(ccy)!);
       assets_.assets.set(ccy, tkns);
@@ -234,15 +246,18 @@ const newGenAssets =
   (genNumAssets: (maxNum: bigint) => bigint) => (): PLifted<PAssets> => {
     const assets = new Map<CurrencySymbol, TokenName[]>();
     const numAssets = genNumAssets(gMaxLength);
-    for (let i = 0; i < numAssets; i++) {
+    let i = 0;
+    while (i < numAssets) {
       const asset = genAsset();
       if (assets.has(asset.currencySymbol)) {
         const tokens = assets.get(asset.currencySymbol)!;
         if (!tokens.includes(asset.tokenName)) {
           tokens.push(asset.tokenName);
+          i++;
         }
       } else {
         assets.set(asset.currencySymbol, [asset.tokenName]);
+        i++;
       }
     }
     return assets;
@@ -258,8 +273,17 @@ export class PAssets
     );
   }
 
-  static genAssets = (): Assets => {
-    return new Assets(PAssets.ptype.genData());
+  static genAssets = (minLength = 0n): Assets => {
+    const genNumAssets = (maxNum: bigint) => newGenInRange(minLength, maxNum)();
+    const genAssets = newGenAssets(genNumAssets);
+    const assets = new Assets(
+      genAssets(),
+    );
+    assert(
+      assets.size() >= minLength,
+      `genAssets: minLength: ${minLength} not met by ${assets.show()}`,
+    );
+    return assets;
   };
 
   static ptype = new PAssets();
@@ -269,28 +293,3 @@ export class PAssets
     return PAssets.ptype;
   }
 }
-
-// const assertNonEmpty = (assets: PLifted<PAssets>) => {
-//   assert(assets.size > 0, "empty assets");
-// };
-
-// export class NonEmptyAssets {
-//   constructor(public assets: Assets) {
-//     assertNonEmpty(assets.assets);
-//   }
-// }
-
-// export class PNonEmptyAssets extends PConstraint<PAssets> {
-//   private constructor() {
-//     super(PAssets.ptype, [assertNonEmpty], newGenAssets(genPositive));
-//   }
-
-//   static genNonEmptyAssets = (): NonEmptyAssets => {
-//     return new NonEmptyAssets(new Assets(PNonEmptyAssets.ptype.genData()));
-//   };
-
-//   static ptype = new PNonEmptyAssets();
-//   static genPType(): PConstraint<PAssets> {
-//     return PNonEmptyAssets.ptype;
-//   }
-// }

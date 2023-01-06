@@ -57,7 +57,7 @@ const genPBounded = (
   return new PBounded(lowerBound, upperBound);
 };
 
-const newGenInRange = (lowerBound: bigint, upperBound: bigint) => {
+export const newGenInRange = (lowerBound: bigint, upperBound: bigint) => {
   if (lowerBound === upperBound) return () => lowerBound;
   assert(
     lowerBound < upperBound,
