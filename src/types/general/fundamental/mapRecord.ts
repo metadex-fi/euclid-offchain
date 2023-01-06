@@ -41,7 +41,7 @@ export class PMapRecord<PFields extends PData>
 
     m.forEach((value, key) => {
       const pvalue = this.pfields[key];
-      data.set(key, pvalue.plift(value));
+      data.set(key, pvalue.plift(value) as PLifted<PFields>);
     });
     return data;
   };
@@ -70,7 +70,7 @@ export class PMapRecord<PFields extends PData>
   public genData = (): Map<string, PLifted<PFields>> => {
     const m = new Map<string, PLifted<PFields>>();
     Object.entries(this.pfields).forEach(([key, pfield]) => {
-      m.set(key, pfield.genData());
+      m.set(key, pfield.genData() as PLifted<PFields>);
     });
     return m;
   };

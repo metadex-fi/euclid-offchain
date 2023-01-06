@@ -8,7 +8,11 @@ T is the equivalent concrete type.
 */
 
 import { Constr, Data } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { PLiteral } from "./literal.ts";
+import { PByteString } from "./bytestring.ts";
+import { PConstr } from "./constr.ts";
+import { PInteger } from "./integer.ts";
+import { PMap } from "./map.ts";
+import { PObject } from "./object.ts";
 
 export type RecordOf<T> = Record<string, T>;
 export type PData = PType<Data, unknown>;
@@ -19,15 +23,24 @@ export type PLifted<PT extends PData> = ReturnType<
   PT["plift"]
 >;
 
+type PlutusObject<T> = RecordOf<PlutusOf<T>>;
+
 export type PlutusOf<T> = T extends Data ? T
   : T extends Array<infer E> ? Array<PlutusOf<E>>
   : T extends Map<infer K, infer V> ? Map<PlutusOf<K>, PlutusOf<V>>
   : T extends Constr<infer F> ? Array<PlutusOf<F>>
-  : T extends RecordOf<PlutusOf<T>> ? PlutusOfObject<T>
+  : T extends PlutusObject<T> ? Array<PlutusOf<T[keyof T]>>
   : never;
-export type PlutusOfObject<T extends RecordOf<PlutusOf<T>>> = Array<
-  PlutusOf<T[keyof T]>
->;
+
+export type PTypeOf<T> = T extends bigint ? PInteger
+  : T extends string ? PByteString
+  // @ts-ignore TODO consider fixing this or leaving as is
+  : T extends Array<infer E> ? PList<PTypeOf<E>>
+  // @ts-ignore TODO consider fixing this or leaving as is
+  : T extends Map<infer K, infer V> ? PMap<PTypeOf<K>, PTypeOf<V>>
+  : T extends Constr<infer F> ? PConstr<PTypeOf<F>>
+  : T extends RecordOf<PlutusOf<unknown>> ? PObject<T>
+  : never; //PAny<PlutusOf<T>>;
 
 export interface PType<P extends Data, T> {
   population: number; // number because convenient Infinity type
@@ -40,8 +53,6 @@ export interface PType<P extends Data, T> {
 }
 export type Constructor<T> = new (...args: unknown[]) => T;
 export const PTypes: RecordOf<PData> = {};
-
-export type PMaybeLiteral<T extends PData> = T | PLiteral<T>;
 
 export const f = "+  ";
 export const t = "   ";

@@ -1,40 +1,30 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Constr } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { Generators } from "../../../mod.ts";
 import { PByteString } from "./bytestring.ts";
-import { PConstr } from "./constr.ts";
 import { PInteger } from "./integer.ts";
 import { PList } from "./list.ts";
 import { PMap } from "./map.ts";
 import {
   f,
-  PAny,
   PConstanted,
   PData,
   PLifted,
   PlutusOf,
-  PlutusOfObject,
   PType,
+  PTypeOf,
   RecordOf,
   t,
 } from "./mod.ts";
 import { PRecord } from "./record.ts";
 
-type PTypeOf<T> = T extends bigint ? PInteger
-  : T extends string ? PByteString
-  : T extends Array<infer E> ? PList<PTypeOf<E>>
-  : T extends Map<infer K, infer V> ? PMap<PTypeOf<K>, PTypeOf<V>>
-  : T extends Constr<infer F> ? PConstr<PTypeOf<F>>
-  : T extends Object ? PObject<T>
-  : PAny<PlutusOf<T>>;
-
 type PFieldsOf<O> = PTypeOf<O[keyof O]>;
 
 type AttributeTypes<T> = {
-  [K in keyof T]: T[K] extends object ? AttributeTypes<T[K]> : T[K];
+  [K in keyof T]: T[K] extends RecordOf<unknown> ? AttributeTypes<T[K]> : T[K];
 }[keyof T];
 
-export class PObject<O extends Object> implements PType<PlutusOfObject<O>, O> {
+// @ts-ignore TODO consider fixing this or leaving as is
+export class PObject<O extends Object> implements PType<PlutusOf<O>, O> {
   public population: number;
   // public precord: PRecord<PData>;
   constructor(
@@ -56,20 +46,19 @@ export class PObject<O extends Object> implements PType<PlutusOfObject<O>, O> {
     // this.precord = new PRecord(record);
   }
 
+  // @ts-ignore TODO consider fixing this or leaving as is
   public plift = (l: PlutusOfObject<O>): O => {
-    const record: RecordOf<PLifted<PFieldsOf<O>>> = this.precord.plift(
-      l as Array<PConstanted<PFieldsOf<O>>>,
-    );
+    const record = this.precord.plift(l);
     const args = Object.values(record);
     return new (this.O)(...args as AttributeTypes<ExampleClass>[]) as O;
   };
 
   public pconstant = (
     data: O,
-  ): PlutusOfObject<O> => {
+  ): PlutusOf<O> => {
     return this.precord.pconstant(
-      data as RecordOf<PLifted<PFieldsOf<O>>>,
-    ) as PlutusOfObject<O>;
+      data as RecordOf<unknown>,
+    ) as PlutusOf<O>;
   };
 
   public genData = (): O => {
@@ -87,7 +76,7 @@ export class PObject<O extends Object> implements PType<PlutusOfObject<O>, O> {
     const ttf = tt + f;
 
     return `Object: ${this.O.name} (
-${ttf}${this.precord.showData(data, ttf)}
+${ttf}${this.precord.showData(data as RecordOf<unknown>, ttf)}
 ${tt})`;
   };
 
@@ -105,7 +94,7 @@ ${tt})`;
   static genPType(
     gen: Generators,
     maxDepth: bigint,
-  ): PObject<any> {
+  ) {
     const precord = new PRecord<PData>(
       {
         s: PByteString.genPType(),

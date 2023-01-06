@@ -4,7 +4,7 @@ import {
 } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Data } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { PData } from "../../mod.ts";
-import { Generators, gMaxDepth } from "./mod.ts";
+import { Generators, gMaxDepth } from "./generators.ts";
 
 export function proptestPTypes(gen: Generators, iterations: number) {
   const popErrs = new Map<string, number>();

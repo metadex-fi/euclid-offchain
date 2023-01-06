@@ -1,7 +1,7 @@
 // TODO consider generating wrong cases as well
 
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { PByteString, PData, PInteger, PRecord } from "../../mod.ts";
+import { PData } from "../../mod.ts";
 
 export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
 const maxStringBytes = 2n; // TODO higher
@@ -122,26 +122,4 @@ export function genName(): string {
   const upper = lower.toUpperCase();
   const alph = lower + upper; // TODO special characters
   return genString(alph);
-}
-
-// sample named record
-
-export class Example {
-  constructor(
-    public ccy: string,
-    public tkn: string,
-    public amnt: bigint,
-  ) {}
-}
-
-export function genPExample() {
-  return new PRecord<PByteString | PInteger>(
-    {
-      "ccy": new PByteString(),
-      "tkn": new PByteString(),
-      "amnt": new PInteger(),
-    },
-    //@ts-ignore TODO fixme
-    Example,
-  );
 }

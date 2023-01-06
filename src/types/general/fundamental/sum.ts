@@ -1,5 +1,14 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Constr } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import {
+  Generators,
+  genName,
+  genNonNegative,
+  gMaxLength,
+  randomChoice,
+} from "../../../mod.ts";
+import { PRecord } from "./record.ts";
+import { PConstanted, PData, PLifted, PType, RecordOf } from "./type.ts";
 
 export class PSum<PFields extends PData>
   implements PType<Constr<PConstanted<PFields>>, RecordOf<PLifted<PFields>>> {
