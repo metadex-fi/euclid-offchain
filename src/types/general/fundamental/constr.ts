@@ -1,10 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Constr } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import {
-  Generators,
-  genNonNegative,
-  maxInteger,
-} from "../../utils/testing/generators.ts";
+import { Generators, genNonNegative, maxInteger } from "../../../mod.ts";
 import { PRecord } from "./record.ts";
 import { f, PConstanted, PData, PLifted, PType, RecordOf, t } from "./type.ts";
 

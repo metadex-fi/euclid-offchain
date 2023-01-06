@@ -19,7 +19,7 @@ export class PAny<P extends Data> implements PType<P, P> {
     throw new Error("not implemented");
   }
 
-  public showData = (data: any): string => {
+  public showData = (data: unknown): string => {
     return `Any: ${data}`;
   };
 
@@ -27,7 +27,7 @@ export class PAny<P extends Data> implements PType<P, P> {
     return `PAny`;
   };
 
-  static genPType(): PAny<PlutusData> {
+  static genPType(): PAny<Data> {
     return new PAny();
   }
 }

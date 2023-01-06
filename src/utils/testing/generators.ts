@@ -1,10 +1,7 @@
 // TODO consider generating wrong cases as well
 
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { PByteString } from "../../types/general/bytestring.ts";
-import { PInteger } from "../../types/general/integer.ts";
-import { PRecord } from "../../types/general/record.ts";
-import { PData } from "../../types/general/type.ts";
+import { PByteString, PData, PInteger, PRecord } from "../../mod.ts";
 
 export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
 const maxStringBytes = 2n; // TODO higher

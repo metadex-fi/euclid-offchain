@@ -1,13 +1,8 @@
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { PObject } from "../general/object.ts";
-import { PRecord } from "../general/record.ts";
+import { Amount, PObject, PRecord } from "../mod.ts";
 import { PAssets } from "./asset.ts";
 import { Prices } from "./prices.ts";
-import {
-  Amount,
-  newPPaymentKeyHashLiteral,
-  PPaymentKeyHash,
-} from "./primitive.ts";
+import { newPPaymentKeyHashLiteral, PPaymentKeyHash } from "./primitive.ts";
 import { JumpSizes } from "./value.ts";
 
 // TODO assertions about lower < initial < upper prices

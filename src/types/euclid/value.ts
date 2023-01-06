@@ -1,17 +1,18 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { maxInteger, maybeNdef } from "../../utils/testing/generators.ts";
-import { PMapRecord } from "../general/mapRecord.ts";
-import { f, RecordOf, t } from "../general/type.ts";
-import { Asset, Assets, PAssets } from "./asset.ts";
 import {
   Amount,
   bothExtreme,
-  CurrencySymbol,
+  f,
   PBounded,
+  PMapRecord,
   PNum,
   PPositive,
-  TokenName,
-} from "./primitive.ts";
+  RecordOf,
+  t,
+} from "../mod.ts";
+import { Asset, Assets, PAssets } from "./asset.ts";
+import { CurrencySymbol, TokenName } from "./primitive.ts";
 
 export class Value {
   constructor(

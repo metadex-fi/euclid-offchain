@@ -5,19 +5,21 @@ import {
   nonEmptySubSet,
   randomChoice,
   randomSubset,
-} from "../../utils/testing/generators.ts";
-import { PConstraint } from "../general/constraint.ts";
-import { f, PLifted, t } from "../general/type.ts";
-import { PMap } from "../general/map.ts";
-import { PObject } from "../general/object.ts";
-import { PRecord } from "../general/record.ts";
-import { PNonEmptyList } from "./nonEmptyList.ts";
+} from "../../mod.ts";
 import {
   CurrencySymbol,
+  f,
+  PConstraint,
   PCurrencySymbol,
+  PLifted,
+  PMap,
+  PNonEmptyList,
+  PObject,
+  PRecord,
   PTokenName,
+  t,
   TokenName,
-} from "./primitive.ts";
+} from "../mod.ts";
 
 const assertADAlovelace = (a: Asset): void => {
   if (a.currencySymbol === "") {

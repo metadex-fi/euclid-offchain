@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { genString } from "../../utils/testing/generators.ts";
+import { genString } from "../../../mod.ts";
 import { PType } from "./type.ts";
 
 export class PByteString implements PType<string, string> {

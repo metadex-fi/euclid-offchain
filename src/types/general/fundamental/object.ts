@@ -1,15 +1,14 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Constr } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { Generators } from "../../utils/testing/generators.ts";
-import { PAny } from "./any.ts";
+import { Generators } from "../../../mod.ts";
 import { PByteString } from "./bytestring.ts";
 import { PConstr } from "./constr.ts";
 import { PInteger } from "./integer.ts";
 import { PList } from "./list.ts";
 import { PMap } from "./map.ts";
-import { PRecord } from "./record.ts";
 import {
   f,
+  PAny,
   PConstanted,
   PData,
   PLifted,
@@ -18,7 +17,8 @@ import {
   PType,
   RecordOf,
   t,
-} from "./type.ts";
+} from "./mod.ts";
+import { PRecord } from "./record.ts";
 
 type PTypeOf<T> = T extends bigint ? PInteger
   : T extends string ? PByteString

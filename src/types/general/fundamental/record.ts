@@ -1,11 +1,4 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  Generators,
-  genName,
-  genNonNegative,
-  gMaxLength,
-} from "../../utils/testing/generators.ts";
-import { f, PConstanted, PData, PLifted, PType, RecordOf, t } from "./type.ts";
 
 export class PRecord<PFields extends PData>
   implements PType<Array<PConstanted<PFields>>, RecordOf<PLifted<PFields>>> {

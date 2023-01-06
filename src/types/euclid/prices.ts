@@ -5,9 +5,8 @@ import {
   maxInteger,
   min,
   randomChoice,
-} from "../../utils/testing/generators.ts";
-import { PConstraint } from "../general/constraint.ts";
-import { f, t } from "../general/type.ts";
+} from "../../mod.ts";
+import { f, PConstraint, t } from "../mod.ts";
 import { Assets } from "./asset.ts";
 import { CurrencySymbol, TokenName } from "./primitive.ts";
 import {

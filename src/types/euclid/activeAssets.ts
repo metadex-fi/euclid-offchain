@@ -1,7 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { genNumber } from "../../utils/testing/generators.ts";
-import { PConstraint } from "../general/constraint.ts";
-import { PMap } from "../general/map.ts";
+import { genNumber } from "../../mod.ts";
+import { PConstraint, PMap } from "../mod.ts";
 import { Asset, PAsset } from "./asset.ts";
 import { PPrices, Prices } from "./prices.ts";
 import { assetsOf, lSubValues } from "./value.ts";

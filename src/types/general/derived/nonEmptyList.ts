@@ -4,10 +4,8 @@ import {
   genPositive,
   gMaxLength,
   maybeNdef,
-} from "../../utils/testing/generators.ts";
-import { PConstraint } from "../general/constraint.ts";
-import { PList } from "../general/list.ts";
-import { PData, PLifted } from "../general/type.ts";
+} from "../../../mod.ts";
+import { PConstraint, PData, PLifted, PList } from "../mod.ts";
 
 export class PNonEmptyList<PElem extends PData> extends PConstraint<
   PList<PElem>

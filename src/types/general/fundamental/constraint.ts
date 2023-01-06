@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Generators } from "../../utils/testing/generators.ts";
+import { Generators } from "../../../mod.ts";
 import { f, PConstanted, PData, PLifted, t } from "./type.ts";
 
 export class PConstraint<PInner extends PData> {
