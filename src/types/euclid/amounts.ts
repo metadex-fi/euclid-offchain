@@ -1,25 +1,9 @@
-import {
-  genNumber,
-  PConstraint,
-} from "../../../refactor_parse/lucid/src/mod.ts";
-import {
-  Asset,
-  Assets,
-  firstAsset,
-  randomAssetsOf,
-  tailAssets,
-} from "./asset.ts";
+import { genNumber } from "../../utils/testing/generators.ts";
+import { PConstraint } from "../general/constraint.ts";
+import { Asset, Assets } from "./asset.ts";
 import { PPrices, Prices } from "./prices.ts";
 import { Amount } from "./primitive.ts";
-import {
-  amountOf,
-  assetsOf,
-  newPPositiveValue,
-  newValue,
-  PPositiveValue,
-  setAmountOf,
-  Value,
-} from "./value.ts";
+import { assetsOf, PPositiveValue, Value } from "./value.ts";
 
 export type Amounts = Value;
 export type PAmounts = PConstraint<PPositiveValue>;

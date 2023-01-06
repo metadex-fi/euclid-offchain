@@ -1,17 +1,16 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
-  f,
   genNonNegative,
   gMaxLength,
-  PConstraint,
-  PLifted,
-  PMap,
-  PObject,
-  PRecord,
+  nonEmptySubSet,
   randomChoice,
-  t,
-} from "../../../refactor_parse/lucid/src/mod.ts";
-import { nonEmptySubSet, randomSubset } from "../../tests/generators.ts";
+  randomSubset,
+} from "../../utils/testing/generators.ts";
+import { PConstraint } from "../general/constraint.ts";
+import { f, PLifted, t } from "../general/type.ts";
+import { PMap } from "../general/map.ts";
+import { PObject } from "../general/object.ts";
+import { PRecord } from "../general/record.ts";
 import { PNonEmptyList } from "./nonEmptyList.ts";
 import {
   CurrencySymbol,

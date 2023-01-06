@@ -4,10 +4,10 @@ import {
   genPositive,
   gMaxLength,
   maybeNdef,
-  PConstraint,
-  PData,
-  PList,
-} from "../../../refactor_parse/lucid/src/mod.ts";
+} from "../../utils/testing/generators.ts";
+import { PConstraint } from "../general/constraint.ts";
+import { PList } from "../general/list.ts";
+import { PData, PLifted } from "../general/type.ts";
 
 export class PNonEmptyList<PElem extends PData> extends PConstraint<
   PList<PElem>
@@ -21,7 +21,11 @@ export class PNonEmptyList<PElem extends PData> extends PConstraint<
     super(
       new PList(pelem, length),
       [assertNonEmptyList],
-      () => PList.genList(pelem.genData, length ?? genPositive(gMaxLength)),
+      () =>
+        PList.genList(
+          pelem.genData,
+          length ?? genPositive(gMaxLength),
+        ) as PLifted<PElem>[],
     );
   }
 

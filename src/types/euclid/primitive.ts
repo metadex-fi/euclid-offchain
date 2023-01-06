@@ -1,17 +1,10 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  genNonNegative,
-  max,
-  maxInteger,
-  maybeNdef,
-  min,
-  PaymentKeyHash,
-  PByteString,
-  PConstraint,
-  PInteger,
-  PLifted,
-} from "../../../refactor_parse/lucid/src/mod.ts";
-import { PLiteral } from "../../../refactor_parse/lucid/src/plutus/types/literal.ts";
+import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { genNonNegative, maxInteger } from "../../utils/testing/generators.ts";
+import { PByteString } from "../general/bytestring.ts";
+import { PConstraint } from "../general/constraint.ts";
+import { PInteger } from "../general/integer.ts";
+import { PLiteral } from "../general/literal.ts";
 
 type PByteStringLiteral = PLiteral<PByteString>;
 const newPByteStringLiteral = (

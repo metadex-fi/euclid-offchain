@@ -35,33 +35,10 @@
 //   setAssetAmount,
 // } from "../src/value.ts";
 
-import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { randomChoice } from "../../refactor_parse/lucid/mod.ts";
-
-const maxNumAssets = 5;
-const dropChance = 0.5;
-const maxJumps = 2n; // per direction, so 1 + 2 * maxJumps per dimension
-export const contractCurrency = "cc"; // TODO replace with actual
-const maxJumpStores = 10;
-const maxThreadNFTs = 10;
-
-export function randomSubset<T>(set: T[]): T[] {
-  const subset = new Array<T>();
-  set.forEach((elem) => {
-    if (Math.random() > dropChance) {
-      subset.push(elem);
-    }
-  });
-  return subset;
-}
-
-export function nonEmptySubSet<T>(set: T[]): T[] {
-  const subset = randomSubset(set);
-  if (subset.length === 0) {
-    subset.push(randomChoice(set));
-  }
-  return subset;
-}
+// const maxNumAssets = 5;
+// const maxJumpStores = 10;
+// const maxThreadNFTs = 10;
+// const maxJumps = 2n; // per direction, so 1 + 2 * maxJumps per dimension
 
 // export function genEuclidData(ptype: PType): EuclidData {
 //   if (ptype === PAmount) {

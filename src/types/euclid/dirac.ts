@@ -1,18 +1,16 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  PaymentKeyHash,
-  PConstraint,
-  PList,
-  PObject,
-  PRecord,
-} from "../../../refactor_parse/lucid/src/mod.ts";
+import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { PConstraint } from "../general/constraint.ts";
+import { PList } from "../general/list.ts";
+import { PObject } from "../general/object.ts";
+import { PRecord } from "../general/record.ts";
 import {
   ActiveAssets,
   newGenActiveAssets,
   newPActiveAssets,
 } from "./activeAssets.ts";
 import { Amounts, genAmounts, newPAmounts } from "./amounts.ts";
-import { Asset, numAssets } from "./asset.ts";
+import { Asset } from "./asset.ts";
 import {
   gMaxHashes,
   IdNFT,
@@ -22,15 +20,9 @@ import {
   nextThreadNFT,
 } from "./idnft.ts";
 import { Param } from "./param.ts";
-import { newPPrices, Prices } from "./prices.ts";
-import { Amount, newPAmount, newPPaymentKeyHashLiteral } from "./primitive.ts";
-import {
-  addAmount,
-  amountOf,
-  assetsOf,
-  mulValues,
-  sumAmounts,
-} from "./value.ts";
+import { Prices } from "./prices.ts";
+import { Amount, newPPaymentKeyHashLiteral } from "./primitive.ts";
+import { addAmount, assetsOf } from "./value.ts";
 
 export class Dirac {
   constructor(

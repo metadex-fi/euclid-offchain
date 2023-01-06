@@ -1,5 +1,3 @@
-import { Value } from "../../refactor_parse/lucid/src/core/wasm_modules/cardano_multiplatform_lib_nodejs/cardano_multiplatform_lib.js";
-
 export function equal<T>(a: T, b: T): boolean {
   if (a === null) {
     if (b === null) {

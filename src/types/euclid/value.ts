@@ -1,12 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  f,
-  maxInteger,
-  maybeNdef,
-  PMapRecord,
-  RecordOf,
-  t,
-} from "../../../refactor_parse/lucid/src/mod.ts";
+import { maxInteger, maybeNdef } from "../../utils/testing/generators.ts";
+import { PMapRecord } from "../general/mapRecord.ts";
+import { f, RecordOf, t } from "../general/type.ts";
 import { Asset, Assets, PAssets } from "./asset.ts";
 import {
   Amount,

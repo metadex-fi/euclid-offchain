@@ -1,14 +1,13 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   abs,
-  f,
   genNonNegative,
   maxInteger,
   min,
-  PConstraint,
   randomChoice,
-  t,
-} from "../../../refactor_parse/lucid/src/mod.ts";
+} from "../../utils/testing/generators.ts";
+import { PConstraint } from "../general/constraint.ts";
+import { f, t } from "../general/type.ts";
 import { Assets } from "./asset.ts";
 import { CurrencySymbol, TokenName } from "./primitive.ts";
 import {

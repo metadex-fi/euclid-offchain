@@ -1,14 +1,16 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   fromHex,
-  genPositive,
-  gMaxLength,
   PaymentKeyHash,
-  PConstraint,
   sha256,
   toHex,
-} from "../../../refactor_parse/lucid/src/mod.ts";
-import { contractCurrency } from "../../tests/generators.ts";
+} from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import {
+  contractCurrency,
+  genPositive,
+  gMaxLength,
+} from "../../utils/testing/generators.ts";
+import { PConstraint } from "../general/constraint.ts";
 import { Asset, PAsset } from "./asset.ts";
 import { maxTicks, minTicks } from "./dirac.ts";
 

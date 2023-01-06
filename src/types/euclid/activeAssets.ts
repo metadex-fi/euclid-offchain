@@ -1,20 +1,10 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  genNumber,
-  PConstraint,
-  PMap,
-} from "../../../refactor_parse/lucid/src/mod.ts";
-import { Asset, PAsset, randomAssetOf } from "./asset.ts";
+import { genNumber } from "../../utils/testing/generators.ts";
+import { PConstraint } from "../general/constraint.ts";
+import { PMap } from "../general/map.ts";
+import { Asset, PAsset } from "./asset.ts";
 import { PPrices, Prices } from "./prices.ts";
-import {
-  assetsOf,
-  firstAmount,
-  firstAssetInValue,
-  lSubValues,
-  mulAmounts,
-  numAssetsInValue,
-  tailValue,
-} from "./value.ts";
+import { assetsOf, lSubValues } from "./value.ts";
 
 export type ActiveAssets = Map<Prices, Asset>;
 export type PActiveAssets = PConstraint<PMap<PPrices, PAsset>>;

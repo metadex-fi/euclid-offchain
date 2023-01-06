@@ -1,10 +1,13 @@
-import { PSum } from "../../../refactor_parse/lucid/src/mod.ts";
+import { PSum } from "../general/sum.ts";
+import { ActiveAssets } from "./activeAssets.ts";
+import { Amounts } from "./amounts.ts";
 import { Asset } from "./asset.ts";
-import { ActiveAssets, Dirac, DiracDatum, PDiracDatum } from "./dirac.ts";
+import { Dirac, DiracDatum } from "./dirac.ts";
 import { IdNFT } from "./idnft.ts";
-import { Param, ParamDatum, PParamDatum } from "./param.ts";
+import { Param, ParamDatum } from "./param.ts";
+import { Prices } from "./prices.ts";
 import { Amount, CurrencySymbol, TokenName } from "./primitive.ts";
-import { Amounts, JumpSizes, Prices, Value } from "./value.ts";
+import { JumpSizes, Value } from "./value.ts";
 
 export type EuclidData =
   | Amount

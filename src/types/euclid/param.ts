@@ -1,17 +1,14 @@
-import {
-  PaymentKeyHash,
-  PObject,
-  PRecord,
-} from "../../../refactor_parse/lucid/src/mod.ts";
-import { PAssets, randomAssetsOf } from "./asset.ts";
-import { newPPrices, Prices } from "./prices.ts";
+import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { PObject } from "../general/object.ts";
+import { PRecord } from "../general/record.ts";
+import { PAssets } from "./asset.ts";
+import { Prices } from "./prices.ts";
 import {
   Amount,
-  newPAmount,
   newPPaymentKeyHashLiteral,
   PPaymentKeyHash,
 } from "./primitive.ts";
-import { JumpSizes, newPJumpSizes, newPPositiveValue } from "./value.ts";
+import { JumpSizes } from "./value.ts";
 
 // TODO assertions about lower < initial < upper prices
 export class Param {
