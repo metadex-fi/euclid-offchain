@@ -1,6 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   genNonNegative,
+  genPositive,
   gMaxLength,
   nonEmptySubSet,
   randomChoice,
@@ -23,7 +24,7 @@ import {
 
 const assertADAlovelace = (a: Asset): void => {
   if (a.currencySymbol === "") {
-    assert(a.tokenName === "", "ADA must have lovelace");
+    assert(a.tokenName === "", `ADA must have lovelace, got ${a.tokenName}`);
   }
 };
 
@@ -37,11 +38,13 @@ export class Asset {
   constructor(
     public currencySymbol: CurrencySymbol,
     public tokenName: TokenName,
-  ) {}
+  ) {
+    assertADAlovelace(this);
+  }
 }
 // @ts-ignore TODO consider fixing this, or leaving as is
 export class PAsset extends PConstraint<PObject<Asset>> {
-  constructor() {
+  private constructor() {
     super(
       new PObject(
         new PRecord(
@@ -67,7 +70,7 @@ const PNonEmptyTokenList = new PNonEmptyList(PTokenName);
 
 export class Assets {
   constructor(
-    public assets: Map<CurrencySymbol, Array<TokenName>> = new Map(),
+    private assets: Map<CurrencySymbol, Array<TokenName>> = new Map(),
   ) {
     for (const [ccy, tkns] of this.assets) {
       assert(tkns.length > 0, `empty token list for ${ccy}`);
@@ -95,13 +98,45 @@ export class Assets {
     return ccys.join(`\n`);
   };
 
+  public equals = (other: Assets): boolean => {
+    if (this.assets.size !== other.assets.size) return false;
+    for (const [ccy, tkns] of this.assets) {
+      const tkns_ = other.assets.get(ccy);
+      if (tkns_ === undefined) return false;
+      if (tkns.length !== tkns_.length) return false;
+      for (const tkn of tkns) {
+        if (!tkns_.includes(tkn)) return false;
+      }
+    }
+    return true;
+  };
+
+  public copy = (): Assets => {
+    const assets = new Assets();
+    for (const [ccy, tkns] of this.assets) {
+      assets.assets.set(ccy, tkns.slice());
+    }
+    return assets;
+  };
+
+  public add = (asset: Asset): Assets => {
+    const assets = this.copy();
+    const { currencySymbol, tokenName } = asset;
+    const tkns = assets.assets.get(currencySymbol) ?? [];
+    assert(!tkns.includes(tokenName), `${asset} already in ${assets.show()}`);
+    tkns.push(tokenName);
+    assets.assets.set(currencySymbol, tkns);
+    return assets;
+  };
+
   public head = (): Asset => {
     for (const [ccy, tkns] of this.assets) {
+      assert(tkns.length > 0, "empty token map");
       for (const tkn in tkns) {
         return new Asset(ccy, tkn);
       }
     }
-    throw new Error("unexpected empty Asset");
+    throw new Error("unexpected empty Assets");
   };
 
   public tail = (): Assets => {
@@ -118,6 +153,7 @@ export class Assets {
         first = false;
       } else tail.assets.set(ccy, tkns);
     }
+    assert(tail.add(this.head()).equals(this), "tail is not tail");
     return tail;
   };
 
@@ -137,12 +173,51 @@ export class Assets {
     return assets_;
   };
 
-  public numAssets = (): number => {
-    let n = 0;
-    for (const tkns of this.assets.values()) {
-      n += tkns.length;
+  // public missesOf = (assets: Assets): Assets => {
+  //   const misses = new Map<CurrencySymbol, TokenName[]>();
+  //   for (const [ccy, tkns] of assets.toMap()) {
+  //     const tkns_ = this.assets.get(ccy);
+  //     if (tkns_ === undefined) {
+  //       misses.set(ccy, tkns);
+  //     } else {
+  //       const tkns__ = tkns.filter((tkn) => !tkns_.includes(tkn));
+  //       if (tkns__.length > 0) misses.set(ccy, tkns__);
+  //     }
+  //   }
+  //   return new Assets(misses);
+  // };
+
+  public has = (asset: Asset): boolean => {
+    const { currencySymbol, tokenName } = asset;
+    const tkns = this.assets.get(currencySymbol);
+    return tkns !== undefined && tkns.includes(tokenName);
+  };
+
+  public toMap = (): Map<CurrencySymbol, TokenName[]> => {
+    const assets = new Map<CurrencySymbol, TokenName[]>();
+    for (const [ccy, tkns] of this.assets) {
+      assets.set(ccy, tkns.slice());
     }
-    return n;
+    return assets;
+  };
+
+  public size = (): number => {
+    let size = 0;
+    for (const tkns of this.assets.values()) {
+      size += tkns.length;
+    }
+    return size;
+  };
+
+  public subsetOf = (assets: Assets): boolean => {
+    for (const [ccy, tkns] of this.assets) {
+      const tkns_ = assets.toMap().get(ccy);
+      if (tkns_ === undefined) return false;
+      for (const tkn of tkns) {
+        if (!tkns_.includes(tkn)) return false;
+      }
+    }
+    return true;
   };
 }
 
@@ -155,32 +230,37 @@ const assertADAlovelaces = (assets: PLifted<PAssets>): void => {
   }
 };
 
-const genAssets = (): PLifted<PAssets> => {
-  const assets = new Map<CurrencySymbol, TokenName[]>();
-  const numAssets = genNonNegative(gMaxLength);
-  for (let i = 0; i < numAssets; i++) {
-    const asset = genAsset();
-    if (assets.has(asset.currencySymbol)) {
-      const tokens = assets.get(asset.currencySymbol)!;
-      if (!tokens.includes(asset.tokenName)) {
-        tokens.push(asset.tokenName);
+const newGenAssets =
+  (genNumAssets: (maxNum: bigint) => bigint) => (): PLifted<PAssets> => {
+    const assets = new Map<CurrencySymbol, TokenName[]>();
+    const numAssets = genNumAssets(gMaxLength);
+    for (let i = 0; i < numAssets; i++) {
+      const asset = genAsset();
+      if (assets.has(asset.currencySymbol)) {
+        const tokens = assets.get(asset.currencySymbol)!;
+        if (!tokens.includes(asset.tokenName)) {
+          tokens.push(asset.tokenName);
+        }
+      } else {
+        assets.set(asset.currencySymbol, [asset.tokenName]);
       }
-    } else {
-      assets.set(asset.currencySymbol, [asset.tokenName]);
     }
-  }
-  return assets;
-};
+    return assets;
+  };
 
 export class PAssets
   extends PConstraint<PMap<PCurrencySymbol, PNonEmptyList<PTokenName>>> {
-  constructor() {
+  private constructor() {
     super(
       new PMap(PCurrencySymbol, PNonEmptyTokenList),
       [assertADAlovelaces],
-      genAssets,
+      newGenAssets(genNonNegative),
     );
   }
+
+  static genAssets = (): Assets => {
+    return new Assets(PAssets.ptype.genData());
+  };
 
   static ptype = new PAssets();
   static genPType(): PConstraint<
@@ -189,3 +269,28 @@ export class PAssets
     return PAssets.ptype;
   }
 }
+
+// const assertNonEmpty = (assets: PLifted<PAssets>) => {
+//   assert(assets.size > 0, "empty assets");
+// };
+
+// export class NonEmptyAssets {
+//   constructor(public assets: Assets) {
+//     assertNonEmpty(assets.assets);
+//   }
+// }
+
+// export class PNonEmptyAssets extends PConstraint<PAssets> {
+//   private constructor() {
+//     super(PAssets.ptype, [assertNonEmpty], newGenAssets(genPositive));
+//   }
+
+//   static genNonEmptyAssets = (): NonEmptyAssets => {
+//     return new NonEmptyAssets(new Assets(PNonEmptyAssets.ptype.genData()));
+//   };
+
+//   static ptype = new PNonEmptyAssets();
+//   static genPType(): PConstraint<PAssets> {
+//     return PNonEmptyAssets.ptype;
+//   }
+// }

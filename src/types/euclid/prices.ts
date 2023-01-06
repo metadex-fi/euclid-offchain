@@ -25,7 +25,9 @@ export class Prices {
 }
 
 export class PPrices extends PConstraint<PPositiveValue> {
-  constructor(
+  private maxJumpsUp: Value;
+  private maxJumpsDown: Value;
+  private constructor(
     public assets: Assets,
     public initialPrices: Prices,
     public jumpSizes: JumpSizes,
@@ -66,7 +68,20 @@ export class PPrices extends PConstraint<PPositiveValue> {
       this.population > 0,
       `Population not positive in ${this.showPType()}`,
     );
+    // for logging
+    this.maxJumpsUp = maxJumpsUp;
+    this.maxJumpsDown = maxJumpsDown;
   }
+
+  public genPrices = (): Prices => {
+    return new Prices(this.pinner.genValue());
+  };
+
+  public showData = (
+    data: Map<CurrencySymbol, Map<TokenName, bigint>>,
+  ): string => {
+    return new Value(data).concise();
+  };
 
   public showPType = (tabs = ""): string => {
     const tt = tabs + t;
@@ -75,18 +90,20 @@ export class PPrices extends PConstraint<PPositiveValue> {
     return `Prices (
 ${ttf}population: ${this.population}, 
 ${ttf}assets = ${this.assets.show(ttf)}, 
-${ttf}initialPrices = ${this.initialPrices.value.show(ttf)}, 
-${ttf}jumpSizes = ${this.jumpSizes.value.show(ttf)}, 
-${ttf}lowerBounds? = ${this.lowerBounds?.value.show(ttf)}, 
-${ttf}upperBounds? =  ${this.upperBounds?.value.show(ttf)}
+${ttf}initialPrices = ${this.initialPrices.value.concise()}, 
+${ttf}jumpSizes = ${this.jumpSizes.value.concise()}, 
+${ttf}lowerBounds? = ${this.lowerBounds?.value.concise()}, 
+${ttf}upperBounds? = ${this.upperBounds?.value.concise()},
+${ttf}maxJumpsUp = ${this.maxJumpsUp?.concise()},
+${ttf}maxJumpsDown = ${this.maxJumpsDown?.concise()}
 ${tt})`;
   };
 
   static genPType(): PConstraint<PPositiveValue> {
     const pvalue = PPositiveValue.genPType();
-    const initialPrices = new Prices(new Value(pvalue.genData()));
+    const initialPrices = new Prices(pvalue.genValue());
     const jumpSizes = new JumpSizes(
-      new Value(PPositiveValue.genOfAssets(pvalue.assets).genData()),
+      PPositiveValue.genOfAssets(pvalue.assets).genValue(),
     ); // TODO not sure about congruency here
 
     return new PPrices(
@@ -181,5 +198,5 @@ const newGenPrices = (
     maxJumpsDown,
     initialPrices.value,
     jumpSizes.value,
-  ).value;
+  ).toMap();
 };

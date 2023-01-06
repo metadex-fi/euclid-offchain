@@ -63,9 +63,9 @@ ${tt})`;
     }
 ${ttf}population: ${this.population},
 ${ttf}pinner: ${this.pinner.showPType(ttf)},
-${ttf}asserts: ${asserts},
-${ttf}genInnerData: ${this.genInnerData.toString()}
 ${tt})`;
+    // ${ttf}asserts: \${asserts},
+    // ${ttf}genInnerData: \${this.genInnerData.toString()}
   };
 
   static genPType(

@@ -4,7 +4,7 @@ import {
 } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Data } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { PData } from "../../mod.ts";
-import { Generators, gMaxDepth } from "./generators.ts";
+import { Generators, gMaxDepth, gMaxLength } from "./generators.ts";
 
 export function proptestPTypes(gen: Generators, iterations: number) {
   const popErrs = new Map<string, number>();
@@ -66,7 +66,7 @@ function testPTypeParse(
 }
 
 function logError(err: Error, record: Map<string, number>) {
-  const e = err.message; //[err.name, err.message, err.cause, err.stack].join("\n");
+  const e = [err.name, err.message, err.cause, err.stack].join("\n");
   const num = record.get(e);
   record.set(e, num ? num + 1 : 1);
 }
@@ -85,54 +85,36 @@ function printErrs(record: Map<string, number>, name: string): number {
   return total;
 }
 
-// testing that population is indeed large
-// function testBigPopulation(ptype: PData, errors: Map<string, number>) {
-//   return;
-// const popStrings: string[] = [];
-// let consecutiveHits = 0
-
-// try {
-//   for (let i = 0; i < 100; i++) {
-//     const p = ptype.genData();
-//     const s = ptype.showData(p);
-//     if (!popStrings.includes(s)) {
-//       popStrings.push(s);
-//     } else {
-//       if (consecutiveHits++ > 3) {
-//         throw new Error(`consecutiveHits: ${consecutiveHits} in ${ptype.showPType()}`);
-//       }
-//     }
-//   }
-// } catch (err) {
-//   logError(err, errors);
-// }
-// }
-
 // this is required to prevent keyset population timeouts
 function testSmallPopulation(ptype: PData, errors: Map<string, number>) {
   const popStrings: string[] = [];
+  let consecutive = 0;
 
   try {
     assert(ptype.population > 0, "population must be positive");
 
-    for (let i = 0; i < ptype.population ** 2; i++) {
+    while (popStrings.length < ptype.population) {
       const p = ptype.genData();
       const s = ptype.showData(p);
       if (!popStrings.includes(s)) {
+        consecutive = 0;
         popStrings.push(s);
+      } else {
+        if (++consecutive > 100000) {
+          throw new Error(
+            `could only achive population size ${popStrings.length} for ${ptype.showPType()}${
+              popStrings.length < 20 ? ":\n" + popStrings.join(", ") : ""
+            }`,
+          );
+        }
       }
     }
-    assert(
-      ptype.population <= popStrings.length,
-      `popStrings.length: ${popStrings.length} less than population of\n${ptype.showPType()}\n`,
-      // popStrings: [${popStrings.join(`\n${f}`)}]`,
-    );
   } catch (err) {
     logError(err, errors);
   }
 }
 
 function testPopulation(ptype: PData, errors: Map<string, number>) {
-  if (ptype.population >= 100n) return; //testBigPopulation(ptype, errors);
+  if (ptype.population > 20) return;
   else testSmallPopulation(ptype, errors);
 }

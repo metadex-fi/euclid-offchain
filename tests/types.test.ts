@@ -20,6 +20,7 @@ import {
   proptestPTypes,
   PValue,
 } from "../src/mod.ts";
+import { PAmounts } from "../src/types/euclid/amounts.ts";
 
 Deno.test("euclid data/types tests", () => {
   // @ts-ignore TODO consider fixing this or leaving as is
@@ -72,6 +73,7 @@ const euclidPrimitiveGenerators = [
   PValue.genPType,
   PPositiveValue.genPType,
   PPrices.genPType,
+  PAmounts.genPType,
   // () => newPPositiveValue(PAssets.genData()),
   // genPParam,
 ];
