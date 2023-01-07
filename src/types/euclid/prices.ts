@@ -6,7 +6,7 @@ import {
   min,
   randomChoice,
 } from "../../mod.ts";
-import { f, PConstraint, t } from "../mod.ts";
+import { f, PConstraint, PLiteral, t } from "../mod.ts";
 import { Assets, PAssets } from "./asset.ts";
 import { CurrencySymbol, TokenName } from "./primitive.ts";
 import {
@@ -28,7 +28,7 @@ export class PPrices extends PConstraint<PPositiveValue> {
   private maxJumpsUp: Value;
   private maxJumpsDown: Value;
   public assets: Assets;
-  constructor(
+  private constructor(
     public initialPrices: Prices,
     public jumpSizes: JumpSizes,
     public lowerBounds?: Prices,
@@ -113,9 +113,7 @@ ${tt})`;
     assert(assets.size() >= 2n, `less than two assets in ${assets.show()}`);
     const pvalue = PPositiveValue.genOfAssets(assets);
     const initialPrices = new Prices(pvalue.genValue());
-    const jumpSizes = new JumpSizes(
-      PPositiveValue.genOfAssets(pvalue.assets).genValue(),
-    ); // TODO not sure about congruency here
+    const jumpSizes = JumpSizes.genOfAssets(assets); // TODO not sure about congruency here
 
     return new PPrices(
       initialPrices,
@@ -123,6 +121,16 @@ ${tt})`;
       pvalue.lowerBounds ? new Prices(pvalue.lowerBounds) : undefined,
       pvalue.upperBounds ? new Prices(pvalue.upperBounds) : undefined,
     );
+  }
+
+  static literal(prices: Prices): PLiteral<PPrices> {
+    const pprices = new PPrices(
+      prices,
+      JumpSizes.nullOfAssets(prices.value.assets()),
+      prices,
+      prices,
+    );
+    return new PLiteral(pprices, prices.value.toMap());
   }
 }
 

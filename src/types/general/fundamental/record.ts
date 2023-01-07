@@ -12,11 +12,11 @@ export class PRecord<PFields extends PData>
   public population: number;
 
   constructor(
-    public pfields: RecordOf<PFields>,
+    public pfields: RecordOf<PFields | undefined>,
   ) {
     let population = 1;
     Object.values(pfields).forEach((pfield) => {
-      population *= pfield.population;
+      if (pfield) population *= pfield.population;
     });
     this.population = population;
     assert(
@@ -38,6 +38,7 @@ export class PRecord<PFields extends PData>
     l.forEach((value, i) => {
       const key = pfields[i][0];
       const pvalue = pfields[i][1];
+      assert(pvalue, `cannot lift undefined fields: ${key}`);
       r[key] = pvalue.plift(value) as PLifted<PFields>;
     });
     return r;
@@ -63,8 +64,12 @@ export class PRecord<PFields extends PData>
 
     const l = new Array<PConstanted<PFields>>();
     Object.entries(data).forEach(([key, value]) => {
+      assert(
+        Object.keys(this.pfields).includes(key),
+        `field not found: ${key}`,
+      );
       const pfield = this.pfields[key];
-      assert(pfield, `field not found: ${key}`);
+      assert(pfield, `cannot constant undefined fields: ${key}`);
       l.push(pfield.pconstant(value) as PConstanted<PFields>);
     });
     return l;
@@ -73,7 +78,7 @@ export class PRecord<PFields extends PData>
   public genData = (): RecordOf<PLifted<PFields>> => {
     const r: RecordOf<PLifted<PFields>> = {};
     Object.entries(this.pfields).forEach(([key, pfield]) => {
-      r[key] = pfield.genData() as PLifted<PFields>;
+      r[key] = pfield?.genData() as PLifted<PFields>;
     });
     return r;
   };
@@ -90,7 +95,7 @@ export class PRecord<PFields extends PData>
 
     const fields = Object.entries(data).map(([key, value]) => {
       return `${ttf}${key.length === 0 ? "_" : key}: ${
-        this.pfields[key].showData(value, ttft)
+        this.pfields[key]?.showData(value, ttft) ?? "undefined"
       }`;
     }).join(",\n");
     return `Record {
@@ -105,7 +110,7 @@ ${tt}}`;
 
     const fields = Object.entries(this.pfields).map(([key, pfield]) => {
       return `\n${ttff}${key.length === 0 ? "_" : key}: ${
-        pfield.showPType(ttff)
+        pfield?.showPType(ttff) ?? "undefined"
       }`;
     });
     return `PRecord (

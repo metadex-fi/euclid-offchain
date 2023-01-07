@@ -233,6 +233,18 @@ export class Value {
   public has = (assets: Assets): boolean => {
     return this.assets().subsetOf(assets);
   };
+
+  static nullOfAssets = (assets: Assets): Value => {
+    const value = new Map<CurrencySymbol, Map<TokenName, bigint>>();
+    for (const [currencySymbol, tokens] of assets.toMap()) {
+      const tokens_ = new Map<TokenName, bigint>();
+      for (const tokenName of tokens) {
+        tokens_.set(tokenName, 0n);
+      }
+      value.set(currencySymbol, tokens_);
+    }
+    return new Value(value);
+  };
 }
 
 // @ts-ignore TODO consider fixing this, or leaving as is
@@ -353,7 +365,15 @@ export class PPositiveValue extends PValue<PPositive> {
 }
 
 export class JumpSizes {
-  constructor(public value: Value) {}
+  private constructor(public value: Value) {}
+
+  static genOfAssets(assets: Assets): JumpSizes {
+    return new JumpSizes(PPositiveValue.genOfAssets(assets).genValue());
+  }
+
+  static nullOfAssets(assets: Assets): JumpSizes {
+    return new JumpSizes(Value.nullOfAssets(assets));
+  }
 }
 export class PJumpSizes extends PPositiveValue {
   constructor(

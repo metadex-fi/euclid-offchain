@@ -85,7 +85,12 @@ function testPTypeParse(
 }
 
 function logError(err: Error, record: Map<string, number>) {
-  const e = [err.name, err.message, err.cause, err.stack].join("\n");
+  const e = [
+    // err.name,
+    err.message,
+    // err.cause,
+    // err.stack
+  ].join("\n");
   const num = record.get(e);
   record.set(e, num ? num + 1 : 1);
 }

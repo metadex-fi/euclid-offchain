@@ -1,27 +1,33 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { PLiteral, PPositive } from "../general/mod.ts";
-import { Amount, PAmount, PObject, PRecord } from "../mod.ts";
+import {
+  Amount,
+  PAmount,
+  PLiteral,
+  PObject,
+  PPositive,
+  PRecord,
+} from "../mod.ts";
 import { PPrices, Prices } from "./prices.ts";
 import { POwner } from "./primitive.ts";
-import { JumpSizes, leq, PJumpSizes, Value } from "./value.ts";
+import { JumpSizes, leq, PJumpSizes } from "./value.ts";
 
 export class Param {
   constructor(
     public owner: PaymentKeyHash,
     public jumpSizes: JumpSizes,
     public initialPrices: Prices,
-    public lowerPriceBounds: Prices,
-    public upperPriceBounds: Prices,
+    public lowerPriceBounds: Prices | undefined,
+    public upperPriceBounds: Prices | undefined,
     public baseAmountA0: Amount,
   ) {
     assert(
-      leq(lowerPriceBounds.value, initialPrices.value),
-      `${lowerPriceBounds.value} > ${initialPrices.value}`,
+      leq(lowerPriceBounds?.value, initialPrices.value),
+      `${lowerPriceBounds?.value} > ${initialPrices.value}`,
     );
     assert(
-      leq(initialPrices.value, upperPriceBounds.value),
-      `${initialPrices.value} > ${upperPriceBounds.value}`,
+      leq(initialPrices.value, upperPriceBounds?.value),
+      `${initialPrices.value} > ${upperPriceBounds?.value}`,
     );
   }
 }
@@ -30,8 +36,8 @@ export class PParam extends PObject<Param> {
     public powner: POwner,
     public pjumpSizes: PLiteral<PJumpSizes>,
     public pinitialPrices: PPrices,
-    public plowerPriceBounds: PLiteral<PPrices>,
-    public pupperPriceBounds: PLiteral<PPrices>,
+    public plowerPriceBounds: PLiteral<PPrices> | undefined,
+    public pupperPriceBounds: PLiteral<PPrices> | undefined,
     public pbaseAmountA0: PAmount,
   ) {
     super(
@@ -57,10 +63,15 @@ export class PParam extends PObject<Param> {
       pprices.jumpSizes.value.toMap(),
     );
 
-    const lowerBounds = pprices.lowerBounds?.value ?? new Value();
-    const plowerPriceBounds = new PLiteral(pprices, lowerBounds.toMap());
-    const upperBounds = pprices.upperBounds?.value ?? new Value();
-    const pupperPriceBounds = new PLiteral(pprices, upperBounds.toMap());
+    const lowerBounds = pprices.lowerBounds;
+    const plowerPriceBounds = lowerBounds
+      ? PPrices.literal(lowerBounds)
+      : undefined;
+    // throw new Error("TODO: PParam.genPType");
+    const upperBounds = pprices.upperBounds;
+    const pupperPriceBounds = upperBounds
+      ? PPrices.literal(upperBounds)
+      : undefined;
 
     const pbaseAmountA0 = new PPositive();
 
