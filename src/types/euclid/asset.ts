@@ -65,6 +65,10 @@ export class PAsset extends PConstraint<PObject<Asset>> {
   }
 
   public showData = (data: Asset): string => {
+    assert(
+      data instanceof Asset,
+      `PAsset.showData: expected Asset, got ${data}`,
+    );
     return data.show();
   };
 

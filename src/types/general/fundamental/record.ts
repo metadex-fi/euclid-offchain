@@ -43,17 +43,23 @@ export class PRecord<PFields extends PData>
     return r;
   };
 
-  public pconstant = (
-    data: RecordOf<PLifted<PFields>>,
-  ): Array<PConstanted<PFields>> => {
-    assert(data instanceof Object, `PRecord.pconstant: expected Object`);
-
+  private checkFields = (data: RecordOf<PLifted<PFields>>) => {
+    assert(
+      data instanceof Object,
+      `PRecord: expected Object, got ${data}`,
+    );
     const pfieldsNames = Object.keys(this.pfields).join(`,\n${f}`);
     const dataFieldsNames = Object.keys(data).join(`,\n${f}`);
     assert(
       pfieldsNames === dataFieldsNames,
-      `PRecord.pconstant:\nexpected fields:\n${f}${pfieldsNames},\ngot:\n${f}${dataFieldsNames}\n`,
+      `PRecord:\nexpected fields:\n${f}${pfieldsNames},\ngot:\n${f}${dataFieldsNames}\n`,
     );
+  };
+
+  public pconstant = (
+    data: RecordOf<PLifted<PFields>>,
+  ): Array<PConstanted<PFields>> => {
+    this.checkFields(data);
 
     const l = new Array<PConstanted<PFields>>();
     Object.entries(data).forEach(([key, value]) => {
@@ -76,7 +82,8 @@ export class PRecord<PFields extends PData>
     data: RecordOf<PLifted<PFields>>,
     tabs = "",
   ): string => {
-    if (data.size === 0) return "MapRecord {}";
+    this.checkFields(data);
+    if (data.size === 0) return "Record {}";
     const tt = tabs + t;
     const ttf = tt + f;
     const ttft = ttf + t;

@@ -7,20 +7,28 @@ export type PMaybeLiteral<T extends PData> = T | PLiteral<T>;
 export class PLiteral<PT extends PData>
   implements PType<PConstanted<PT>, PLifted<PT>> {
   public population = 1;
-  public plutusLiteral: PConstanted<PT>;
+  private plutusLiteral: PConstanted<PT>;
+  private str: string;
   constructor(
     public pliteral: PT,
     public literal: PLifted<PT>,
   ) {
     this.plutusLiteral = pliteral.pconstant(literal) as PConstanted<PT>;
+    this.str = pliteral.showData(literal);
   }
 
   public plift = (l: PConstanted<PT>): PLifted<PT> => {
-    assert(l === this.plutusLiteral, "Literal does not match");
+    assert(
+      this.pliteral.showData(this.pliteral.plift(l)) === this.str,
+      "Literal does not match",
+    );
     return this.literal;
   };
   public pconstant = (data: PLifted<PT>): PConstanted<PT> => {
-    assert(data === this.literal, "Literal does not match");
+    assert(
+      this.pliteral.showData(data) === this.str,
+      "Literal does not match",
+    );
     return this.plutusLiteral;
   };
   public genData = (): PLifted<PT> => {
@@ -29,10 +37,10 @@ export class PLiteral<PT extends PData>
 
   public showData = (data: PLifted<PT>, tabs = ""): string => {
     assert(
-      data === this.literal,
-      // `Literal does not match: ${this.showData(data)} vs. ${
-      //   this.showData(this.literal)
-      // }`,
+      this.pliteral.showData(data) === this.str,
+      `Literal.showData: Literal does not match, got:\n${
+        this.pliteral.showData(data)
+      },\nexpected:\n${this.str}.`,
     );
     const tt = tabs + t;
     const ttf = tt + f;
@@ -48,8 +56,8 @@ ${tt})`;
 
     return `PLiteral (
 ${ttf}population: ${this.population},
-${ttf}plutusLiteral: ${this.pliteral.showPType(ttf)},
-${ttf}literal: TODO implement
+${ttf}pliteral: ${this.pliteral.showPType(ttf)},
+${ttf}literal: ${this.pliteral.showData(this.literal, ttf)}
 ${tt})`;
   };
 

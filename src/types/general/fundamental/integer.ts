@@ -23,7 +23,11 @@ export class PInteger implements PType<bigint, bigint> {
   };
 
   public showData = (data: bigint): string => {
-    return `Integer: ${Number(data)}`;
+    assert(
+      typeof data === `bigint`,
+      `PInteger.showData: expected Integer, got ${data}`,
+    );
+    return `Integer: ${data}`;
   };
 
   public showPType = (): string => {

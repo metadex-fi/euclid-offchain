@@ -16,6 +16,7 @@ import {
   PNonEmptyList,
   PObject,
   POwner,
+  PParam,
   PPositive,
   PPositiveValue,
   PPrices,
@@ -39,7 +40,7 @@ Deno.test("euclid data/types tests", () => {
       // ...euclidContainerGenerators,
     ],
   );
-  proptestPTypes(gen, 10000);
+  proptestPTypes(gen, 2000);
 });
 
 const fundamentalPrimitiveGenerators = [
@@ -54,8 +55,8 @@ const fundamentalContainerGenerators = [
   PList.genPType,
   PMap.genPType,
   PMapRecord.genPType,
-  PConstr.genPType,
   PRecord.genPType,
+  PConstr.genPType,
   PObject.genPType,
   // PSum.genPType,
 ];

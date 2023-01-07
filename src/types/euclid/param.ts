@@ -28,10 +28,10 @@ export class Param {
 export class PParam extends PObject<Param> {
   private constructor(
     public powner: POwner,
-    public pjumpSizes: PJumpSizes,
+    public pjumpSizes: PLiteral<PJumpSizes>,
     public pinitialPrices: PPrices,
-    public plowerPriceBounds: PPrices,
-    public pupperPriceBounds: PPrices,
+    public plowerPriceBounds: PLiteral<PPrices>,
+    public pupperPriceBounds: PLiteral<PPrices>,
     public pbaseAmountA0: PAmount,
   ) {
     super(

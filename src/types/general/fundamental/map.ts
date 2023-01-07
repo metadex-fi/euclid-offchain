@@ -196,6 +196,7 @@ ${t}pkey: ${pkey.showPType(t)}`,
     data: Map<PLifted<PKey>, PLifted<PValue>>,
     tabs = "",
   ): string => {
+    assert(data instanceof Map, `PMap.showData: expected Map, got ${data}`);
     const tt = tabs + t;
     const ttf = tt + f;
 

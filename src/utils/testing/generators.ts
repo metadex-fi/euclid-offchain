@@ -94,7 +94,7 @@ export function genPositive(maxValue = maxInteger): bigint {
   return 1n + genNonNegative(maxValue - 1n);
 }
 
-export function genNumber(maxValue?: bigint): bigint {
+export function genNumber(maxValue = maxInteger): bigint {
   const n = genNonNegative(maxValue);
   return randomChoice([n, -n]);
 }

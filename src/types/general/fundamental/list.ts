@@ -62,6 +62,10 @@ export class PList<PElem extends PData>
   };
 
   public showData = (data: PLifted<PElem>[], tabs = ""): string => {
+    assert(
+      data instanceof Array,
+      `PList.showData: expected Array, got ${data}`,
+    );
     const tt = tabs + t;
     const ttf = tt + f;
 
