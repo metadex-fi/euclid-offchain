@@ -4,6 +4,7 @@ import {
   bothExtreme,
   f,
   PBounded,
+  PLiteral,
   PMapRecord,
   PNum,
   PPositive,
@@ -222,10 +223,10 @@ export class Value {
     return map;
   };
 
-  public size = (): number => {
-    let size = 0;
+  public size = (): bigint => {
+    let size = 0n;
     for (const [_, tokens] of this.value) {
-      size += tokens.size;
+      size += BigInt(tokens.size);
     }
     return size;
   };
@@ -324,10 +325,6 @@ export class PositiveValue {
     assert(allPositive(value), "value must be positive");
   }
 
-  public concise = (tabs = ""): string => {
-    return `+${this.value.concise(tabs)}`;
-  };
-
   public initAmountOf = (asset: Asset, amount: bigint): void => {
     assert(
       amount >= 0n,
@@ -336,9 +333,14 @@ export class PositiveValue {
     this.value?.initAmountOf(asset, amount);
   };
 
-  public toMap = (): Map<CurrencySymbol, Map<TokenName, bigint>> => {
-    return this.value.toMap();
-  };
+  public concise = (tabs = ""): string => `+${this.value.concise(tabs)}`;
+  public toMap = (): Map<CurrencySymbol, Map<TokenName, bigint>> =>
+    this.value.toMap();
+  public assets = (): Assets => this.value.assets();
+  public unsigned = (): Value => new Value(this.value.toMap());
+  public unit = (): Value => this.value.unit();
+  public size = (): bigint => this.value.size();
+  public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
 }
 
 export class PPositiveValue extends PValue<PPositive> {
@@ -362,6 +364,16 @@ export class PPositiveValue extends PValue<PPositive> {
     return PValue.newGenPValue(PPositive, assets)();
   }
   static genPType = PValue.newGenPValue(PPositive);
+
+  static maybePLiteral(
+    value?: PositiveValue,
+  ): PLiteral<PPositiveValue> | undefined {
+    if (value === undefined) return undefined;
+    else {return new PLiteral(
+        new PPositiveValue(value.assets(), value.unsigned(), value.unsigned()),
+        value.toMap(),
+      );}
+  }
 }
 
 export class JumpSizes {

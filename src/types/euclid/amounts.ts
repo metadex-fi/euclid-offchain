@@ -66,19 +66,19 @@ const newGenAmounts = (
 
 const genAmounts = (baseAmountA0: Amount, prices: Prices): Amounts => {
   assert(
-    prices.value.size() >= 2n,
-    `genAmounts: less than two assets in ${prices.value.show()}`,
+    prices.size() >= 2n,
+    `genAmounts: less than two assets in ${prices.concise()}`,
   );
-  const assets = prices.value.assets();
+  const assets = prices.assets();
   const denom = assets.head();
   const nonzero = assets.nonEmptySubset();
-  const p0 = prices.value.amountOf(denom);
+  const p0 = prices.amountOf(denom);
   const amounts = new PositiveValue();
   let amountA0 = baseAmountA0;
   for (const [ccy, tkns] of nonzero.tail().toMap()) {
     for (const tkn of tkns) {
       const asset = new Asset(ccy, tkn);
-      const p = prices.value.amountOf(asset);
+      const p = prices.amountOf(asset);
       const tradedA0 = genNonNegative(amountA0);
       const received = (tradedA0 * p) / p0;
       if (received <= maxInteger && received > 0n) {
@@ -87,7 +87,7 @@ const genAmounts = (baseAmountA0: Amount, prices: Prices): Amounts => {
       }
     }
   }
-  const p = prices.value.amountOf(nonzero.head())!;
+  const p = prices.amountOf(nonzero.head())!;
   const firstAmnt = (amountA0 * p) / p0;
   // if the amount of the first asset is too large, use the
   // base amount, as we know that to be within global bounds
