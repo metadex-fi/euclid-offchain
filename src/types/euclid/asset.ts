@@ -64,6 +64,14 @@ export class PAsset extends PConstraint<PObject<Asset>> {
     );
   }
 
+  public showData = (data: Asset): string => {
+    return data.show();
+  };
+
+  public showPType = (): string => {
+    return `PObject: PAsset`;
+  };
+
   static ptype = new PAsset();
   static genPType(): PConstraint<PObject<Asset>> {
     return PAsset.ptype;

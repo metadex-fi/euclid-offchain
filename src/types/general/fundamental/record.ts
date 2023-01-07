@@ -94,16 +94,16 @@ ${tt}}`;
   public showPType = (tabs = ""): string => {
     const tt = tabs + t;
     const ttf = tt + f;
-    const ttft = ttf + t;
+    const ttff = ttf + f;
 
     const fields = Object.entries(this.pfields).map(([key, pfield]) => {
-      return `${key.length === 0 ? "_" : key}: ${
-        pfield.showPType(ttft)
-      }\n${ttf}`;
-    }).join(",\n");
+      return `\n${ttff}${key.length === 0 ? "_" : key}: ${
+        pfield.showPType(ttff)
+      }`;
+    });
     return `PRecord (
 ${ttf}population: ${this.population},
-${ttf}pfields: {${fields}}
+${ttf}pfields: {${fields.length > 0 ? `${fields.join(`,`)}\n${ttf}` : ""}}
 ${tt})`;
   };
 

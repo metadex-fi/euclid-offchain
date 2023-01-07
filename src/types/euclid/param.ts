@@ -3,7 +3,7 @@ import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { PLiteral, PPositive } from "../general/mod.ts";
 import { Amount, PAmount, PObject, PRecord } from "../mod.ts";
 import { PPrices, Prices } from "./prices.ts";
-import { newPPaymentKeyHashLiteral, PPaymentKeyHash } from "./primitive.ts";
+import { POwner } from "./primitive.ts";
 import { JumpSizes, leq, PJumpSizes, Value } from "./value.ts";
 
 export class Param {
@@ -27,7 +27,7 @@ export class Param {
 }
 export class PParam extends PObject<Param> {
   private constructor(
-    public powner: PPaymentKeyHash,
+    public powner: POwner,
     public pjumpSizes: PJumpSizes,
     public pinitialPrices: PPrices,
     public plowerPriceBounds: PPrices,
@@ -36,7 +36,7 @@ export class PParam extends PObject<Param> {
   ) {
     super(
       new PRecord({
-        "owner": PPaymentKeyHash,
+        "owner": powner,
         "jumpSizes": pjumpSizes,
         "initialPrices": pinitialPrices,
         "lowerPriceBounds": plowerPriceBounds,
@@ -48,7 +48,7 @@ export class PParam extends PObject<Param> {
   }
 
   static genPType(): PObject<Param> {
-    const powner = newPPaymentKeyHashLiteral(PPaymentKeyHash.genData());
+    const powner = POwner.genPType();
 
     const pprices = PPrices.genPType() as PPrices;
     const assets = pprices.assets;

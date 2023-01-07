@@ -99,7 +99,9 @@ export function genNumber(maxValue?: bigint): bigint {
   return randomChoice([n, -n]);
 }
 
-export function genString(alph: string): string {
+export function genString(alph: string, minBytes = 0n): string {
+  assert(minBytes >= 0n, `genString: minBytes < 0`);
+  assert(maxStringBytes >= minBytes, `genString: maxStringBytes < minBytes`);
   function genChar(): string {
     const choice = Math.floor(Math.random() * (alph.length + 10));
     if (choice < alph.length) {
@@ -109,8 +111,8 @@ export function genString(alph: string): string {
     }
   }
   const l: string[] = [];
-  const maxi = 8n * genNonNegative(maxStringBytes);
-  for (let i = 0; i < maxi; i++) {
+  const maxi = 8n * (minBytes + genNonNegative(maxStringBytes - minBytes));
+  for (let i = 0n; i < maxi; i++) {
     l.push(genChar());
   }
   const s = l.join("");

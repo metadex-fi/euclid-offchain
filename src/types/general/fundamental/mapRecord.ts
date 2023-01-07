@@ -97,17 +97,16 @@ ${tt}}`;
   public showPType = (tabs = ""): string => {
     const tt = tabs + t;
     const ttf = tt + f;
-    const ttfttt = ttf + t + t + t;
+    const ttff = ttf + f;
 
     const fields = Object.entries(this.pfields).map(([key, pfield]) => {
-      return `${key.length === 0 ? "_" : key} => ${
-        pfield.showPType(ttfttt + f + t)
+      return `\n${ttff}${key.length === 0 ? "_" : key} => ${
+        pfield.showPType(ttff)
       }`;
-    }).join(`,\n`);
+    });
     return `PMapRecord (
 ${ttf}population: ${this.population},
-${ttf}pfields: {${fields}
-${ttfttt}}
+${ttf}pfields: {${fields.length > 0 ? `${fields.join(`,`)}\n${ttf}` : ""}}
 ${tt})`;
   };
 

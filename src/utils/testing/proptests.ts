@@ -65,7 +65,10 @@ function testPTypeParse(
     } catch (_) {
       // Deno can't compare functions how we want it;
       // PObject wrongly fails because of that, so we have to do this:
-      assert(ptype.showPType().includes("PObject"));
+      assert(
+        ptype.showPType().includes("PObject"),
+        `no PObject in ptype: ${ptype.showPType()}`,
+      );
       // @ts-ignore TODO consider fixing this or leaving as is
       assertEquals(ptype.showData(data), ptype.showData(data_));
     }
