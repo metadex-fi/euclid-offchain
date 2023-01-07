@@ -341,6 +341,13 @@ export class PositiveValue {
   public unit = (): Value => this.value.unit();
   public size = (): bigint => this.value.size();
   public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
+
+  static maybeFromMap = (
+    m?: Map<CurrencySymbol, Map<TokenName, bigint>>,
+  ): PositiveValue | undefined => {
+    if (m === undefined) return undefined;
+    else return new PositiveValue(new Value(m));
+  };
 }
 
 export class PPositiveValue extends PValue<PPositive> {
@@ -377,14 +384,26 @@ export class PPositiveValue extends PValue<PPositive> {
 }
 
 export class JumpSizes {
-  private constructor(public value: Value) {}
+  private constructor(private value: PositiveValue) {}
+
+  public assets = (): Assets => this.value.assets();
+  public unsigned = (): Value => this.value.unsigned();
+  public concise = (tabs = ""): string => this.value.concise(tabs);
+  public toMap = (): Map<CurrencySymbol, Map<TokenName, bigint>> =>
+    this.value.toMap();
 
   static genOfAssets(assets: Assets): JumpSizes {
-    return new JumpSizes(PPositiveValue.genOfAssets(assets).genValue());
+    return new JumpSizes(
+      (PPositiveValue.genOfAssets(assets) as PPositiveValue).genPositiveValue(),
+    );
   }
 
   static nullOfAssets(assets: Assets): JumpSizes {
-    return new JumpSizes(Value.nullOfAssets(assets));
+    return new JumpSizes(new PositiveValue(Value.nullOfAssets(assets)));
+  }
+
+  static fromMap(m: Map<CurrencySymbol, Map<TokenName, bigint>>): JumpSizes {
+    return new JumpSizes(new PositiveValue(new Value(m)));
   }
 }
 export class PJumpSizes extends PPositiveValue {

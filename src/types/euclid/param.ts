@@ -9,7 +9,7 @@ import {
   PRecord,
 } from "../mod.ts";
 import { PPrices, Prices } from "./prices.ts";
-import { POwner } from "./primitive.ts";
+import { CurrencySymbol, POwner, TokenName } from "./primitive.ts";
 import {
   JumpSizes,
   leq,
@@ -17,25 +17,35 @@ import {
   PositiveValue,
   PPositiveValue,
   PValue,
+  Value,
 } from "./value.ts";
 
 export class Param {
+  public jumpSizes: JumpSizes;
+  public initPs: Prices;
+  public lowerBounds: PositiveValue | undefined;
+  public upperBounds: PositiveValue | undefined;
   constructor(
     public owner: PaymentKeyHash,
-    public jumpSizes: JumpSizes,
-    public initialPrices: Prices,
-    public lowerPriceBounds: PositiveValue | undefined,
-    public upperPriceBounds: PositiveValue | undefined,
+    jumpSizes_: Map<CurrencySymbol, Map<TokenName, bigint>>,
+    initialPrices: Map<CurrencySymbol, Map<TokenName, bigint>>,
+    lowerPriceBounds: Map<CurrencySymbol, Map<TokenName, bigint>> | undefined,
+    upperPriceBounds: Map<CurrencySymbol, Map<TokenName, bigint>> | undefined,
     public baseAmountA0: Amount,
   ) {
-    // assert(
-    //   leq(lowerPriceBounds?.unsigned(), initialPrices.unsigned()),
-    //   `${lowerPriceBounds?.unsigned()} > ${initialPrices.unsigned()}`,
-    // );
-    // assert(
-    //   leq(initialPrices.unsigned(), upperPriceBounds?.unsigned()),
-    //   `${initialPrices.unsigned()} > ${upperPriceBounds?.unsigned()}`,
-    // );
+    this.jumpSizes = JumpSizes.fromMap(jumpSizes_);
+    this.initPs = Prices.fromMap(initialPrices);
+    this.lowerBounds = PositiveValue.maybeFromMap(lowerPriceBounds);
+    this.upperBounds = PositiveValue.maybeFromMap(upperPriceBounds);
+
+    assert(
+      leq(this.lowerBounds?.unsigned(), this.initPs.unsigned()),
+      `${this.lowerBounds?.unsigned()} > ${this.initPs.unsigned()}`,
+    );
+    assert(
+      leq(this.initPs.unsigned(), this.upperBounds?.unsigned()),
+      `${this.initPs.unsigned()} > ${this.upperBounds?.unsigned()}`,
+    );
   }
 }
 export class PParam extends PObject<Param> {
@@ -67,7 +77,7 @@ export class PParam extends PObject<Param> {
     const assets = pprices.assets;
     const pjumpSizes = new PLiteral(
       new PJumpSizes(assets),
-      pprices.jumpSizes.value.toMap(),
+      pprices.jumpSizes.toMap(),
     );
 
     const plowerPriceBounds = PPositiveValue.maybePLiteral(

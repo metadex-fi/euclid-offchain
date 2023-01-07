@@ -65,12 +65,16 @@ export class PObject<O extends Object> implements PType<PlutusOf<O>, O> {
 
   public genData = (): O => {
     const record = this.precord.genData();
-    // console.log(record, JSON.stringify(record));
-    const o = new this.O(
-      ...Object.values(record),
-    );
-    // console.log(o, JSON.stringify(o));
-    return o;
+    try {
+      const o = new this.O(
+        ...Object.values(record),
+      );
+      return o;
+    } catch (e) {
+      throw new Error(
+        `Error in genData for ${this.precord.showData(record)}: ${e}`,
+      );
+    }
   };
 
   public showData = (data: O, tabs = ""): string => {
