@@ -8,13 +8,16 @@ export class PInteger implements PType<bigint, bigint> {
   public plift = (i: bigint): bigint => {
     assert(
       typeof i === `bigint`,
-      `.PInteger.plift: expected Integer: ${i}`,
+      `.PInteger.plift: expected Integer, got ${i} (${typeof i})`,
     );
     return i;
   };
 
   public pconstant = (data: bigint): bigint => {
-    assert(typeof data === `bigint`, `PInteger.pconstant: expected Integer`);
+    assert(
+      typeof data === `bigint`,
+      `PInteger.pconstant: expected Integer, got ${data} (${typeof data})`,
+    );
     return data;
   };
 
@@ -25,7 +28,7 @@ export class PInteger implements PType<bigint, bigint> {
   public showData = (data: bigint): string => {
     assert(
       typeof data === `bigint`,
-      `PInteger.showData: expected Integer, got ${data}`,
+      `PInteger.showData: expected Integer, got ${data} (${typeof data})`,
     );
     return `Integer: ${data}`;
   };

@@ -9,5 +9,5 @@ export * from "./map.ts";
 export * from "./mapRecord.ts";
 export * from "./object.ts";
 export * from "./record.ts";
-export * from "./sum.ts";
+// export * from "./sum.ts";
 export * from "./type.ts";

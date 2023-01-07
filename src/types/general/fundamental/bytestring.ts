@@ -8,13 +8,16 @@ export class PByteString implements PType<string, string> {
   public plift = (s: string): string => {
     assert(
       typeof s === `string`,
-      `plift: expected String: ${s}`,
+      `PByteString.plift: expected String, got ${s} (${typeof s})`,
     );
     return s;
   };
 
   public pconstant = (data: string): string => {
-    assert(typeof data === `string`, `pconstant: expected String: ${data}`);
+    assert(
+      typeof data === `string`,
+      `PByteString.pconstant: expected String, got ${data} (${typeof data})`,
+    );
     return data;
   };
 
@@ -23,6 +26,10 @@ export class PByteString implements PType<string, string> {
   }
 
   public showData = (data: string): string => {
+    assert(
+      typeof data === `string`,
+      `PByteString.showData: expected String, got ${data} (${typeof data})`,
+    );
     return `ByteString: ${data}`;
   };
 

@@ -4,15 +4,26 @@ import {
   genName,
   genNonNegative,
   gMaxLength,
+  maybeNdef,
 } from "../../../mod.ts";
-import { f, PConstanted, PData, PLifted, PType, RecordOf, t } from "./type.ts";
+import {
+  f,
+  PConstanted,
+  PData,
+  PLifted,
+  PType,
+  RecordOf,
+  RecordOfMaybe,
+  t,
+} from "./type.ts";
 
 export class PRecord<PFields extends PData>
-  implements PType<Array<PConstanted<PFields>>, RecordOf<PLifted<PFields>>> {
+  implements
+    PType<Array<PConstanted<PFields>>, RecordOfMaybe<PLifted<PFields>>> {
   public population: number;
 
   constructor(
-    public pfields: RecordOf<PFields | undefined>,
+    public pfields: RecordOfMaybe<PFields>,
   ) {
     let population = 1;
     Object.values(pfields).forEach((pfield) => {
@@ -27,56 +38,87 @@ export class PRecord<PFields extends PData>
 
   public plift = (
     l: Array<PConstanted<PFields>>,
-  ): RecordOf<PLifted<PFields>> => {
+  ): RecordOfMaybe<PLifted<PFields>> => {
     assert(
       l instanceof Array,
-      `Record.plift: expected List: ${l}`,
+      `Record.plift: expected Array, got ${l} (${typeof l})\nfor ${this.showPType()})`,
     );
-    const r: Record<string, PLifted<PFields>> = {};
-
-    const pfields = Object.entries(this.pfields);
-    l.forEach((value, i) => {
-      const key = pfields[i][0];
-      const pvalue = pfields[i][1];
-      assert(pvalue, `cannot lift undefined fields: ${key}`);
-      r[key] = pvalue.plift(value) as PLifted<PFields>;
+    const r: RecordOfMaybe<PLifted<PFields>> = {};
+    let i = 0;
+    Object.entries(this.pfields).forEach(([key, pfield]) => {
+      if (pfield !== undefined) {
+        assert(
+          i < l.length,
+          `Record.plift: too few elements at
+key = ${key}
+i = ${i}
+pfield = ${pfield.showPType()}
+in [${l}] of length ${l.length}
+for ${this.showPType()};
+status: ${Object.keys(r).join(`,\n${f}`)}`,
+        );
+        const value = l[i++];
+        assert(
+          value !== undefined,
+          `Record.plift: undefined value <${value}> at
+key = ${key}
+i = ${i}
+pfield = ${pfield.showPType()}
+in [${l}] of length ${l.length}
+for ${this.showPType()};
+status: ${Object.keys(r).join(`,\n${f}`)}`,
+        );
+        r[key] = pfield.plift(value) as PConstanted<PFields>;
+      } else {
+        r[key] = undefined;
+      }
     });
+    assert(
+      i === l.length,
+      `Record.plift: too many elements (${l.length}) for ${this.showPType()}`,
+    );
     return r;
   };
 
-  private checkFields = (data: RecordOf<PLifted<PFields>>) => {
+  private checkFields = (data: RecordOfMaybe<PLifted<PFields>>) => {
     assert(
       data instanceof Object,
-      `PRecord: expected Object, got ${data}`,
+      `PRecord.checkFields: expected Object, got ${data}\nfor ${this.showPType()}`,
     );
     const pfieldsNames = Object.keys(this.pfields).join(`,\n${f}`);
     const dataFieldsNames = Object.keys(data).join(`,\n${f}`);
     assert(
       pfieldsNames === dataFieldsNames,
-      `PRecord:\nexpected fields:\n${f}${pfieldsNames},\ngot:\n${f}${dataFieldsNames}\n`,
+      `PRecord.checkFields: expected fields:\n${f}${pfieldsNames},\ngot:\n${f}${dataFieldsNames}\nfor ${this.showPType()}\n`,
     );
   };
 
   public pconstant = (
-    data: RecordOf<PLifted<PFields>>,
+    data: RecordOfMaybe<PLifted<PFields>>,
   ): Array<PConstanted<PFields>> => {
     this.checkFields(data);
 
     const l = new Array<PConstanted<PFields>>();
-    Object.entries(data).forEach(([key, value]) => {
-      assert(
-        Object.keys(this.pfields).includes(key),
-        `field not found: ${key}`,
-      );
-      const pfield = this.pfields[key];
-      assert(pfield, `cannot constant undefined fields: ${key}`);
-      l.push(pfield.pconstant(value) as PConstanted<PFields>);
+    Object.entries(this.pfields).forEach(([key, pfield]) => {
+      const value = data[key];
+      if (pfield) {
+        assert(
+          value !== undefined,
+          `cannot constant ${value} with pfield: ${pfield.showPType()}`,
+        );
+        l.push(pfield.pconstant(value) as PConstanted<PFields>);
+      } else {
+        assert(
+          value === undefined,
+          `cannot constant ${value} with undefined pfield`,
+        );
+      }
     });
     return l;
   };
 
-  public genData = (): RecordOf<PLifted<PFields>> => {
-    const r: RecordOf<PLifted<PFields>> = {};
+  public genData = (): RecordOfMaybe<PLifted<PFields>> => {
+    const r: RecordOfMaybe<PLifted<PFields>> = {};
     Object.entries(this.pfields).forEach(([key, pfield]) => {
       r[key] = pfield?.genData() as PLifted<PFields>;
     });
@@ -84,7 +126,7 @@ export class PRecord<PFields extends PData>
   };
 
   public showData = (
-    data: RecordOf<PLifted<PFields>>,
+    data: RecordOfMaybe<PLifted<PFields>>,
     tabs = "",
   ): string => {
     this.checkFields(data);
@@ -123,11 +165,11 @@ ${tt})`;
     gen: Generators,
     maxDepth: bigint,
   ): PRecord<PData> {
-    const pfields: RecordOf<PData> = {};
+    const pfields: RecordOfMaybe<PData> = {};
     const maxi = genNonNegative(gMaxLength);
     for (let i = 0; i < maxi; i++) {
       const key = genName();
-      const pvalue = gen.generate(maxDepth);
+      const pvalue = maybeNdef(() => gen.generate(maxDepth))?.();
       pfields[key] = pvalue;
     }
     return new PRecord(pfields);

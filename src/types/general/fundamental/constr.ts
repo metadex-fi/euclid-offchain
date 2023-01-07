@@ -2,10 +2,20 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Constr } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { Generators, genNonNegative, maxInteger } from "../../../mod.ts";
 import { PRecord } from "./record.ts";
-import { f, PConstanted, PData, PLifted, PType, RecordOf, t } from "./type.ts";
+import {
+  f,
+  PConstanted,
+  PData,
+  PLifted,
+  PType,
+  RecordOf,
+  RecordOfMaybe,
+  t,
+} from "./type.ts";
 
 export class PConstr<PFields extends PData>
-  implements PType<Constr<PConstanted<PFields>>, RecordOf<PLifted<PFields>>> {
+  implements
+    PType<Constr<PConstanted<PFields>>, RecordOfMaybe<PLifted<PFields>>> {
   public population: number;
 
   constructor(
@@ -21,7 +31,7 @@ export class PConstr<PFields extends PData>
 
   public plift = (
     c: Constr<PConstanted<PFields>>,
-  ): RecordOf<PLifted<PFields>> => {
+  ): RecordOfMaybe<PLifted<PFields>> => {
     assert(c instanceof Constr, `plift: expected Constr`);
     assert(
       this.index === BigInt(c.index),
@@ -46,7 +56,7 @@ export class PConstr<PFields extends PData>
     return new Constr(index, this.pfields.pconstant(data));
   };
 
-  public genData = (): RecordOf<PLifted<PFields>> => {
+  public genData = (): RecordOfMaybe<PLifted<PFields>> => {
     return this.pfields.genData();
   };
 

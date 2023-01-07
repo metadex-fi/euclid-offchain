@@ -15,6 +15,7 @@ import { PMap } from "./map.ts";
 import { PObject } from "./object.ts";
 
 export type RecordOf<T> = Record<string, T>;
+export type RecordOfMaybe<T> = RecordOf<T | undefined>;
 export type PData = PType<Data, unknown>;
 export type PConstanted<PT extends PData> = ReturnType<
   PT["pconstant"]

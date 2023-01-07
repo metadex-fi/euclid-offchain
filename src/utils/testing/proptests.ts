@@ -60,36 +60,24 @@ function testPTypeParse(
 ) {
   try {
     const data_ = ptype.plift(plutusData);
-    try {
-      assertEquals(data, data_);
-    } catch (_) {
-      // Deno can't compare functions how we want it;
-      // PObject wrongly fails because of that, so we have to do this:
-      assert(
-        ptype.showPType().includes("PObject"),
-        `no PObject in ptype: ${ptype.showPType()}`,
-      );
-      // @ts-ignore TODO consider fixing this or leaving as is
+    // Deno can't compare functions how we want it;
+    // PObject wrongly fails because of that, so we have to do this:
+    if (ptype.showPType().includes("PObject")) {
       assertEquals(ptype.showData(data), ptype.showData(data_));
+    } else {
+      assertEquals(data, data_);
     }
   } catch (err) {
     logError(err, errors);
-    // logError(
-    //   new Error(
-    //     ptype.showData(data) + "\n" +
-    //       ptype.showData(ptype.plift(plutusData)),
-    //   ),
-    //   errors,
-    // );
   }
 }
 
 function logError(err: Error, record: Map<string, number>) {
   const e = [
     // err.name,
-    err.message,
+    // err.message,
     // err.cause,
-    // err.stack
+    err.stack,
   ].join("\n");
   const num = record.get(e);
   record.set(e, num ? num + 1 : 1);

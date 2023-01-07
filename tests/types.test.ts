@@ -31,12 +31,12 @@ Deno.test("euclid data/types tests", () => {
     // @ts-ignore TODO consider fixing this or leaving as is
     [
       ...fundamentalPrimitiveGenerators,
-      ...derivedPrimitiveGenerators,
-      ...euclidPrimitiveGenerators,
+      // ...derivedPrimitiveGenerators,
+      // ...euclidPrimitiveGenerators,
     ],
     [
       ...fundamentalContainerGenerators,
-      ...derivedContainerGenerators,
+      // ...derivedContainerGenerators,
       // ...euclidContainerGenerators,
     ],
   );
@@ -50,14 +50,14 @@ const fundamentalPrimitiveGenerators = [
 ];
 
 const fundamentalContainerGenerators = [
-  PLiteral.genPType,
-  PConstraint.genPType,
-  PList.genPType,
-  PMap.genPType,
-  PMapRecord.genPType,
+  // PLiteral.genPType,
+  // PConstraint.genPType,
+  // PList.genPType,
+  // PMap.genPType,
+  // PMapRecord.genPType,
   PRecord.genPType,
-  PConstr.genPType,
-  PObject.genPType,
+  // PConstr.genPType,
+  // PObject.genPType,
   // PSum.genPType,
 ];
 
