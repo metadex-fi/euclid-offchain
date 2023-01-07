@@ -3,7 +3,7 @@ import {
   assertEquals,
 } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Data } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { PData } from "../../mod.ts";
+import { PData, PObject } from "../../mod.ts";
 import { Generators, gMaxDepth, gMaxLength } from "./generators.ts";
 
 export function proptestPTypes(gen: Generators, iterations: number) {
@@ -59,9 +59,25 @@ function testPTypeParse(
   errors: Map<string, number>,
 ) {
   try {
-    assertEquals(data, ptype.plift(plutusData));
+    const data_ = ptype.plift(plutusData);
+    try {
+      assertEquals(data, data_);
+    } catch (_) {
+      // Deno can't compare functions how we want it;
+      // PObject wrongly fails because of that, so we have to do this:
+      assert(ptype.showPType().includes("PObject"));
+      // @ts-ignore TODO consider fixing this or leaving as is
+      assertEquals(ptype.showData(data), ptype.showData(data_));
+    }
   } catch (err) {
     logError(err, errors);
+    // logError(
+    //   new Error(
+    //     ptype.showData(data) + "\n" +
+    //       ptype.showData(ptype.plift(plutusData)),
+    //   ),
+    //   errors,
+    // );
   }
 }
 

@@ -99,12 +99,12 @@ export class PPrices extends PConstraint<PPositiveValue> {
 
     return `Prices (
 ${ttf}population: ${this.population}, 
-${ttf}initialPrices = ${this.initialPrices.value.concise()}, 
-${ttf}jumpSizes = ${this.jumpSizes.value.concise()}, 
-${ttf}lowerBounds? = ${this.lowerBounds?.value.concise()}, 
-${ttf}upperBounds? = ${this.upperBounds?.value.concise()},
-${ttf}maxJumpsUp = ${this.maxJumpsUp?.concise()},
-${ttf}maxJumpsDown = ${this.maxJumpsDown?.concise()}
+${ttf}initialPrices = ${this.initialPrices.value.concise(ttf)}, 
+${ttf}jumpSizes = ${this.jumpSizes.value.concise(ttf)}, 
+${ttf}lowerBounds? = ${this.lowerBounds?.value.concise(ttf)}, 
+${ttf}upperBounds? = ${this.upperBounds?.value.concise(ttf)},
+${ttf}maxJumpsUp = ${this.maxJumpsUp?.concise(ttf)},
+${ttf}maxJumpsDown = ${this.maxJumpsDown?.concise(ttf)}
 ${tt})`;
   };
 

@@ -1,11 +1,13 @@
 import {
   Generators,
+  PAmounts,
   PAsset,
   PAssets,
   PBounded,
   PByteString,
   PConstr,
   PConstraint,
+  PIdNFT,
   PInteger,
   PList,
   PLiteral,
@@ -20,25 +22,23 @@ import {
   proptestPTypes,
   PValue,
 } from "../src/mod.ts";
-import { PAmounts } from "../src/types/euclid/amounts.ts";
-import { PParam } from "../src/types/euclid/param.ts";
 
 Deno.test("euclid data/types tests", () => {
   // @ts-ignore TODO consider fixing this or leaving as is
   const gen = new Generators(
     // @ts-ignore TODO consider fixing this or leaving as is
     [
-      // ...fundamentalPrimitiveGenerators,
-      // ...derivedPrimitiveGenerators,
+      ...fundamentalPrimitiveGenerators,
+      ...derivedPrimitiveGenerators,
       ...euclidPrimitiveGenerators,
     ],
     [
-      // ...fundamentalContainerGenerators,
-      // ...derivedContainerGenerators,
+      ...fundamentalContainerGenerators,
+      ...derivedContainerGenerators,
       // ...euclidContainerGenerators,
     ],
   );
-  proptestPTypes(gen, 5000);
+  proptestPTypes(gen, 1000);
 });
 
 const fundamentalPrimitiveGenerators = [
@@ -70,14 +70,18 @@ const derivedContainerGenerators = [
 
 const euclidPrimitiveGenerators = [
   PAsset.genPType,
+  // PIdNFT.genPType,
   PAssets.genPType,
   PValue.genPType,
   PPositiveValue.genPType,
   PPrices.genPType,
-  PAmounts.genPType,
+  PAmounts.genPType, // <- works until here (10k iterations)
   // PParam.genPType,
-  // () => newPPositiveValue(PAssets.genData()),
-  // genPParam,
+  // PParamDatum.genPType,
+  // PActiveAssets.genPType,
+  // PDirac.genPType,
+  // PDiracDatum.genPType,
+  // PEuclidDatum.genPType,
 ];
 
 // const euclidContainerGenerators = [

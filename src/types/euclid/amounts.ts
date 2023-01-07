@@ -14,7 +14,10 @@ import {
   PPrices,
   Prices,
   t,
+  Value,
 } from "../mod.ts";
+import { TokenName } from "./primitive.ts";
+import { CurrencySymbol } from "./primitive.ts";
 
 export type Amounts = PositiveValue;
 export class PAmounts extends PConstraint<PPositiveValue> {
@@ -27,7 +30,15 @@ export class PAmounts extends PConstraint<PPositiveValue> {
       [], // TODO only looking at datums, include values
       newGenAmounts(baseAmountA0, pprices),
     );
+    this.population = 1; //probably far too conservative, but nonissue
   }
+
+  public showData = (
+    data: Map<CurrencySymbol, Map<TokenName, bigint>>,
+    tabs = "",
+  ): string => {
+    return `Amount ${new Value(data).concise(tabs)}`;
+  };
 
   public showPType = (tabs = ""): string => {
     const tt = tabs + t;

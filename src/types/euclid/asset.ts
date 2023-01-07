@@ -41,6 +41,10 @@ export class Asset {
   ) {
     assertADAlovelace(this);
   }
+
+  public show = (): string => {
+    return `Asset(${this.currencySymbol}, ${this.tokenName})`;
+  };
 }
 // @ts-ignore TODO consider fixing this, or leaving as is
 export class PAsset extends PConstraint<PObject<Asset>> {

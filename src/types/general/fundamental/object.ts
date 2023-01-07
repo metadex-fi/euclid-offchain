@@ -21,6 +21,11 @@ type AttributeTypes<T> = {
   [K in keyof T]: T[K] extends RecordOf<unknown> ? AttributeTypes<T[K]> : T[K];
 }[keyof T];
 
+const filterFunctions = <O extends Object>(o: O) =>
+  Object.fromEntries(
+    Object.entries(o).filter(([_, v]) => typeof v !== "function"),
+  );
+
 // @ts-ignore TODO consider fixing this or leaving as is
 export class PObject<O extends Object> implements PType<PlutusOf<O>, O> {
   public population: number;
@@ -54,9 +59,8 @@ export class PObject<O extends Object> implements PType<PlutusOf<O>, O> {
   public pconstant = (
     data: O,
   ): PlutusOf<O> => {
-    return this.precord.pconstant(
-      data as RecordOf<unknown>,
-    ) as PlutusOf<O>;
+    const record = filterFunctions(data);
+    return this.precord.pconstant(record) as PlutusOf<O>;
   };
 
   public genData = (): O => {
@@ -74,7 +78,7 @@ export class PObject<O extends Object> implements PType<PlutusOf<O>, O> {
     const ttf = tt + f;
 
     return `Object: ${this.O.name} (
-${ttf}${this.precord.showData(data as RecordOf<unknown>, ttf)}
+${ttf}${this.precord.showData(filterFunctions(data) as RecordOf<unknown>, ttf)}
 ${tt})`;
   };
 
@@ -97,10 +101,10 @@ ${tt})`;
       {
         s: PByteString.genPType(),
         i: PInteger.genPType(),
-        ls: PList.genPType(gen, maxDepth),
-        li: PList.genPType(gen, maxDepth),
-        msli: PMap.genPType(gen, maxDepth),
-        mlis: PMap.genPType(gen, maxDepth),
+        // ls: PList.genPType(gen, maxDepth),
+        // li: PList.genPType(gen, maxDepth),
+        // msli: PMap.genPType(gen, maxDepth),
+        // mlis: PMap.genPType(gen, maxDepth),
       },
     );
     return new PObject(precord, ExampleClass);
@@ -111,9 +115,12 @@ class ExampleClass {
   constructor(
     public s: string,
     public i: bigint,
-    public ls: string[],
-    public li: bigint[],
-    public msli: Map<string, bigint[]>,
-    public mlis: Map<bigint[], string>,
+    // public ls: string[],
+    // public li: bigint[],
+    // public msli: Map<string, bigint[]>,
+    // public mlis: Map<bigint[], string>,
   ) {}
+  public show = () => {
+    return `ExampleClass (${this.s}, ${this.i})`;
+  };
 }

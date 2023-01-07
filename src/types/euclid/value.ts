@@ -38,14 +38,16 @@ export class Value {
     return ccys.join(`\n`);
   };
 
-  public concise = (): string => {
+  public concise = (tabs = ""): string => {
+    const tf = tabs + f;
     const amounts = [];
-    for (const [_, tokenMap] of this.value) {
-      for (const [_, amount] of tokenMap) {
-        amounts.push(amount.toString());
+    for (const [ccy, tokenMap] of this.value) {
+      for (const [tkn, amount] of tokenMap) {
+        amounts.push(`${tf}${ccy}_${tkn}: ${amount.toString()}`);
       }
     }
-    return `[${amounts.join(`, `)}]`;
+    if (amounts.length === 0) return `[]`;
+    else return `[\n${amounts.join(`,\n`)}\n${tabs}]`;
   };
 
   public zeroed = (): Value => {
@@ -158,9 +160,7 @@ export class Value {
       defaultAmnt;
     assert(
       amount !== undefined,
-      `amountOf: amount not found for asset\n${
-        JSON.stringify(asset)
-      }\nin ${this.show()}`,
+      `amountOf: amount not found for asset\n${asset.show()}\nin ${this.show()}`,
     );
     return amount;
   };
@@ -169,15 +169,11 @@ export class Value {
     const tokens = this.value.get(asset.currencySymbol);
     assert(
       tokens,
-      `setAmountOf: tokens not found for asset ${
-        JSON.stringify(asset)
-      } in ${this.show()}`,
+      `setAmountOf: tokens not found for asset ${asset.show()} in ${this.show()}`,
     );
     assert(
       tokens.has(asset.tokenName),
-      `setAmountOf: amount not found for asset ${
-        JSON.stringify(asset)
-      } in ${this.show()}`,
+      `setAmountOf: amount not found for asset ${asset.show()} in ${this.show()}`,
     );
     tokens.set(asset.tokenName, amount);
   };
@@ -187,9 +183,7 @@ export class Value {
     if (tokens) {
       assert(
         !tokens.has(asset.tokenName),
-        `initAmountOf: amount already set for asset ${
-          JSON.stringify(asset)
-        } in ${this.show()}`,
+        `initAmountOf: amount already set for asset ${asset.show()} in ${this.show()}`,
       );
       tokens.set(asset.tokenName, amount);
     } else {
@@ -274,14 +268,9 @@ maxInteger: ${maxInteger}`,
     for (const [currencySymbol, tokens] of assets.toMap()) {
       const pamounts: RecordOf<N> = {};
       for (const tokenName of tokens) {
-        const lowerBound = lowerBounds?.maybeAmountOf({
-          currencySymbol,
-          tokenName,
-        });
-        const upperBound = upperBounds?.maybeAmountOf({
-          currencySymbol,
-          tokenName,
-        });
+        const asset = new Asset(currencySymbol, tokenName);
+        const lowerBound = lowerBounds?.maybeAmountOf(asset);
+        const upperBound = upperBounds?.maybeAmountOf(asset);
         pamounts[tokenName] = new pnum(lowerBound, upperBound);
       }
       value[currencySymbol] = new PMapRecord(pamounts);
@@ -323,12 +312,14 @@ export class PositiveValue {
     assert(allPositive(value), "value must be positive");
   }
 
+  public concise = (tabs = ""): string => {
+    return `+${this.value.concise(tabs)}`;
+  };
+
   public initAmountOf = (asset: Asset, amount: bigint): void => {
     assert(
       amount >= 0n,
-      `initAmountOf: amount must be positive, got ${amount} for asset ${
-        JSON.stringify(asset)
-      }`,
+      `initAmountOf: amount must be positive, got ${amount} for asset ${asset.show()}`,
     );
     this.value?.initAmountOf(asset, amount);
   };

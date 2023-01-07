@@ -5,48 +5,92 @@ import {
   sha256,
   toHex,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { contractCurrency, genPositive, gMaxLength } from "../../mod.ts";
-import { Asset, maxTicks, minTicks, PAsset, PConstraint } from "../mod.ts";
+import {
+  contractCurrency,
+  genPositive,
+  gMaxLength,
+  maybeNdef,
+} from "../../mod.ts";
+import { Asset, PAsset, PConstraint } from "../mod.ts";
 
+export const minTicks = 1n; // per dimension
+export const maxTicks = 5n; // per dimension
 // 4 ** 4 = 256
 // TODO prod: derive this from observed number of diracs in pool
 export const gMaxHashes = gMaxLength ** (maxTicks - minTicks);
 
-export type IdNFT = Asset;
-export const newIdNFT = (hash: string): IdNFT => {
-  return new Asset(contractCurrency, hash);
-};
-export function nextThreadNFT(threadNFT: IdNFT): IdNFT {
-  return newIdNFT(toHex(sha256(fromHex(threadNFT.tokenName))));
+export class IdNFT {
+  constructor(
+    private owner: PaymentKeyHash,
+    private hashes = 0n,
+  ) {
+    assert(
+      hashes <= gMaxHashes,
+      `hashes: ${hashes} exceeds gMaxHashes: ${gMaxHashes}`,
+    );
+  }
+
+  public next = (): IdNFT => {
+    assert(
+      this.hashes < gMaxHashes,
+      `hashes: ${this.hashes} will exceed gMaxHashes: ${gMaxHashes}`,
+    );
+    return new IdNFT(this.owner, this.hashes + 1n);
+  };
+
+  public asset = (): Asset => {
+    let tokenName = this.owner;
+    for (let i = 0; i < this.hashes; i++) {
+      tokenName = nextHash(tokenName);
+    }
+    return new Asset(contractCurrency, tokenName);
+  };
+
+  public show = (): string => {
+    return `IdNFT(${this.owner}, ${this.hashes})`;
+  };
 }
 
+function nextHash(hash: string): string {
+  return toHex(sha256(fromHex(hash)));
+}
+
+// @ts-ignore TODO consider fixing this or leaving as is
 export class PIdNFT extends PConstraint<PAsset> {
-  constructor(
+  private constructor(
     public owner: PaymentKeyHash,
     public maxHashes = 0n,
   ) {
     super(
-      new PAsset(),
+      PAsset.ptype,
       [assertContractCurrency, newAssertOwnersToken(owner, maxHashes)],
       newGenIdNFT(owner, maxHashes),
     );
   }
 
+  static newPParamNFT(owner: PaymentKeyHash) {
+    return new PIdNFT(owner);
+  }
+
+  static newPThreadNFT(owner: PaymentKeyHash) {
+    return new PIdNFT(owner, gMaxHashes);
+  }
+
   static genPType(): PConstraint<PAsset> {
+    const maxHashes = maybeNdef(() => genPositive(gMaxHashes))?.();
     return new PConstraint(
-      PAsset.genPType(),
+      PAsset.ptype,
       [assertContractCurrency],
-      newGenIdNFT(contractCurrency),
+      newGenIdNFT(contractCurrency, maxHashes),
     );
   }
 }
 
-export const newPParamNFT = (owner: PaymentKeyHash) => new PIdNFT(owner);
-export const newPThreadNFT = (owner: PaymentKeyHash) =>
-  new PIdNFT(owner, gMaxHashes);
-
 function assertContractCurrency(a: Asset) {
-  assert(a.currencySymbol === contractCurrency, "not contract-currency");
+  assert(
+    a.currencySymbol === contractCurrency,
+    `currencySymbol: ${a.currencySymbol} of ${a.show()} is not contractCurrency: ${contractCurrency}`,
+  );
 }
 
 const newAssertOwnersToken =
@@ -62,13 +106,7 @@ const newAssertOwnersToken =
   };
 
 const newGenIdNFT =
-  (owner: PaymentKeyHash, maxHashes?: bigint) => (): IdNFT => {
-    let hash = owner;
-    if (maxHashes) {
-      const hashes = genPositive(maxHashes);
-      for (let i = 0; i < hashes; i++) {
-        hash = toHex(sha256(fromHex(hash)));
-      }
-    }
-    return newIdNFT(hash);
+  (owner: PaymentKeyHash, maxHashes?: bigint) => (): Asset => {
+    const hashes = maxHashes ? genPositive(maxHashes) : 0n;
+    return new IdNFT(owner, hashes).asset();
   };

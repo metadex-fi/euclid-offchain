@@ -48,11 +48,11 @@ export class PRecord<PFields extends PData>
   ): Array<PConstanted<PFields>> => {
     assert(data instanceof Object, `PRecord.pconstant: expected Object`);
 
-    const pfieldsNames = Object.getOwnPropertyNames(this.pfields);
-    const dataFieldsNames = Object.getOwnPropertyNames(data);
+    const pfieldsNames = Object.keys(this.pfields).join(`,\n${f}`);
+    const dataFieldsNames = Object.keys(data).join(`,\n${f}`);
     assert(
-      pfieldsNames.toString() === dataFieldsNames.toString(),
-      "PRecord.pconstant: fields mismatch",
+      pfieldsNames === dataFieldsNames,
+      `PRecord.pconstant:\nexpected fields:\n${f}${pfieldsNames},\ngot:\n${f}${dataFieldsNames}\n`,
     );
 
     const l = new Array<PConstanted<PFields>>();
@@ -82,12 +82,12 @@ export class PRecord<PFields extends PData>
     const ttft = ttf + t;
 
     const fields = Object.entries(data).map(([key, value]) => {
-      return `${key.length === 0 ? "_" : key}: ${
+      return `${ttf}${key.length === 0 ? "_" : key}: ${
         this.pfields[key].showData(value, ttft)
       }`;
     }).join(",\n");
     return `Record {
-${ttf}${fields}
+${fields}
 ${tt}}`;
   };
 

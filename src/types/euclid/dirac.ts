@@ -1,19 +1,14 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
-  ActiveAssets,
   addAmount,
   Amount,
   Amounts,
   Asset,
   assetsOf,
-  genAmounts,
   gMaxHashes,
   IdNFT,
-  newGenActiveAssets,
   newIdNFT,
-  newPActiveAssets,
-  newPAmounts,
   newPParamNFT,
   newPPaymentKeyHashLiteral,
   newPThreadNFT,

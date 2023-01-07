@@ -37,11 +37,15 @@ export class PSum<PFields extends PData>
     throw new Error(`pconstant: not implemented`); // TODO something about matching maybe
   };
 
+  public equals(data: PLifted<PSum<PData>>): string {
+    throw new Error(`show: not implemented`);
+  }
+
   public genData = (): RecordOf<PLifted<PFields>> => {
     return randomChoice(this.pconstrs).genData();
   };
 
-  public showData(_data: PLifted<PSum<PData>>): string {
+  public showData(data: PLifted<PSum<PData>>): string {
     throw new Error(`show: not implemented`);
   }
 
