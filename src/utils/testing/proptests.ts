@@ -65,7 +65,11 @@ function testPTypeParse(
     if (ptype.showPType().includes("PObject")) {
       assertEquals(ptype.showData(data), ptype.showData(data_));
     } else {
-      assertEquals(data, data_);
+      try {
+        assertEquals(data, data_);
+      } catch (err) {
+        throw new Error(ptype.showPType() + "\n" + err.message);
+      }
     }
   } catch (err) {
     logError(err, errors);

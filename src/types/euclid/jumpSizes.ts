@@ -25,10 +25,6 @@ export class JumpSizes {
     );
   }
 
-  static nullOfAssets(assets: Assets): JumpSizes {
-    return new JumpSizes(new PositiveValue(Value.nullOfAssets(assets)));
-  }
-
   static fromMap(m: Map<CurrencySymbol, Map<TokenName, bigint>>): JumpSizes {
     return new JumpSizes(new PositiveValue(new Value(m)));
   }

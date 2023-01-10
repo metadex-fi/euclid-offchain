@@ -97,22 +97,18 @@ export class ParamDatum {
 }
 export class PParamDatum extends PObject<ParamDatum> {
   private constructor(
-    public _0: PParam,
+    public pparam: PParam,
   ) {
     super(
       new PRecord({
-        "_0": _0,
+        "_0": pparam,
       }),
       ParamDatum,
     );
   }
 
   static genPType(): PObject<ParamDatum> {
-    return new PObject(
-      new PRecord({
-        "_0": PParam.genPType(),
-      }),
-      ParamDatum,
-    );
+    const pparam = PParam.genPType() as PParam;
+    return new PParamDatum(pparam);
   }
 }

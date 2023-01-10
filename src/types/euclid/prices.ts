@@ -24,6 +24,7 @@ import {
   TokenName,
   Value,
 } from "../../mod.ts";
+import { PLiteral } from "../mod.ts";
 
 export const gMaxJumps = 3n;
 
@@ -167,6 +168,18 @@ ${tt})`;
       param.lowerPriceBounds,
       param.upperPriceBounds,
     );
+  }
+
+  static pliteral(prices: Prices): PLiteral<PPrices> {
+    const value = prices.value();
+    const pprices = new PPrices(
+      prices,
+      new JumpSizes(value), // this would be nicer as zeroes, but we can't, and don't need to
+      value,
+      value,
+    );
+
+    return new PLiteral(pprices, prices);
   }
 }
 
