@@ -1,14 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { genNonNegative } from "../../mod.ts";
-import {
-  Asset,
-  f,
-  lSubValues,
-  PAsset,
-  PConstraint,
-  PEnum,
-  PMap,
-} from "../mod.ts";
+import { Asset, lSubValues, PAsset, PConstraint, PEnum, PMap } from "../mod.ts";
 import { PPrices, Prices } from "./prices.ts";
 
 export type ActiveAssets = Map<Prices, Asset>;
@@ -24,7 +15,6 @@ export class PActiveAssets extends PConstraint<PMap<PPrices, PEnum<PAsset>>> {
       [newAssertNotDefault(pprices.initialPrices)],
       newGenActiveAssets(pprices),
     );
-    this.population = 1; //probably far too conservative, but nonissue TODO generated, look at it
   }
 
   static genPType(): PConstraint<PMap<PPrices, PEnum<PAsset>>> {

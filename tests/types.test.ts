@@ -85,8 +85,8 @@ const euclidPrimitiveGenerators = [
   PPrices.genPType,
   PAmounts.genPType,
   PParam.genPType,
-  PParamDatum.genPType, // <- works until here (10k iterations)
-  PActiveAssets.genPType,
+  PParamDatum.genPType,
+  PActiveAssets.genPType, // <- works until here (10k iterations)
   // PDirac.genPType,
   // PDiracDatum.genPType,
   // PEuclidDatum.genPType,
