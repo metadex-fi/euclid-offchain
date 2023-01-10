@@ -8,6 +8,8 @@ import {
   PByteString,
   PConstr,
   PConstraint,
+  PDirac,
+  PDiracDatum,
   PEnum,
   PIdNFT,
   PInteger,

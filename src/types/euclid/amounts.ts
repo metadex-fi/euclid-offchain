@@ -61,7 +61,7 @@ const newGenAmounts = (
 ) =>
 () => genAmounts(baseAmountA0, pprices.genData());
 
-const genAmounts = (baseAmountA0: Amount, prices: Prices): Amounts => {
+export const genAmounts = (baseAmountA0: Amount, prices: Prices): Amounts => {
   assert(
     prices.size() >= 2n,
     `genAmounts: less than two assets in ${prices.concise()}`,

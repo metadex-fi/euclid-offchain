@@ -243,6 +243,14 @@ export class Value {
     return this.assets().subsetOf(assets);
   };
 
+  public clone = (): Value => new Value(this.toMap());
+
+  public addAmountOf = (asset: Asset, amount: bigint): Value => {
+    const value = this.clone();
+    value.setAmountOf(asset, value.amountOf(asset) + amount);
+    return value;
+  };
+
   static nullOfAssets = (assets: Assets): Value => {
     const value = new Map<CurrencySymbol, Map<TokenName, bigint>>();
     for (const [currencySymbol, tokens] of assets.toMap()) {
@@ -444,16 +452,10 @@ export const newUnionWith = (
 
 export const addValues = newUnionWith((a, b) => a + b, 0n, 0n, 0n);
 // export const subValues = newUnionWith((a, b) => a - b);
-// export const mulValues = newUnionWith((a, b) => a * b);
+export const mulValues = newUnionWith((a, b) => a * b);
 // export const divValues = newUnionWith((a, b) => a / b);
 
 export const lSubValues = newUnionWith((a, b) => a > b ? a - b : 0n, 0n);
-
-export const addAmount = (v: Value, asset: Asset, amount: bigint): Value => {
-  const add = newUnionWith((a, b) => a + b, 0n, undefined, 0n);
-  const value = add(v, singleton(asset, amount));
-  return value;
-};
 
 export const newMapAmounts = (op: (arg: bigint) => bigint) =>
   newUnionWith(

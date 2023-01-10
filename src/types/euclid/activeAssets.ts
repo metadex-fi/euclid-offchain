@@ -4,7 +4,7 @@ import { PPrices, Prices } from "./prices.ts";
 
 export type ActiveAssets = Map<Prices, Asset>;
 export class PActiveAssets extends PConstraint<PMap<PPrices, PEnum<PAsset>>> {
-  private constructor(
+  constructor(
     public pprices: PPrices,
   ) {
     super(

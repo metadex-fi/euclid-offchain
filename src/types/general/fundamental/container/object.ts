@@ -93,8 +93,8 @@ ${tt})`;
   };
 
   static genPType(
-    gen: Generators,
-    maxDepth: bigint,
+    _gen: Generators,
+    _maxDepth: bigint,
   ): PObject<any> {
     const precord = new PRecord<PData>(
       {

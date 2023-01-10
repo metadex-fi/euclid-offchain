@@ -11,10 +11,16 @@ import {
   gMaxLength,
   maybeNdef,
 } from "../../mod.ts";
-import { Asset, f, PAsset, PConstraint, POwner } from "../mod.ts";
+import {
+  Asset,
+  f,
+  maxTicks,
+  minTicks,
+  PAsset,
+  PConstraint,
+  POwner,
+} from "../mod.ts";
 
-export const minTicks = 1n; // per dimension
-export const maxTicks = 5n; // per dimension
 // 4 ** 4 = 256
 // TODO prod: derive this from observed number of diracs in pool
 export const gMaxHashes = gMaxLength ** (maxTicks - minTicks);
@@ -49,6 +55,14 @@ export class IdNFT {
   public show = (): string => {
     return `IdNFT(${this.owner}, ${this.hashes})`;
   };
+
+  static newParamNFT(owner: PaymentKeyHash) {
+    return new IdNFT(owner);
+  }
+
+  static newThreadNFT(owner: PaymentKeyHash) {
+    return new IdNFT(owner, gMaxHashes);
+  }
 }
 
 function nextHash(hash: string): string {

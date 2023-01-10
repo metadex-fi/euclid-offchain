@@ -2,13 +2,13 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
   ActiveAssets,
-  addAmount,
   Amount,
   Amounts,
-  Asset,
-  assetsOf,
+  genAmounts,
   gMaxHashes,
   IdNFT,
+  mulValues,
+  newGenActiveAssets,
   PActiveAssets,
   PAmounts,
   Param,
@@ -16,6 +16,8 @@ import {
   PIdNFT,
   PList,
   PObject,
+  PParam,
+  PPositive,
   PPrices,
   PRecord,
   Prices,
@@ -32,73 +34,86 @@ export class Dirac {
     public jumpStorage: ActiveAssets,
   ) {}
 }
-export type PDirac = PConstraint<PObject<Dirac>>;
-export const newPDirac = (param: Param): PDirac => {
-  const pprices = PPrices.fromParam(param);
+export class PDirac extends PConstraint<PObject<Dirac>> {
+  constructor(
+    public param: Param,
+  ) {
+    const pprices = PPrices.fromParam(param);
+    const pinner = new PObject(
+      new PRecord({
+        "owner": POwner.pliteral(param.owner),
+        "threadNFT": PIdNFT.newPThreadNFT(param.owner),
+        "paramNFT": PIdNFT.newPParamNFT(param.owner),
+        "prices": pprices,
+        "activeAmnts": new PAmounts(param.baseAmountA0, pprices),
+        "jumpStorage": new PActiveAssets(pprices),
+      }),
+      Dirac,
+    );
 
-  const pinner = new PObject(
-    new PRecord({
-      "owner": POwner.pliteral(param.owner),
-      "threadNFT": PIdNFT.newPThreadNFT(param.owner),
-      "paramNFT": PIdNFT.newPParamNFT(param.owner),
-      "prices": pprices,
-      "activeAmnts": new PAmounts(param.baseAmountA0, pprices),
-      "jumpStorage": new PActiveAssets(param.initialPrices, pprices),
-    }),
-    Dirac,
-  );
+    super(
+      pinner,
+      [newAssertAmountsCongruent(param.baseAmountA0)], // <- the only reason for PConstraint
+      pinner.genData,
+    );
+  }
 
-  return new PConstraint(
-    pinner,
-    [newAssertAmountsCongruent(param.baseAmountA0)],
-    pinner.genData,
-  );
-};
+  static genPType(): PConstraint<PObject<Dirac>> {
+    const param = PParam.genPType().genData();
+    return new PDirac(param);
+  }
+}
 
 // TODO consider fees here
 const newAssertAmountsCongruent =
   (baseAmountA0: Amount) => (dirac: Dirac): void => {
-    const total = sumAmounts(mulValues(dirac.prices, dirac.activeAmnts));
+    const total = mulValues(
+      dirac.prices.unsigned(),
+      dirac.activeAmnts.unsigned(),
+    ).sumAmounts();
     assert(
       total === baseAmountA0,
       `total ${total} !== baseAmountA0 ${baseAmountA0}`,
     );
   };
 
-export type PDiracs = PConstraint<PList<PDirac>>;
-export const newPDiracs = (param: Param): PDiracs => {
-  const pinner = new PList(newPDirac(param));
-  return new PConstraint(
-    pinner,
-    [], // TODO asserts
-    newGenAllDiracs(param),
-  );
-};
+export class PAllDiracs extends PConstraint<PList<PDirac>> {
+  constructor(
+    public param: Param,
+  ) {
+    const pinner = new PList(new PDirac(param));
+    super(
+      pinner,
+      [], // TODO asserts
+      newGenAllDiracs(param),
+    );
+  }
+
+  static genPType(): PConstraint<PList<PDirac>> {
+    const param = PParam.genPType().genData();
+    return new PAllDiracs(param);
+  }
+}
 
 export const minTicks = 1n; // per dimension
 export const maxTicks = 5n; // per dimension
-const PTicks = newPAmount(minTicks, maxTicks);
+const PTicks = new PPositive(minTicks, maxTicks);
 
 const newGenAllDiracs = (param: Param) => (): Dirac[] => {
-  const assets = assetsOf(param.initialPrices);
-  const paramNFT = newIdNFT(param.owner);
+  const assets = param.initialPrices.assets();
+  const paramNFT = new IdNFT(param.owner);
   const numTicks = PTicks.genData();
 
-  const numDiracs = Number(numTicks) ** numAssets(assets);
+  const numDiracs = Number(numTicks) ** assets.size();
   assert(numDiracs <= gMaxHashes, "too many diracs");
 
+  let threadNFT = paramNFT.next();
   function genDiracForPrices(prices: Prices): Dirac {
-    const pprices = newPPrices(
-      assets,
-      param.lowerPriceBounds,
-      param.upperPriceBounds,
-      prices,
-      param.jumpSizes,
-    );
-    const genActiveAssets = newGenActiveAssets(prices, pprices);
+    const pprices = PPrices.fromParam(param);
+    const genActiveAssets = newGenActiveAssets(pprices);
     return new Dirac(
       param.owner,
-      nextThreadNFT(paramNFT),
+      threadNFT,
       paramNFT,
       prices,
       genAmounts(param.baseAmountA0, prices),
@@ -106,7 +121,6 @@ const newGenAllDiracs = (param: Param) => (): Dirac[] => {
     );
   }
 
-  let threadNFT = nextThreadNFT(paramNFT);
   const prices = param.initialPrices;
   let diracs = [
     genDiracForPrices(prices),
@@ -114,23 +128,20 @@ const newGenAllDiracs = (param: Param) => (): Dirac[] => {
   // for each asset and for each existing dirac, "spread" that dirac
   // in that asset's dimension. "spread" means: add all other tick
   // offsets for that asset's price.
-  for (const [ccy, tkns] of assets) {
-    for (const tkn of tkns) {
-      const asset = new Asset(ccy, tkn);
-      const jumpSize = amountOf(param.jumpSizes, asset);
-      const tickSize = jumpSize / numTicks;
-      const diracs_ = new Array<Dirac>();
-      diracs.forEach((dirac) => {
-        for (let offset = tickSize; offset < jumpSize; offset += tickSize) {
-          threadNFT = nextThreadNFT(threadNFT);
-          const prices = addAmount(dirac.prices, asset, offset);
-          diracs_.push(
-            genDiracForPrices(prices),
-          );
-        }
-      });
-      diracs = diracs.concat(diracs_);
-    }
+  for (const asset of assets.toList()) {
+    const jumpSize = param.jumpSizes.amountOf(asset);
+    const tickSize = jumpSize / numTicks;
+    const diracs_ = new Array<Dirac>();
+    diracs.forEach((dirac) => {
+      for (let offset = tickSize; offset < jumpSize; offset += tickSize) {
+        threadNFT = threadNFT.next();
+        const prices = dirac.prices.addAmountOf(asset, offset);
+        diracs_.push(
+          genDiracForPrices(prices),
+        );
+      }
+    });
+    diracs = diracs.concat(diracs_);
   }
 
   return diracs;
@@ -138,15 +149,23 @@ const newGenAllDiracs = (param: Param) => (): Dirac[] => {
 
 export class DiracDatum {
   constructor(
-    public _0: Dirac,
+    public _0: Dirac, // should this be _1?
   ) {}
 }
-export type PDiracDatum = PObject<DiracDatum>;
-export const newPDiracDatum = (param: Param) => {
-  new PObject(
-    new PRecord({
-      "_0": newPDirac(param),
-    }),
-    DiracDatum,
-  );
-};
+export class PDiracDatum extends PObject<DiracDatum> {
+  constructor(
+    public param: Param,
+  ) {
+    super(
+      new PRecord({
+        "_0": new PDirac(param), // should this be _1?
+      }),
+      DiracDatum,
+    );
+  }
+
+  static genPType(): PObject<DiracDatum> {
+    const param = PParam.genPType().genData();
+    return new PDiracDatum(param);
+  }
+}

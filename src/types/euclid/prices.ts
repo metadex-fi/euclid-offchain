@@ -38,6 +38,8 @@ export class Prices {
   public show = (tabs = ""): string => `Prices (\n${this.prices.show(tabs)}\n)`;
   public size = (): bigint => this.prices.size();
   public amountOf = (asset: Asset): bigint => this.prices.amountOf(asset);
+  public addAmountOf = (asset: Asset, amount: bigint): Prices =>
+    new Prices(this.prices.addAmountOf(asset, amount));
   public toMap = (): Map<CurrencySymbol, Map<TokenName, bigint>> =>
     this.prices.toMap();
 
