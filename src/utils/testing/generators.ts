@@ -5,7 +5,7 @@ import { PData } from "../../mod.ts";
 
 export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
 const maxStringBytes = 2n; // TODO higher
-export const gMaxLength = 4n;
+export const gMaxLength = 3n;
 export const gMaxDepth = 4n;
 const dropChance = 0.5;
 export const contractCurrency = "cc"; // TODO replace with actual

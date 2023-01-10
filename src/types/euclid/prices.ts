@@ -161,9 +161,9 @@ ${tt})`;
     );
   }
 
-  static fromParam(param: Param): PPrices {
+  static fromParam(param: Param, initialPrices?: Prices): PPrices {
     return new PPrices(
-      param.initialPrices,
+      initialPrices ?? param.initialPrices,
       param.jumpSizes,
       param.lowerPriceBounds,
       param.upperPriceBounds,
@@ -209,7 +209,10 @@ const newAssertPricesCongruent =
         currentPs.unsigned(),
         jumpSizes.unsigned(),
       ),
-      "prices out of whack",
+      `newAssertPricesCongruent: prices not congruent:
+initPs: ${initPs.concise()}
+currentPs: ${currentPs.concise()}
+jumpSizes: ${jumpSizes.concise()}`,
     );
   };
 

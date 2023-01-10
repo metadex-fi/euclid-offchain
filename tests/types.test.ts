@@ -1,6 +1,7 @@
 import {
   Generators,
   PActiveAssets,
+  PAllDiracs,
   PAmounts,
   PAsset,
   PAssets,
@@ -32,7 +33,6 @@ import {
 } from "../src/mod.ts";
 
 Deno.test("euclid data/types tests", () => {
-  // @ts-ignore TODO consider fixing this or leaving as is
   const gen = new Generators(
     // @ts-ignore TODO consider fixing this or leaving as is
     [
@@ -91,6 +91,6 @@ const euclidPrimitiveGenerators = [
   PActiveAssets.genPType,
   PDirac.genPType,
   PDiracDatum.genPType,
-  // PAllDiracs.genPType,
+  PAllDiracs.genPType,
   // PEuclidDatum.genPType,
 ];

@@ -63,7 +63,7 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
 }
 
 // TODO consider fees here
-const newAssertAmountsCongruent =
+export const newAssertAmountsCongruent =
   (baseAmountA0: bigint, prices: Prices) => (dirac: Dirac): void => {
     const prices_ = prices.unsigned();
     const worth = newUnionWith(

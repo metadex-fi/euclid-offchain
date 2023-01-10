@@ -11,19 +11,10 @@ import {
   gMaxLength,
   maybeNdef,
 } from "../../mod.ts";
-import {
-  Asset,
-  f,
-  maxTicks,
-  minTicks,
-  PAsset,
-  PConstraint,
-  POwner,
-} from "../mod.ts";
+import { Asset, f, maxTicks, PAsset, PConstraint, POwner } from "../mod.ts";
 
-// 4 ** 4 = 256
 // TODO prod: derive this from observed number of diracs in pool
-export const gMaxHashes = gMaxLength ** (maxTicks - minTicks);
+export const gMaxHashes = maxTicks ** gMaxLength; // TODO why is this wrong?
 
 export class IdNFT {
   constructor(
@@ -38,7 +29,7 @@ export class IdNFT {
 
   public next = (): IdNFT => {
     assert(
-      this.hashes < gMaxHashes,
+      this.hashes <= gMaxHashes,
       `hashes: ${this.hashes} will exceed gMaxHashes: ${gMaxHashes}`,
     );
     return new IdNFT(this.owner, this.hashes + 1n);
