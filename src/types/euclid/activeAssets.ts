@@ -1,6 +1,14 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { genNonNegative } from "../../mod.ts";
-import { Asset, lSubValues, PAsset, PConstraint, PEnum, PMap } from "../mod.ts";
+import {
+  Asset,
+  f,
+  lSubValues,
+  PAsset,
+  PConstraint,
+  PEnum,
+  PMap,
+} from "../mod.ts";
 import { PPrices, Prices } from "./prices.ts";
 
 export type ActiveAssets = Map<Prices, Asset>;
@@ -28,11 +36,11 @@ export class PActiveAssets extends PConstraint<PMap<PPrices, PEnum<PAsset>>> {
 const newAssertNotDefault =
   (initialPs: Prices) => (activeAssets: ActiveAssets) => {
     for (const [location, asset] of activeAssets) {
-      // const defaultAsset = defaultActiveAsset(initialPs, location);
-      // assert(
-      //   asset !== defaultAsset,
-      //   `default asset ${defaultAsset} should not be stored at location ${location}`,
-      // );
+      const defaultAsset = defaultActiveAsset(initialPs, location);
+      assert(
+        asset !== defaultAsset,
+        `default asset ${defaultAsset} should not be stored at location ${location}`,
+      );
     }
   };
 
@@ -49,37 +57,50 @@ export const newGenActiveAssets = (
       location.assets().equals(assets),
       `location ${location} should have assets ${assets}`,
     );
-    // const defaultAsset = defaultActiveAsset(pprices.initialPrices, location);
+    const defaultAsset = defaultActiveAsset(pprices.initialPrices, location);
     const asset = assets.randomChoice();
-    // if (asset !== defaultAsset) {
-    activeAssets.set(location, asset);
-    // }
+    if (asset !== defaultAsset) {
+      activeAssets.set(location, asset);
+    }
   }
   return activeAssets;
 };
 
 function defaultActiveAsset(initPs: Prices, currentPs: Prices): Asset {
-  const current = currentPs.unsigned();
-  const init = initPs.unsigned();
+  let branch = "none";
+  try {
+    const current = currentPs.unsigned();
+    const init = initPs.unsigned();
 
-  const diff = lSubValues(current, init);
-
-  switch (diff.size()) {
-    case 0n:
-      return init.firstAsset();
-    case 1n:
-      return diff.firstAsset();
-    default: {
-      let init_ = init.tail();
-      let current_ = current.tail();
-      const fstInit = init_.firstAmount();
-      const fstCurrent = current_.firstAmount();
-      init_ = init_.scaledWith(fstCurrent);
-      current_ = current_.scaledWith(fstInit);
-      return defaultActiveAsset(
-        Prices.fromValue(init_),
-        Prices.fromValue(current_),
-      );
+    const diff = lSubValues(current, init);
+    switch (diff.size()) {
+      case 0n:
+        branch = `0n with ${init.concise()}`;
+        return init.firstAsset();
+      case 1n:
+        branch = `1n with ${diff.concise()}`;
+        return diff.firstAsset();
+      default: {
+        branch = `default with \n${init.concise()}\n${current.concise()}`;
+        let init_ = init.tail();
+        let current_ = current.tail();
+        const fstInit = init_.firstAmount();
+        const fstCurrent = current_.firstAmount();
+        init_ = init_.scaledWith(fstCurrent);
+        current_ = current_.scaledWith(fstInit);
+        return defaultActiveAsset(
+          Prices.fromValue(init_),
+          Prices.fromValue(current_),
+        );
+      }
     }
+  } catch (e) {
+    throw new Error(
+      `defaultActiveAsset(
+initPs: ${initPs.concise()},
+currentPs: ${currentPs.concise()},
+branch: ${branch}
+): ${e}`,
+    );
   }
 }

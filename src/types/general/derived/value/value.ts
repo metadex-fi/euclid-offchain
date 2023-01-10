@@ -13,6 +13,7 @@ export class Value {
       `Value must be a Map, not ${JSON.stringify(this.value)}`,
     );
   }
+
   public show = (tabs = ""): string => {
     const ttf = tabs + t + f;
     const ttff = ttf + f;
@@ -87,43 +88,55 @@ export class Value {
   };
 
   public firstAsset = (): Asset => {
-    for (const [currencySymbol, tokens] of this.value) {
-      for (const tokenName in tokens) {
-        return new Asset(currencySymbol, tokenName);
-      }
-    }
-    throw new Error("no assets in value");
+    assert(this.value.size > 0, `no currencies in value: ${this.show()}`);
+    const ccy = [...this.value.keys()].sort()[0];
+    const tkns = this.value.get(ccy);
+    assert(tkns, `no tokens for currency ${ccy}`);
+    assert(tkns.size > 0, `no tokens for currency ${ccy}`);
+    const tkn = [...tkns.keys()].sort()[0];
+    return new Asset(ccy, tkn);
   };
 
   public firstAmount = (): bigint => {
-    for (const [_, tokens] of this.value) {
-      for (const [_, amount] of tokens) {
-        return amount;
-      }
-    }
-    throw new Error("no assets in value");
+    assert(this.value.size > 0, `no currencies in value: ${this.show()}`);
+    const ccy = [...this.value.keys()].sort()[0];
+    const tkns = this.value.get(ccy);
+    assert(tkns, `no tokens for currency ${ccy}`);
+    assert(tkns.size > 0, `no tokens for currency ${ccy}`);
+    const tkn = [...tkns.keys()].sort()[0];
+    const amnt = tkns.get(tkn);
+    assert(amnt, `no amount for token ${tkn}`);
+    return amnt;
   };
 
   public tail = (): Value => {
-    assert(this.value.size > 0, "empty values tell no tails");
-    const tail = new Value();
+    const size = this.size();
+    assert(size > 0, "empty values tell no tails");
+    const tail = new Map<CurrencySymbol, Map<TokenName, bigint>>();
     let first = true;
-    for (const [ccy, tkns] of this.value) {
+    for (const ccy of [...this.value.keys()].sort()) {
+      const tkns = this.value.get(ccy);
+      assert(tkns, `no tokens for currency ${ccy}`);
       if (first) {
         assert(tkns.size > 0, "empty token map");
         if (tkns.size > 1) {
           const tail_ = new Map<TokenName, bigint>();
-          let first_ = true;
-          for (const [tkn, amnt] of tkns) {
-            if (first_) first_ = false;
-            else tail_.set(tkn, amnt);
+          for (const tkn of [...tkns.keys()].sort().slice(1)) {
+            const amnt = tkns.get(tkn);
+            assert(amnt, `no amount for token ${tkn}`);
+            tail_.set(tkn, amnt);
           }
-          tail.value.set(ccy, tail_);
+          tail.set(ccy, tail_);
         }
         first = false;
-      } else tail.value.set(ccy, tkns);
+      } else tail.set(ccy, tkns);
     }
-    return tail;
+    const tail_ = new Value(tail);
+    assert(
+      tail_.size() === size - 1n,
+      `tail size ${tail_.size()} != ${size} - 1`,
+    );
+    return tail_;
   };
 
   public foldWith =
@@ -156,7 +169,7 @@ export class Value {
       defaultAmnt;
     assert(
       amount !== undefined,
-      `amountOf: amount not found for asset\n${asset.show()}\nin ${this.show()}`,
+      `amountOf: amount not found for asset\n${asset.show()}\nin ${this.concise()}`,
     );
     return amount;
   };

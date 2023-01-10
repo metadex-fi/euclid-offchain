@@ -43,7 +43,7 @@ Deno.test("euclid data/types tests", () => {
       ...derivedContainerGenerators,
     ],
   );
-  proptestPTypes(gen, 1000);
+  proptestPTypes(gen, 10000);
 });
 
 const fundamentalPrimitiveGenerators = [

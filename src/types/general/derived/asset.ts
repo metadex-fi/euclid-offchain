@@ -143,33 +143,30 @@ export class Assets {
   };
 
   public head = (): Asset => {
-    {
-      for (const [ccy, tkns] of this.assets) {
-        assert(tkns.length > 0, "empty token map");
-        for (const tkn of tkns) {
-          return new Asset(ccy, tkn);
-        }
-      }
-      throw new Error("unexpected empty Assets");
-    }
+    assert(this.assets.size > 0, "empty assets have no head");
+    const ccy = [...this.assets.keys()].sort()[0];
+    const tkn = this.assets.get(ccy)!.slice(0).sort()[0];
+    return new Asset(ccy, tkn);
   };
 
   public tail = (): Assets => {
     assert(this.assets.size > 0, "empty assets tell no tails");
-    const tail = new Assets();
+    const tail = new Map<CurrencySymbol, TokenName[]>();
     let first = true;
-    for (const [ccy, tkns] of this.assets) {
+    for (const ccy of [...this.assets.keys()].sort()) {
+      const tkns = this.assets.get(ccy)!.slice(0).sort();
       if (first) {
         assert(tkns.length > 0, "empty token map");
         if (tkns.length > 1) {
           const tail_ = tkns.slice(1);
-          tail.assets.set(ccy, tail_);
+          tail.set(ccy, tail_);
         }
         first = false;
-      } else tail.assets.set(ccy, tkns);
+      } else tail.set(ccy, tkns);
     }
-    assert(tail.add(this.head()).equals(this), "tail is not tail");
-    return tail;
+    const tail_ = new Assets(tail);
+    assert(tail_.add(this.head()).equals(this), "tail is not tail");
+    return tail_;
   };
 
   public randomChoice = (): Asset => {
