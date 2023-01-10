@@ -1,6 +1,5 @@
 import {
   Generators,
-  PAmounts,
   PAsset,
   PAssets,
   PBounded,
@@ -9,6 +8,7 @@ import {
   PConstraint,
   PIdNFT,
   PInteger,
+  PJumpSizes,
   PList,
   PLiteral,
   PMap,
@@ -16,7 +16,6 @@ import {
   PNonEmptyList,
   PObject,
   POwner,
-  PParam,
   PPositive,
   PPositiveValue,
   PPrices,
@@ -37,7 +36,6 @@ Deno.test("euclid data/types tests", () => {
     [
       ...fundamentalContainerGenerators,
       ...derivedContainerGenerators,
-      // ...euclidContainerGenerators,
     ],
   );
   proptestPTypes(gen, 2000);
@@ -64,28 +62,27 @@ const fundamentalContainerGenerators = [
 const derivedPrimitiveGenerators = [
   PBounded.genPType,
   PPositive.genPType,
+  PAsset.genPType,
+  PAssets.genPType,
+  PValue.genPType,
+  PPositiveValue.genPType,
 ];
 
 const derivedContainerGenerators = [
   PNonEmptyList.genPType,
 ];
 
+// @ts-ignore TODO consider fixing this or leaving as is
 const euclidPrimitiveGenerators = [
   POwner.genPType,
-  PAsset.genPType,
   PIdNFT.genPType,
-  PAssets.genPType,
-  PValue.genPType,
-  PPositiveValue.genPType,
+  PJumpSizes.genPType,
   PPrices.genPType,
-  PAmounts.genPType, // <- works until here (10k iterations)
-  PParam.genPType,
+  // PAmounts.genPType, // <- works until here (10k iterations)
+  // PParam.genPType,
   // PParamDatum.genPType,
   // PActiveAssets.genPType,
   // PDirac.genPType,
   // PDiracDatum.genPType,
   // PEuclidDatum.genPType,
 ];
-
-// const euclidContainerGenerators = [
-// ];

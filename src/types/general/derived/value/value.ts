@@ -1,23 +1,18 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { maxInteger, maybeNdef } from "../../utils/testing/generators.ts";
-import {
-  bothExtreme,
-  f,
-  PBounded,
-  PLiteral,
-  PMapRecord,
-  PNum,
-  PPositive,
-  RecordOf,
-  t,
-} from "../mod.ts";
-import { Asset, Assets, PAssets } from "./asset.ts";
-import { CurrencySymbol, TokenName } from "./primitive.ts";
+import { maxInteger, maybeNdef } from "../../../../mod.ts";
+import { f, PMapRecord, PObject, PRecord, RecordOf, t } from "../../mod.ts";
+import { Asset, Assets, CurrencySymbol, PAssets, TokenName } from "../asset.ts";
+import { bothExtreme, PBounded, PNum } from "../bounded.ts";
 
 export class Value {
   constructor(
     private value: Map<CurrencySymbol, Map<TokenName, bigint>> = new Map(),
-  ) {}
+  ) {
+    assert(
+      this.value instanceof Map,
+      `Value must be a Map, not ${JSON.stringify(this.value)}`,
+    );
+  }
   public show = (tabs = ""): string => {
     const ttf = tabs + t + f;
     const ttff = ttf + f;
@@ -248,9 +243,8 @@ export class Value {
   };
 }
 
-// @ts-ignore TODO consider fixing this, or leaving as is
-export class PValue<N extends PNum> extends PMapRecord<PMapRecord<N>> {
-  protected constructor(
+export class PValue<N extends PNum> extends PObject<Value> {
+  constructor(
     public pnum: new (lowerBound?: bigint, upperBound?: bigint) => N,
     public assets: Assets,
     public lowerBounds?: Value,
@@ -288,12 +282,13 @@ maxInteger: ${maxInteger}`,
       }
       value[currencySymbol] = new PMapRecord(pamounts);
     }
-    super(value);
+    super(
+      new PRecord({
+        value: new PMapRecord(value),
+      }),
+      Value,
+    );
   }
-
-  public genValue = (): Value => {
-    return new Value(this.genData());
-  };
 
   static newGenPValue = <N extends PNum>(
     pnum: new (lowerBound?: bigint, upperBound?: bigint) => N,
@@ -303,117 +298,19 @@ maxInteger: ${maxInteger}`,
     const lowerBoundedAssets = assets.randomSubset();
     const upperBoundedAssets = assets.randomSubset();
     const lowerBounds = maybeNdef(() =>
-      new PValue(pnum, lowerBoundedAssets).genValue()
+      new PValue(pnum, lowerBoundedAssets).genData()
     )?.();
     const upperBounds = maybeNdef(() =>
       new PValue(
         pnum,
         upperBoundedAssets,
         lowerBounds?.ofAssets(upperBoundedAssets),
-      ).genValue()
+      ).genData()
     )?.();
     return new PValue(pnum, assets, lowerBounds, upperBounds);
   };
 
   static genPType = PValue.newGenPValue(PBounded);
-}
-
-export class PositiveValue {
-  constructor(
-    private value = new Value(),
-  ) {
-    assert(allPositive(value), "value must be positive");
-  }
-
-  public initAmountOf = (asset: Asset, amount: bigint): void => {
-    assert(
-      amount >= 0n,
-      `initAmountOf: amount must be positive, got ${amount} for asset ${asset.show()}`,
-    );
-    this.value?.initAmountOf(asset, amount);
-  };
-
-  public concise = (tabs = ""): string => `+${this.value.concise(tabs)}`;
-  public toMap = (): Map<CurrencySymbol, Map<TokenName, bigint>> =>
-    this.value.toMap();
-  public assets = (): Assets => this.value.assets();
-  public unsigned = (): Value => new Value(this.value.toMap());
-  public unit = (): Value => this.value.unit();
-  public size = (): bigint => this.value.size();
-  public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
-
-  static maybeFromMap = (
-    m?: Map<CurrencySymbol, Map<TokenName, bigint>>,
-  ): PositiveValue | undefined => {
-    if (m === undefined) return undefined;
-    else return new PositiveValue(new Value(m));
-  };
-}
-
-export class PPositiveValue extends PValue<PPositive> {
-  constructor(
-    public assets: Assets,
-    public lowerBounds?: Value,
-    public upperBounds?: Value,
-  ) {
-    assert(
-      !lowerBounds || allPositive(lowerBounds),
-      "lowerBounds must be positive",
-    );
-    super(PPositive, assets, lowerBounds, upperBounds);
-  }
-
-  public genPositiveValue = (): PositiveValue => {
-    return new PositiveValue(this.genValue());
-  };
-
-  static genOfAssets(assets: Assets) {
-    return PValue.newGenPValue(PPositive, assets)();
-  }
-  static genPType = PValue.newGenPValue(PPositive);
-
-  static maybePLiteral(
-    value?: PositiveValue,
-  ): PLiteral<PPositiveValue> | undefined {
-    if (value === undefined) return undefined;
-    else {return new PLiteral(
-        new PPositiveValue(value.assets(), value.unsigned(), value.unsigned()),
-        value.toMap(),
-      );}
-  }
-}
-
-export class JumpSizes {
-  private constructor(private value: PositiveValue) {}
-
-  public assets = (): Assets => this.value.assets();
-  public unsigned = (): Value => this.value.unsigned();
-  public concise = (tabs = ""): string => this.value.concise(tabs);
-  public toMap = (): Map<CurrencySymbol, Map<TokenName, bigint>> =>
-    this.value.toMap();
-
-  static genOfAssets(assets: Assets): JumpSizes {
-    return new JumpSizes(
-      (PPositiveValue.genOfAssets(assets) as PPositiveValue).genPositiveValue(),
-    );
-  }
-
-  static nullOfAssets(assets: Assets): JumpSizes {
-    return new JumpSizes(new PositiveValue(Value.nullOfAssets(assets)));
-  }
-
-  static fromMap(m: Map<CurrencySymbol, Map<TokenName, bigint>>): JumpSizes {
-    return new JumpSizes(new PositiveValue(new Value(m)));
-  }
-}
-export class PJumpSizes extends PPositiveValue {
-  constructor(
-    public assets: Assets,
-    public lowerBounds?: Value,
-    public upperBounds?: Value,
-  ) {
-    super(assets, lowerBounds, upperBounds);
-  }
 }
 
 export function assetsOf(
@@ -493,8 +390,6 @@ export const newAmountsCheck = (op: (arg: bigint) => boolean) =>
   newCompareWith(
     (a) => op(a),
   );
-
-export const allPositive = newAmountsCheck((a) => a > 0n);
 
 export const newUnionWith = (
   op: (arg: bigint, ...args: Array<bigint>) => bigint,

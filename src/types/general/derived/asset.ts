@@ -1,26 +1,23 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   genNonNegative,
-  genPositive,
   gMaxLength,
   nonEmptySubSet,
   randomChoice,
   randomSubset,
-} from "../../mod.ts";
-import { newGenInRange, PObject, PPositive } from "../general/mod.ts";
-import {
-  CurrencySymbol,
-  f,
-  PConstraint,
-  PCurrencySymbol,
-  PLifted,
-  PMap,
-  PNonEmptyList,
-  PRecord,
-  PTokenName,
-  t,
-  TokenName,
-} from "../mod.ts";
+} from "../../../mod.ts";
+import { f, PConstraint, PLifted, PObject, PRecord, t } from "../mod.ts";
+import { newGenInRange } from "./bounded.ts";
+import { PNonEmptyList } from "./nonEmptyList.ts";
+import { PByteString, PMap } from "../fundamental/mod.ts";
+
+export type CurrencySymbol = string;
+export type PCurrencySymbol = PByteString;
+export const PCurrencySymbol = new PByteString();
+
+export type TokenName = string;
+export type PTokenName = PByteString;
+export const PTokenName = new PByteString();
 
 const assertADAlovelace = (a: Asset): void => {
   if (a.currencySymbol === "") {

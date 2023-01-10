@@ -5,17 +5,16 @@ import {
   genNonNegative,
   gMaxLength,
   maybeNdef,
-} from "../../../mod.ts";
+} from "../../../../mod.ts";
 import {
   f,
   PConstanted,
   PData,
   PLifted,
   PType,
-  RecordOf,
   RecordOfMaybe,
   t,
-} from "./type.ts";
+} from "../type.ts";
 
 export class PRecord<PFields extends PData>
   implements

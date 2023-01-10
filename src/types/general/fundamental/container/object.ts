@@ -1,24 +1,15 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Generators } from "../../../mod.ts";
-import { PByteString } from "./bytestring.ts";
-import { PInteger } from "./integer.ts";
-import { PList } from "./list.ts";
-import { PMap } from "./map.ts";
-import {
-  f,
-  PData,
-  PlutusOf,
-  PRecord,
-  PType,
-  PTypeOf,
-  RecordOf,
-  t,
-} from "./mod.ts";
+import { Data } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Generators } from "../../../../mod.ts";
+import { PByteString, PInteger } from "../mod.ts";
+import { DataOf, f, PData, PTypeOf, RecordOfMaybe, t } from "../type.ts";
+import { PRecord } from "./record.ts";
 
 type PFieldsOf<O> = PTypeOf<O[keyof O]>;
 
 type AttributeTypes<T> = {
-  [K in keyof T]: T[K] extends RecordOf<unknown> ? AttributeTypes<T[K]> : T[K];
+  [K in keyof T]: T[K] extends RecordOfMaybe<unknown> ? AttributeTypes<T[K]>
+    : T[K];
 }[keyof T];
 
 const filterFunctions = <O extends Object>(o: O) =>
@@ -27,7 +18,7 @@ const filterFunctions = <O extends Object>(o: O) =>
   );
 
 // @ts-ignore TODO consider fixing this or leaving as is
-export class PObject<O extends Object> implements PType<PlutusOf<O>, O> {
+export class PObject<O extends Object> implements PType<DataOf<O>, O> {
   public population: number;
   // public precord: PRecord<PData>;
   constructor(
@@ -49,8 +40,7 @@ export class PObject<O extends Object> implements PType<PlutusOf<O>, O> {
     // this.precord = new PRecord(record);
   }
 
-  // @ts-ignore TODO consider fixing this or leaving as is
-  public plift = (l: PlutusOfObject<O>): O => {
+  public plift = (l: Data[]): O => {
     const record = this.precord.plift(l);
     const args = Object.values(record);
     return new (this.O)(...args as AttributeTypes<ExampleClass>[]) as O;
@@ -58,9 +48,9 @@ export class PObject<O extends Object> implements PType<PlutusOf<O>, O> {
 
   public pconstant = (
     data: O,
-  ): PlutusOf<O> => {
+  ): Data[] => {
     const record = filterFunctions(data);
-    return this.precord.pconstant(record) as PlutusOf<O>;
+    return this.precord.pconstant(record);
   };
 
   public genData = (): O => {
@@ -82,7 +72,12 @@ export class PObject<O extends Object> implements PType<PlutusOf<O>, O> {
     const ttf = tt + f;
 
     return `Object: ${this.O.name} (
-${ttf}${this.precord.showData(filterFunctions(data) as RecordOf<unknown>, ttf)}
+${ttf}${
+      this.precord.showData(
+        filterFunctions(data) as RecordOfMaybe<unknown>,
+        ttf,
+      )
+    }
 ${tt})`;
   };
 

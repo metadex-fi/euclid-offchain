@@ -1,13 +1,3 @@
-// export * from "./any.ts";
-export * from "./bytestring.ts";
-export * from "./constr.ts";
-export * from "./constraint.ts";
-export * from "./integer.ts";
-export * from "./list.ts";
-export * from "./literal.ts";
-export * from "./map.ts";
-export * from "./mapRecord.ts";
-export * from "./object.ts";
-export * from "./record.ts";
-// export * from "./sum.ts";
 export * from "./type.ts";
+export * from "./primitive/mod.ts";
+export * from "./container/mod.ts";

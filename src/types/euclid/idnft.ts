@@ -11,8 +11,7 @@ import {
   gMaxLength,
   maybeNdef,
 } from "../../mod.ts";
-import { Asset, f, PAsset, PConstraint } from "../mod.ts";
-import { POwner } from "./primitive.ts";
+import { Asset, f, PAsset, PConstraint, POwner } from "../mod.ts";
 
 export const minTicks = 1n; // per dimension
 export const maxTicks = 5n; // per dimension

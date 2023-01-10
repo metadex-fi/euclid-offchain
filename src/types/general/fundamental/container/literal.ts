@@ -1,6 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Generators } from "../../../mod.ts";
-import { f, PConstanted, PData, PLifted, PType, t } from "./type.ts";
+import { Generators } from "../../../../mod.ts";
+import { f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
 
 export type PMaybeLiteral<T extends PData> = T | PLiteral<T>;
 

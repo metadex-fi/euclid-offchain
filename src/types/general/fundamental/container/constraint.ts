@@ -1,9 +1,9 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Generators } from "../../../mod.ts";
-import { f, PConstanted, PData, PLifted, t } from "./type.ts";
+import { Generators } from "../../../../mod.ts";
+import { f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
 
-export class PConstraint<PInner extends PData> {
-  // implements PType<PConstanted<PInner>, PLifted<PInner>> {
+export class PConstraint<PInner extends PData>
+  implements PType<PConstanted<PInner>, PLifted<PInner>> {
   public population: number;
 
   constructor(
@@ -27,7 +27,6 @@ export class PConstraint<PInner extends PData> {
     return plifted;
   };
 
-  // @ts-ignore TODO: fix this
   public pconstant = (data: PLifted<PInner>): PConstanted<PInner> => {
     this.asserts.forEach((assert) => {
       assert(data);

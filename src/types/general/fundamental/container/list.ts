@@ -4,8 +4,8 @@ import {
   genNonNegative,
   gMaxLength,
   maybeNdef,
-} from "../../../mod.ts";
-import { f, PConstanted, PData, PLifted, PType, t } from "./type.ts";
+} from "../../../../mod.ts";
+import { f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
 
 export class PList<PElem extends PData>
   implements PType<Array<PConstanted<PElem>>, Array<PLifted<PElem>>> {

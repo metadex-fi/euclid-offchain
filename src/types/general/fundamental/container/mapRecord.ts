@@ -1,8 +1,8 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { fromHex, toHex } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { Generators, genNonNegative, gMaxLength } from "../../../mod.ts";
-import { PByteString } from "./bytestring.ts";
-import { f, PConstanted, PData, PLifted, PType, RecordOf, t } from "./mod.ts";
+import { Generators, genNonNegative, gMaxLength } from "../../../../mod.ts";
+import { PByteString } from "../mod.ts";
+import { f, PConstanted, PData, PLifted, PType, RecordOf, t } from "../type.ts";
 
 export class PMapRecord<PFields extends PData>
   implements
@@ -79,6 +79,11 @@ export class PMapRecord<PFields extends PData>
     data: Map<string, PLifted<PFields>>,
     tabs = "",
   ): string => {
+    assert(
+      data instanceof Map,
+      `PMapRecord.showData: expected Map, got ${JSON.stringify(data)}`,
+    );
+
     if (data.size === 0) return "MapRecord {}";
     const tt = tabs + t;
     const ttf = tt + f;

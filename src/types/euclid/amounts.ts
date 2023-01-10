@@ -7,6 +7,7 @@ import {
 import {
   Amount,
   Asset,
+  CurrencySymbol,
   f,
   PConstraint,
   PositiveValue,
@@ -14,10 +15,9 @@ import {
   PPrices,
   Prices,
   t,
+  TokenName,
   Value,
 } from "../mod.ts";
-import { TokenName } from "./primitive.ts";
-import { CurrencySymbol } from "./primitive.ts";
 
 export type Amounts = PositiveValue;
 export class PAmounts extends PConstraint<PPositiveValue> {
@@ -62,7 +62,7 @@ const newGenAmounts = (
   baseAmountA0: Amount,
   pprices: PPrices,
 ) =>
-() => genAmounts(baseAmountA0, pprices.genPrices()).toMap();
+() => genAmounts(baseAmountA0, Prices.fromMap(pprices.genData())).toMap();
 
 const genAmounts = (baseAmountA0: Amount, prices: Prices): Amounts => {
   assert(

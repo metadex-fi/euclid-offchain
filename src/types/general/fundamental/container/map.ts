@@ -5,9 +5,9 @@ import {
   genNonNegative,
   gMaxLength,
   maybeNdef,
-} from "../../../mod.ts";
+} from "../../../../mod.ts";
+import { f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
 import { PList } from "./list.ts";
-import { f, PConstanted, PData, PLifted, PType, t } from "./mod.ts";
 
 export class PMap<
   PKey extends PData,
