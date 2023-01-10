@@ -1,5 +1,6 @@
 import {
   Generators,
+  PAmounts,
   PAsset,
   PAssets,
   PBounded,
@@ -78,7 +79,7 @@ const euclidPrimitiveGenerators = [
   PIdNFT.genPType,
   PJumpSizes.genPType,
   PPrices.genPType,
-  // PAmounts.genPType, // <- works until here (10k iterations)
+  PAmounts.genPType, // <- works until here (10k iterations)
   // PParam.genPType,
   // PParamDatum.genPType,
   // PActiveAssets.genPType,

@@ -7,7 +7,6 @@ import {
 import {
   Amount,
   Asset,
-  CurrencySymbol,
   f,
   PConstraint,
   PositiveValue,
@@ -15,8 +14,6 @@ import {
   PPrices,
   Prices,
   t,
-  TokenName,
-  Value,
 } from "../mod.ts";
 
 export type Amounts = PositiveValue;
@@ -34,10 +31,10 @@ export class PAmounts extends PConstraint<PPositiveValue> {
   }
 
   public showData = (
-    data: Map<CurrencySymbol, Map<TokenName, bigint>>,
+    data: PositiveValue,
     tabs = "",
   ): string => {
-    return `Amount ${new Value(data).concise(tabs)}`;
+    return `Amount ${data.concise(tabs)}`;
   };
 
   public showPType = (tabs = ""): string => {
@@ -62,7 +59,7 @@ const newGenAmounts = (
   baseAmountA0: Amount,
   pprices: PPrices,
 ) =>
-() => genAmounts(baseAmountA0, Prices.fromMap(pprices.genData())).toMap();
+() => genAmounts(baseAmountA0, pprices.genData());
 
 const genAmounts = (baseAmountA0: Amount, prices: Prices): Amounts => {
   assert(
