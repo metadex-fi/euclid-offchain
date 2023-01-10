@@ -43,16 +43,17 @@ export class PositiveValue {
 export class PPositiveValue extends PObject<PositiveValue> {
   constructor(
     public assets: Assets,
-    public lowerBounds?: Value,
-    public upperBounds?: Value,
+    public lowerBounds?: PositiveValue,
+    public upperBounds?: PositiveValue,
   ) {
-    assert(
-      !lowerBounds || allPositive(lowerBounds),
-      "lowerBounds must be positive",
-    );
     super(
       new PRecord({
-        value: new PValue(PPositive, assets, lowerBounds, upperBounds),
+        value: new PValue(
+          PPositive,
+          assets,
+          lowerBounds?.unsigned(),
+          upperBounds?.unsigned(),
+        ),
       }),
       PositiveValue,
     );
@@ -64,15 +65,19 @@ export class PPositiveValue extends PObject<PositiveValue> {
 
   static genOfAssets(assets: Assets): PPositiveValue {
     const pvalue = PValue.newGenPValue(PPositive, assets)();
-    return new PPositiveValue(assets, pvalue.lowerBounds, pvalue.upperBounds);
+    return new PPositiveValue(
+      assets,
+      pvalue.lowerBounds ? new PositiveValue(pvalue.lowerBounds) : undefined,
+      pvalue.upperBounds ? new PositiveValue(pvalue.upperBounds) : undefined,
+    );
   }
 
   static genPType(): PPositiveValue {
     const pvalue = PValue.newGenPValue(PPositive)();
     return new PPositiveValue(
       pvalue.assets,
-      pvalue.lowerBounds,
-      pvalue.upperBounds,
+      pvalue.lowerBounds ? new PositiveValue(pvalue.lowerBounds) : undefined,
+      pvalue.upperBounds ? new PositiveValue(pvalue.upperBounds) : undefined,
     );
   }
 
@@ -81,7 +86,7 @@ export class PPositiveValue extends PObject<PositiveValue> {
   ): PLiteral<PPositiveValue> | undefined {
     if (value === undefined) return undefined;
     else {return new PLiteral(
-        new PPositiveValue(value.assets(), value.unsigned(), value.unsigned()),
+        new PPositiveValue(value.assets(), value, value),
         value,
       );}
   }

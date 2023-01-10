@@ -18,7 +18,7 @@ import {
 
 export type Amounts = PositiveValue;
 export class PAmounts extends PConstraint<PPositiveValue> {
-  private constructor(
+  constructor(
     public baseAmountA0: bigint,
     public pprices: PPrices,
   ) {

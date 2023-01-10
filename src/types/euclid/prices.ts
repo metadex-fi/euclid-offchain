@@ -12,6 +12,7 @@ import {
   min,
   newCompareWith,
   newUnionWith,
+  Param,
   PAssets,
   PConstraint,
   PObject,
@@ -57,8 +58,8 @@ export class PPrices extends PConstraint<PObject<Prices>> {
   private constructor(
     public initialPrices: Prices,
     public jumpSizes: JumpSizes,
-    public lowerBounds?: Prices,
-    public upperBounds?: Prices,
+    public lowerBounds?: PositiveValue,
+    public upperBounds?: PositiveValue,
   ) {
     const maxJumpsUp = maxJumps(
       initialPrices,
@@ -78,8 +79,8 @@ export class PPrices extends PConstraint<PObject<Prices>> {
         new PRecord({
           prices: new PPositiveValue(
             initialPrices.assets(),
-            lowerBounds?.unsigned(),
-            upperBounds?.unsigned(),
+            lowerBounds,
+            upperBounds,
           ),
         }),
         Prices,
@@ -152,8 +153,17 @@ ${tt})`;
     return new PPrices(
       initialPrices,
       jumpSizes,
-      pvalue.lowerBounds ? Prices.fromValue(pvalue.lowerBounds) : undefined,
-      pvalue.upperBounds ? Prices.fromValue(pvalue.upperBounds) : undefined,
+      pvalue.lowerBounds,
+      pvalue.upperBounds,
+    );
+  }
+
+  static fromParam(param: Param): PPrices {
+    return new PPrices(
+      param.initialPrices,
+      param.jumpSizes,
+      param.lowerPriceBounds,
+      param.upperPriceBounds,
     );
   }
 }
@@ -192,7 +202,7 @@ const maxJumps = (
   initialPrices: Prices,
   jumpSizes: JumpSizes,
   gBoundary: bigint,
-  bounds?: Prices,
+  bounds?: PositiveValue,
 ): Value => {
   // jump the price of each asset from initial price,
   // a random number of times,

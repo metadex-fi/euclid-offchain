@@ -62,7 +62,7 @@ export class Value {
   //   return newSetAmounts(-maxInteger)(this);
   // };
 
-  public scaled = (amount: bigint): Value => {
+  public scaledWith = (amount: bigint): Value => {
     return newMapAmounts((a) => a * amount)(this);
   };
 

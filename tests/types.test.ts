@@ -1,5 +1,6 @@
 import {
   Generators,
+  PActiveAssets,
   PAmounts,
   PAsset,
   PAssets,
@@ -7,6 +8,7 @@ import {
   PByteString,
   PConstr,
   PConstraint,
+  PEnum,
   PIdNFT,
   PInteger,
   PJumpSizes,
@@ -52,6 +54,7 @@ const fundamentalPrimitiveGenerators = [
 
 const fundamentalContainerGenerators = [
   PLiteral.genPType,
+  PEnum.genPType,
   PConstraint.genPType,
   PList.genPType,
   PMap.genPType,
@@ -81,8 +84,8 @@ const euclidPrimitiveGenerators = [
   PJumpSizes.genPType,
   PPrices.genPType,
   PAmounts.genPType,
-  PParam.genPType, // <- works until here (10k iterations)
-  PParamDatum.genPType,
+  PParam.genPType,
+  PParamDatum.genPType, // <- works until here (10k iterations)
   // PActiveAssets.genPType,
   // PDirac.genPType,
   // PDiracDatum.genPType,

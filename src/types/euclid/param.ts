@@ -68,10 +68,10 @@ export class PParam extends PObject<Param> {
     );
 
     const plowerPriceBounds = PPositiveValue.maybePLiteral(
-      pprices.lowerBounds?.value(),
+      pprices.lowerBounds,
     );
     const pupperPriceBounds = PPositiveValue.maybePLiteral(
-      pprices.upperBounds?.value(),
+      pprices.upperBounds,
     );
 
     const pbaseAmountA0 = new PPositive();

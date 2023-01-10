@@ -36,8 +36,8 @@ export class JumpSizes {
 export class PJumpSizes extends PObject<JumpSizes> {
   constructor(
     public assets: Assets,
-    public lowerBounds?: Value,
-    public upperBounds?: Value,
+    public lowerBounds?: PositiveValue,
+    public upperBounds?: PositiveValue,
   ) {
     super(
       new PRecord({

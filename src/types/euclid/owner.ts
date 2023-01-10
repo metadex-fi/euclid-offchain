@@ -23,4 +23,8 @@ export class POwner extends PLiteral<PByteString> {
     const paymentKeyHash = genString("abcdef", 1n);
     return new POwner(paymentKeyHash);
   }
+
+  static pliteral(paymentKeyHash: PaymentKeyHash): POwner {
+    return new POwner(paymentKeyHash);
+  }
 }

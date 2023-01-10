@@ -1,6 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
+  ActiveAssets,
   addAmount,
   Amount,
   Amounts,
@@ -8,18 +9,18 @@ import {
   assetsOf,
   gMaxHashes,
   IdNFT,
-  newIdNFT,
-  newPParamNFT,
-  newPPaymentKeyHashLiteral,
-  newPThreadNFT,
-  nextThreadNFT,
+  PActiveAssets,
+  PAmounts,
   Param,
   PConstraint,
+  PIdNFT,
   PList,
   PObject,
+  PPrices,
   PRecord,
   Prices,
 } from "../mod.ts";
+import { POwner } from "./owner.ts";
 
 export class Dirac {
   constructor(
@@ -33,21 +34,16 @@ export class Dirac {
 }
 export type PDirac = PConstraint<PObject<Dirac>>;
 export const newPDirac = (param: Param): PDirac => {
-  const assets = assetsOf(param.initialPrices);
-  const pprices = newPPrices(
-    assets,
-    param.lowerPriceBounds,
-    param.upperPriceBounds,
-  );
+  const pprices = PPrices.fromParam(param);
 
   const pinner = new PObject(
     new PRecord({
-      "owner": newPPaymentKeyHashLiteral(param.owner),
-      "threadNFT": newPThreadNFT(param.owner),
-      "paramNFT": newPParamNFT(param.owner),
+      "owner": POwner.pliteral(param.owner),
+      "threadNFT": PIdNFT.newPThreadNFT(param.owner),
+      "paramNFT": PIdNFT.newPParamNFT(param.owner),
       "prices": pprices,
-      "activeAmnts": newPAmounts(assets, param.baseAmountA0, pprices),
-      "jumpStorage": newPActiveAssets(param.initialPrices, pprices),
+      "activeAmnts": new PAmounts(param.baseAmountA0, pprices),
+      "jumpStorage": new PActiveAssets(param.initialPrices, pprices),
     }),
     Dirac,
   );
