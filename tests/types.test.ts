@@ -18,6 +18,7 @@ import {
   PObject,
   POwner,
   PParam,
+  PParamDatum,
   PPositive,
   PPositiveValue,
   PPrices,
@@ -79,9 +80,9 @@ const euclidPrimitiveGenerators = [
   PIdNFT.genPType,
   PJumpSizes.genPType,
   PPrices.genPType,
-  PAmounts.genPType, // <- works until here (10k iterations)
-  PParam.genPType,
-  // PParamDatum.genPType,
+  PAmounts.genPType,
+  PParam.genPType, // <- works until here (10k iterations)
+  PParamDatum.genPType,
   // PActiveAssets.genPType,
   // PDirac.genPType,
   // PDiracDatum.genPType,

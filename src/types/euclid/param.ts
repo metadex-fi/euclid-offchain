@@ -95,24 +95,24 @@ export class ParamDatum {
     public _0: Param,
   ) {}
 }
-// export class PParamDatum extends PObject<ParamDatum> {
-//   private constructor(
-//     public _0: PParam,
-//   ) {
-//     super(
-//       new PRecord({
-//         "_0": _0,
-//       }),
-//       ParamDatum,
-//     );
-//   }
+export class PParamDatum extends PObject<ParamDatum> {
+  private constructor(
+    public _0: PParam,
+  ) {
+    super(
+      new PRecord({
+        "_0": _0,
+      }),
+      ParamDatum,
+    );
+  }
 
-//   static genPType(): PObject<ParamDatum> {
-//     return new PObject(
-//       new PRecord({
-//         "_0": PParam.genPType(),
-//       }),
-//       ParamDatum,
-//     );
-//   }
-// }
+  static genPType(): PObject<ParamDatum> {
+    return new PObject(
+      new PRecord({
+        "_0": PParam.genPType(),
+      }),
+      ParamDatum,
+    );
+  }
+}
