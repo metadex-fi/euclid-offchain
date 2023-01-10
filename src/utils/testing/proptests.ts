@@ -112,7 +112,7 @@ function testSmallPopulation(ptype: PData, errors: Map<string, number>) {
         consecutive = 0;
         popStrings.push(s);
       } else {
-        if (++consecutive > 100000) {
+        if (++consecutive > 10000) {
           throw new Error(
             `could only achive population size ${popStrings.length} for ${ptype.showPType()}${
               popStrings.length < 20 ? ":\n" + popStrings.join(", ") : ""

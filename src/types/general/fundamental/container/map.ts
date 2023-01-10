@@ -9,6 +9,15 @@ import {
 import { f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
 import { PList } from "./list.ts";
 
+function census(numKeys: number, numValues: number, size: bigint): number {
+  let population = 1;
+  let remaining = numKeys;
+  for (let i = 0; i < size; i++) {
+    population *= numValues * remaining--;
+  }
+  return population;
+}
+
 export class PMap<
   PKey extends PData,
   PValue extends PData,
@@ -27,7 +36,6 @@ export class PMap<
     private plutusKeys?: PConstanted<PKey>[],
   ) {
     if (keys) {
-      this.population = pvalue.population ** keys.length;
       this.plutusKeys = keys.map((k) => pkey.pconstant(k)) as PConstanted<
         PKey
       >[];
@@ -37,12 +45,13 @@ export class PMap<
       } else {
         this.size = length;
       }
+      this.population = pvalue.population ** keys.length; //if keys given, their ordering is fixed
     } else if (size) {
-      this.population = (pkey.population * pvalue.population) ** Number(size); // overkill
       assert(
         Number(size) <= pkey.population,
         `PMap: not enough keys for size ${size} in\n${pkey.showPType()}`,
       );
+      this.population = census(pkey.population, pvalue.population, size); // if keys not given, their ordering matters
     } else this.population = 1; // worst case, consider preventing this by setting minimum size, or using undefined
     assert(
       this.population > 0,

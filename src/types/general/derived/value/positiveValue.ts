@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { PObject, PRecord } from "../../mod.ts";
+import { PLiteral, PObject, PRecord } from "../../mod.ts";
 import { Asset, Assets, CurrencySymbol, TokenName } from "../asset.ts";
 import { PPositive } from "../bounded.ts";
 import { newAmountsCheck, PValue, Value } from "./value.ts";
@@ -76,13 +76,13 @@ export class PPositiveValue extends PObject<PositiveValue> {
     );
   }
 
-  // static maybePLiteral(
-  //   value?: PositiveValue,
-  // ): PLiteral<PPositiveValue> | undefined {
-  //   if (value === undefined) return undefined;
-  //   else {return new PLiteral(
-  //       new PPositiveValue(value.assets(), value.unsigned(), value.unsigned()),
-  //       value.toMap(),
-  //     );}
-  // }
+  static maybePLiteral(
+    value?: PositiveValue,
+  ): PLiteral<PPositiveValue> | undefined {
+    if (value === undefined) return undefined;
+    else {return new PLiteral(
+        new PPositiveValue(value.assets(), value.unsigned(), value.unsigned()),
+        value,
+      );}
+  }
 }
