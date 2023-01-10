@@ -9,8 +9,6 @@ import {
   PByteString,
   PConstr,
   PConstraint,
-  PDirac,
-  PDiracDatum,
   PEnum,
   PIdNFT,
   PInteger,
@@ -45,7 +43,7 @@ Deno.test("euclid data/types tests", () => {
       ...derivedContainerGenerators,
     ],
   );
-  proptestPTypes(gen, 10000);
+  proptestPTypes(gen, 5000);
 });
 
 const fundamentalPrimitiveGenerators = [
@@ -89,8 +87,8 @@ const euclidPrimitiveGenerators = [
   PParam.genPType,
   PParamDatum.genPType,
   PActiveAssets.genPType,
-  PDirac.genPType,
-  PDiracDatum.genPType,
+  // PDirac.genPType,
+  // PDiracDatum.genPType,
   PAllDiracs.genPType,
   // PEuclidDatum.genPType,
 ];

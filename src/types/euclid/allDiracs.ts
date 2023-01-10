@@ -24,8 +24,8 @@ import { newAssertAmountsCongruent } from "./dirac.ts";
 export class PAllDiracs extends PConstraint<PList<PObject<Dirac>>> {
   private constructor(
     public param: Param,
-  ) {
-    const pprices = PPrices.fromParam(param);
+  ) { // TODO issue is that we're manually offsetting below, that't of course incongruent from PPrices-perspective
+    const pprices = PPrices.fromParam(param); 
     const pinner = new PList(
       new PObject(
         new PRecord({
@@ -79,7 +79,6 @@ const newGenAllDiracs = (param: Param) => (): Dirac[] => {
 
   let threadNFT = paramNFT.next();
   function genDiracForPrices(prices: Prices): Dirac {
-    try {
       const pprices = PPrices.fromParam(param, prices);
       const genActiveAssets = newGenActiveAssets(pprices);
       return new Dirac(
@@ -90,9 +89,6 @@ const newGenAllDiracs = (param: Param) => (): Dirac[] => {
         genAmounts(param.baseAmountA0, prices),
         genActiveAssets(),
       );
-    } catch (e) {
-      throw new Error(`genDiracForPrices(${prices}): ${e}`);
-    }
   }
 
   const prices = param.initialPrices;
@@ -102,25 +98,25 @@ const newGenAllDiracs = (param: Param) => (): Dirac[] => {
   // for each asset and for each existing dirac, "spread" that dirac
   // in that asset's dimension. "spread" means: add all other tick
   // offsets for that asset's price.
-  // for (const asset of assets.toList()) {
-  //   const jumpSize = param.jumpSizes.amountOf(asset);
-  //   const tickSize = jumpSize / numTicks;
-  //   const diracs_ = new Array<Dirac>();
-  //   diracs.forEach((dirac) => {
-  //     for (let offset = tickSize; offset < jumpSize; offset += tickSize) {
-  //       threadNFT = threadNFT.next();
-  //       const prices = dirac.prices.addAmountOf(asset, offset);
-  //       diracs_.push(
-  //         genDiracForPrices(prices),
-  //       );
-  //     }
-  //   });
-  //   diracs = diracs.concat(diracs_);
-  //   assert(
-  //     diracs.length <= gMaxHashes,
-  //     `diracs.length: ${diracs.length} must be <= gMaxHashes: ${gMaxHashes}`,
-  //   );
-  // }
+  for (const asset of assets.toList()) {
+    const jumpSize = param.jumpSizes.amountOf(asset);
+    const tickSize = jumpSize / numTicks;
+    const diracs_ = new Array<Dirac>();
+    diracs.forEach((dirac) => {
+      for (let offset = tickSize; offset < jumpSize; offset += tickSize) {
+        threadNFT = threadNFT.next();
+        const prices = dirac.prices.addAmountOf(asset, offset);
+        diracs_.push(
+          genDiracForPrices(prices),
+        );
+      }
+    });
+    diracs = diracs.concat(diracs_);
+    assert(
+      diracs.length <= gMaxHashes,
+      `diracs.length: ${diracs.length} must be <= gMaxHashes: ${gMaxHashes}`,
+    );
+  }
 
   return diracs;
 };

@@ -28,8 +28,14 @@ export class PConstraint<PInner extends PData>
   };
 
   public pconstant = (data: PLifted<PInner>): PConstanted<PInner> => {
-    this.asserts.forEach((assert) => {
-      assert(data);
+    this.asserts.forEach((assertion) => {
+      try {
+        assertion(data);
+      } catch (e) {
+        throw new Error(
+          `Assertion failed in pconstant: ${e.message} of ${this.showPType()}`,
+        );
+      }
     });
     return this.pinner.pconstant(data) as PConstanted<PInner>;
   };
