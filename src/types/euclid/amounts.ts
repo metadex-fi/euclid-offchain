@@ -21,12 +21,12 @@ export type Amounts = PositiveValue;
 export class PAmounts extends PConstraint<PPositiveValue> {
   constructor(
     public baseAmountA0: bigint,
-    public prices: Prices,
+    public pprices: PPrices,
   ) {
     super(
-      new PPositiveValue(prices.assets()),
-      [newAssertAmountsCongruent(baseAmountA0, prices)], // TODO only looking at datums, include values
-      newGenAmounts(baseAmountA0, prices),
+      new PPositiveValue(pprices.initialPrices.assets()),
+      [], // TODO only looking at datums, include values
+      newGenAmounts(baseAmountA0, pprices),
     );
     this.population = 1; //probably far too conservative, but nonissue
   }
@@ -44,49 +44,31 @@ export class PAmounts extends PConstraint<PPositiveValue> {
     return `PObject: PAmounts (
 ${ttf}population: ${this.population},
 ${ttf}baseAmountA0: ${this.baseAmountA0},
-${ttf}prices: ${this.prices.concise(ttf)}
+${ttf}pprices: ${this.pprices.showPType(ttf)}
 ${tt})`;
   };
 
   static genPType(): PConstraint<PPositiveValue> {
     const baseAmountA0 = genPositive();
-    const pprices = PPrices.genPType();
-    const prices = pprices.genData();
+    const pprices = PPrices.genPType() as PPrices;
 
-    return new PAmounts(baseAmountA0, prices);
+    return new PAmounts(baseAmountA0, pprices);
   }
 }
 
-// TODO consider fees here
-const newAssertAmountsCongruent =
-  (baseAmountA0: bigint, prices: Prices) => (amounts: Amounts): void => {
-    const prices_ = prices.unsigned();
-    const worth = newUnionWith(
-      (amnt: bigint, price: bigint) => price * amnt,
-      0n,
-      0n,
-    );
-    const total = worth(
-      amounts.unsigned(),
-      prices_,
-    ).sumAmounts();
-    const lower = baseAmountA0 * prices_.firstAmount();
-    const upper = lower + prices_.firstAmount();
-    assert(
-      lower <= total && total <= upper,
-      `expected ${lower} <= ${total} <= ${upper} with
-baseAmountA0: ${baseAmountA0},
-baseAsset: ${prices_.firstAsset().show()},
-prices: ${prices.concise()},
-activeAmnts: ${amounts.concise()}`,
-    );
-  };
-
 const newGenAmounts = (
   baseAmountA0: Amount,
-  prices: Prices,
+  pprices: PPrices,
 ) =>
 () => {
+  const prices = pprices.genData();
+  return genAmounts(baseAmountA0, prices);
+};
+
+export const genAmounts = (
+  baseAmountA0: Amount,
+  prices: Prices,
+) => {
   assert(
     prices.size() >= 2n,
     `genAmounts: less than two assets in ${prices.concise()}`,
