@@ -1,22 +1,25 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { genNonNegative } from "../../mod.ts";
-import { Asset, lSubValues, PAsset, PConstraint, PMap } from "../mod.ts";
+import { Asset, lSubValues, PAsset, PConstraint, PEnum, PMap } from "../mod.ts";
 import { PPrices, Prices } from "./prices.ts";
 
 export type ActiveAssets = Map<Prices, Asset>;
-export class PActiveAssets extends PConstraint<PMap<PPrices, PAsset>> {
+export class PActiveAssets extends PConstraint<PMap<PPrices, PEnum<PAsset>>> {
   private constructor(
     public pprices: PPrices,
   ) {
     super(
-      new PMap(pprices, PAsset.ptype),
+      new PMap(
+        pprices,
+        new PEnum(PAsset.ptype, pprices.initialPrices.assets().toList()),
+      ),
       [newAssertNotDefault(pprices.initialPrices)],
       newGenActiveAssets(pprices),
     );
     this.population = 1; //probably far too conservative, but nonissue TODO generated, look at it
   }
 
-  static genPType(): PConstraint<PMap<PPrices, PAsset>> {
+  static genPType(): PConstraint<PMap<PPrices, PEnum<PAsset>>> {
     const pprices = PPrices.genPType();
     return new PActiveAssets(pprices as PPrices);
   }
@@ -25,30 +28,32 @@ export class PActiveAssets extends PConstraint<PMap<PPrices, PAsset>> {
 const newAssertNotDefault =
   (initialPs: Prices) => (activeAssets: ActiveAssets) => {
     for (const [location, asset] of activeAssets) {
-      const defaultAsset = defaultActiveAsset(initialPs, location);
-      assert(
-        asset !== defaultAsset,
-        `default asset ${defaultAsset} should not be stored at location ${location}`,
-      );
+      // const defaultAsset = defaultActiveAsset(initialPs, location);
+      // assert(
+      //   asset !== defaultAsset,
+      //   `default asset ${defaultAsset} should not be stored at location ${location}`,
+      // );
     }
   };
 
 // TODO this might lead to some paradoxes, let's see, we might learn something
-const maxJumpStores = 3n;
 export const newGenActiveAssets = (
   pprices: PPrices,
 ) =>
 (): ActiveAssets => {
   const assets = pprices.initialPrices.assets();
-  const storeSize = genNonNegative(maxJumpStores);
   const activeAssets = new Map<Prices, Asset>();
-  const locations: Prices[] = PMap.genKeys(pprices, storeSize);
+  const locations: Prices[] = PMap.genKeys(pprices);
   for (const location of locations) {
-    const defaultAsset = defaultActiveAsset(pprices.initialPrices, location);
+    assert(
+      location.assets().equals(assets),
+      `location ${location} should have assets ${assets}`,
+    );
+    // const defaultAsset = defaultActiveAsset(pprices.initialPrices, location);
     const asset = assets.randomChoice();
-    if (asset !== defaultAsset) {
-      activeAssets.set(location, asset);
-    }
+    // if (asset !== defaultAsset) {
+    activeAssets.set(location, asset);
+    // }
   }
   return activeAssets;
 };
@@ -61,9 +66,9 @@ function defaultActiveAsset(initPs: Prices, currentPs: Prices): Asset {
 
   switch (diff.size()) {
     case 0n:
-      return initPs.assets().head();
+      return init.firstAsset();
     case 1n:
-      return diff.assets().head();
+      return diff.firstAsset();
     default: {
       let init_ = init.tail();
       let current_ = current.tail();

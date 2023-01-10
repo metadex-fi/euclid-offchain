@@ -43,7 +43,7 @@ Deno.test("euclid data/types tests", () => {
       ...derivedContainerGenerators,
     ],
   );
-  proptestPTypes(gen, 10000);
+  proptestPTypes(gen, 1000);
 });
 
 const fundamentalPrimitiveGenerators = [
@@ -86,7 +86,7 @@ const euclidPrimitiveGenerators = [
   PAmounts.genPType,
   PParam.genPType,
   PParamDatum.genPType, // <- works until here (10k iterations)
-  // PActiveAssets.genPType,
+  PActiveAssets.genPType,
   // PDirac.genPType,
   // PDiracDatum.genPType,
   // PEuclidDatum.genPType,

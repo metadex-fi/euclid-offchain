@@ -244,6 +244,16 @@ export class Assets {
     }
     return true;
   };
+
+  public toList = (): Asset[] => {
+    const assets: Asset[] = [];
+    for (const [ccy, tkns] of this.assets) {
+      for (const tkn of tkns) {
+        assets.push(new Asset(ccy, tkn));
+      }
+    }
+    return assets;
+  };
 }
 
 const assertADAlovelaces = (assets: PLifted<PAssets>): void => {
