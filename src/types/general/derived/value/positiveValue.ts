@@ -1,8 +1,8 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { PLiteral, PObject, PRecord } from "../../mod.ts";
+import { PObject, PRecord } from "../../mod.ts";
 import { Asset, Assets, CurrencySymbol, TokenName } from "../asset.ts";
 import { PPositive } from "../bounded.ts";
-import { newAmountsCheck, PValue, Value } from "./value.ts";
+import { newAmountsCheck, newBoundedWith, PValue, Value } from "./value.ts";
 
 export const allPositive = newAmountsCheck((a) => a > 0n);
 
@@ -34,6 +34,10 @@ export class PositiveValue {
   public addAmountOf = (asset: Asset, amount: bigint): PositiveValue => {
     return new PositiveValue(this.value.addAmountOf(asset, amount));
   };
+  public fill = (assets: Assets, amount: bigint): PositiveValue => {
+    assert(amount > 0n, `fill: amount must be positive, got ${amount}`);
+    return new PositiveValue(this.value.fill(assets, amount));
+  };
 
   static maybeFromMap = (
     m?: Map<CurrencySymbol, Map<TokenName, bigint>>,
@@ -41,56 +45,44 @@ export class PositiveValue {
     if (m === undefined) return undefined;
     else return new PositiveValue(new Value(m));
   };
+
+  static genOfAssets = (
+    assets: Assets,
+    ppositive = new PPositive(),
+  ): PositiveValue => {
+    const value = new Value();
+    assets.forEach((asset) => {
+      value.initAmountOf(asset, ppositive.genData());
+    });
+    return new PositiveValue(value);
+  };
 }
+
+export const boundPositive = newBoundedWith(new PPositive());
 
 export class PPositiveValue extends PObject<PositiveValue> {
   constructor(
-    public assets: Assets,
-    public lowerBounds?: PositiveValue,
-    public upperBounds?: PositiveValue,
+    public pnum = new PPositive(),
   ) {
     super(
       new PRecord({
-        value: new PValue(
-          PPositive,
-          assets,
-          lowerBounds?.unsigned(),
-          upperBounds?.unsigned(),
-        ),
+        value: new PValue(pnum),
       }),
       PositiveValue,
     );
   }
 
-  // public genPositiveValue = (): PositiveValue => {
-  //   return new PositiveValue(this.genValue());
-  // };
-
-  static genOfAssets(assets: Assets): PPositiveValue {
-    const pvalue = PValue.newGenPValue(PPositive, assets)();
-    return new PPositiveValue(
-      assets,
-      pvalue.lowerBounds ? new PositiveValue(pvalue.lowerBounds) : undefined,
-      pvalue.upperBounds ? new PositiveValue(pvalue.upperBounds) : undefined,
-    );
-  }
-
   static genPType(): PPositiveValue {
-    const pvalue = PValue.newGenPValue(PPositive)();
-    return new PPositiveValue(
-      pvalue.assets,
-      pvalue.lowerBounds ? new PositiveValue(pvalue.lowerBounds) : undefined,
-      pvalue.upperBounds ? new PositiveValue(pvalue.upperBounds) : undefined,
-    );
+    const pnum = PPositive.genPType();
+    return new PPositiveValue(pnum);
   }
 
-  static maybePLiteral(
-    value?: PositiveValue,
-  ): PLiteral<PPositiveValue> | undefined {
-    if (value === undefined) return undefined;
-    else {return new PLiteral(
-        new PPositiveValue(value.assets(), value, value),
-        value,
-      );}
-  }
+  // static pliteral(
+  //   value: PositiveValue,
+  // ): PLiteral<PPositiveValue> {
+  //   return new PLiteral(
+  //     new PPositiveValue(),
+  //     value,
+  //   );
+  // }
 }

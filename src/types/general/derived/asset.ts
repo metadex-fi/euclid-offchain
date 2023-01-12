@@ -1,15 +1,15 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
-  genNonNegative,
   gMaxLength,
+  minSizedSubset,
   nonEmptySubSet,
   randomChoice,
   randomSubset,
 } from "../../../mod.ts";
-import { f, PConstraint, PLifted, PObject, PRecord, t } from "../mod.ts";
+import { f, PConstraint, PObject, PRecord, t } from "../mod.ts";
 import { newGenInRange } from "./bounded.ts";
 import { PNonEmptyList } from "./nonEmptyList.ts";
-import { PByteString, PMap } from "../fundamental/mod.ts";
+import { PByteString, PList, PMap } from "../fundamental/mod.ts";
 
 export type CurrencySymbol = string;
 export type PCurrencySymbol = PByteString;
@@ -19,29 +19,41 @@ export type TokenName = string;
 export type PTokenName = PByteString;
 export const PTokenName = new PByteString();
 
-const assertADAlovelace = (a: Asset): void => {
-  if (a.currencySymbol === "") {
-    assert(a.tokenName === "", `ADA must have lovelace, got ${a.tokenName}`);
-  }
-};
-
-const genAsset = (): Asset => {
-  const ccy = randomChoice([() => "", PCurrencySymbol.genData])();
-  const tkn = ccy === "" ? "" : PTokenName.genData();
-  return new Asset(ccy, tkn);
-};
-
 export class Asset {
   constructor(
-    public currencySymbol: CurrencySymbol,
-    public tokenName: TokenName,
+    public readonly currencySymbol: CurrencySymbol,
+    public readonly tokenName: TokenName,
   ) {
-    assertADAlovelace(this);
+    Asset.assert(this);
   }
 
   public show = (): string => {
     return `Asset(${this.currencySymbol}, ${this.tokenName})`;
   };
+
+  public toLucid = (): string => {
+    if (this.currencySymbol === "") {
+      Asset.assert(this);
+      return "lovelace";
+    } else {
+      return `${this.currencySymbol}${this.tokenName}`;
+    }
+  };
+
+  static assert(asset: Asset): void {
+    if (asset.currencySymbol === "") {
+      assert(
+        asset.tokenName === "",
+        `ADA must have lovelace, got ${asset.tokenName}`,
+      );
+    }
+  }
+
+  static generate(): Asset {
+    const ccy = randomChoice([() => "", PCurrencySymbol.genData])();
+    const tkn = ccy === "" ? "" : PTokenName.genData();
+    return new Asset(ccy, tkn);
+  }
 }
 // @ts-ignore TODO consider fixing this, or leaving as is
 export class PAsset extends PConstraint<PObject<Asset>> {
@@ -56,8 +68,8 @@ export class PAsset extends PConstraint<PObject<Asset>> {
         ),
         Asset,
       ),
-      [assertADAlovelace],
-      genAsset,
+      [Asset.assert],
+      Asset.generate,
     );
   }
 
@@ -132,13 +144,17 @@ export class Assets {
     return assets;
   };
 
+  public insert = (asset: Asset): void => {
+    const { currencySymbol, tokenName } = asset;
+    const tkns = this.assets.get(currencySymbol) ?? [];
+    assert(!tkns.includes(tokenName), `${asset} already in ${this.show()}`);
+    tkns.push(tokenName);
+    this.assets.set(currencySymbol, tkns);
+  };
+
   public add = (asset: Asset): Assets => {
     const assets = this.copy();
-    const { currencySymbol, tokenName } = asset;
-    const tkns = assets.assets.get(currencySymbol) ?? [];
-    assert(!tkns.includes(tokenName), `${asset} already in ${assets.show()}`);
-    tkns.push(tokenName);
-    assets.assets.set(currencySymbol, tkns);
+    assets.insert(asset);
     return assets;
   };
 
@@ -195,19 +211,9 @@ export class Assets {
     return assets_;
   };
 
-  // public missesOf = (assets: Assets): Assets => {
-  //   const misses = new Map<CurrencySymbol, TokenName[]>();
-  //   for (const [ccy, tkns] of assets.toMap()) {
-  //     const tkns_ = this.assets.get(ccy);
-  //     if (tkns_ === undefined) {
-  //       misses.set(ccy, tkns);
-  //     } else {
-  //       const tkns__ = tkns.filter((tkn) => !tkns_.includes(tkn));
-  //       if (tkns__.length > 0) misses.set(ccy, tkns__);
-  //     }
-  //   }
-  //   return new Assets(misses);
-  // };
+  public minSizedSubset = (minSize: bigint): Asset[] => {
+    return minSizedSubset(this.toList(), minSize);
+  };
 
   public has = (asset: Asset): boolean => {
     const { currencySymbol, tokenName } = asset;
@@ -251,65 +257,62 @@ export class Assets {
     }
     return assets;
   };
+
+  public toLucid = (): string[] => {
+    return this.toList().map((asset) => asset.toLucid());
+  };
+
+  public forEach = (
+    f: (value: Asset, index?: number, array?: Asset[]) => void,
+  ) => this.toList().forEach(f);
+
+  static fromList(assets: Asset[]): Assets {
+    const assets_ = new Assets();
+    for (const asset of assets) {
+      assets_.insert(asset);
+    }
+    assert(
+      assets_.size() === assets.length,
+      `fromList ${assets} resulted in ${assets_.show()}`,
+    );
+    return assets_;
+  }
+
+  static assert(assets: Assets): void {
+    assets.forEach((asset) => Asset.assert(asset));
+  }
+
+  static generate = (minLength = 0n): Assets => {
+    const assets = PMap.genKeys(
+      PAsset.ptype,
+      newGenInRange(minLength, gMaxLength)(),
+    );
+    assert(assets.length >= minLength, `generated ${assets} too small`);
+    const assets_ = Assets.fromList(assets);
+    assert(
+      assets_.size() >= minLength,
+      `generated ${assets_.show()} too small`,
+    );
+    return assets_;
+  };
 }
 
-const assertADAlovelaces = (assets: PLifted<PAssets>): void => {
-  for (const [ccy, tkns] of assets) {
-    if (ccy === "") {
-      assert(tkns.includes(""), "Assets: ADA must have lovelace");
-      assert(tkns.length === 1, "Assets: ADA must have only lovelace");
-    }
-  }
-};
-
-const newGenAssets =
-  (genNumAssets: (maxNum: bigint) => bigint) => (): PLifted<PAssets> => {
-    const assets = new Map<CurrencySymbol, TokenName[]>();
-    const numAssets = genNumAssets(gMaxLength);
-    let i = 0;
-    while (i < numAssets) {
-      const asset = genAsset();
-      if (assets.has(asset.currencySymbol)) {
-        const tokens = assets.get(asset.currencySymbol)!;
-        if (!tokens.includes(asset.tokenName)) {
-          tokens.push(asset.tokenName);
-          i++;
-        }
-      } else {
-        assets.set(asset.currencySymbol, [asset.tokenName]);
-        i++;
-      }
-    }
-    return assets;
-  };
-
-export class PAssets
-  extends PConstraint<PMap<PCurrencySymbol, PNonEmptyList<PTokenName>>> {
+export class PAssets extends PConstraint<PObject<Assets>> {
   private constructor() {
     super(
-      new PMap(PCurrencySymbol, PNonEmptyTokenList),
-      [assertADAlovelaces],
-      newGenAssets(genNonNegative),
+      new PObject(
+        new PRecord({
+          assets: new PMap(PCurrencySymbol, PNonEmptyTokenList),
+        }),
+        Assets,
+      ),
+      [Assets.assert],
+      Assets.generate,
     );
   }
 
-  static genAssets = (minLength = 0n): Assets => {
-    const genNumAssets = (maxNum: bigint) => newGenInRange(minLength, maxNum)();
-    const genAssets = newGenAssets(genNumAssets);
-    const assets = new Assets(
-      genAssets(),
-    );
-    assert(
-      assets.size() >= minLength,
-      `genAssets: minLength: ${minLength} not met by ${assets.show()}`,
-    );
-    return assets;
-  };
-
   static ptype = new PAssets();
-  static genPType(): PConstraint<
-    PMap<PCurrencySymbol, PNonEmptyList<PTokenName>>
-  > {
+  static genPType(): PConstraint<PObject<Assets>> {
     return PAssets.ptype;
   }
 }

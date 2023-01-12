@@ -11,8 +11,9 @@ import {
   gMaxLength,
   maybeNdef,
 } from "../../mod.ts";
-import { Asset, f, maxTicks, PAsset, PConstraint, POwner } from "../mod.ts";
+import { Asset, f, PAsset, PConstraint, POwner } from "../mod.ts";
 
+export const maxTicks = 5n; // per dimension
 // TODO prod: derive this from observed number of diracs in pool
 export const gMaxHashes = maxTicks ** gMaxLength; // TODO why is this wrong?
 

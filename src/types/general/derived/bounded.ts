@@ -2,8 +2,6 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { genNonNegative, maxInteger } from "../../../mod.ts";
 import { PConstraint, PInteger } from "../mod.ts";
 
-export type PNum = PInteger | PBounded | PPositive;
-
 export const bothExtreme = (a: Amount, b: Amount) =>
   a === b && a === maxInteger || a === -maxInteger;
 

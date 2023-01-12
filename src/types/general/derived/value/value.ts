@@ -1,8 +1,15 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { maxInteger, maybeNdef } from "../../../../mod.ts";
-import { f, PMapRecord, PObject, PRecord, RecordOf, t } from "../../mod.ts";
-import { Asset, Assets, CurrencySymbol, PAssets, TokenName } from "../asset.ts";
-import { bothExtreme, PBounded, PNum } from "../bounded.ts";
+import { maxInteger } from "../../../../mod.ts";
+import { f, PConstraint, PMap, PObject, PRecord, t } from "../../mod.ts";
+import {
+  Asset,
+  Assets,
+  CurrencySymbol,
+  PCurrencySymbol,
+  PTokenName,
+  TokenName,
+} from "../asset.ts";
+import { bothExtreme, PBounded } from "../bounded.ts";
 
 export class Value {
   constructor(
@@ -202,6 +209,19 @@ export class Value {
     }
   };
 
+  public fillAmountOf = (asset: Asset, amount: bigint): void => {
+    const tokens = this.value.get(asset.currencySymbol);
+    if (tokens) {
+      if (!tokens.has(asset.tokenName)) {
+        tokens.set(asset.tokenName, amount);
+      }
+    } else {
+      const tokens = new Map<TokenName, bigint>();
+      tokens.set(asset.tokenName, amount);
+      this.value.set(asset.currencySymbol, tokens);
+    }
+  };
+
   public ofAssets = (assets: Assets): Value => {
     const value = new Value();
     for (const [currencySymbol, tokens] of this.value) {
@@ -251,6 +271,14 @@ export class Value {
     return value;
   };
 
+  public fill = (assets: Assets, amount: bigint): Value => {
+    const value = this.clone();
+    for (const asset of assets.toList()) {
+      value.fillAmountOf(asset, amount);
+    }
+    return value;
+  };
+
   static nullOfAssets = (assets: Assets): Value => {
     const value = new Map<CurrencySymbol, Map<TokenName, bigint>>();
     for (const [currencySymbol, tokens] of assets.toMap()) {
@@ -262,76 +290,39 @@ export class Value {
     }
     return new Value(value);
   };
-}
 
-export class PValue<N extends PNum> extends PObject<Value> {
-  constructor(
-    public pnum: new (lowerBound?: bigint, upperBound?: bigint) => N,
-    public assets: Assets,
-    public lowerBounds?: Value,
-    public upperBounds?: Value,
-  ) {
-    assert(
-      !lowerBounds || !upperBounds || leq(lowerBounds, upperBounds),
-      `lowerBounds ${lowerBounds?.show()} must be leq upperBounds ${upperBounds?.show()}
-maxInteger: ${maxInteger}`,
-    );
-    if (lowerBounds) {
-      assert(
-        lowerBounds.has(assets),
-        `lowerBounds missing from ${assets.show()}
-  lower bounds ${lowerBounds.show()}`,
-      );
-    }
-
-    if (upperBounds) {
-      assert(
-        upperBounds.has(assets),
-        `upperBounds missing from ${assets.show()}
-  upper bounds ${upperBounds.show()}`,
-      );
-    }
-
-    const value: RecordOf<PMapRecord<N>> = {};
-    for (const [currencySymbol, tokens] of assets.toMap()) {
-      const pamounts: RecordOf<N> = {};
-      for (const tokenName of tokens) {
-        const asset = new Asset(currencySymbol, tokenName);
-        const lowerBound = lowerBounds?.maybeAmountOf(asset);
-        const upperBound = upperBounds?.maybeAmountOf(asset);
-        pamounts[tokenName] = new pnum(lowerBound, upperBound);
-      }
-      value[currencySymbol] = new PMapRecord(pamounts);
-    }
-    super(
-      new PRecord({
-        value: new PMapRecord(value),
-      }),
-      Value,
-    );
+  static assert(value: Value): void {
+    Assets.assert(value.assets());
   }
 
-  static newGenPValue = <N extends PNum>(
-    pnum: new (lowerBound?: bigint, upperBound?: bigint) => N,
-    assets = new Assets(PAssets.genPType().genData()),
-  ) =>
-  (): PValue<N> => {
-    const lowerBoundedAssets = assets.randomSubset();
-    const upperBoundedAssets = assets.randomSubset();
-    const lowerBounds = maybeNdef(() =>
-      new PValue(pnum, lowerBoundedAssets).genData()
-    )?.();
-    const upperBounds = maybeNdef(() =>
-      new PValue(
-        pnum,
-        upperBoundedAssets,
-        lowerBounds?.ofAssets(upperBoundedAssets),
-      ).genData()
-    )?.();
-    return new PValue(pnum, assets, lowerBounds, upperBounds);
+  static generateWith = (bounded: PBounded) => (): Value => {
+    const assets = Assets.generate();
+    const value = new Value();
+    assets.forEach((asset) => {
+      value.initAmountOf(asset, bounded.genData());
+    });
+    return value;
   };
+}
 
-  static genPType = PValue.newGenPValue(PBounded);
+export class PValue extends PConstraint<PObject<Value>> {
+  constructor(
+    public pbounded: PBounded,
+  ) {
+    super(
+      new PObject(
+        new PRecord({
+          value: new PMap(PCurrencySymbol, new PMap(PTokenName, pbounded)),
+        }),
+        Value,
+      ),
+      [Value.assert],
+      Value.generateWith(pbounded),
+    );
+  }
+  static genPType(): PConstraint<PObject<Value>> {
+    return new PValue(PBounded.genPType() as PBounded);
+  }
 }
 
 export function assetsOf(
@@ -450,12 +441,31 @@ export const newUnionWith = (
   };
 };
 
-export const addValues = newUnionWith((a, b) => a + b, 0n, 0n, 0n);
-// export const subValues = newUnionWith((a, b) => a - b);
-export const mulValues = newUnionWith((a, b) => a * b);
-// export const divValues = newUnionWith((a, b) => a / b);
-
+export const addValues = newUnionWith((a, b) => a + b);
 export const lSubValues = newUnionWith((a, b) => a > b ? a - b : 0n, 0n);
+export const lSubValues_ = newUnionWith(
+  (a, b) => a > b ? a - b : 0n,
+  undefined,
+  undefined,
+  0n,
+);
+
+export const newBoundedWith = (bounds: PBounded) => (value: Value): Value => {
+  const bounded = new Value();
+  for (const [currencySymbol, tokens] of value.toMap()) {
+    for (const [tokenName, amount] of tokens) {
+      bounded.initAmountOf(
+        new Asset(currencySymbol, tokenName),
+        amount < bounds.lowerBound
+          ? bounds.lowerBound
+          : amount > bounds.upperBound
+          ? bounds.upperBound
+          : amount,
+      );
+    }
+  }
+  return bounded;
+};
 
 export const newMapAmounts = (op: (arg: bigint) => bigint) =>
   newUnionWith(

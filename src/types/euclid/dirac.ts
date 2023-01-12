@@ -98,7 +98,7 @@ const newGenDirac = (param: Param, prices: Prices) => (): Dirac => {
 
 export class DiracDatum {
   constructor(
-    public _0: Dirac, // should this be _1?
+    public _0: Dirac,
   ) {}
 }
 export class PDiracDatum extends PObject<DiracDatum> {
@@ -107,7 +107,7 @@ export class PDiracDatum extends PObject<DiracDatum> {
   ) {
     super(
       new PRecord({
-        "_0": pdirac, // should this be _1?
+        "_0": pdirac,
       }),
       DiracDatum,
     );

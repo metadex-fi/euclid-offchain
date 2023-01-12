@@ -4,7 +4,7 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PData } from "../mod.ts";
 
 export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
-const maxStringBytes = 2n; // TODO higher
+export const gMaxStringBytes = 2n; // TODO higher
 export const gMaxLength = 3n;
 export const gMaxDepth = 4n;
 const dropChance = 0.5;
@@ -76,6 +76,20 @@ export function nonEmptySubSet<T>(set: T[]): T[] {
   return subset;
 }
 
+export function minSizedSubset<T>(set: T[], minSize: bigint): T[] {
+  assert(minSize <= set.length, `minSizedSubset: minSize > set.length`);
+  const subset = [];
+  const pickedIndices: number[] = [];
+  while (subset.length < minSize) {
+    const [elem, index] = randomIndexedChoice(set);
+    if (!pickedIndices.includes(index)) {
+      subset.push(elem);
+      pickedIndices.push(index);
+    }
+  }
+  return subset;
+}
+
 export function maybeNdef<T>(value: T) {
   return randomChoice([value, undefined]);
 }
@@ -101,7 +115,7 @@ export function genNumber(maxValue = maxInteger): bigint {
 
 export function genString(alph: string, minBytes = 0n): string {
   assert(minBytes >= 0n, `genString: minBytes < 0`);
-  assert(maxStringBytes >= minBytes, `genString: maxStringBytes < minBytes`);
+  assert(gMaxStringBytes >= minBytes, `genString: maxStringBytes < minBytes`);
   function genChar(): string {
     const choice = Math.floor(Math.random() * (alph.length + 10));
     if (choice < alph.length) {
@@ -111,7 +125,7 @@ export function genString(alph: string, minBytes = 0n): string {
     }
   }
   const l: string[] = [];
-  const maxi = 8n * (minBytes + genNonNegative(maxStringBytes - minBytes));
+  const maxi = 8n * (minBytes + genNonNegative(gMaxStringBytes - minBytes));
   for (let i = 0n; i < maxi; i++) {
     l.push(genChar());
   }
@@ -125,3 +139,7 @@ export function genName(): string {
   const alph = lower + upper; // TODO special characters
   return genString(alph);
 }
+
+// export function genKeyHash(): string {
+//   return genString("abcdef", 1n);
+// }

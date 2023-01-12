@@ -1,48 +1,42 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { abs, genNonNegative, min, randomChoice } from "../../mod.ts";
 import {
-  abs,
-  addValues,
   Asset,
   Assets,
   CurrencySymbol,
-  f,
-  genNonNegative,
-  JumpSizes,
-  maxInteger,
-  min,
-  newCompareWith,
   newUnionWith,
-  Param,
   PAssets,
   PConstraint,
   PObject,
-  PositiveValue,
-  PPositiveValue,
   PRecord,
-  randomChoice,
-  t,
   TokenName,
   Value,
-} from "../../mod.ts";
-import { PLiteral } from "../mod.ts";
+} from "../mod.ts";
+import { JumpSizes } from "./jumpSizes.ts";
+import {
+  PositiveValue,
+  PPositiveValue,
+} from "../general/derived/value/positiveValue.ts";
 
 export const gMaxJumps = 3n;
 
 export class Prices {
-  constructor(private prices: PositiveValue) {}
+  constructor(private value: PositiveValue) {
+    Prices.assert(this);
+  }
 
-  public value = (): PositiveValue => new PositiveValue(this.prices.unsigned());
-  public unsigned = (): Value => this.prices.unsigned();
-  public assets = (): Assets => this.prices.assets();
-  public unit = (): Value => this.prices.unit();
-  public concise = (tabs = ""): string => `Prices ${this.prices.concise(tabs)}`;
-  public show = (tabs = ""): string => `Prices (\n${this.prices.show(tabs)}\n)`;
-  public size = (): bigint => this.prices.size();
-  public amountOf = (asset: Asset): bigint => this.prices.amountOf(asset);
+  public signed = (): PositiveValue => new PositiveValue(this.unsigned());
+  public unsigned = (): Value => this.value.unsigned();
+  public assets = (): Assets => this.value.assets();
+  public unit = (): Value => this.value.unit();
+  public concise = (tabs = ""): string => `Prices ${this.value.concise(tabs)}`;
+  public show = (tabs = ""): string => `Prices (\n${this.value.show(tabs)}\n)`;
+  public size = (): bigint => this.value.size();
+  public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
   public addAmountOf = (asset: Asset, amount: bigint): Prices =>
-    new Prices(this.prices.addAmountOf(asset, amount));
+    new Prices(this.value.addAmountOf(asset, amount));
   public toMap = (): Map<CurrencySymbol, Map<TokenName, bigint>> =>
-    this.prices.toMap();
+    this.value.toMap();
 
   static fromValue = (prices: Value): Prices => {
     return new Prices(new PositiveValue(prices));
@@ -52,184 +46,55 @@ export class Prices {
   ): Prices => {
     return Prices.fromValue(new Value(prices));
   };
+
+  static assert(prices: Prices): void {
+    assert(
+      prices.size() >= 2n,
+      `assertTwoAssets: less than two assets in ${prices.show()}`,
+    );
+  }
+
+  static generate(): Prices {
+    const assets = Assets.generate(2n);
+    assert(assets.size);
+    const value = PositiveValue.genOfAssets(assets);
+    return new Prices(value);
+  }
 }
 
 export class PPrices extends PConstraint<PObject<Prices>> {
-  private maxJumpsUp: Value;
-  private maxJumpsDown: Value;
-  public assets: Assets;
-  private constructor(
-    public initialPrices: Prices,
-    public jumpSizes: JumpSizes,
-    public lowerBounds?: PositiveValue,
-    public upperBounds?: PositiveValue,
-  ) {
-    const maxJumpsUp = maxJumps(
-      initialPrices,
-      jumpSizes,
-      maxInteger,
-      upperBounds,
-    );
-    const maxJumpsDown = maxJumps(
-      initialPrices,
-      jumpSizes,
-      1n,
-      lowerBounds,
-    );
-
+  private constructor() {
     super(
       new PObject(
         new PRecord({
-          prices: new PPositiveValue(
-            initialPrices.assets(),
-            lowerBounds,
-            upperBounds,
-          ),
+          value: new PPositiveValue(),
         }),
         Prices,
       ),
-      [newAssertPricesCongruent(initialPrices, jumpSizes), assertTwoAssets],
-      newGenPrices(
-        initialPrices,
-        jumpSizes,
-        maxJumpsUp,
-        maxJumpsDown,
-      ),
+      [Prices.assert],
+      Prices.generate,
     );
-
-    this.assets = initialPrices.assets();
-    assert(
-      this.assets.size() >= 2n,
-      `new PPrices: less than two assets in ${this.assets.show()}`,
-    );
-    assert(
-      this.assets.equals(jumpSizes.assets()),
-      `Assets not equal in ${this.showPType()}`,
-    );
-
-    this.population = Number(
-      addValues(initialPrices.unit(), addValues(maxJumpsUp, maxJumpsDown))
-        .mulAmounts(),
-    );
-    assert(
-      this.population > 0,
-      `Population not positive in ${this.showPType()}`,
-    );
-    // for logging
-    this.maxJumpsUp = maxJumpsUp;
-    this.maxJumpsDown = maxJumpsDown;
   }
 
-  // public genPrices = (): Prices => {
-  //   return Prices.fromMap(this.pinner.genData());
-  // };
-
-  public showData = (
-    data: Prices,
-    tabs = "",
-  ): string => {
-    return data.concise(tabs);
-  };
-
-  public showPType = (tabs = ""): string => {
-    const tt = tabs + t;
-    const ttf = tt + f;
-
-    return `PObject: PPrices (
-${ttf}population: ${this.population}, 
-${ttf}initialPrices = ${this.initialPrices.concise(ttf)}, 
-${ttf}jumpSizes = ${this.jumpSizes.concise(ttf)}, 
-${ttf}lowerBounds? = ${this.lowerBounds?.concise(ttf)}, 
-${ttf}upperBounds? = ${this.upperBounds?.concise(ttf)},
-${ttf}maxJumpsUp = ${this.maxJumpsUp?.concise(ttf)},
-${ttf}maxJumpsDown = ${this.maxJumpsDown?.concise(ttf)}
-${tt})`;
-  };
-
+  static ptype = new PPrices();
   static genPType(): PConstraint<PObject<Prices>> {
-    const assets = PAssets.genAssets(2n);
-    assert(assets.size() >= 2n, `less than two assets in ${assets.show()}`);
-    const pvalue = PPositiveValue.genOfAssets(assets);
-    const initialPrices = new Prices(pvalue.genData());
-    const jumpSizes = JumpSizes.genOfAssets(assets); // TODO not sure about congruency here
-
-    return new PPrices(
-      initialPrices,
-      jumpSizes,
-      pvalue.lowerBounds,
-      pvalue.upperBounds,
-    );
-  }
-
-  static fromParam(param: Param, initialPrices?: Prices): PPrices {
-    return new PPrices(
-      initialPrices ?? param.initialPrices,
-      param.jumpSizes,
-      param.lowerPriceBounds,
-      param.upperPriceBounds,
-    );
-  }
-
-  static pliteral(prices: Prices): PLiteral<PPrices> {
-    const value = prices.value();
-    const pprices = new PPrices(
-      prices,
-      new JumpSizes(value), // this would be nicer as zeroes, but we can't, and don't need to
-      value,
-      value,
-    );
-
-    return new PLiteral(pprices, prices);
+    return PPrices.ptype;
   }
 }
-
-const assertTwoAssets = (
-  prices: Prices,
-): void => {
-  assert(
-    prices.size() >= 2n,
-    `assertTwoAssets: less than two assets in ${prices.show()}`,
-  );
-};
-
-// this also implicitly checks that assets match
-const newAssertPricesCongruent =
-  (initPs: Prices, jumpSizes: JumpSizes) => (currentPs: Prices): void => {
-    const singlePriceCongruent = (
-      initP: bigint,
-      currentP: bigint,
-      jumpSize: bigint,
-    ): boolean => {
-      return (currentP - initP) % jumpSize === 0n;
-    };
-    const allPricesCongruent = newCompareWith(singlePriceCongruent);
-    assert(
-      allPricesCongruent(
-        initPs.unsigned(),
-        currentPs.unsigned(),
-        jumpSizes.unsigned(),
-      ),
-      `newAssertPricesCongruent: prices not congruent:
-initPs: ${initPs.concise()}
-currentPs: ${currentPs.concise()}
-jumpSizes: ${jumpSizes.concise()}`,
-    );
-  };
 
 const maxJumps = (
   initialPrices: Prices,
   jumpSizes: JumpSizes,
-  gBoundary: bigint,
-  bounds?: PositiveValue,
+  bounds: PositiveValue,
 ): Value => {
   // jump the price of each asset from initial price,
   // a random number of times,
   // with the respective jump size,
   // while respecting the bounds
   const maxSingleAsset = (
-    boundary: bigint,
     initialPrice: bigint,
     jumpSize: bigint,
+    boundary: bigint,
   ): bigint =>
     jumpSize === 0n ? 0n : min(
       gMaxJumps,
@@ -238,16 +103,15 @@ const maxJumps = (
   const maxAllAssets = newUnionWith(
     maxSingleAsset,
     0n,
-    gBoundary,
   );
   return maxAllAssets(
-    bounds?.unsigned(),
     initialPrices.unsigned(),
     jumpSizes.unsigned(),
+    bounds.unsigned(),
   );
 };
 
-const newGenPrices = (
+export const newGenPrices = (
   initialPrices: Prices,
   jumpSizes: JumpSizes,
   maxJumpsUp: Value,

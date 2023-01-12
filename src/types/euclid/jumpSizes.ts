@@ -18,10 +18,8 @@ export class JumpSizes {
     this.value.toMap();
 
   static genOfAssets(assets: Assets): JumpSizes {
-    const ppositiveValue = PPositiveValue.genOfAssets(assets);
-    const positiveValue = ppositiveValue.genData();
     return new JumpSizes(
-      positiveValue,
+      PositiveValue.genOfAssets(assets),
     );
   }
 
@@ -31,16 +29,17 @@ export class JumpSizes {
 }
 
 export class PJumpSizes extends PObject<JumpSizes> {
-  constructor(
-    public assets: Assets,
-    public lowerBounds?: PositiveValue,
-    public upperBounds?: PositiveValue,
-  ) {
+  private constructor() {
     super(
       new PRecord({
-        value: new PPositiveValue(assets, lowerBounds, upperBounds),
+        value: new PPositiveValue(),
       }),
       JumpSizes,
     );
+  }
+
+  static ptype = new PJumpSizes();
+  static genPType(): PJumpSizes {
+    return PJumpSizes.ptype;
   }
 }
