@@ -4,11 +4,10 @@ import {
   addValues,
   Amount,
   boundPositive,
+  f,
   JumpSizes,
   leq,
-  lSubValues,
   lSubValues_,
-  newCompareWith,
   PByteString,
   PConstraint,
   PObject,
@@ -16,13 +15,13 @@ import {
   PPositive,
   PPositiveValue,
   PRecord,
+  t,
 } from "../mod.ts";
 import { PJumpSizes } from "./jumpSizes.ts";
 import { PPaymentKeyHash } from "./owner.ts";
 import { PPrices, Prices } from "./prices.ts";
 
 export class Param {
-  public assertPricesCongruent;
   constructor(
     public owner: PaymentKeyHash,
     public jumpSizes: JumpSizes,
@@ -34,33 +33,19 @@ export class Param {
     const assets = jumpSizes.assets();
     this.lowerPriceBounds = this.lowerPriceBounds.fill(assets, 1n);
     Param.assert(this);
-    this.assertPricesCongruent = (currentPrices: Prices): void => {
-      const singlePriceCongruent = (
-        initP: bigint,
-        currentP: bigint,
-        jumpSize: bigint,
-        lowerBound: bigint,
-        upperBound: bigint,
-      ): boolean => {
-        return (currentP - initP) % jumpSize === 0n &&
-          currentP >= lowerBound &&
-          currentP <= upperBound;
-      };
-      const allPricesCongruent = newCompareWith(singlePriceCongruent);
-      assert(
-        allPricesCongruent(
-          this.initialPrices.unsigned(),
-          currentPrices.unsigned(),
-          jumpSizes.unsigned(),
-          this.lowerPriceBounds.unsigned(),
-          this.upperPriceBounds.unsigned(),
-        ),
-        `newAssertPricesCongruent: prices not congruent:
-    initPs: ${this.initialPrices.concise()}
-    currentPs: ${currentPrices.concise()}
-    jumpSizes: ${this.jumpSizes.concise()}`,
-      );
-    };
+  }
+
+  public concise(tabs = ""): string {
+    const tt = tabs + t;
+    const ttf = tt + f;
+    return `Param(
+${ttf}owner: ${this.owner}, 
+${ttf}jumpSizes: ${this.jumpSizes.concise()}, 
+${ttf}initialPrices: ${this.initialPrices.concise()}, 
+${ttf}lowerPriceBounds: ${this.lowerPriceBounds.concise()}, 
+${ttf}upperPriceBounds: ${this.upperPriceBounds.concise()}, 
+${ttf}baseAmountA0: ${this.baseAmountA0}
+${tt})`;
   }
 
   static assert(param: Param): void {
@@ -126,7 +111,7 @@ export class PParam extends PConstraint<PObject<Param>> {
         new PRecord({
           "owner": new PByteString(1n),
           "jumpSizes": PJumpSizes.ptype,
-          "initialPrices": PPrices.ptype,
+          "initialPrices": new PPrices(),
           "lowerPriceBounds": new PPositiveValue(),
           "upperPriceBounds": new PPositiveValue(),
           "baseAmountA0": new PPositive(),

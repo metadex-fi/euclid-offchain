@@ -1,87 +1,59 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { genNonNegative, genPositive, maxInteger } from "../../mod.ts";
+import { genNonNegative, maxInteger } from "../../mod.ts";
+import { Param, PObject, PRecord, Value } from "../mod.ts";
+import { Prices } from "./prices.ts";
 import {
-  Amount,
-  f,
-  PConstraint,
   PositiveValue,
   PPositiveValue,
-  t,
-} from "../mod.ts";
-import { PPrices, Prices } from "./prices.ts";
+} from "../general/derived/value/positiveValue.ts";
 
-export type Amounts = PositiveValue;
-export class PAmounts extends PConstraint<PPositiveValue> {
+export class Amounts {
   constructor(
-    public baseAmountA0: bigint,
-    public pprices: PPrices,
-  ) {
-    super(
-      new PPositiveValue(pprices.initialPrices.assets()),
-      [], // TODO only looking at datums, include values
-      newGenAmounts(baseAmountA0, pprices),
+    private value: PositiveValue,
+  ) {}
+
+  public unsigned = (): Value => this.value.unsigned();
+  public concise = (tabs = ""): string => `Amounts ${this.value.concise(tabs)}`;
+
+  static generateWith = (param: Param, prices: Prices) => (): Amounts => {
+    assert(
+      prices.size() >= 2n,
+      `genAmounts: less than two assets in ${prices.concise()}`,
     );
-    this.population = 1; //probably far too conservative, but nonissue
-  }
+    const assets = prices.assets();
+    const A0 = assets.head();
+    const p0 = prices.amountOf(A0);
+    let netWorth = param.baseAmountA0 * p0;
+    const amounts = new PositiveValue();
 
-  public showData = (
-    data: PositiveValue,
-    tabs = "",
-  ): string => {
-    return `Amount ${data.concise(tabs)}`;
+    for (const asset of assets.tail().toList()) {
+      const p = prices.amountOf(asset);
+      const received = genNonNegative(netWorth / p);
+      const spent = received * p;
+      if (received <= maxInteger && received > 0n && spent > 0n) {
+        netWorth -= spent;
+        amounts.initAmountOf(asset, received);
+      }
+    }
+    const remainingA0 = netWorth / p0 + (netWorth % p0 === 0n ? 0n : 1n);
+    if (remainingA0 > 0n) amounts.initAmountOf(A0, remainingA0);
+    return new Amounts(amounts);
   };
-
-  public showPType = (tabs = ""): string => {
-    const tt = tabs + t;
-    const ttf = tt + f;
-    return `PObject: PAmounts (
-${ttf}population: ${this.population},
-${ttf}baseAmountA0: ${this.baseAmountA0},
-${ttf}pprices: ${this.pprices.showPType(ttf)}
-${tt})`;
-  };
-
-  static genPType(): PConstraint<PPositiveValue> {
-    const baseAmountA0 = genPositive();
-    const pprices = PPrices.genPType() as PPrices;
-
-    return new PAmounts(baseAmountA0, pprices);
-  }
 }
 
-const newGenAmounts = (
-  baseAmountA0: Amount,
-  pprices: PPrices,
-) =>
-() => {
-  const prices = pprices.genData();
-  return genAmounts(baseAmountA0, prices);
-};
-
-export const genAmounts = (
-  baseAmountA0: Amount,
-  prices: Prices,
-) => {
-  assert(
-    prices.size() >= 2n,
-    `genAmounts: less than two assets in ${prices.concise()}`,
-  );
-  const assets = prices.assets();
-  const A0 = assets.head();
-  const p0 = prices.amountOf(A0);
-  let netWorth = baseAmountA0 * p0;
-  const amounts = new PositiveValue();
-
-  for (const asset of assets.tail().toList()) {
-    const p = prices.amountOf(asset);
-    const received = genNonNegative(netWorth / p);
-    const spent = received * p;
-    if (received <= maxInteger && received > 0n && spent > 0n) {
-      netWorth -= spent;
-      amounts.initAmountOf(asset, received);
-    }
+export class PAmounts extends PObject<Amounts> {
+  private constructor() {
+    super(
+      new PRecord({
+        value: new PPositiveValue(),
+      }),
+      Amounts,
+    );
+    // this.population = 1; //probably far too conservative, but nonissue
   }
-  const remainingA0 = netWorth / p0 + (netWorth % p0 === 0n ? 0n : 1n);
-  if (remainingA0 > 0n) amounts.initAmountOf(A0, remainingA0);
-  return amounts;
-};
+
+  static ptype = new PAmounts();
+  static genPType(): PObject<Amounts> {
+    return PAmounts.ptype;
+  }
+}

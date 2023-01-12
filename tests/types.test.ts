@@ -1,5 +1,6 @@
 import {
   Generators,
+  PAmounts,
   PAsset,
   PAssets,
   PBounded,
@@ -82,7 +83,7 @@ const euclidPrimitiveGenerators = [
   PPrices.genPType,
   PParam.genPType,
   PParamDatum.genPType,
-  // PAmounts.genPType,
+  PAmounts.genPType,
   // PActiveAssets.genPType,
   // PDirac.genPType,
   // PDiracDatum.genPType,

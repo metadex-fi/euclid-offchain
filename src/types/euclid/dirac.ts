@@ -1,22 +1,19 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
-  ActiveAssets,
   Amounts,
   Asset,
-  genAmounts,
   newUnionWith,
-  PActiveAssets,
   PAmounts,
   Param,
   PConstraint,
   PIdNFT,
   PObject,
-  PParam,
   PPrices,
   PRecord,
   Prices,
 } from "../mod.ts";
+import { ActiveAssets, PActiveAssets } from "./activeAssets.ts";
 import { POwner } from "./owner.ts";
 
 export class Dirac {
@@ -28,41 +25,12 @@ export class Dirac {
     public activeAmnts: Amounts,
     public jumpStorage: ActiveAssets,
   ) {}
-}
-export class PDirac extends PConstraint<PObject<Dirac>> {
-  private constructor(
-    public param: Param,
-    public prices: Prices,
-  ) {
-    const pprices = PPrices.fromParam(param);
-    super(
-      new PObject(
-        new PRecord({
-          "owner": POwner.pliteral(param.owner),
-          "threadNFT": PIdNFT.newPThreadNFT(param.owner),
-          "paramNFT": PIdNFT.newPParamNFT(param.owner),
-          "prices": pprices,
-          "activeAmnts": new PAmounts(param.baseAmountA0, pprices),
-          "jumpStorage": new PActiveAssets(pprices),
-        }),
-        Dirac,
-      ),
-      [newAssertAmountsCongruent(param.baseAmountA0, prices)],
-      newGenDirac(param, prices),
-    );
-  }
 
-  static genPType(): PConstraint<PObject<Dirac>> {
-    const param = PParam.genPType().genData();
-    const prices = PPrices.fromParam(param).genData();
-    return new PDirac(param, prices);
-  }
-}
+  // TODO consider fees here
+  static assertWith = (param: Param) => (dirac: Dirac): void => {
+    Prices.assertWith(param)(dirac.prices);
 
-// TODO consider fees here
-export const newAssertAmountsCongruent =
-  (baseAmountA0: bigint, prices: Prices) => (dirac: Dirac): void => {
-    const prices_ = prices.unsigned();
+    const prices_ = dirac.prices.unsigned();
     const worth = newUnionWith(
       (amnt: bigint, price: bigint) => price * amnt,
       0n,
@@ -72,29 +40,62 @@ export const newAssertAmountsCongruent =
       dirac.activeAmnts.unsigned(),
       prices_,
     ).sumAmounts();
-    const lower = baseAmountA0 * prices_.firstAmount();
+    const lower = param.baseAmountA0 * prices_.firstAmount();
     const upper = lower + prices_.firstAmount();
     assert(
       lower <= total && total <= upper,
       `expected ${lower} <= ${total} <= ${upper} with
-baseAmountA0: ${baseAmountA0},
+baseAmountA0: ${param.baseAmountA0},
 baseAsset: ${prices_.firstAsset().show()},
-prices: ${prices.concise()},
+prices: ${dirac.prices.concise()},
 activeAmnts: ${dirac.activeAmnts.concise()}`,
     );
   };
 
-const newGenDirac = (param: Param, prices: Prices) => (): Dirac => {
-  const pprices = PPrices.fromParam(param);
-  return new Dirac(
-    param.owner,
-    PIdNFT.newPThreadNFT(param.owner).genData(),
-    PIdNFT.newPParamNFT(param.owner).genData(),
-    prices,
-    genAmounts(param.baseAmountA0, prices),
-    new PActiveAssets(pprices).genData(),
-  );
-};
+  static generateWith = (param: Param) => (): Dirac => {
+    const owner = param.owner;
+    const threadNFT = PIdNFT.newPThreadNFT(owner).genData();
+    const paramNFT = PIdNFT.newPParamNFT(owner).genData();
+    const prices = Prices.generateWith(param)();
+    const activeAmnts = Amounts.generateWith(param, prices)();
+    const jumpStorage = ActiveAssets.generateWith(param)();
+
+    return new Dirac(
+      owner,
+      threadNFT,
+      paramNFT,
+      prices,
+      activeAmnts,
+      jumpStorage,
+    );
+  };
+}
+export class PDirac extends PConstraint<PObject<Dirac>> {
+  private constructor(
+    public readonly param: Param,
+  ) {
+    super(
+      new PObject(
+        new PRecord({
+          "owner": POwner.pliteral(param.owner),
+          "threadNFT": PIdNFT.newPThreadNFT(param.owner),
+          "paramNFT": PIdNFT.newPParamNFT(param.owner),
+          "prices": new PPrices(param),
+          "activeAmnts": PAmounts.ptype,
+          "jumpStorage": new PActiveAssets(param),
+        }),
+        Dirac,
+      ),
+      [Dirac.assertWith(param)],
+      Dirac.generateWith(param),
+    );
+  }
+
+  static genPType(): PConstraint<PObject<Dirac>> {
+    const param = Param.generate();
+    return new PDirac(param);
+  }
+}
 
 export class DiracDatum {
   constructor(

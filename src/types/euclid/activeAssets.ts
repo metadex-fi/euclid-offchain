@@ -1,60 +1,79 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Asset, lSubValues, PAsset, PConstraint, PEnum, PMap } from "../mod.ts";
+import {
+  Asset,
+  lSubValues,
+  Param,
+  PAsset,
+  PConstraint,
+  PMap,
+  PObject,
+  PRecord,
+} from "../mod.ts";
 import { PPrices, Prices } from "./prices.ts";
 
-export type ActiveAssets = Map<Prices, Asset>;
-export class PActiveAssets extends PConstraint<PMap<PPrices, PEnum<PAsset>>> {
+export class ActiveAssets {
   constructor(
-    public pprices: PPrices,
-  ) {
-    super(
-      new PMap(
-        pprices,
-        new PEnum(PAsset.ptype, pprices.initialPrices.assets().toList()),
-      ),
-      [newAssertNotDefault(pprices.initialPrices)],
-      newGenActiveAssets(pprices),
-    );
+    private activeAssets: Map<Prices, Asset>,
+  ) {}
+
+  public forEach(
+    callbackfn: (value: Asset, key: Prices, map: Map<Prices, Asset>) => void,
+  ): void {
+    this.activeAssets.forEach(callbackfn);
   }
 
-  static genPType(): PConstraint<PMap<PPrices, PEnum<PAsset>>> {
-    const pprices = PPrices.genPType();
-    return new PActiveAssets(pprices as PPrices);
-  }
-}
-
-const newAssertNotDefault =
-  (initialPs: Prices) => (activeAssets: ActiveAssets) => {
-    for (const [location, asset] of activeAssets) {
-      const defaultAsset = defaultActiveAsset(initialPs, location);
+  static assertWith = (param: Param) => (activeAssets: ActiveAssets): void => {
+    activeAssets.forEach((asset, location) => {
+      const defaultAsset = defaultActiveAsset(param.initialPrices, location);
       assert(
         asset !== defaultAsset,
         `default asset ${defaultAsset} should not be stored at location ${location}`,
       );
-    }
+    });
   };
 
-// TODO this might lead to some paradoxes, let's see, we might learn something
-export const newGenActiveAssets = (
-  pprices: PPrices,
-) =>
-(): ActiveAssets => {
-  const assets = pprices.initialPrices.assets();
-  const activeAssets = new Map<Prices, Asset>();
-  const locations: Prices[] = PMap.genKeys(pprices);
-  for (const location of locations) {
-    assert(
-      location.assets().equals(assets),
-      `location ${location} should have assets ${assets}`,
-    );
-    const defaultAsset = defaultActiveAsset(pprices.initialPrices, location);
-    const asset = assets.randomChoice();
-    if (asset !== defaultAsset) {
-      activeAssets.set(location, asset);
+  // TODO this might lead to some paradoxes, let's see, we might learn something
+  static generateWith = (param: Param) => (): ActiveAssets => {
+    const assets = param.initialPrices.assets();
+    const activeAssets = new Map<Prices, Asset>();
+    const pprices = new PPrices(param);
+    const locations: Prices[] = PMap.genKeys(pprices);
+    for (const location of locations) {
+      assert(
+        location.assets().equals(assets),
+        `location ${location} should have assets ${assets}`,
+      );
+      const defaultAsset = defaultActiveAsset(param.initialPrices, location);
+      const asset = assets.randomChoice();
+      if (asset !== defaultAsset) {
+        activeAssets.set(location, asset);
+      }
     }
+    return new ActiveAssets(activeAssets);
+  };
+}
+
+export class PActiveAssets extends PConstraint<PObject<ActiveAssets>> {
+  constructor(
+    public readonly param: Param,
+  ) {
+    super(
+      new PObject(
+        new PRecord({
+          "activeAssets": new PMap(new PPrices(param), PAsset.ptype),
+        }),
+        ActiveAssets,
+      ),
+      [ActiveAssets.assertWith(param)],
+      ActiveAssets.generateWith(param),
+    );
   }
-  return activeAssets;
-};
+
+  static genPType(): PConstraint<PObject<ActiveAssets>> {
+    const param = Param.generate();
+    return new PActiveAssets(param);
+  }
+}
 
 function defaultActiveAsset(initPs: Prices, currentPs: Prices): Asset {
   let branch = "none";
