@@ -28,6 +28,7 @@ import {
   PValue,
 } from "../src/mod.ts";
 import { PActiveAssets } from "../src/types/euclid/activeAssets.ts";
+import { PDirac, PDiracDatum } from "../src/types/euclid/dirac.ts";
 
 Deno.test("euclid data/types tests", () => {
   const gen = new Generators(
@@ -86,8 +87,8 @@ const euclidPrimitiveGenerators = [
   PParamDatum.genPType,
   PAmounts.genPType,
   PActiveAssets.genPType,
-  // PDirac.genPType,
-  // PDiracDatum.genPType,
+  PDirac.genPType,
+  PDiracDatum.genPType,
   // PAllDiracs.genPType,
   // PEuclidDatum.genPType,
 ];
