@@ -7,7 +7,9 @@ import {
   PConstraint,
   PMap,
   PObject,
+  PositiveValue,
   PRecord,
+  Value,
 } from "../mod.ts";
 import { PPrices, Prices } from "./prices.ts";
 
@@ -24,7 +26,10 @@ export class ActiveAssets {
 
   static assertWith = (param: Param) => (activeAssets: ActiveAssets): void => {
     activeAssets.forEach((asset, location) => {
-      const defaultAsset = defaultActiveAsset(param.initialPrices, location);
+      const defaultAsset = defaultActiveAsset(
+        param.initialPrices.unsigned(),
+        location.unsigned(),
+      );
       assert(
         asset !== defaultAsset,
         `default asset ${defaultAsset} should not be stored at location ${location}`,
@@ -43,7 +48,10 @@ export class ActiveAssets {
         location.assets().equals(assets),
         `location ${location} should have assets ${assets}`,
       );
-      const defaultAsset = defaultActiveAsset(param.initialPrices, location);
+      const defaultAsset = defaultActiveAsset(
+        param.initialPrices.unsigned(),
+        location.unsigned(),
+      );
       const asset = assets.randomChoice();
       if (asset !== defaultAsset) {
         activeAssets.set(location, asset);
@@ -75,31 +83,28 @@ export class PActiveAssets extends PConstraint<PObject<ActiveAssets>> {
   }
 }
 
-function defaultActiveAsset(initPs: Prices, currentPs: Prices): Asset {
+function defaultActiveAsset(initPs: Value, currentPs: Value): Asset {
   let branch = "none";
   try {
-    const current = currentPs.unsigned();
-    const init = initPs.unsigned();
-
-    const diff = lSubValues(current, init);
+    const diff = lSubValues(currentPs, initPs);
     switch (diff.size()) {
       case 0n:
-        branch = `0n with ${init.concise()}`;
-        return init.firstAsset();
+        branch = `0n with ${initPs.concise()}`;
+        return initPs.firstAsset();
       case 1n:
         branch = `1n with ${diff.concise()}`;
         return diff.firstAsset();
       default: {
-        branch = `default with \n${init.concise()}\n${current.concise()}`;
-        let init_ = init.tail();
-        let current_ = current.tail();
-        const fstInit = init_.firstAmount();
-        const fstCurrent = current_.firstAmount();
-        init_ = init_.scaledWith(fstCurrent);
-        current_ = current_.scaledWith(fstInit);
+        branch = `default with \n${initPs.concise()}\n${currentPs.concise()}`;
+        let initTail = initPs.tail();
+        let currentTail = currentPs.tail();
+        const fstInit = initTail.firstAmount();
+        const fstCurrent = currentTail.firstAmount();
+        initTail = initTail.scaledWith(fstCurrent);
+        currentTail = currentTail.scaledWith(fstInit);
         return defaultActiveAsset(
-          Prices.fromValue(init_),
-          Prices.fromValue(current_),
+          initTail,
+          currentTail,
         );
       }
     }
