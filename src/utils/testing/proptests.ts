@@ -19,17 +19,17 @@ export function proptestPTypes(gen: Generators, iterations: number) {
       // console.log("generating ptype")
       const ptype = gen.generate(gMaxDepth);
       // console.log("generating data for " + ptype.showPType(t));
-      // const data = ptype.genData();
+      const data = ptype.genData();
       // console.log("constanting " + ptype.showData(data));
-      // const plutusData = ptype.pconstant(data);
+      const plutusData = ptype.pconstant(data);
       // console.log(ptype.showData(data));
 
       // console.log(`testing population of ${ptype.showPType(t)}`)
-      // testPopulation(ptype, popErrs);
+      testPopulation(ptype, popErrs);
       // console.log("testing data parsing")
-      // testDataParse(plutusData, dataErrs);
+      testDataParse(plutusData, dataErrs);
       // console.log("testing ptype parsing")
-      // testPTypeParse(plutusData, data, ptype, ptypeErrs);
+      testPTypeParse(plutusData, data, ptype, ptypeErrs);
     } catch (err) {
       logError(err, otherErrs);
     }

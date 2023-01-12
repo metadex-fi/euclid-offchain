@@ -25,7 +25,7 @@ export class PAllDiracs extends PConstraint<PList<PObject<Dirac>>> {
   private constructor(
     public param: Param,
   ) { // TODO issue is that we're manually offsetting below, that't of course incongruent from PPrices-perspective
-    const pprices = PPrices.fromParam(param); 
+    const pprices = PPrices.fromParam(param);
     const pinner = new PList(
       new PObject(
         new PRecord({
@@ -79,16 +79,16 @@ const newGenAllDiracs = (param: Param) => (): Dirac[] => {
 
   let threadNFT = paramNFT.next();
   function genDiracForPrices(prices: Prices): Dirac {
-      const pprices = PPrices.fromParam(param, prices);
-      const genActiveAssets = newGenActiveAssets(pprices);
-      return new Dirac(
-        param.owner,
-        threadNFT.asset(),
-        paramNFT.asset(),
-        prices,
-        genAmounts(param.baseAmountA0, prices),
-        genActiveAssets(),
-      );
+    const pprices = PPrices.fromParam(param, prices);
+    const genActiveAssets = newGenActiveAssets(pprices);
+    return new Dirac(
+      param.owner,
+      threadNFT.asset(),
+      paramNFT.asset(),
+      prices,
+      genAmounts(param.baseAmountA0, prices),
+      genActiveAssets(),
+    );
   }
 
   const prices = param.initialPrices;
