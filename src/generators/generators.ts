@@ -1,7 +1,7 @@
 // TODO consider generating wrong cases as well
 
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { PData } from "../../mod.ts";
+import { PData } from "../mod.ts";
 
 export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
 const maxStringBytes = 2n; // TODO higher

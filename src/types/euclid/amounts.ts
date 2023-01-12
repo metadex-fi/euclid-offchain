@@ -1,21 +1,14 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  genNonNegative,
-  genPositive,
-  maxInteger,
-} from "../../utils/testing/generators.ts";
+import { genNonNegative, genPositive, maxInteger } from "../../mod.ts";
 import {
   Amount,
-  Asset,
   f,
-  newUnionWith,
   PConstraint,
   PositiveValue,
   PPositiveValue,
-  PPrices,
-  Prices,
   t,
 } from "../mod.ts";
+import { PPrices, Prices } from "./prices.ts";
 
 export type Amounts = PositiveValue;
 export class PAmounts extends PConstraint<PPositiveValue> {
