@@ -1,4 +1,4 @@
-export * from "./constr.ts";
+// export * from "./constr.ts";
 export * from "./constraint.ts";
 export * from "./enum.ts";
 export * from "./list.ts";

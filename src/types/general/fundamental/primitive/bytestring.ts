@@ -7,7 +7,7 @@ import {
 } from "../../../../mod.ts";
 import { PType } from "../type.ts";
 
-export class PByteString implements PType<string> {
+export class PByteString implements PType<string, string> {
   public readonly population = Infinity;
 
   constructor(

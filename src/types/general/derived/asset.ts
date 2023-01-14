@@ -9,7 +9,7 @@ import {
 import { f, PConstraint, PObject, PRecord, t } from "../mod.ts";
 import { newGenInRange } from "./bounded.ts";
 import { PNonEmptyList } from "./nonEmptyList.ts";
-import { PByteString, PList, PMap } from "../fundamental/mod.ts";
+import { PByteString, PMap } from "../fundamental/mod.ts";
 
 export type CurrencySymbol = string;
 export type PCurrencySymbol = PByteString;

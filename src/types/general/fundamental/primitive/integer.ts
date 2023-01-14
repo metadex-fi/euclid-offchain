@@ -2,7 +2,7 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { genNumber, maxInteger } from "../../../../mod.ts";
 import { PType } from "../type.ts";
 
-export class PInteger implements PType<bigint> {
+export class PInteger implements PType<bigint, bigint> {
   public readonly population = Number(maxInteger) * 2 + 1;
 
   public plift = (i: bigint): bigint => {

@@ -7,20 +7,21 @@ import {
   maybeNdef,
 } from "../../../../mod.ts";
 import {
-  Constanted,
   f,
-  Lifted,
-  Lmm,
+  PConstanted,
+  PData,
+  PLifted,
   PType,
   RecordOfMaybe,
   t,
 } from "../type.ts";
 
-export class PRecord<F extends Lifted> implements PType<RecordOfMaybe<Lmm<F>>> {
+export class PRecord<PFields extends PData>
+  implements PType<PConstanted<PFields>[], RecordOfMaybe<PLifted<PFields>>> {
   public readonly population: number;
 
   constructor(
-    public readonly pfields: RecordOfMaybe<PType<Lmm<F>>>,
+    public readonly pfields: RecordOfMaybe<PFields>,
   ) {
     let population = 1;
     Object.values(pfields).forEach((pfield) => {
@@ -34,13 +35,13 @@ export class PRecord<F extends Lifted> implements PType<RecordOfMaybe<Lmm<F>>> {
   }
 
   public plift = (
-    l: Constanted<Lmm<F>>[],
-  ): RecordOfMaybe<Lmm<F>> => {
+    l: PConstanted<PFields>[],
+  ): RecordOfMaybe<PLifted<PFields>> => {
     assert(
       l instanceof Array,
       `Record.plift: expected Array, got ${l} (${typeof l})\nfor ${this.showPType()})`,
     );
-    const r: RecordOfMaybe<Lmm<F>> = {};
+    const r: RecordOfMaybe<PLifted<PFields>> = {};
     let i = 0;
     Object.entries(this.pfields).forEach(([key, pfield]) => {
       if (pfield !== undefined) {
@@ -65,7 +66,7 @@ in [${l}] of length ${l.length}
 for ${this.showPType()};
 status: ${Object.keys(r).join(`,\n${f}`)}`,
         );
-        r[key] = pfield.plift(value);
+        r[key] = pfield.plift(value) as PLifted<PFields>;
       } else {
         r[key] = undefined;
       }
@@ -77,7 +78,7 @@ status: ${Object.keys(r).join(`,\n${f}`)}`,
     return r;
   };
 
-  private checkFields = (data: RecordOfMaybe<Lmm<F>>) => {
+  private checkFields = (data: RecordOfMaybe<PLifted<PFields>>) => {
     assert(
       data instanceof Object,
       `PRecord.checkFields: expected Object, got ${data}\nfor ${this.showPType()}`,
@@ -91,11 +92,11 @@ status: ${Object.keys(r).join(`,\n${f}`)}`,
   };
 
   public pconstant = (
-    data: RecordOfMaybe<Lmm<F>>,
-  ): Constanted<Lmm<F>>[] => {
+    data: RecordOfMaybe<PLifted<PFields>>,
+  ): PConstanted<PFields>[] => {
     this.checkFields(data);
 
-    const l = new Array<Constanted<Lmm<F>>>();
+    const l = new Array<PConstanted<PFields>>();
     Object.entries(this.pfields).forEach(([key, pfield]) => {
       const value = data[key];
       if (pfield) {
@@ -103,7 +104,7 @@ status: ${Object.keys(r).join(`,\n${f}`)}`,
           value !== undefined,
           `cannot constant ${value} with pfield: ${pfield.showPType()}`,
         );
-        l.push(pfield.pconstant(value));
+        l.push(pfield.pconstant(value) as PConstanted<PFields>);
       } else {
         assert(
           value === undefined,
@@ -114,16 +115,16 @@ status: ${Object.keys(r).join(`,\n${f}`)}`,
     return l;
   };
 
-  public genData = (): RecordOfMaybe<Lmm<F>> => {
-    const r: RecordOfMaybe<Lmm<F>> = {};
+  public genData = (): RecordOfMaybe<PLifted<PFields>> => {
+    const r: RecordOfMaybe<PLifted<PFields>> = {};
     Object.entries(this.pfields).forEach(([key, pfield]) => {
-      r[key] = pfield?.genData();
+      r[key] = pfield?.genData() as PLifted<PFields>;
     });
     return r;
   };
 
   public showData = (
-    data: RecordOfMaybe<Lmm<F>>,
+    data: RecordOfMaybe<PLifted<PFields>>,
     tabs = "",
   ): string => {
     this.checkFields(data);
@@ -171,17 +172,17 @@ ${ttf}pfields: {${fields.length > 0 ? `${fields.join(`,`)}\n${ttf}` : ""}}
 ${tt})`;
   };
 
-  static genPType<F extends Lifted>(
+  static genPType<PFields extends PData>(
     gen: Generators,
     maxDepth: bigint,
-  ): PRecord<F> {
-    const pfields: RecordOfMaybe<PType<Lmm<F>>> = {};
+  ): PRecord<PFields> {
+    const pfields: RecordOfMaybe<PFields> = {};
     const maxi = genNonNegative(gMaxLength);
     for (let i = 0; i < maxi; i++) {
       const key = genName();
       const pvalue = maybeNdef(() => gen.generate(maxDepth))?.();
-      pfields[key] = pvalue;
+      pfields[key] = pvalue as PFields;
     }
-    return new PRecord(pfields);
+    return new PRecord(pfields) as PRecord<PFields>;
   }
 }
