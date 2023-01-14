@@ -5,15 +5,14 @@ import {
   gMaxLength,
   maybeNdef,
 } from "../../../../mod.ts";
-import { f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
+import { Constanted, f, Lifted, Lmm, PType, t } from "../type.ts";
 
-export class PList<PElem extends PData>
-  implements PType<Array<PConstanted<PElem>>, Array<PLifted<PElem>>> {
-  public population: number;
+export class PList<E extends Lifted> implements PType<Lmm<E>[]> {
+  public readonly population: number;
 
   constructor(
-    public pelem: PElem,
-    public length?: bigint,
+    public readonly pelem: PType<Lmm<E>>,
+    public readonly length?: bigint,
   ) {
     assert(!length || length >= 0, "negative length");
     if (!length || length === 0n) this.population = 1; // worst case, consider preventing this by setting minimum size
@@ -24,25 +23,25 @@ export class PList<PElem extends PData>
     );
   }
 
-  public plift = (l: Array<PConstanted<PElem>>): Array<PLifted<PElem>> => {
+  public plift = (l: Constanted<Lmm<E>>[]): Lmm<E>[] => {
     assert(l instanceof Array, `List.plift: expected List: ${l}`);
     assert(
       !this.length || this.length === BigInt(l.length),
       `plift: wrong length - ${this.length} vs. ${l.length}`,
     );
     const data = l.map((elem) => this.pelem.plift(elem));
-    return data as Array<PLifted<PElem>>;
+    return data;
   };
 
   public pconstant = (
-    data: Array<PLifted<PElem>>,
-  ): Array<PConstanted<PElem>> => {
+    data: Lmm<E>[],
+  ): Constanted<Lmm<E>>[] => {
     assert(data instanceof Array, `pconstant: expected Array`);
     assert(
       !this.length || this.length === BigInt(data.length),
       `pconstant: wrong length`,
     );
-    return data.map(this.pelem.pconstant) as Array<PConstanted<PElem>>;
+    return data.map(this.pelem.pconstant);
   };
 
   static genList<T>(
@@ -56,12 +55,12 @@ export class PList<PElem extends PData>
     return l;
   }
 
-  public genData = (): PLifted<PElem>[] => {
+  public genData = (): Lmm<E>[] => {
     const length = this.length ? this.length : genNonNegative(gMaxLength);
-    return PList.genList(this.pelem.genData, length) as PLifted<PElem>[];
+    return PList.genList(this.pelem.genData, length);
   };
 
-  public showData = (data: PLifted<PElem>[], tabs = ""): string => {
+  public showData = (data: Lmm<E>[], tabs = ""): string => {
     assert(
       data instanceof Array,
       `PList.showData: expected Array, got ${data}`,
@@ -85,12 +84,12 @@ ${ttf}length?: ${this.length}
 ${tt})`;
   };
 
-  static genPType(
+  static genPType<E extends Lifted>(
     gen: Generators,
     maxDepth: bigint,
-  ): PList<PData> {
+  ): PList<E> {
     const length = maybeNdef(genNonNegative(gMaxLength));
-    const pelem = gen.generate(maxDepth);
-    return new PList(pelem, length);
+    const pelem: PType<Lmm<E>> = gen.generate(maxDepth);
+    return new PList<E>(pelem, length);
   }
 }

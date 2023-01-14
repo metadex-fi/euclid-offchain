@@ -7,11 +7,11 @@ import {
 } from "../../../../mod.ts";
 import { PType } from "../type.ts";
 
-export class PByteString implements PType<string, string> {
-  public population = Infinity;
+export class PByteString implements PType<string> {
+  public readonly population = Infinity;
 
   constructor(
-    public minBytes = 0n,
+    public readonly minBytes = 0n,
   ) {}
 
   public plift = (s: string): string => {

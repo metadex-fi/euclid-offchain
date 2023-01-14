@@ -55,7 +55,7 @@ export class Asset {
     return new Asset(ccy, tkn);
   }
 }
-// @ts-ignore TODO consider fixing this, or leaving as is
+
 export class PAsset extends PConstraint<PObject<Asset>> {
   private constructor() {
     super(

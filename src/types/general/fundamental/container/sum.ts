@@ -1,34 +1,34 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Constr } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Constr, Data } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
   Generators,
   genName,
   genNonNegative,
   gMaxLength,
   randomChoice,
-} from "../../../mod.ts";
+} from "../../../../mod.ts";
+import { PConstanted, PData, PLifted, PType, RecordOf } from "../type.ts";
+import { PObject } from "./object.ts";
 import { PRecord } from "./record.ts";
-import { PConstanted, PData, PLifted, PType, RecordOf } from "./type.ts";
 
-export class PSum<PFields extends PData>
-  implements PType<Constr<PConstanted<PFields>>, RecordOf<PLifted<PFields>>> {
+export class PSum<O extends Object> implements PType<Constr<Data>, O> {
   public population = 0; // because not implemented
 
   constructor(
-    public pconstrs: Array<PRecord<PFields>>,
+    public pconstrs: Array<PObject<O>>,
   ) {}
 
   public plift = (
-    c: Constr<PConstanted<PFields>>,
-  ): RecordOf<PLifted<PFields>> => {
+    c: Constr<DataOf<O>>,
+  ): O => {
     assert(c instanceof Constr, `plift: expected Constr`);
     assert(c.index < this.pconstrs.length, `plift: constr index out of bounds`);
     return this.pconstrs[Number(c.index)].plift(c.fields);
   };
 
   public pconstant = (
-    data: RecordOf<PLifted<PFields>>,
-  ): Constr<PConstanted<PFields>> => {
+    data: O,
+  ): Constr<Data> => {
     assert(data instanceof Object, `PSum.pconstant: expected Object`);
     assert(
       !(data instanceof Array),
@@ -36,10 +36,6 @@ export class PSum<PFields extends PData>
     );
     throw new Error(`pconstant: not implemented`); // TODO something about matching maybe
   };
-
-  public equals(data: PLifted<PSum<PData>>): string {
-    throw new Error(`show: not implemented`);
-  }
 
   public genData = (): RecordOf<PLifted<PFields>> => {
     return randomChoice(this.pconstrs).genData();

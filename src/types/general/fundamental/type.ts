@@ -8,47 +8,45 @@ T is the equivalent concrete type.
 */
 
 import { Constr, Data } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { PByteString, PConstr, PInteger, PObject } from "./mod.ts";
 
-export type RecordOf<T> = Record<string, T>;
-export type RecordOfMaybe<T> = RecordOf<T | undefined>;
-export type PData = PType<Data, unknown>;
-export type PConstanted<PT extends PData> = ReturnType<
-  PT["pconstant"]
->; //| PT extends PConstr<PT> ? Constr<PConstanted<PT>> : never;
-export type PLifted<PT extends PData> = ReturnType<
-  PT["plift"]
->;
+export type RecordOfMaybe<T> = Record<string, T | undefined>;
 
-export type DataOf<T> = T extends Data ? T
-  : T extends Array<infer E> ? Array<DataOf<E>>
-  : T extends Map<infer K, infer V> ? Map<DataOf<K>, DataOf<V>>
-  : T extends Constr<infer F> ? Array<DataOf<F>>
-  : T extends RecordOfMaybe<DataOf<T>> ? Array<DataOf<T[keyof T]>>
+// returns all the fields that conform to Lifted, also filters functions
+export type F<T> = {
+  [P in keyof T]: T[P] extends Lmm<Lifted> | undefined ? T[P] : never;
+};
+
+
+// export class ObjectOf<T> implements RecordOfMaybe<T>{
+// [x: string]: T|undefined;
+// }
+
+type L0 = bigint | string;
+export type Lpp<L extends Lifted> = L | Array<L> | Map<L, L> | RecordOfMaybe<unknown>
+// any type with an equivalent Data-type, determined by Constanted
+export type Lifted = Lpp<Lpp<L0>>; //Lpp<Lpp<Lpp<Lpp<Lpp<Lpp<L0>>>>>>;
+export type Lmm<LContainer extends Lifted> = LContainer extends Lpp<infer L> ? L
   : never;
 
-export type PTypeOf<T> = T extends bigint ? PInteger
-  : T extends string ? PByteString
-  // @ts-ignore TODO consider fixing this or leaving as is
-  : T extends Array<infer E> ? PList<PTypeOf<E>>
-  // @ts-ignore TODO consider fixing this or leaving as is
-  : T extends Map<infer K, infer V> ? PMap<PTypeOf<K>, PTypeOf<V>>
-  // @ts-ignore TODO consider fixing this or leaving as is
-  : T extends Constr<infer F> ? PConstr<PTypeOf<F>>
-  : T extends RecordOfMaybe<DataOf<unknown>> ? PObject<T>
-  : never; //PAny<DataOf<T>>;
+// the equivalent Data-type
+export type Constanted<L extends Lifted> = L extends bigint ? bigint
+  : L extends string ? string
+  : L extends Array<infer E extends Lifted> ? Array<Constanted<E>>
+  : L extends Map<infer K extends Lifted, infer V extends Lifted>
+    ? Map<Constanted<K>, Constanted<V>>
+  : L extends RecordOfMaybe<unknown> 
+    ? Array<Constanted<F<L>>>
+  : never;
 
-export interface PType<P extends Data, T> {
-  population: number; // number because convenient Infinity type
-  plift(data: P): T;
-  pconstant(data: T): P;
+export interface PType<L extends Lifted> {
+  readonly population: number; // number because convenient Infinity type
+  plift(data: Constanted<L>): L;
+  pconstant(data: L): Constanted<L>;
   // abstract genPType(gen: Generators, maxDepth: number, maxLength: number): PData; // static
-  genData(): T;
-  showData(data: T, tabs?: string): string;
+  genData(): L;
+  showData(data: L, tabs?: string): string;
   showPType(tabs?: string): string;
 }
-export type Constructor<T> = new (...args: unknown[]) => T;
-export const PTypes: RecordOfMaybe<PData> = {};
 
 export const f = "+  ";
 export const t = "   ";
