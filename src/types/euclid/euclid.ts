@@ -1,41 +1,21 @@
 import {
-  ActiveAssets,
-  Amount,
-  Amounts,
-  Asset,
-  CurrencySymbol,
-  Dirac,
   DiracDatum,
-  IdNFT,
-  JumpSizes,
-  Param,
   ParamDatum,
-  Prices,
-  PSum,
-  TokenName,
-  Value,
-} from "../mod.ts";
-
-export type EuclidData =
-  | Amount
-  | CurrencySymbol
-  | TokenName
-  | Asset
-  | IdNFT
-  | Value
-  | Prices
-  | Amounts
-  | JumpSizes
-  | ActiveAssets
-  | Dirac
-  | Param
-  | DiracDatum
-  | ParamDatum
-  | EuclidDatum;
-
-export type EuclidDatum = DiracDatum | ParamDatum;
-
-export const PEuclidDatum = new PSum([
   PDiracDatum,
   PParamDatum,
-]);
+  PSum,
+} from "../mod.ts";
+
+export type EuclidDatum = ParamDatum | DiracDatum;
+
+export class PEuclidDatum extends PSum<EuclidDatum> {
+  private constructor(
+    public pdiracDatum: PDiracDatum,
+    public pparamDatum: PParamDatum,
+  ) {
+    super([
+      pparamDatum,
+      pdiracDatum,
+    ]);
+  }
+}

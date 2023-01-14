@@ -91,58 +91,68 @@ ${tt})`;
 
   static genPType(): PSum<any> {
     //minSizedSubset also serves as shuffle
-    const objects = [Sum0, Sum1, Sum2, Sum3];
-    const len = genPositive(BigInt(objects.length));
-    const objects_ = minSizedSubset([Sum0, Sum1, Sum2, Sum3], len);
-    const pconstrs = objects_.map((O) =>
-      new PObject(
-        new PRecord({
-          s: PByteString.genPType(),
-          i: PInteger.genPType(),
-        }),
-        O,
-      )
-    );
-    return new PSum(pconstrs);
+    const pconstrs = [PConstr0, PConstr1, PConstr2, PConstr3];
+    const len = genPositive(BigInt(pconstrs.length));
+    const pconstrs_: Array<
+      PObject<Constr0> | PObject<Constr2> | PObject<Constr3>
+    > = minSizedSubset(pconstrs, len);
+
+    return new PSum<any>(pconstrs_);
   }
 }
 
-class Sum0 {
+class Constr0 {
   constructor(
     public s: string,
     public i: bigint,
   ) {}
-  public show = () => {
-    return `Sum0 (${this.s}, ${this.i})`;
-  };
 }
 
-class Sum1 {
+class Constr1 {
   constructor(
-    public s: string,
     public i: bigint,
+    public s: string,
   ) {}
-  public show = () => {
-    return `Sum1 (${this.s}, ${this.i})`;
-  };
 }
 
-class Sum2 {
+class Constr2 {
   constructor(
-    public s: string,
     public i: bigint,
   ) {}
-  public show = () => {
-    return `Sum2 (${this.s}, ${this.i})`;
-  };
 }
 
-class Sum3 {
+class Constr3 {
   constructor(
     public s: string,
-    public i: bigint,
   ) {}
-  public show = () => {
-    return `Sum3 (${this.s}, ${this.i})`;
-  };
 }
+
+const PConstr0 = new PObject(
+  new PRecord({
+    s: PByteString.genPType(),
+    i: PInteger.genPType(),
+  }),
+  Constr0,
+);
+
+const PConstr1 = new PObject(
+  new PRecord({
+    i: PInteger.genPType(),
+    s: PByteString.genPType(),
+  }),
+  Constr1,
+);
+
+const PConstr2 = new PObject(
+  new PRecord({
+    i: PInteger.genPType(),
+  }),
+  Constr2,
+);
+
+const PConstr3 = new PObject(
+  new PRecord({
+    s: PByteString.genPType(),
+  }),
+  Constr3,
+);
