@@ -21,6 +21,7 @@ import {
   PPrices,
   PRecord,
   proptestPTypes,
+  PSum,
 } from "../src/mod.ts";
 import { PAsset, PAssets } from "../src/types/general/derived/asset.ts";
 import { PBounded, PPositive } from "../src/types/general/derived/bounded.ts";
@@ -62,7 +63,7 @@ const fundamentalContainerGenerators = [
   // PMapRecord.genPType,
   PRecord.genPType,
   PObject.genPType,
-  // PSum.genPType,
+  PSum.genPType,
 ];
 
 const derivedPrimitiveGenerators = [
