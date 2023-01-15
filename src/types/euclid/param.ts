@@ -6,7 +6,6 @@ import {
   boundPositive,
   f,
   JumpSizes,
-  leq,
   lSubValues_,
   PByteString,
   PConstraint,
@@ -19,6 +18,9 @@ import {
 } from "../mod.ts";
 import { PJumpSizes } from "./jumpSizes.ts";
 import { PPaymentKeyHash } from "./owner.ts";
+
+// TODO a flag somewhere to deactivate it, so owner can start closing.
+// or can we just "break" it?
 
 export class Param {
   constructor(

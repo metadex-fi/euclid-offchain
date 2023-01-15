@@ -31,6 +31,9 @@ export class PositiveValue {
   public unit = (): Value => this.value.unit();
   public size = (): bigint => this.value.size();
   public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
+  public setAmountOf = (asset: Asset, amount: bigint): void =>
+    this.value.setAmountOf(asset, amount);
+  public clone = (): PositiveValue => new PositiveValue(this.value.clone());
   public addAmountOf = (asset: Asset, amount: bigint): PositiveValue => {
     return new PositiveValue(this.value.addAmountOf(asset, amount));
   };

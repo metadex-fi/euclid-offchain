@@ -1,6 +1,7 @@
 import {
   Generators,
   PActiveAssets,
+  PAllDiracs,
   PAmounts,
   PByteString,
   PConstraint,
@@ -90,6 +91,6 @@ const euclidPrimitiveGenerators = [
   PActiveAssets.genPType,
   PDirac.genPType,
   PDiracDatum.genPType,
-  // PAllDiracs.genPType,
+  PAllDiracs.genPType,
   // PEuclidDatum.genPType,
 ];
