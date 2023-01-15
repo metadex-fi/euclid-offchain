@@ -1,10 +1,7 @@
-import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { gMaxLength } from "../../mod.ts";
 import {
   ActiveAssets,
   Amounts,
   Dirac,
-  gMaxHashes,
   IdNFT,
   PActiveAssets,
   PAmounts,
@@ -98,13 +95,18 @@ const generateWith = (param: Param) => (): Dirac[] => {
     const jumpSize = param.jumpSizes.amountOf(asset);
     const tickSize = jumpSize / numTicks;
     if (tickSize > 0n) {
+      const minPrice = param.lowerPriceBounds.amountOf(asset);
       const maxPrice = param.upperPriceBounds.amountOf(asset);
       const basePrice = initialPrices.amountOf(asset);
       const diracs_ = new Array<Dirac>();
+      let down = -1n;
       diracs.forEach((dirac) => {
         for (let i = 1n; i < numTicks; i++) {
-          const tickPrice = basePrice + i * tickSize;
-          if (tickPrice > maxPrice) break;
+          let tickPrice = basePrice + i * tickSize;
+          if (tickPrice > maxPrice) {
+            tickPrice = basePrice + down-- * tickSize;
+            if (tickPrice < minPrice) break;
+          }
           const initialPrices = dirac.initialPrices.clone();
           initialPrices.setAmountOf(
             asset,
