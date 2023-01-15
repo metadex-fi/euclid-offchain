@@ -8,7 +8,6 @@ import {
   PAmounts,
   Param,
   PConstraint,
-  PDirac,
   PDiracDatum,
   PIdNFT,
   PList,
@@ -134,7 +133,7 @@ export const maxTicks = 5n; // per dimension
 const PTicks = new PPositive(minTicks, maxTicks);
 
 export class PAllDiracDatums extends PConstraint<PList<PDiracDatum>> {
-  constructor(
+  private constructor(
     public readonly param: Param,
   ) {
     super(
@@ -142,6 +141,10 @@ export class PAllDiracDatums extends PConstraint<PList<PDiracDatum>> {
       [PAllDiracDatums.assertWith(param)],
       PAllDiracDatums.generateWith(param),
     );
+  }
+
+  static fromParam(param: Param): PAllDiracDatums {
+    return new PAllDiracDatums(param);
   }
 
   static assertWith = (param: Param) => (diracDatums: DiracDatum[]) => {
@@ -155,4 +158,9 @@ export class PAllDiracDatums extends PConstraint<PList<PDiracDatum>> {
     const allDiracs = PAllDiracs.generateWith(param)();
     return allDiracs.map((dirac) => new DiracDatum(dirac));
   };
+
+  static genPType(): PConstraint<PList<PDiracDatum>> {
+    const param = Param.generate();
+    return new PAllDiracDatums(param);
+  }
 }
