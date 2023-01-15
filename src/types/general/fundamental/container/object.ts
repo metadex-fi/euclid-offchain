@@ -92,7 +92,7 @@ ${tt})`;
         // mlis: PMap.genPType(gen, maxDepth),
       },
     );
-    return new PObject(precord, ExampleClass as any);
+    return new PObject(precord, ExampleClass);
   }
 }
 

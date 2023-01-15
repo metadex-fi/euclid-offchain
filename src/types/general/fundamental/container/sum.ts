@@ -11,11 +11,10 @@ import {
 import { f, PType, t } from "../type.ts";
 import { PObject } from "./object.ts";
 
-export class PSum<O extends Object> implements PType<Constr<Data>, O> {
-  public readonly population; // because not implemented
-
+export class PSum<Os extends Object> implements PType<Constr<Data>, Os> {
+  public readonly population;
   constructor(
-    public readonly pconstrs: Array<PObject<O>>,
+    public readonly pconstrs: Array<Os extends Object ? PObject<Os> : never>,
   ) {
     assert(
       pconstrs.length > 0,
@@ -33,15 +32,15 @@ export class PSum<O extends Object> implements PType<Constr<Data>, O> {
 
   public plift = (
     c: Constr<Data>,
-  ): O => {
+  ): Os => {
     assert(c instanceof Constr, `plift: expected Constr`);
     assert(c.index < this.pconstrs.length, `plift: constr index out of bounds`);
-    return this.pconstrs[Number(c.index)].plift(c.fields);
+    return this.pconstrs[Number(c.index)].plift(c.fields) as Os;
   };
 
-  private matchData = (data: O): [number, PObject<O>] => {
+  private matchData = (data: Os): [number, PObject<Os>] => {
     assert(data instanceof Object, `PSum.matchData: expected Object`);
-    const matches = new Array<PObject<O>>();
+    const matches = new Array<PObject<Os>>();
     let index = -1;
     this.pconstrs.forEach((pconstr, i) => {
       if (data instanceof pconstr.O) {
@@ -59,17 +58,17 @@ export class PSum<O extends Object> implements PType<Constr<Data>, O> {
   };
 
   public pconstant = (
-    data: O,
+    data: Os,
   ): Constr<Data> => {
     const [index, match] = this.matchData(data);
     return new Constr(index, match.pconstant(data));
   };
 
-  public genData = (): O => {
-    return randomChoice(this.pconstrs).genData();
+  public genData = (): Os => {
+    return randomChoice(this.pconstrs).genData() as Os;
   };
 
-  public showData(data: O, tabs = ""): string {
+  public showData(data: Os, tabs = ""): string {
     const tt = tabs + t;
     const ttf = tt + f;
 
@@ -93,11 +92,9 @@ ${tt})`;
     //minSizedSubset also serves as shuffle
     const pconstrs = [PConstr0, PConstr1, PConstr2, PConstr3];
     const len = genPositive(BigInt(pconstrs.length));
-    const pconstrs_: Array<
-      PObject<Constr0> | PObject<Constr2> | PObject<Constr3>
-    > = minSizedSubset(pconstrs, len);
+    const pconstrs_ = minSizedSubset(pconstrs, len);
 
-    return new PSum<any>(pconstrs_);
+    return new PSum<Constr0 | Constr1 | Constr2 | Constr3>(pconstrs_);
   }
 }
 

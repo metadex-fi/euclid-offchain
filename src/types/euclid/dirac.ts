@@ -91,6 +91,10 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
     );
   }
 
+  static fromParam(param: Param): PDirac {
+    return new PDirac(param);
+  }
+
   static genPType(): PConstraint<PObject<Dirac>> {
     const param = Param.generate();
     return new PDirac(param);
@@ -99,12 +103,12 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
 
 export class DiracDatum {
   constructor(
-    public _0: Dirac,
+    public readonly _0: Dirac,
   ) {}
 }
 export class PDiracDatum extends PObject<DiracDatum> {
-  constructor(
-    public pdirac: PDirac,
+  private constructor(
+    public readonly pdirac: PDirac,
   ) {
     super(
       new PRecord({
@@ -112,6 +116,11 @@ export class PDiracDatum extends PObject<DiracDatum> {
       }),
       DiracDatum,
     );
+  }
+
+  static fromParam(param: Param): PDiracDatum {
+    const pdirac = PDirac.fromParam(param);
+    return new PDiracDatum(pdirac);
   }
 
   static genPType(): PObject<DiracDatum> {

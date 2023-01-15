@@ -1,5 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { maxInteger } from "../../mod.ts";
 import {
   addValues,
   Amount,
@@ -19,7 +20,7 @@ import {
 } from "../mod.ts";
 import { PJumpSizes } from "./jumpSizes.ts";
 import { PPaymentKeyHash } from "./owner.ts";
-import { PPrices, Prices } from "./prices.ts";
+import { maxJumps, PPrices, Prices } from "./prices.ts";
 
 export class Param {
   constructor(
@@ -35,7 +36,24 @@ export class Param {
     Param.assert(this);
   }
 
-  public concise(tabs = ""): string {
+  // the number of reachable price-locations
+  public numPrices = (): bigint => {
+    const maxJumpsUp = maxJumps(
+      this.initialPrices,
+      this.jumpSizes,
+      this.upperPriceBounds,
+      maxInteger,
+    );
+    const maxJumpsDown = maxJumps(
+      this.initialPrices,
+      this.jumpSizes,
+      this.lowerPriceBounds,
+      maxInteger,
+    );
+    return addValues(maxJumpsUp, maxJumpsDown).sumAmounts();
+  };
+
+  public concise = (tabs = ""): string => {
     const tt = tabs + t;
     const ttf = tt + f;
     return `Param(
@@ -46,7 +64,7 @@ ${ttf}lowerPriceBounds: ${this.lowerPriceBounds.concise()},
 ${ttf}upperPriceBounds: ${this.upperPriceBounds.concise()}, 
 ${ttf}baseAmountA0: ${this.baseAmountA0}
 ${tt})`;
-  }
+  };
 
   static assert(param: Param): void {
     const assets = param.jumpSizes.assets();
@@ -123,19 +141,20 @@ export class PParam extends PConstraint<PObject<Param>> {
     );
   }
 
+  static ptype = new PParam();
   static genPType(): PConstraint<PObject<Param>> {
-    return new PParam();
+    return PParam.ptype;
   }
 }
 
 export class ParamDatum {
   constructor(
-    public _0: Param,
+    public readonly _0: Param,
   ) {}
 }
 export class PParamDatum extends PObject<ParamDatum> {
   private constructor(
-    public pparam: PParam,
+    public readonly pparam: PParam,
   ) {
     super(
       new PRecord({
@@ -145,8 +164,8 @@ export class PParamDatum extends PObject<ParamDatum> {
     );
   }
 
+  static ptype = new PParamDatum(PParam.ptype);
   static genPType(): PObject<ParamDatum> {
-    const pparam = PParam.genPType() as PParam;
-    return new PParamDatum(pparam);
+    return PParamDatum.ptype;
   }
 }

@@ -123,12 +123,7 @@ param: ${param.concise()}`,
       param.lowerPriceBounds,
     );
 
-    const jumpAllAssets = newUnionWith(
-      jumpSingleAsset,
-      undefined,
-      0n,
-      0n,
-    );
+    const jumpAllAssets = newUnionWith(jumpSingleAsset);
     const jumped = jumpAllAssets(
       maxJumpsUp,
       maxJumpsDown,
@@ -170,10 +165,11 @@ export class PPrices extends PConstraint<PObject<Prices>> {
   }
 }
 
-const maxJumps = (
+export const maxJumps = (
   initialPrices: Prices,
   jumpSizes: JumpSizes,
   bounds: PositiveValue,
+  maxJumps = gMaxJumps,
 ): Value => {
   // jump the price of each asset from initial price,
   // a random number of times,
@@ -185,13 +181,10 @@ const maxJumps = (
     boundary: bigint,
   ): bigint =>
     jumpSize === 0n ? 0n : min(
-      gMaxJumps,
+      maxJumps,
       abs(initialPrice - boundary) / jumpSize,
     );
-  const maxAllAssets = newUnionWith(
-    maxSingleAsset,
-    0n,
-  );
+  const maxAllAssets = newUnionWith(maxSingleAsset);
   return maxAllAssets(
     initialPrices.unsigned(),
     jumpSizes.unsigned(),
