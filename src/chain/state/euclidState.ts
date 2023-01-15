@@ -6,9 +6,8 @@ import {
   Lucid,
   UTxO,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { Dirac, Param } from "../../mod.ts";
+import { Dirac, IdNFT, PAllDiracs, Param, PParamDatum } from "../../mod.ts";
 import { DiracUtxo } from "./diracUtxo.ts";
-import { ParamUtxo } from "./paramUtxo.ts";
 
 export class EuclidState {
   public valid = new Map<Param, Dirac[]>();
@@ -32,9 +31,10 @@ export class EuclidState {
         assert(datum instanceof Constr, `datum must be a Constr`);
         switch (datum.index) {
           case 0: {
-            const [paramNFT, paramUtxo] = ParamUtxo.parse(datum.fields);
+            const param = PParamDatum.ptype.plift(datum.fields)._0;
+            const paramNFT = IdNFT.newParamNFT(param.owner).show();
             assert(!params.has(paramNFT), `duplicate idNFT: ${paramNFT}`);
-            params.set(paramNFT, paramUtxo);
+            params.set(paramNFT, param);
             break;
           }
           case 1: {
@@ -60,6 +60,10 @@ export class EuclidState {
       try {
         const param = params.get(paramNFT);
         assert(param, `missing paramUtxo for ${paramNFT}`);
+        assert(!this.valid.has(param), `duplicate param: ${param}`);
+
+        const pallDiracs = PAllDiracs.fromParam(param);
+
         for (const diracUtxo of diracUtxos_) {
           try {
             const diracs = this.valid.get(param) ?? [];
