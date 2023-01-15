@@ -21,16 +21,18 @@ export class Dirac {
     public owner: PaymentKeyHash,
     public threadNFT: Asset,
     public paramNFT: Asset,
-    public prices: Prices,
+    public initialPrices: Prices,
+    public currentPrices: Prices,
     public activeAmnts: Amounts,
     public jumpStorage: ActiveAssets,
   ) {}
 
   // TODO consider fees here
   static assertWith = (param: Param) => (dirac: Dirac): void => {
-    Prices.assertWith(param)(dirac.prices);
+    Prices.assertCurrent(param, dirac.initialPrices)(dirac.currentPrices);
+    ActiveAssets.assertWith(dirac.initialPrices)(dirac.jumpStorage);
 
-    const prices_ = dirac.prices.unsigned();
+    const prices_ = dirac.currentPrices.unsigned();
     const worth = newUnionWith(
       (amnt: bigint, price: bigint) => price * amnt,
       0n,
@@ -47,7 +49,7 @@ export class Dirac {
       `expected ${lower} <= ${total} <= ${upper} with
 baseAmountA0: ${param.baseAmountA0},
 baseAsset: ${prices_.firstAsset().show()},
-prices: ${dirac.prices.concise()},
+currentPrices: ${dirac.currentPrices.concise()},
 activeAmnts: ${dirac.activeAmnts.concise()}`,
     );
   };
@@ -56,15 +58,19 @@ activeAmnts: ${dirac.activeAmnts.concise()}`,
     const owner = param.owner;
     const threadNFT = PIdNFT.newPThreadNFT(owner).genData();
     const paramNFT = PIdNFT.newPParamNFT(owner).genData();
-    const prices = Prices.generateWith(param)();
-    const activeAmnts = Amounts.generateWith(param, prices)();
-    const jumpStorage = ActiveAssets.generateWith(param)();
+
+    const initialPrices = Prices.generateInitial(param)();
+    const currentPrices = Prices.generateCurrent(param, initialPrices)();
+
+    const activeAmnts = Amounts.generateWith(param, currentPrices)();
+    const jumpStorage = ActiveAssets.generateWith(param, initialPrices)();
 
     return new Dirac(
       owner,
       threadNFT,
       paramNFT,
-      prices,
+      initialPrices,
+      currentPrices,
       activeAmnts,
       jumpStorage,
     );
@@ -80,7 +86,8 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
           "owner": POwner.pliteral(param.owner),
           "threadNFT": PIdNFT.newPThreadNFT(param.owner),
           "paramNFT": PIdNFT.newPParamNFT(param.owner),
-          "prices": new PPrices(param),
+          "initialPrices": PPrices.initial(param),
+          "currentPrices": PPrices.initial(param),
           "activeAmnts": PAmounts.ptype,
           "jumpStorage": new PActiveAssets(param),
         }),

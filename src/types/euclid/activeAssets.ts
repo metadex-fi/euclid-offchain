@@ -24,62 +24,59 @@ export class ActiveAssets {
     this.activeAssets.forEach(callbackfn);
   }
 
-  static assertWith = (param: Param) => (activeAssets: ActiveAssets): void => {
-    activeAssets.forEach((asset, location) => {
-      const defaultAsset = defaultActiveAsset(
-        param.initialPrices.unsigned(),
-        location.unsigned(),
-      );
-      assert(
-        asset !== defaultAsset,
-        `default asset ${defaultAsset} should not be stored at location ${location}`,
-      );
-    });
-  };
+  static assertWith =
+    (initialPrices: Prices) => (activeAssets: ActiveAssets): void => {
+      activeAssets.forEach((asset, location) => {
+        const defaultAsset = defaultActiveAsset(
+          initialPrices.unsigned(),
+          location.unsigned(),
+        );
+        assert(
+          asset !== defaultAsset,
+          `default asset ${defaultAsset} should not be stored at location ${location}`,
+        );
+      });
+    };
 
   // TODO this might lead to some paradoxes, let's see, we might learn something
-  static generateWith = (param: Param) => (): ActiveAssets => {
-    const assets = param.initialPrices.assets();
-    const activeAssets = new Map<Prices, Asset>();
-    const pprices = new PPrices(param);
-    const locations: Prices[] = PMap.genKeys(pprices);
-    for (const location of locations) {
-      assert(
-        location.assets().equals(assets),
-        `location ${location} should have assets ${assets}`,
-      );
-      const defaultAsset = defaultActiveAsset(
-        param.initialPrices.unsigned(),
-        location.unsigned(),
-      );
-      const asset = assets.randomChoice();
-      if (asset !== defaultAsset) {
-        activeAssets.set(location, asset);
+  static generateWith =
+    (param: Param, initialPrices: Prices) => (): ActiveAssets => {
+      const assets = initialPrices.assets();
+      const activeAssets = new Map<Prices, Asset>();
+      const pprices = PPrices.current(param, initialPrices);
+      const locations: Prices[] = PMap.genKeys(pprices);
+      for (const location of locations) {
+        assert(
+          location.assets().equals(assets),
+          `location ${location} should have assets ${assets}`,
+        );
+        const defaultAsset = defaultActiveAsset(
+          initialPrices.unsigned(),
+          location.unsigned(),
+        );
+        const asset = assets.randomChoice();
+        if (asset !== defaultAsset) {
+          activeAssets.set(location, asset);
+        }
       }
-    }
-    return new ActiveAssets(activeAssets);
-  };
+      return new ActiveAssets(activeAssets);
+    };
 }
 
-export class PActiveAssets extends PConstraint<PObject<ActiveAssets>> {
+export class PActiveAssets extends PObject<ActiveAssets> {
   constructor(
     public readonly param: Param,
   ) {
     super(
-      new PObject(
-        new PRecord({
-          "activeAssets": new PMap(new PPrices(param), PAsset.ptype),
-        }),
-        ActiveAssets,
-      ),
-      [ActiveAssets.assertWith(param)],
-      ActiveAssets.generateWith(param),
+      new PRecord({
+        "activeAssets": new PMap(PPrices.initial(param), PAsset.ptype), // TODO could constain PAsset more here, but that's nonessential
+      }),
+      ActiveAssets,
     );
   }
 
-  static genPType(): PConstraint<PObject<ActiveAssets>> {
-    const param = Param.generate();
-    return new PActiveAssets(param);
+  static genPType(): PObject<ActiveAssets> {
+    return new PActiveAssets(Param.generate());
   }
 }
 

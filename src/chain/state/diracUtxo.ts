@@ -16,6 +16,8 @@ export class DiracUtxo {
   public parseWith = (param: Param): Dirac => {
     const pdiracDatum = PDiracDatum.fromParam(param);
     const dirac = pdiracDatum.plift(this.fields)._0;
-    // number of reachable prices * baseAmountA0 = total value of amounts. Do we check this? where?
+    // number of reachable prices * baseAmountA0 <= total value of amounts. 
+    // TODO Do we check this? where?
+    const 
   };
 }
