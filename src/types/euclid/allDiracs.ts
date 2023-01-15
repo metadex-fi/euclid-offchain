@@ -8,6 +8,8 @@ import {
   PAmounts,
   Param,
   PConstraint,
+  PDirac,
+  PDiracDatum,
   PIdNFT,
   PList,
   PObject,
@@ -39,7 +41,7 @@ export class PAllDiracs extends PConstraint<PList<PObject<Dirac>>> {
     );
     super(
       pinner,
-      [assertDiracsWith(param), assertCountWith(param)],
+      [assertDiracsWith(param)], //, assertCountWith(param)],
       PAllDiracs.generateWith(param),
     );
   }
@@ -122,6 +124,7 @@ const assertDiracsWith = (param: Param) => (diracs: Dirac[]) => {
 
 // NOTE: This might fail if owner starts closing;
 // which sounds correct for users and wrong for owner.
+// NOTE: This could be a parameter for PList
 const assertCountWith = (param: Param) => (diracs: Dirac[]) => {
   // assert(diracs.length === TODO);
 };
@@ -130,26 +133,12 @@ export const minTicks = 1n; // per dimension
 export const maxTicks = 5n; // per dimension
 const PTicks = new PPositive(minTicks, maxTicks);
 
-export class PAllDiracDatums extends PConstraint<PList<PObject<DiracDatum>>> {
+export class PAllDiracDatums extends PConstraint<PList<PDiracDatum>> {
   constructor(
     public readonly param: Param,
   ) {
-    const pinner = new PList(
-      new PObject(
-        new PRecord({
-          "owner": POwner.pliteral(param.owner),
-          "threadNFT": PIdNFT.newPThreadNFT(param.owner),
-          "paramNFT": PIdNFT.newPParamNFT(param.owner),
-          "initialPrices": PPrices.initial(param),
-          "currentPrices": PPrices.initial(param),
-          "activeAmnts": PAmounts.ptype,
-          "jumpStorage": new PActiveAssets(param),
-        }),
-        DiracDatum,
-      ),
-    );
     super(
-      pinner,
+      new PList(PDiracDatum.fromParam(param)),
       [PAllDiracDatums.assertWith(param)],
       PAllDiracDatums.generateWith(param),
     );
