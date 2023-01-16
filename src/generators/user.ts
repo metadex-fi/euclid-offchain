@@ -10,6 +10,8 @@ import { EuclidState } from "../chain/euclidState.ts";
 import { DiracUtxo, ParamUtxo } from "../chain/euclidUtxo.ts";
 import { Dirac, PAllDiracDatums, Param, ParamDatum, PParamDatum, randomChoice } from "../mod.ts";
 
+
+
 const euclidAddress = "TODO";
 
 export class User {

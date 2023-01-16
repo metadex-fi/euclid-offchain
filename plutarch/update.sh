@@ -3,11 +3,11 @@
 curl -X POST \
      -d '[]' \
      -H 'Content-Type: application/json' \
-     localhost:3939/query-script/diracValidator \
- | jq > diracValidator.json
+     localhost:3939/query-script/euclidValidator \
+ | jq > euclidValidator.json
 
 curl -X POST \
     -d '[]' \
     -H 'Content-Type: application/json' \
-    localhost:3939/query-script/diracMinting \
-| jq > diracMinting.json
+    localhost:3939/query-script/euclidMinting \
+| jq > euclidMinting.json
