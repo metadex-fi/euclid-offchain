@@ -8,22 +8,27 @@ import {
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { EuclidState } from "../chain/euclidState.ts";
 import { DiracUtxo, ParamUtxo } from "../chain/euclidUtxo.ts";
-import { Dirac, PAllDiracDatums, Param, ParamDatum, PParamDatum, randomChoice } from "../mod.ts";
-
-
-
-const euclidAddress = "TODO";
+import {
+  PAllDiracDatums,
+  Param,
+  ParamDatum,
+  PParamDatum,
+  randomChoice,
+} from "../mod.ts";
+import { Contract } from "./contract.ts";
 
 export class User {
   public assets: Assets = {};
   public state: EuclidState;
   public own = new Map<ParamUtxo, DiracUtxo[]>();
+  public readonly contract: Contract;
 
   constructor(
     public lucid: Lucid,
     public address: Address,
   ) {
-    this.state = new EuclidState(this.lucid, euclidAddress);
+    this.contract = new Contract(lucid);
+    this.state = new EuclidState(this.lucid, this.contract.address);
   }
 
   public update = async (): Promise<void> => {
@@ -44,24 +49,25 @@ export class User {
   };
 
   public genOpenTx = (): Tx => {
-    const param = Param.generate()
+    const param = Param.generate();
     const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(param));
-    const pdiracDatums = PAllDiracDatums.fromParam(param)
+    const pdiracDatums = PAllDiracDatums.fromParam(param);
     const diracDatums = pdiracDatums.pconstant(pdiracDatums.genData());
 
     // TODO mint & add NFTs
     // TODO funds
-    
+
     let tx = this.lucid.newTx()
-      .payToContract(euclidAddress,
-        { inline: Data.to(paramDatum),
-          scriptRef: euclidScript }, // for now, for simplicities' sake
-        {})
+      .payToContract(
+        this.contract.address,
+        { inline: Data.to(paramDatum), scriptRef: this.contract.validator }, // for now, for simplicities' sake
+        {},
+      );
 
     diracDatums.forEach((diracDatum) => {
-      tx = tx.payToContract(euclidAddress,
-        { inline: Data.to(diracDatum) },
-        {});
+      tx = tx.payToContract(this.contract.address, {
+        inline: Data.to(diracDatum),
+      }, {});
     });
 
     return tx;
@@ -81,7 +87,7 @@ export class User {
 
   public genOwnerTx = (): Tx => {
     const param = randomChoice(Array.from(this.own.keys()));
-    const diracs = this.own.get(param) ?? []
+    const diracs = this.own.get(param) ?? [];
     return randomChoice([
       this.genCloseTx,
       this.genAdminTx,
@@ -96,14 +102,14 @@ export class User {
   };
 
   public genEuclidTx = async (): Promise<TxComplete> => {
-    await Promise.all([this.update(), this.state.update()])
-    this.own = this.state.get(this.address)
+    await Promise.all([this.update(), this.state.update()]);
+    this.own = this.state.get(this.address);
 
     const genTx = randomChoice([
-        ...this.canOpen() ? [this.genOpenTx] : [],
-        ...this.isOwner() ? [this.genOwnerTx] : [],
-        this.genUserTx,
-      ])
+      ...this.canOpen() ? [this.genOpenTx] : [],
+      ...this.isOwner() ? [this.genOwnerTx] : [],
+      this.genUserTx,
+    ]);
 
     return await genTx().complete();
   };

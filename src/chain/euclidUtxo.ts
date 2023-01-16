@@ -1,5 +1,5 @@
 import { Data, UTxO } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { Param,Dirac,PDiracDatum, PParamDatum, IdNFT } from "../mod.ts";
+import { Dirac, IdNFT, Param, PDiracDatum, PParamDatum } from "../mod.ts";
 
 export class ParamUtxo {
   public readonly param: Param;
@@ -28,6 +28,6 @@ export class DiracUtxo {
     this.dirac = pdiracDatum.plift(this.fields)._0;
     // number of reachable prices * baseAmountA0 <= total value of amounts.
     // TODO Do we check this? where?
-    return this
+    return this;
   };
 }

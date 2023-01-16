@@ -18,21 +18,23 @@ export class EuclidState {
   }
 
   public get = (address: Address): Map<ParamUtxo, DiracUtxo[]> => {
-    const valid = new Map<ParamUtxo, DiracUtxo[]>()
+    const valid = new Map<ParamUtxo, DiracUtxo[]>();
     for (const [param, diracs] of this.valid) {
       if (param.param.owner === address) {
-        valid.set(param, diracs)
+        valid.set(param, diracs);
       }
     }
     return valid;
-  }
+  };
 
   public update = async (): Promise<void> => {
     const utxos = await this.lucid.utxosAt(this.address);
     [this.valid, this.invalid] = EuclidState.parse(utxos);
-  }
+  };
 
-  static parse (utxos: UTxO[]): [Map<ParamUtxo, DiracUtxo[]>, Map<string, UTxO[]>] {
+  static parse(
+    utxos: UTxO[],
+  ): [Map<ParamUtxo, DiracUtxo[]>, Map<string, UTxO[]>] {
     const valid = new Map<ParamUtxo, DiracUtxo[]>();
     const invalid = new Map<string, UTxO[]>();
     const params = new Map<string, ParamUtxo>();
@@ -46,7 +48,10 @@ export class EuclidState {
         switch (datum.index) {
           case 0: {
             const paramUtxo = new ParamUtxo(utxo, datum.fields);
-            assert(!params.has(paramUtxo.paramNFT), `duplicate idNFT: ${paramUtxo.paramNFT}`);
+            assert(
+              !params.has(paramUtxo.paramNFT),
+              `duplicate idNFT: ${paramUtxo.paramNFT}`,
+            );
             params.set(paramUtxo.paramNFT, paramUtxo);
             break;
           }

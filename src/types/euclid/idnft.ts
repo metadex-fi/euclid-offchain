@@ -5,14 +5,15 @@ import {
   sha256,
   toHex,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { genPositive, gMaxLength, maxTicks, maybeNdef } from "../../mod.ts";
 import {
-  contractCurrency,
-  genPositive,
-  gMaxLength,
-  maxTicks,
-  maybeNdef,
-} from "../../mod.ts";
-import { Asset, f, PAsset, PConstraint, POwner } from "../mod.ts";
+  Asset,
+  CurrencySymbol,
+  f,
+  PAsset,
+  PConstraint,
+  POwner,
+} from "../mod.ts";
 
 // export const maxTicks = 5n; // per dimension
 // TODO prod: derive this from observed number of diracs in pool
@@ -20,8 +21,9 @@ export const gMaxHashes = 1n + maxTicks ** gMaxLength; // TODO why is this wrong
 
 export class IdNFT {
   constructor(
-    private owner: PaymentKeyHash,
-    private hashes = 0n,
+    private readonly owner: PaymentKeyHash,
+    private readonly hashes = 0n,
+    private readonly contractCurrency = "cc",
   ) {
     assert(
       hashes <= gMaxHashes,
@@ -42,7 +44,7 @@ export class IdNFT {
     for (let i = 0; i < this.hashes; i++) {
       tokenName = nextHash(tokenName);
     }
-    return new Asset(contractCurrency, tokenName);
+    return new Asset(this.contractCurrency, tokenName);
   };
 
   public show = (): string => {
@@ -66,7 +68,8 @@ function nextHash(hash: string): string {
 export class PIdNFT extends PConstraint<PAsset> {
   private constructor(
     public owner: PaymentKeyHash,
-    public maxHashes?: bigint, // undefined means Param-NFT, so exactly 0 hashes; if set,
+    public maxHashes?: bigint,
+    public contractCurrency = "cc", // undefined means Param-NFT, so exactly 0 hashes; if set,
   ) { //                          we are saying that it's a thread-NFT, so at least 1 hashes
     if (maxHashes) {
       assert(
@@ -77,7 +80,10 @@ export class PIdNFT extends PConstraint<PAsset> {
     }
     super(
       PAsset.ptype,
-      [assertContractCurrency, newAssertOwnersToken(owner, maxHashes)],
+      [
+        newAssertContractCurrency(contractCurrency),
+        newAssertOwnersToken(owner, maxHashes),
+      ],
       newGenIdNFT(owner, maxHashes),
       `PIdNFT(${owner}, ${maxHashes})`,
     );
@@ -107,12 +113,13 @@ export class PIdNFT extends PConstraint<PAsset> {
   }
 }
 
-function assertContractCurrency(a: Asset) {
-  assert(
-    a.currencySymbol === contractCurrency,
-    `currencySymbol: ${a.currencySymbol} of ${a.show()} is not contractCurrency: ${contractCurrency}`,
-  );
-}
+const newAssertContractCurrency =
+  (contractCurrency: CurrencySymbol) => (a: Asset) => {
+    assert(
+      a.currencySymbol === contractCurrency,
+      `currencySymbol: ${a.currencySymbol} of ${a.show()} is not contractCurrency: ${contractCurrency}`,
+    );
+  };
 
 const newAssertOwnersToken =
   (owner: PaymentKeyHash, maxHashes = 0n) => (a: Asset): void => {

@@ -4,11 +4,7 @@ import {
   Emulator,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { Assets, PPaymentKeyHash } from "../mod.ts";
-import {
-  genNonNegative,
-  genPositive,
-  gMaxLength,
-} from "./generators.ts";
+import { genNonNegative, genPositive, gMaxLength } from "./generators.ts";
 
 export function genEmulator(): Emulator {
   const accounts: { address: Address; assets: Value }[] = [];
@@ -37,7 +33,7 @@ export function genEmulator(): Emulator {
   const anyKeyHashes: Address[] = [];
 
   while (anyKeyHashes.length < numAny) {
-    const keyHash = PPaymentKeyHash.genData()
+    const keyHash = PPaymentKeyHash.genData();
     if (!anyKeyHashes.includes(keyHash)) {
       anyKeyHashes.push(keyHash);
       const assets: Value = {};

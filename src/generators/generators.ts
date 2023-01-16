@@ -8,7 +8,6 @@ export const gMaxStringBytes = 2n; // TODO higher
 export const gMaxLength = 3n;
 export const gMaxDepth = 4n;
 const dropChance = 0.5;
-export const contractCurrency = "cc"; // TODO replace with actual
 
 export class Generators {
   constructor(
