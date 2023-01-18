@@ -3,15 +3,20 @@ import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
   Amounts,
   Asset,
+  gMaxHashes,
   newUnionWith,
   PAmounts,
   Param,
+  ParamNFT,
   PConstraint,
-  PIdNFT,
+  placeholderCcy,
   PObject,
+  PParamNFT,
   PPrices,
   PRecord,
   Prices,
+  PThreadNFT,
+  ThreadNFT,
 } from "../mod.ts";
 import { ActiveAssets, PActiveAssets } from "./activeAssets.ts";
 import { POwner } from "./owner.ts";
@@ -56,8 +61,16 @@ activeAmnts: ${dirac.activeAmnts.concise()}`,
 
   static generateWith = (param: Param) => (): Dirac => {
     const owner = param.owner;
-    const threadNFT = PIdNFT.newPThreadNFT(owner).genData();
-    const paramNFT = PIdNFT.newPParamNFT(owner).genData();
+
+    const paramNFT = ParamNFT.generateWith(
+      placeholderCcy,
+      param.owner,
+      gMaxHashes,
+    );
+    const threadNFT = ThreadNFT.generateWith(
+      paramNFT,
+      param.boundedMaxDiracs(),
+    );
 
     const initialPrices = Prices.generateInitial(param)();
     const currentPrices = Prices.generateCurrent(param, initialPrices)();
@@ -67,8 +80,8 @@ activeAmnts: ${dirac.activeAmnts.concise()}`,
 
     return new Dirac(
       owner,
-      threadNFT,
-      paramNFT,
+      threadNFT.asset,
+      paramNFT.asset,
       initialPrices,
       currentPrices,
       activeAmnts,
@@ -84,8 +97,16 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
       new PObject(
         new PRecord({
           "owner": POwner.pliteral(param.owner),
-          "threadNFT": PIdNFT.newPThreadNFT(param.owner),
-          "paramNFT": PIdNFT.newPParamNFT(param.owner),
+          "threadNFT": new PThreadNFT(
+            placeholderCcy,
+            param.owner,
+            gMaxHashes + param.boundedMaxDiracs(),
+          ),
+          "paramNFT": new PParamNFT(
+            placeholderCcy,
+            param.owner,
+            gMaxHashes,
+          ),
           "initialPrices": PPrices.initial(param),
           "currentPrices": PPrices.initial(param),
           "activeAmnts": PAmounts.ptype,

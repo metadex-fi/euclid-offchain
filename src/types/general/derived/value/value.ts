@@ -441,7 +441,7 @@ export const newUnionWith = (
   };
 };
 
-export const addValues = newUnionWith((a, b) => a + b);
+export const addValues = newUnionWith((a, b) => a + b, undefined, 0n);
 export const lSubValues = newUnionWith((a, b) => a > b ? a - b : 0n, 0n);
 export const lSubValues_ = newUnionWith(
   (a, b) => a > b ? a - b : 0n,

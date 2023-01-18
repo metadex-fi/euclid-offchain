@@ -9,7 +9,6 @@ import {
   PDirac,
   PDiracDatum,
   PEnum,
-  PIdNFT,
   PInteger,
   PJumpSizes,
   PList,
@@ -20,10 +19,12 @@ import {
   POwner,
   PParam,
   PParamDatum,
+  PParamNFT,
   PPrices,
   PRecord,
   proptestPTypes,
   PSum,
+  PThreadNFT,
 } from "../src/mod.ts";
 import { PAsset, PAssets } from "../src/types/general/derived/asset.ts";
 import { PBounded, PPositive } from "../src/types/general/derived/bounded.ts";
@@ -83,7 +84,8 @@ const derivedContainerGenerators = [
 
 const euclidPrimitiveGenerators = [
   POwner.genPType,
-  PIdNFT.genPType,
+  PParamNFT.genPType,
+  PThreadNFT.genPType,
   PJumpSizes.genPType,
   PPrices.genPType,
   PParam.genPType,
@@ -92,7 +94,7 @@ const euclidPrimitiveGenerators = [
   PActiveAssets.genPType,
   PDirac.genPType,
   PDiracDatum.genPType,
-  PAllDiracs.genPType,
-  PAllDiracDatums.genPType,
+  // PAllDiracs.genPType,
+  // PAllDiracDatums.genPType,
   // PEuclidDatum.genPType,
 ];

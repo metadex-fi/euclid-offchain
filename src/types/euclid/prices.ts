@@ -215,7 +215,8 @@ export const maxJumps = (
     jumpSize: bigint,
     boundary: bigint,
   ): bigint =>
-    jumpSize === 0n ? 0n : min(
+    // jumpSize === 0n ? 0n :
+    min(
       maxJumps,
       abs(initialPrice - boundary) / jumpSize,
     );

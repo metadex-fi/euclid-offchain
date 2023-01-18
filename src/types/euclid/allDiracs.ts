@@ -3,33 +3,45 @@ import {
   Amounts,
   Dirac,
   DiracDatum,
-  IdNFT,
+  gMaxHashes,
   PActiveAssets,
   PAmounts,
   Param,
+  ParamNFT,
   PConstraint,
   PDiracDatum,
-  PIdNFT,
+  placeholderCcy,
   PList,
   PObject,
   POwner,
   PParam,
+  PParamNFT,
   PPositive,
   PPrices,
   PRecord,
   Prices,
+  PThreadNFT,
 } from "../mod.ts";
 
 export class PAllDiracs extends PConstraint<PList<PObject<Dirac>>> {
   private constructor(
     public param: Param,
+    public paramNFT: ParamNFT,
   ) {
     const pinner = new PList(
       new PObject(
         new PRecord({
           "owner": POwner.pliteral(param.owner),
-          "threadNFT": PIdNFT.newPThreadNFT(param.owner),
-          "paramNFT": PIdNFT.newPParamNFT(param.owner),
+          "threadNFT": new PThreadNFT(
+            placeholderCcy,
+            param.owner,
+            gMaxHashes + param.boundedMaxDiracs(),
+          ),
+          "paramNFT": new PParamNFT(
+            placeholderCcy,
+            param.owner,
+            gMaxHashes,
+          ),
           "initialPrices": PPrices.initial(param),
           "currentPrices": PPrices.initial(param),
           "activeAmnts": PAmounts.ptype,
@@ -41,23 +53,27 @@ export class PAllDiracs extends PConstraint<PList<PObject<Dirac>>> {
     super(
       pinner,
       [assertDiracsWith(param)], //, assertCountWith(param)],
-      PAllDiracs.generateWith(param),
+      PAllDiracs.generateWith(param, paramNFT),
     );
   }
 
-  static fromParam(param: Param): PAllDiracs {
-    return new PAllDiracs(param);
+  static fromParam(param: Param, paramNFT: ParamNFT): PAllDiracs {
+    return new PAllDiracs(param, paramNFT);
   }
 
   static genPType(): PConstraint<PList<PObject<Dirac>>> {
     const param = PParam.genPType().genData();
-    return new PAllDiracs(param);
+    const paramNFT = ParamNFT.generateWith(
+      placeholderCcy,
+      param.owner,
+      gMaxHashes,
+    );
+    return new PAllDiracs(param, paramNFT);
   }
 
-  static generateWith = (param: Param) => (): Dirac[] => {
+  static generateWith = (param: Param, paramNFT: ParamNFT) => (): Dirac[] => {
     const initialPrices = Prices.generateInitial(param)();
     const assets = initialPrices.assets();
-    const paramNFT = new IdNFT(param.owner);
     const numTicks = PTicks.genData();
 
     let threadNFT = paramNFT.next();
@@ -65,8 +81,8 @@ export class PAllDiracs extends PConstraint<PList<PObject<Dirac>>> {
       const currentPrices = Prices.generateCurrent(param, initialPrices)();
       return new Dirac(
         param.owner,
-        threadNFT.asset(),
-        paramNFT.asset(),
+        threadNFT.asset,
+        paramNFT.asset,
         initialPrices,
         currentPrices,
         Amounts.generateWith(param, currentPrices)(),
@@ -124,9 +140,9 @@ const assertDiracsWith = (param: Param) => (diracs: Dirac[]) => {
 // NOTE: This might fail if owner starts closing;
 // which sounds correct for users and wrong for owner.
 // NOTE: This could be a parameter for PList
-const assertCountWith = (param: Param) => (diracs: Dirac[]) => {
-  // assert(diracs.length === TODO);
-};
+// const assertCountWith = (param: Param) => (diracs: Dirac[]) => {
+//   // assert(diracs.length === TODO);
+// };
 
 export const minTicks = 1n; // per dimension
 export const maxTicks = 5n; // per dimension
@@ -135,32 +151,40 @@ const PTicks = new PPositive(minTicks, maxTicks);
 export class PAllDiracDatums extends PConstraint<PList<PDiracDatum>> {
   private constructor(
     public readonly param: Param,
+    public readonly paramNFT: ParamNFT,
   ) {
     super(
       new PList(PDiracDatum.fromParam(param)),
-      [PAllDiracDatums.assertWith(param)],
-      PAllDiracDatums.generateWith(param),
+      [PAllDiracDatums.assertWith(param, paramNFT)],
+      PAllDiracDatums.generateWith(param, paramNFT),
     );
   }
 
-  static fromParam(param: Param): PAllDiracDatums {
-    return new PAllDiracDatums(param);
+  static fromParam(param: Param, paramNFT: ParamNFT): PAllDiracDatums {
+    return new PAllDiracDatums(param, paramNFT);
   }
 
-  static assertWith = (param: Param) => (diracDatums: DiracDatum[]) => {
-    const diracs = diracDatums.map((diracDatum) => diracDatum._0);
-    PAllDiracs.fromParam(param).asserts.forEach((assert) => {
-      assert(diracs);
-    });
-  };
+  static assertWith =
+    (param: Param, paramNFT: ParamNFT) => (diracDatums: DiracDatum[]) => {
+      const diracs = diracDatums.map((diracDatum) => diracDatum._0);
+      PAllDiracs.fromParam(param, paramNFT).asserts.forEach((assert) => {
+        assert(diracs);
+      });
+    };
 
-  static generateWith = (param: Param) => (): DiracDatum[] => {
-    const allDiracs = PAllDiracs.generateWith(param)();
-    return allDiracs.map((dirac) => new DiracDatum(dirac));
-  };
+  static generateWith =
+    (param: Param, paramNFT: ParamNFT) => (): DiracDatum[] => {
+      const allDiracs = PAllDiracs.generateWith(param, paramNFT)();
+      return allDiracs.map((dirac) => new DiracDatum(dirac));
+    };
 
   static genPType(): PConstraint<PList<PDiracDatum>> {
     const param = Param.generate();
-    return new PAllDiracDatums(param);
+    const paramNFT = ParamNFT.generateWith(
+      placeholderCcy,
+      param.owner,
+      gMaxHashes,
+    );
+    return new PAllDiracDatums(param, paramNFT);
   }
 }

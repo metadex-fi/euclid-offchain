@@ -1,6 +1,14 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
+  addValues,
+  gMaxHashes,
+  maxInteger,
+  maxJumps,
+  min,
+  Prices,
+} from "../../mod.ts";
+import {
   Amount,
   Assets,
   boundPositive,
@@ -45,6 +53,25 @@ ${ttf}lowerPriceBounds: ${this.lowerPriceBounds.concise()},
 ${ttf}upperPriceBounds: ${this.upperPriceBounds.concise()}, 
 ${ttf}baseAmountA0: ${this.baseAmountA0}
 ${tt})`;
+  };
+
+  private maxDiracs = (): bigint => {
+    const lowerBounds = addValues(
+      this.lowerPriceBounds.unsigned(),
+      this.jumpSizes.unsigned().zeroed(),
+    );
+    const lowerPriceBounds = Prices.fromValue(lowerBounds);
+    const maxJumps_ = maxJumps(
+      lowerPriceBounds,
+      this.jumpSizes,
+      this.upperPriceBounds,
+      maxInteger,
+    );
+    return maxJumps_.increment().mulAmounts();
+  };
+
+  public boundedMaxDiracs = (): bigint => {
+    return min(gMaxHashes, this.maxDiracs());
   };
 
   static assert(param: Param): void {

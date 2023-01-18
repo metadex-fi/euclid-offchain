@@ -8,6 +8,7 @@ import {
   Address,
   Lucid,
   MintingPolicy,
+  PolicyId,
   Validator,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 
@@ -15,6 +16,7 @@ export class Contract {
   public readonly validator: Validator;
   public readonly mintingPolicy: MintingPolicy;
   public readonly address: Address;
+  public readonly policyId: PolicyId;
 
   constructor(
     public readonly lucid: Lucid,
@@ -30,5 +32,6 @@ export class Contract {
     };
 
     this.address = lucid.utils.validatorToAddress(this.validator);
+    this.policyId = lucid.utils.mintingPolicyToId(this.mintingPolicy);
   }
 }

@@ -9,6 +9,7 @@ import {
 import { EuclidState } from "../chain/euclidState.ts";
 import { DiracUtxo, ParamUtxo } from "../chain/euclidUtxo.ts";
 import {
+  IdNFT,
   PAllDiracDatums,
   Param,
   ParamDatum,
@@ -18,17 +19,20 @@ import {
 import { Contract } from "./contract.ts";
 
 export class User {
-  public assets: Assets = {};
-  public state: EuclidState;
-  public own = new Map<ParamUtxo, DiracUtxo[]>();
+  public readonly state: EuclidState;
   public readonly contract: Contract;
 
+  public assets: Assets = {};
+  public own = new Map<ParamUtxo, DiracUtxo[]>();
+  public latestNFT: IdNFT;
+
   constructor(
-    public lucid: Lucid,
-    public address: Address,
+    public readonly lucid: Lucid,
+    public readonly address: Address,
   ) {
     this.contract = new Contract(lucid);
     this.state = new EuclidState(this.lucid, this.contract.address);
+    this.latestNFT = IdNFT.paramNFT(this.contract.policyId, this.address);
   }
 
   public update = async (): Promise<void> => {
@@ -51,7 +55,10 @@ export class User {
   public genOpenTx = (): Tx => {
     const param = Param.generate();
     const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(param));
-    const pdiracDatums = PAllDiracDatums.fromParam(param);
+    const pdiracDatums = PAllDiracDatums.fromParam(
+      param,
+      this.latestNFT.next(),
+    );
     const diracDatums = pdiracDatums.pconstant(pdiracDatums.genData());
 
     // TODO mint & add NFTs
