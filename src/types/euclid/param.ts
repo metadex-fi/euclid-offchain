@@ -10,6 +10,7 @@ import {
 } from "../../mod.ts";
 import {
   Amount,
+  Amounts,
   Assets,
   boundPositive,
   f,
@@ -110,6 +111,33 @@ ${tt})`;
       baseAmountA0,
     );
   }
+
+  // static generateWith(owner: PaymentKeyHash, deposit: Amounts): Param {
+  //     const assets = deposit.assets();
+
+  //     const jumpSizes = JumpSizes.genOfAssets(assets);
+
+  //     const upperBounds = PositiveValue.genOfAssets(assets);
+  //     const lowerOffset = PositiveValue.genOfAssets(assets.randomSubset())
+  //       .unsigned();
+
+  //     const lowerBounds = new PositiveValue(
+  //       boundPositive(lSubValues_(upperBounds.unsigned(), lowerOffset)),
+  //     );
+
+  //     const lowestAmountA0 = deposit.equivalentA0(lowerBounds)
+  //     const highestAmountA0 = deposit.equivalentA0(upperBounds)
+
+  //     const baseAmountA0 = new PPositive(lowestAmountA0, highestAmountA0).genData();
+
+  //     return new Param(
+  //       owner,
+  //       jumpSizes,
+  //       lowerBounds,
+  //       upperBounds,
+  //       baseAmountA0,
+  //     );
+  // }
 }
 export class PParam extends PConstraint<PObject<Param>> {
   private constructor() {

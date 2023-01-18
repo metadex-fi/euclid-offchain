@@ -10,6 +10,7 @@ import { f, PConstraint, PObject, PRecord, t } from "../mod.ts";
 import { newGenInRange } from "./bounded.ts";
 import { PNonEmptyList } from "./nonEmptyList.ts";
 import { PByteString, PMap } from "../fundamental/mod.ts";
+import { Assets as LucidAssets } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 
 export type CurrencySymbol = string;
 export type PCurrencySymbol = PByteString;
@@ -32,13 +33,23 @@ export class Asset {
   };
 
   public toLucid = (): string => {
-    if (this.currencySymbol === "") {
-      Asset.assert(this);
-      return "lovelace";
-    } else {
-      return `${this.currencySymbol}${this.tokenName}`;
-    }
+    return this.currencySymbol === ""
+      ? "lovelace"
+      : `${this.currencySymbol}${this.tokenName}`;
   };
+
+  public toLucidWith = (amount: bigint): LucidAssets => {
+    return {
+      [this.toLucid()]: amount,
+    };
+  };
+
+  static fromLucid(name: string): Asset {
+    if (name === "lovelace") {
+      return new Asset("", "");
+    }
+    return new Asset(name, ""); // TODO ccy should be prefix of fixed length, look that up
+  }
 
   static assert(asset: Asset): void {
     if (asset.currencySymbol === "") {
@@ -258,8 +269,16 @@ export class Assets {
     return assets;
   };
 
-  public toLucid = (): string[] => {
-    return this.toList().map((asset) => asset.toLucid());
+  public toLucidWith = (amount: bigint): LucidAssets => {
+    const names: string[] = [];
+    const assets: LucidAssets = {};
+    this.forEach((asset) => {
+      const name = asset.toLucid();
+      assert(!names.includes(name), `duplicate asset name ${name}`);
+      names.push(name);
+      assets[name] = amount;
+    });
+    return assets;
   };
 
   public forEach = (

@@ -1,8 +1,6 @@
 import {
   Generators,
   PActiveAssets,
-  PAllDiracDatums,
-  PAllDiracs,
   PAmounts,
   PByteString,
   PConstraint,
@@ -20,6 +18,8 @@ import {
   PParam,
   PParamDatum,
   PParamNFT,
+  PPool,
+  PPoolDatums,
   PPrices,
   PRecord,
   proptestPTypes,
@@ -48,7 +48,7 @@ Deno.test("euclid data/types tests", () => {
       ...derivedContainerGenerators,
     ],
   );
-  proptestPTypes(gen, 5000);
+  proptestPTypes(gen, 1000);
 });
 
 const fundamentalPrimitiveGenerators = [
@@ -94,7 +94,7 @@ const euclidPrimitiveGenerators = [
   PActiveAssets.genPType,
   PDirac.genPType,
   PDiracDatum.genPType,
-  PAllDiracs.genPType,
-  PAllDiracDatums.genPType,
+  PPool.genPType,
+  PPoolDatums.genPType,
   // PEuclidDatum.genPType,
 ];

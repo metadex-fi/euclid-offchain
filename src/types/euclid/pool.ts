@@ -22,7 +22,7 @@ import {
   PThreadNFT,
 } from "../mod.ts";
 
-export class PAllDiracs extends PConstraint<PList<PObject<Dirac>>> {
+export class PPool extends PConstraint<PList<PObject<Dirac>>> {
   private constructor(
     public param: Param,
     public paramNFT: ParamNFT,
@@ -52,12 +52,12 @@ export class PAllDiracs extends PConstraint<PList<PObject<Dirac>>> {
     super(
       pinner,
       [assertDiracsWith(param)], //, assertCountWith(param)],
-      PAllDiracs.generateWith(param, paramNFT),
+      PPool.generateWith(param, paramNFT),
     );
   }
 
-  static fromParam(param: Param, paramNFT: ParamNFT): PAllDiracs {
-    return new PAllDiracs(param, paramNFT);
+  static fromParam(param: Param, paramNFT: ParamNFT): PPool {
+    return new PPool(param, paramNFT);
   }
 
   static generateWith = (param: Param, paramNFT: ParamNFT) => (): Dirac[] => {
@@ -74,7 +74,7 @@ export class PAllDiracs extends PConstraint<PList<PObject<Dirac>>> {
         paramNFT.asset,
         initialPrices,
         currentPrices,
-        Amounts.generateWith(param, currentPrices)(),
+        Amounts.generateUsed(param, currentPrices),
         ActiveAssets.generateWith(param, initialPrices)(),
       );
     }
@@ -126,7 +126,7 @@ export class PAllDiracs extends PConstraint<PList<PObject<Dirac>>> {
       param.owner,
       gMaxHashes,
     );
-    return new PAllDiracs(param, paramNFT);
+    return new PPool(param, paramNFT);
   }
 }
 
@@ -147,33 +147,33 @@ export const minTicks = 1n; // per dimension
 export const maxTicks = 5n; // per dimension
 const PTicks = new PPositive(minTicks, maxTicks);
 
-export class PAllDiracDatums extends PConstraint<PList<PDiracDatum>> {
+export class PPoolDatums extends PConstraint<PList<PDiracDatum>> {
   private constructor(
     public readonly param: Param,
     public readonly paramNFT: ParamNFT,
   ) {
     super(
       new PList(PDiracDatum.fromParam(param)),
-      [PAllDiracDatums.assertWith(param, paramNFT)],
-      PAllDiracDatums.generateWith(param, paramNFT),
+      [PPoolDatums.assertWith(param, paramNFT)],
+      PPoolDatums.generateUsed(param, paramNFT),
     );
   }
 
-  static fromParam(param: Param, paramNFT: ParamNFT): PAllDiracDatums {
-    return new PAllDiracDatums(param, paramNFT);
+  static fromParam(param: Param, paramNFT: ParamNFT): PPoolDatums {
+    return new PPoolDatums(param, paramNFT);
   }
 
   static assertWith =
     (param: Param, paramNFT: ParamNFT) => (diracDatums: DiracDatum[]) => {
       const diracs = diracDatums.map((diracDatum) => diracDatum._0);
-      PAllDiracs.fromParam(param, paramNFT).asserts.forEach((assert) => {
+      PPool.fromParam(param, paramNFT).asserts.forEach((assert) => {
         assert(diracs);
       });
     };
 
-  static generateWith =
+  static generateUsed =
     (param: Param, paramNFT: ParamNFT) => (): DiracDatum[] => {
-      const allDiracs = PAllDiracs.generateWith(param, paramNFT)();
+      const allDiracs = PPool.generateWith(param, paramNFT)();
       return allDiracs.map((dirac) => new DiracDatum(dirac));
     };
 
@@ -184,6 +184,6 @@ export class PAllDiracDatums extends PConstraint<PList<PDiracDatum>> {
       param.owner,
       gMaxHashes,
     );
-    return new PAllDiracDatums(param, paramNFT);
+    return new PPoolDatums(param, paramNFT);
   }
 }

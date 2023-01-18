@@ -22,6 +22,10 @@ export class ActiveAssets {
     this.activeAssets.forEach(callbackfn);
   }
 
+  static empty(): ActiveAssets {
+    return new ActiveAssets(new Map<Prices, Asset>());
+  }
+
   static assertWith =
     (initialPrices: Prices) => (activeAssets: ActiveAssets): void => {
       activeAssets.forEach((asset, location) => {
@@ -78,7 +82,7 @@ export class PActiveAssets extends PObject<ActiveAssets> {
   }
 }
 
-function defaultActiveAsset(initPs: Value, currentPs: Value): Asset {
+export function defaultActiveAsset(initPs: Value, currentPs: Value): Asset {
   let branch = "none";
   try {
     const diff = lSubValues(currentPs, initPs);

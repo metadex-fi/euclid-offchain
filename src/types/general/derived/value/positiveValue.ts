@@ -1,4 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { Assets as LucidAssets } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { genPositive } from "../../../../mod.ts";
 import { PObject, PRecord } from "../../mod.ts";
 import { Asset, Assets, CurrencySymbol, TokenName } from "../asset.ts";
 import { PPositive } from "../bounded.ts";
@@ -31,6 +33,7 @@ export class PositiveValue {
   public unit = (): Value => this.value.unit();
   public size = (): bigint => this.value.size();
   public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
+  public firstAmount = (): bigint => this.value.firstAmount();
   public setAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.setAmountOf(asset, amount);
   public clone = (): PositiveValue => new PositiveValue(this.value.clone());
@@ -40,6 +43,16 @@ export class PositiveValue {
   public fill = (assets: Assets, amount: bigint): PositiveValue => {
     assert(amount > 0n, `fill: amount must be positive, got ${amount}`);
     return new PositiveValue(this.value.fill(assets, amount));
+  };
+
+  public minSizedSubValue = (minSize: bigint): PositiveValue => {
+    const assets = this.assets().minSizedSubset(minSize);
+    const value = new PositiveValue();
+    assets.forEach((asset) => {
+      const amount = this.amountOf(asset);
+      value.initAmountOf(asset, genPositive(amount));
+    });
+    return value;
   };
 
   static maybeFromMap = (

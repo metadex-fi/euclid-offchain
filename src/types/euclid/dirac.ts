@@ -1,6 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { maxInteger } from "../../mod.ts";
+import { maxInteger, randomChoice } from "../../mod.ts";
 import {
   Amounts,
   Asset,
@@ -88,7 +88,11 @@ activeAmnts: ${dirac.activeAmnts.concise()}`,
     const initialPrices = Prices.generateInitial(param)();
     const currentPrices = Prices.generateCurrent(param, initialPrices)();
 
-    const activeAmnts = Amounts.generateWith(param, currentPrices)();
+    const activeAmnts = Amounts.generateUsed(param, currentPrices);
+    // randomChoice([
+    //   () => Amounts.generateOpening(param, initialPrices, currentPrices),
+    //   () => Amounts.generateUsed(param, currentPrices)
+    // ])();
     const jumpStorage = ActiveAssets.generateWith(param, initialPrices)();
 
     return new Dirac(
@@ -147,6 +151,7 @@ export class DiracDatum {
     public readonly _0: Dirac,
   ) {}
 }
+
 export class PDiracDatum extends PObject<DiracDatum> {
   private constructor(
     public readonly pdirac: PDirac,

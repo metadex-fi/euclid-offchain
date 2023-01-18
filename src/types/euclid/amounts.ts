@@ -1,11 +1,21 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { genNonNegative, maxInteger } from "../../mod.ts";
-import { Param, PObject, PRecord, Value } from "../mod.ts";
+import {
+  Asset,
+  Assets,
+  mulValues,
+  Param,
+  PObject,
+  PRecord,
+  Value,
+} from "../mod.ts";
 import { Prices } from "./prices.ts";
 import {
   PositiveValue,
   PPositiveValue,
 } from "../general/derived/value/positiveValue.ts";
+import { Assets as LucidAssets } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { defaultActiveAsset } from "./activeAssets.ts";
 
 export class Amounts {
   constructor(
@@ -14,8 +24,34 @@ export class Amounts {
 
   public unsigned = (): Value => this.value.unsigned();
   public concise = (tabs = ""): string => `Amounts ${this.value.concise(tabs)}`;
+  public size = (): bigint => this.value.size();
+  public assets = (): Assets => this.value.assets();
+  public firstAmount = (): bigint => this.value.firstAmount();
 
-  static generateWith = (param: Param, prices: Prices) => (): Amounts => {
+  public minSizedSubAmounts = (minSize: bigint): Amounts => {
+    return new Amounts(this.value.minSizedSubValue(minSize));
+  };
+
+  public equivalentA0 = (prices: PositiveValue): bigint => {
+    return mulValues(this.unsigned(), prices.unsigned()).mulAmounts();
+  };
+
+  static generateFresh = (
+    param: Param,
+    initialPrices: Prices,
+    currentPrices: Prices,
+  ): Amounts => {
+    const initPs = initialPrices.unsigned();
+    const currentPs = currentPrices.unsigned();
+    const activeAsset = defaultActiveAsset(initPs, currentPs);
+    const amount = param.baseAmountA0 * currentPs.firstAmount() /
+      currentPs.amountOf(activeAsset);
+    const amounts = new PositiveValue();
+    amounts.initAmountOf(activeAsset, amount); // this will probably crash out of the box, because 0
+    return new Amounts(amounts);
+  };
+
+  static generateUsed = (param: Param, prices: Prices): Amounts => {
     assert(
       prices.size() >= 2n,
       `genAmounts: less than two assets in ${prices.concise()}`,
@@ -39,6 +75,15 @@ export class Amounts {
     if (remainingA0 > 0n) amounts.initAmountOf(A0, remainingA0);
     return new Amounts(amounts);
   };
+
+  static fromLucid(assets: LucidAssets): Amounts {
+    const value = new Value();
+    Object.entries(assets).forEach(([name, amount]) => {
+      const asset = Asset.fromLucid(name);
+      value.initAmountOf(asset, amount);
+    });
+    return new Amounts(new PositiveValue(value));
+  }
 }
 
 export class PAmounts extends PObject<Amounts> {

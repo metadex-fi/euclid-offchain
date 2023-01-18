@@ -23,7 +23,7 @@ import { Asset, CurrencySymbol, f, PAsset, PConstraint } from "../mod.ts";
 export const gMaxHashes = 128n;
 export const placeholderCcy = "cc";
 
-class IdNFT {
+export class IdNFT {
   public readonly asset: Asset;
   protected constructor(
     public readonly contractCurrency: CurrencySymbol,
@@ -32,8 +32,11 @@ class IdNFT {
     this.asset = new Asset(this.contractCurrency, tokenName);
   }
 
-  public next = (): IdNFT => {
-    return new IdNFT(this.contractCurrency, nextHash(this.tokenName));
+  public next = (skip = 0): IdNFT => {
+    return new IdNFT(
+      this.contractCurrency,
+      hashNTimes(this.tokenName, 1n + BigInt(skip)),
+    );
   };
 
   public show = (): string => {

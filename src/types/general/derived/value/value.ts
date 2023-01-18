@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { maxInteger } from "../../../../mod.ts";
+import { genPositive, maxInteger } from "../../../../mod.ts";
 import { f, PConstraint, PMap, PObject, PRecord, t } from "../../mod.ts";
 import {
   Asset,
@@ -449,6 +449,7 @@ export const lSubValues_ = newUnionWith(
   undefined,
   0n,
 );
+export const mulValues = newUnionWith((a, b) => a * b, undefined, 1n);
 
 export const newBoundedWith = (bounds: PBounded) => (value: Value): Value => {
   const bounded = new Value();
