@@ -1,3 +1,4 @@
+import { maxInteger, placeholderCcy } from "../../mod.ts";
 import {
   ActiveAssets,
   Amounts,
@@ -10,11 +11,9 @@ import {
   ParamNFT,
   PConstraint,
   PDiracDatum,
-  placeholderCcy,
   PList,
   PObject,
   POwner,
-  PParam,
   PParamNFT,
   PPositive,
   PPrices,
@@ -33,14 +32,14 @@ export class PAllDiracs extends PConstraint<PList<PObject<Dirac>>> {
         new PRecord({
           "owner": POwner.pliteral(param.owner),
           "threadNFT": new PThreadNFT(
-            placeholderCcy,
+            paramNFT.contractCurrency,
             param.owner,
-            gMaxHashes + param.boundedMaxDiracs(),
+            maxInteger, // TODO maybe excessive; but want to verify in prod
           ),
           "paramNFT": new PParamNFT(
-            placeholderCcy,
-            param.owner,
-            gMaxHashes,
+            paramNFT.contractCurrency,
+            paramNFT.tokenName,
+            0n,
           ),
           "initialPrices": PPrices.initial(param),
           "currentPrices": PPrices.initial(param),
@@ -58,16 +57,6 @@ export class PAllDiracs extends PConstraint<PList<PObject<Dirac>>> {
   }
 
   static fromParam(param: Param, paramNFT: ParamNFT): PAllDiracs {
-    return new PAllDiracs(param, paramNFT);
-  }
-
-  static genPType(): PConstraint<PList<PObject<Dirac>>> {
-    const param = PParam.genPType().genData();
-    const paramNFT = ParamNFT.generateWith(
-      placeholderCcy,
-      param.owner,
-      gMaxHashes,
-    );
     return new PAllDiracs(param, paramNFT);
   }
 
@@ -129,6 +118,16 @@ export class PAllDiracs extends PConstraint<PList<PObject<Dirac>>> {
 
     return diracs;
   };
+
+  static genPType(): PConstraint<PList<PObject<Dirac>>> {
+    const param = Param.generate();
+    const paramNFT = ParamNFT.generateWith(
+      placeholderCcy,
+      param.owner,
+      gMaxHashes,
+    );
+    return new PAllDiracs(param, paramNFT);
+  }
 }
 
 const assertDiracsWith = (param: Param) => (diracs: Dirac[]) => {

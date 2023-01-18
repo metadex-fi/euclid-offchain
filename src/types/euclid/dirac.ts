@@ -1,5 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { maxInteger } from "../../mod.ts";
 import {
   Amounts,
   Asset,
@@ -31,6 +32,18 @@ export class Dirac {
     public activeAmnts: Amounts,
     public jumpStorage: ActiveAssets,
   ) {}
+
+  public show = (tabs = ""): string => {
+    return `Dirac(
+  owner: ${this.owner},
+  threadNFT: ${this.threadNFT.show()},
+  paramNFT: ${this.paramNFT.show()},
+  initialPrices: ${this.initialPrices.concise(tabs)},
+  currentPrices: ${this.currentPrices.concise(tabs)},
+  activeAmnts: ${this.activeAmnts.concise(tabs)},
+  )`;
+    // jumpStorage: ${this.jumpStorage.show(tabs)},
+  };
 
   // TODO consider fees here
   static assertWith = (param: Param) => (dirac: Dirac): void => {
@@ -100,12 +113,12 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
           "threadNFT": new PThreadNFT(
             placeholderCcy,
             param.owner,
-            gMaxHashes + param.boundedMaxDiracs(),
+            maxInteger,
           ),
           "paramNFT": new PParamNFT(
             placeholderCcy,
             param.owner,
-            gMaxHashes,
+            maxInteger,
           ),
           "initialPrices": PPrices.initial(param),
           "currentPrices": PPrices.initial(param),

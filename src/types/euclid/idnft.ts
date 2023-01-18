@@ -55,9 +55,9 @@ export function hashNTimes(hash: string, n: bigint): string {
 export class ParamNFT extends IdNFT {
   constructor(
     contractCurrency: CurrencySymbol,
-    owner: PaymentKeyHash,
+    tokenName: PaymentKeyHash,
   ) {
-    super(contractCurrency, owner);
+    super(contractCurrency, tokenName);
   }
 
   static generateWith = (

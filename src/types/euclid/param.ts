@@ -48,9 +48,9 @@ export class Param {
     const ttf = tt + f;
     return `Param(
 ${ttf}owner: ${this.owner}, 
-${ttf}jumpSizes: ${this.jumpSizes.concise()}, 
-${ttf}lowerPriceBounds: ${this.lowerPriceBounds.concise()}, 
-${ttf}upperPriceBounds: ${this.upperPriceBounds.concise()}, 
+${ttf}jumpSizes: ${this.jumpSizes.concise(ttf)}, 
+${ttf}lowerPriceBounds: ${this.lowerPriceBounds.concise(ttf)}, 
+${ttf}upperPriceBounds: ${this.upperPriceBounds.concise(ttf)}, 
 ${ttf}baseAmountA0: ${this.baseAmountA0}
 ${tt})`;
   };
