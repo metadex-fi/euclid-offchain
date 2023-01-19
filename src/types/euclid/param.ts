@@ -1,10 +1,10 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
+abs,
   addValues,
   gMaxHashes,
   maxInteger,
-  maxJumps,
   min,
   Prices,
 } from "../../mod.ts";
@@ -16,14 +16,17 @@ import {
   f,
   JumpSizes,
   lSubValues_,
+  newUnionWith,
   PByteString,
   PConstraint,
   PObject,
   PositiveValue,
   PPositive,
   PPositiveValue,
+  PPrices,
   PRecord,
   t,
+Value,
 } from "../mod.ts";
 import { PJumpSizes } from "./jumpSizes.ts";
 import { PPaymentKeyHash } from "./owner.ts";
@@ -31,10 +34,13 @@ import { PPaymentKeyHash } from "./owner.ts";
 // TODO a flag somewhere to deactivate it, so owner can start closing.
 // or can we just "break" it?
 
+const gMaxJumps = 3n;
+
 export class Param {
   constructor(
     public owner: PaymentKeyHash,
     public jumpSizes: JumpSizes,
+    public initialPrices: Prices,
     public lowerPriceBounds: PositiveValue,
     public upperPriceBounds: PositiveValue,
     public baseAmountA0: Amount,
@@ -50,10 +56,38 @@ export class Param {
     return `Param(
 ${ttf}owner: ${this.owner}, 
 ${ttf}jumpSizes: ${this.jumpSizes.concise(ttf)}, 
+${ttf}initialPrices: ${this.initialPrices.concise(ttf)}, 
 ${ttf}lowerPriceBounds: ${this.lowerPriceBounds.concise(ttf)}, 
 ${ttf}upperPriceBounds: ${this.upperPriceBounds.concise(ttf)}, 
 ${ttf}baseAmountA0: ${this.baseAmountA0}
 ${tt})`;
+  };
+
+  private maxJumps = (
+    from: PositiveValue,
+    to: PositiveValue,
+    maxJumps = gMaxJumps,
+  ): Value => {
+    // jump the price of each asset from initial price,
+    // a random number of times,
+    // with the respective jump size,
+    // while respecting the bounds
+    const maxSingleAsset = (
+      from: bigint,
+      to: bigint,
+      jumpSize: bigint,
+    ): bigint =>
+      // jumpSize === 0n ? 0n :
+      min(
+        maxJumps,
+        abs(from - to) / jumpSize,
+      );
+    const maxAllAssets = newUnionWith(maxSingleAsset);
+    return maxAllAssets(
+      from.unsigned(),
+      to.unsigned(),
+      this.jumpSizes.unsigned(),
+    );
   };
 
   private maxDiracs = (): bigint => {
@@ -61,14 +95,12 @@ ${tt})`;
       this.lowerPriceBounds.unsigned(),
       this.jumpSizes.unsigned().zeroed(),
     );
-    const lowerPriceBounds = Prices.fromValue(lowerBounds);
-    const maxJumps_ = maxJumps(
-      lowerPriceBounds,
-      this.jumpSizes,
+    const maxJumps = this.maxJumps(
+      new PositiveValue(lowerBounds),
       this.upperPriceBounds,
       maxInteger,
     );
-    return maxJumps_.increment().mulAmounts();
+    return maxJumps.increment().mulAmounts();
   };
 
   public boundedMaxDiracs = (): bigint => {
@@ -85,12 +117,14 @@ ${tt})`;
       param.upperPriceBounds.assets().equals(assets),
       `assets must match, got ${param.upperPriceBounds.concise()}, expected ${assets.show()}`,
     );
+    // TODO assert leq
   }
 
   static generate(): Param {
     const owner = PPaymentKeyHash.genData();
 
-    const assets = Assets.generate(2n);
+    const initialPrices = Prices.generateInitial();
+    const assets = initialPrices.assets();
     const jumpSizes = JumpSizes.genOfAssets(assets);
 
     const upperBounds = PositiveValue.genOfAssets(assets);
@@ -106,38 +140,12 @@ ${tt})`;
     return new Param(
       owner,
       jumpSizes,
+      initialPrices,
       lowerBounds,
       upperBounds,
       baseAmountA0,
     );
   }
-
-  // static generateWith(owner: PaymentKeyHash, deposit: Amounts): Param {
-  //     const assets = deposit.assets();
-
-  //     const jumpSizes = JumpSizes.genOfAssets(assets);
-
-  //     const upperBounds = PositiveValue.genOfAssets(assets);
-  //     const lowerOffset = PositiveValue.genOfAssets(assets.randomSubset())
-  //       .unsigned();
-
-  //     const lowerBounds = new PositiveValue(
-  //       boundPositive(lSubValues_(upperBounds.unsigned(), lowerOffset)),
-  //     );
-
-  //     const lowestAmountA0 = deposit.equivalentA0(lowerBounds)
-  //     const highestAmountA0 = deposit.equivalentA0(upperBounds)
-
-  //     const baseAmountA0 = new PPositive(lowestAmountA0, highestAmountA0).genData();
-
-  //     return new Param(
-  //       owner,
-  //       jumpSizes,
-  //       lowerBounds,
-  //       upperBounds,
-  //       baseAmountA0,
-  //     );
-  // }
 }
 export class PParam extends PConstraint<PObject<Param>> {
   private constructor() {
@@ -146,6 +154,7 @@ export class PParam extends PConstraint<PObject<Param>> {
         new PRecord({
           "owner": new PByteString(1n),
           "jumpSizes": PJumpSizes.ptype,
+          "initialPrices": PPrices.initial(),
           "lowerPriceBounds": new PPositiveValue(),
           "upperPriceBounds": new PPositiveValue(),
           "baseAmountA0": new PPositive(),

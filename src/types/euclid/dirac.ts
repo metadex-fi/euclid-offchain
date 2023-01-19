@@ -27,8 +27,7 @@ export class Dirac {
     public owner: PaymentKeyHash,
     public threadNFT: Asset,
     public paramNFT: Asset,
-    public initialPrices: Prices,
-    public currentPrices: Prices,
+    public prices: Prices,
     public activeAmnts: Amounts,
     public jumpStorage: ActiveAssets,
   ) {}
@@ -38,8 +37,7 @@ export class Dirac {
   owner: ${this.owner},
   threadNFT: ${this.threadNFT.show()},
   paramNFT: ${this.paramNFT.show()},
-  initialPrices: ${this.initialPrices.concise(tabs)},
-  currentPrices: ${this.currentPrices.concise(tabs)},
+  currentPrices: ${this.prices.concise(tabs)},
   activeAmnts: ${this.activeAmnts.concise(tabs)},
   )`;
     // jumpStorage: ${this.jumpStorage.show(tabs)},
@@ -47,10 +45,7 @@ export class Dirac {
 
   // TODO consider fees here
   static assertWith = (param: Param) => (dirac: Dirac): void => {
-    Prices.assertCurrent(param, dirac.initialPrices)(dirac.currentPrices);
-    ActiveAssets.assertWith(dirac.initialPrices)(dirac.jumpStorage);
-
-    const prices_ = dirac.currentPrices.unsigned();
+    const prices = dirac.prices.unsigned();
     const worth = newUnionWith(
       (amnt: bigint, price: bigint) => price * amnt,
       0n,
@@ -58,21 +53,29 @@ export class Dirac {
     );
     const total = worth(
       dirac.activeAmnts.unsigned(),
-      prices_,
+      prices,
     ).sumAmounts();
-    const lower = param.baseAmountA0 * prices_.firstAmount();
-    const upper = lower + prices_.firstAmount();
+    const lower = param.baseAmountA0 * prices.firstAmount();
+    const upper = lower + prices.firstAmount();
     assert(
       lower <= total && total <= upper,
       `expected ${lower} <= ${total} <= ${upper} with
 baseAmountA0: ${param.baseAmountA0},
-baseAsset: ${prices_.firstAsset().show()},
-currentPrices: ${dirac.currentPrices.concise()},
+baseAsset: ${prices.firstAsset().show()},
+prices: ${dirac.prices.concise()},
 activeAmnts: ${dirac.activeAmnts.concise()}`,
     );
   };
 
-  static generateWith = (param: Param) => (): Dirac => {
+  static generateWith = (param: Param) => randomChoice([
+    Dirac.generateFresh, 
+    Dirac.generateUsed
+  ])(param)
+
+  static generateFresh = (param: Param) => Dirac.generateInner(param, Amounts.generateFresh(param), ActiveAssets.fresh)
+  static generateUsed = (param: Param) => Dirac.generateInner(param, Amounts.generateUsed(param), ActiveAssets.generateUsed(param))
+
+  private static generateInner = (param: Param, generateAmounts: (prices: Prices) => Amounts, generateActiveAssets: () => ActiveAssets) => (): Dirac => {
     const owner = param.owner;
 
     const paramNFT = ParamNFT.generateWith(
@@ -85,22 +88,15 @@ activeAmnts: ${dirac.activeAmnts.concise()}`,
       param.boundedMaxDiracs(),
     );
 
-    const initialPrices = Prices.generateInitial(param)();
-    const currentPrices = Prices.generateCurrent(param, initialPrices)();
-
-    const activeAmnts = Amounts.generateUsed(param, currentPrices);
-    // randomChoice([
-    //   () => Amounts.generateOpening(param, initialPrices, currentPrices),
-    //   () => Amounts.generateUsed(param, currentPrices)
-    // ])();
-    const jumpStorage = ActiveAssets.generateWith(param, initialPrices)();
+    const prices = Prices.generateCurrent(param)();
+    const activeAmnts = generateAmounts(prices);
+    const jumpStorage = generateActiveAssets();
 
     return new Dirac(
       owner,
       threadNFT.asset,
       paramNFT.asset,
-      initialPrices,
-      currentPrices,
+      prices,
       activeAmnts,
       jumpStorage,
     );
@@ -124,8 +120,7 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
             param.owner,
             maxInteger,
           ),
-          "initialPrices": PPrices.initial(param),
-          "currentPrices": PPrices.initial(param),
+          "prices": PPrices.current(param),
           "activeAmnts": PAmounts.ptype,
           "jumpStorage": new PActiveAssets(param),
         }),

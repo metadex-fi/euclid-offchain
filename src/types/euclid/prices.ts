@@ -4,6 +4,8 @@ import {
   Asset,
   Assets,
   CurrencySymbol,
+  generateWithin,
+  lSubValues,
   newCompareWith,
   newUnionWith,
   Param,
@@ -19,14 +21,48 @@ import {
   PPositiveValue,
 } from "../general/derived/value/positiveValue.ts";
 
-export const gMaxJumps = 3n;
-
 export class Prices {
   constructor(private value: PositiveValue) {
-    assert(
-      value.size() >= 2n,
-      `Prices: less than two assets in ${value.show()}`,
-    );
+    Prices.assertInitial(this)
+  }
+
+  public defaultActiveAsset = (param:Param): Asset => {
+    function inner(initPs: Value, currentPs: Value): Asset {
+      let branch = "none";
+      try {
+        const diff = lSubValues(currentPs, initPs);
+        switch (diff.size()) {
+          case 0n:
+            branch = `0n with ${initPs.concise()}`;
+            return initPs.firstAsset();
+          case 1n:
+            branch = `1n with ${diff.concise()}`;
+            return diff.firstAsset();
+          default: {
+            branch = `default with \n${initPs.concise()}\n${currentPs.concise()}`;
+            let initTail = initPs.tail();
+            let currentTail = currentPs.tail();
+            const fstInit = initTail.firstAmount();
+            const fstCurrent = currentTail.firstAmount();
+            initTail = initTail.scaledWith(fstCurrent);
+            currentTail = currentTail.scaledWith(fstInit);
+            return inner(
+              initTail,
+              currentTail,
+            );
+          }
+        }
+      } catch (e) {
+        throw new Error(
+          `defaultActiveAsset(
+    initPs: ${initPs.concise()},
+    currentPs: ${currentPs.concise()},
+    branch: ${branch}
+    ): ${e}`,
+        );
+      }
+    }
+    return inner(param.initialPrices.unsigned(), this.unsigned());
   }
 
   public signed = (): PositiveValue => new PositiveValue(this.unsigned());
@@ -54,113 +90,35 @@ export class Prices {
     return Prices.fromValue(new Value(prices));
   };
 
-  static assertInitial = (param: Param) => (initialPrices: Prices): void => {
+  static assertInitial = (prices: Prices): void => {
     assert(
-      leq(param.lowerPriceBounds.unsigned(), initialPrices.unsigned()),
-      `lower bounds ${param.lowerPriceBounds.concise()} must be less than or equal to initial prices ${initialPrices.concise()}`,
+      prices.size() >= 2n,
+      `Prices: less than two assets in ${prices.show()}`,
     );
-    assert(
-      leq(initialPrices.unsigned(), param.upperPriceBounds.unsigned()),
-      `upper bounds ${param.upperPriceBounds.concise()} must be greater than or equal to initial prices ${initialPrices.concise()}`,
-    );
-  };
+  }
 
   static assertCurrent =
-    (param: Param, initialPrices: Prices) => (currentPrices: Prices): void => {
-      Prices.assertInitial(param)(initialPrices);
-      Prices.assertInitial(param)(currentPrices);
-      const singlePriceCongruent = (
-        initP: bigint,
-        currentP: bigint,
-        jumpSize: bigint,
-      ): boolean => {
-        return (currentP - initP) % jumpSize === 0n;
-      };
-      const allPricesCongruent = newCompareWith(singlePriceCongruent);
-      assert(
-        allPricesCongruent(
-          initialPrices.unsigned(),
-          currentPrices.unsigned(),
-          param.jumpSizes.unsigned(),
-        ),
-        `Dirac.assertWith: prices not congruent`,
-      );
+    (param: Param) => (prices: Prices): void => {
+      Prices.assertInitial(prices);
+      assert(leq(param.lowerPriceBounds.unsigned(), prices.unsigned()), `Prices: ${prices.show()} < ${param.lowerPriceBounds.show()}`);
+      assert(leq(prices.unsigned(), param.upperPriceBounds.unsigned()), `Prices: ${prices.show()} > ${param.upperPriceBounds.show()}`);
     };
 
-  // static generateAny(): Prices {
-  //   const assets = Assets.generate(2n);
-  //   assert(assets.size);
-  //   const value = PositiveValue.genOfAssets(assets);
-  //   return new Prices(value);
-  // }
-
-  static generateInitial = (param: Param) => (): Prices => {
-    const generateSingleAsset = (
-      lowerBound: bigint,
-      upperBound: bigint,
-    ): bigint => {
-      return lowerBound + genNonNegative(upperBound - lowerBound);
-    };
-    const generateAllAssets = newUnionWith(generateSingleAsset);
-    const value = generateAllAssets(
-      param.lowerPriceBounds.unsigned(),
-      param.upperPriceBounds.unsigned(),
-    );
-    return Prices.fromValue(value);
-  };
+  static generateInitial(): Prices {
+    const assets = Assets.generate(2n);
+    const value = PositiveValue.genOfAssets(assets);
+    return new Prices(value);
+  }
 
   static generateCurrent =
-    (param: Param, initialPrices: Prices) => (): Prices => {
-      // jump the price of each asset from initial price,
-      // a random number of times,
-      // with the respective jump size,
-      // while respecting the bounds
-      const jumpSingleAsset = (
-        maxJumpsUp: bigint,
-        maxJumpsDown: bigint,
-        initP: bigint,
-        jumpSize: bigint,
-      ): bigint => {
-        const direction = randomChoice([-1n, 1n]);
-        const maxJumps = direction === 1n ? maxJumpsUp : maxJumpsDown;
-        return initP + jumpSize * direction * genNonNegative(maxJumps);
-      };
-
-      const maxJumpsUp = maxJumps(
-        initialPrices,
-        param.jumpSizes,
-        param.upperPriceBounds,
-      );
-      const maxJumpsDown = maxJumps(
-        initialPrices,
-        param.jumpSizes,
-        param.lowerPriceBounds,
-      );
-
-      const jumpAllAssets = newUnionWith(jumpSingleAsset);
-      const jumped = jumpAllAssets(
-        maxJumpsUp,
-        maxJumpsDown,
-        initialPrices.unsigned(),
-        param.jumpSizes.unsigned(),
-      );
-      assert(
-        jumped.assets().equals(initialPrices.assets()),
-        `newGenPrices: assets don't match in ${jumped.show()}
-      and ${initialPrices.concise()}
-      with 
-      jumpSizes ${param.jumpSizes.concise()}
-      maxJumpsUp ${maxJumpsUp.show()}
-      maxJumpsDown ${maxJumpsDown.show()}`,
-      );
-      return Prices.fromValue(jumped);
-    };
+    (param: Param) => (): Prices => {
+      return Prices.fromValue(generateWithin(param.lowerPriceBounds.unsigned(), param.upperPriceBounds.unsigned()));
+    }
 }
 
 export class PPrices extends PConstraint<PObject<Prices>> {
   private constructor(
-    public readonly param: Param,
-    public readonly initialPrices?: Prices,
+    public readonly param?: Param,
   ) {
     super(
       new PObject(
@@ -170,60 +128,31 @@ export class PPrices extends PConstraint<PObject<Prices>> {
         Prices,
       ),
       [
-        initialPrices
-          ? Prices.assertCurrent(param, initialPrices)
-          : Prices.assertInitial(param),
+        param
+          ? Prices.assertCurrent(param)
+          : Prices.assertInitial,
       ],
-      initialPrices
-        ? Prices.generateCurrent(param, initialPrices)
-        : Prices.generateInitial(param),
+      param
+        ? Prices.generateCurrent(param)
+        : Prices.generateInitial,
     );
   }
 
-  static initial(param: Param): PPrices {
+  static initial(): PPrices {
+    return new PPrices();
+  }
+
+  static current(param: Param): PPrices {
     return new PPrices(param);
   }
 
-  static current(param: Param, initialPrices: Prices): PPrices {
-    return new PPrices(param, initialPrices);
-  }
-
   static genPType(): PConstraint<PObject<Prices>> {
-    const param = Param.generate();
     return randomChoice([
-      () => PPrices.initial(param),
+      PPrices.initial,
       () => {
-        const initialPrices = Prices.generateInitial(param)();
-        return PPrices.current(param, initialPrices);
+        const param = Param.generate();
+        return PPrices.current(param);
       },
     ])();
   }
 }
-
-export const maxJumps = (
-  initialPrices: Prices,
-  jumpSizes: JumpSizes,
-  bounds: PositiveValue,
-  maxJumps = gMaxJumps,
-): Value => {
-  // jump the price of each asset from initial price,
-  // a random number of times,
-  // with the respective jump size,
-  // while respecting the bounds
-  const maxSingleAsset = (
-    initialPrice: bigint,
-    jumpSize: bigint,
-    boundary: bigint,
-  ): bigint =>
-    // jumpSize === 0n ? 0n :
-    min(
-      maxJumps,
-      abs(initialPrice - boundary) / jumpSize,
-    );
-  const maxAllAssets = newUnionWith(maxSingleAsset);
-  return maxAllAssets(
-    initialPrices.unsigned(),
-    jumpSizes.unsigned(),
-    bounds.unsigned(),
-  );
-};

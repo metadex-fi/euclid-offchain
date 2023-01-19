@@ -451,6 +451,8 @@ export const lSubValues_ = newUnionWith(
 );
 export const mulValues = newUnionWith((a, b) => a * b, undefined, 1n);
 
+export const generateWithin = newUnionWith((a, b) => new PBounded(a, b).genData(), undefined, 1n)
+
 export const newBoundedWith = (bounds: PBounded) => (value: Value): Value => {
   const bounded = new Value();
   for (const [currencySymbol, tokens] of value.toMap()) {

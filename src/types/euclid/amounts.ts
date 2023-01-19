@@ -15,7 +15,6 @@ import {
   PPositiveValue,
 } from "../general/derived/value/positiveValue.ts";
 import { Assets as LucidAssets } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { defaultActiveAsset } from "./activeAssets.ts";
 
 export class Amounts {
   constructor(
@@ -36,22 +35,17 @@ export class Amounts {
     return mulValues(this.unsigned(), prices.unsigned()).mulAmounts();
   };
 
-  static generateFresh = (
-    param: Param,
-    initialPrices: Prices,
-    currentPrices: Prices,
-  ): Amounts => {
-    const initPs = initialPrices.unsigned();
-    const currentPs = currentPrices.unsigned();
-    const activeAsset = defaultActiveAsset(initPs, currentPs);
+  static generateFresh = (param: Param) => (prices: Prices): Amounts => {
+    const currentPs = prices.unsigned();
+    const activeAsset = currentPs.firstAsset() //prices.defaultActiveAsset(param);
     const amount = param.baseAmountA0 * currentPs.firstAmount() /
       currentPs.amountOf(activeAsset);
     const amounts = new PositiveValue();
-    amounts.initAmountOf(activeAsset, amount); // this will probably crash out of the box, because 0
+    amounts.initAmountOf(activeAsset, amount); // TODO this will probably crash out of the box, because when 0es
     return new Amounts(amounts);
   };
 
-  static generateUsed = (param: Param, prices: Prices): Amounts => {
+  static generateUsed = (param: Param) => (prices: Prices): Amounts => {
     assert(
       prices.size() >= 2n,
       `genAmounts: less than two assets in ${prices.concise()}`,
