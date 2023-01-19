@@ -35,15 +35,15 @@ export class Amounts {
     return mulValues(this.unsigned(), prices.unsigned()).mulAmounts();
   };
 
-  static generateFresh = (param: Param) => (prices: Prices): Amounts => {
-    const currentPs = prices.unsigned();
-    const activeAsset = currentPs.firstAsset() //prices.defaultActiveAsset(param);
-    const amount = param.baseAmountA0 * currentPs.firstAmount() /
-      currentPs.amountOf(activeAsset);
-    const amounts = new PositiveValue();
-    amounts.initAmountOf(activeAsset, amount); // TODO this will probably crash out of the box, because when 0es
-    return new Amounts(amounts);
-  };
+  // static generateFresh = (param: Param) => (prices: Prices): Amounts => {
+  //   const currentPs = prices.unsigned();
+  //   const activeAsset = prices.defaultActiveAsset(param);
+  //   const amount = param.baseAmountA0 * currentPs.firstAmount() /
+  //     currentPs.amountOf(activeAsset);
+  //   const amounts = new PositiveValue();
+  //   amounts.initAmountOf(activeAsset, amount); // TODO this will probably crash out of the box, because when 0es
+  //   return new Amounts(amounts);
+  // };
 
   static generateUsed = (param: Param) => (prices: Prices): Amounts => {
     assert(

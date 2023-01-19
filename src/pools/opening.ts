@@ -35,7 +35,7 @@ This graph is
     -> approach A:
         - start at maximally concentrated (single dirac) position, with all prices at 1
         - incrementally move away from there, checking for validity at each step
-            - could be made more efficient by taking larger steps, checking validity, 
+            - could be made more efficient by taking larger steps, checking validity,
               and then stepping back and taking smaller steps if that fails
 
     -> approach B:
@@ -44,7 +44,7 @@ This graph is
           to compute default asset there, and only sum those
 
 
-    --> 
+    -->
         1.  given initialPrices, totalMinPrices, totalMaxPrices, and tickSizes, we can compute number of
             virtual diracs, and for each the defaultActiveAsset --> total number of virtual diracs per asset
         2.  then, we can divide the deposit for each asset by number of virtual diracs for that asset
@@ -52,18 +52,15 @@ This graph is
             -> if it's a fraction larger than 1, we simply have some excess deposit (display that somewhere)
 
 
-==> this seems to belong in a Param-variant or generator, which wants to be parameterized with initial deposit; 
-    write those asserts, then write that stepwise generator as discussed. 
+==> this seems to belong in a Param-variant or generator, which wants to be parameterized with initial deposit;
+    write those asserts, then write that stepwise generator as discussed.
         - JumpSize encodes tick stuff there
-        - Param then needs a function like "virtualDiracsPerAsset(initialPrices, lowerBounds, upperBounds, jumpSizes)" 
+        - Param then needs a function like "virtualDiracsPerAsset(initialPrices, lowerBounds, upperBounds, jumpSizes)"
 
 */
 
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { maxInteger } from "../mod.ts";
-
-
-
 
 // class Range {
 //     private options: bigint[] = []
@@ -77,7 +74,6 @@ import { maxInteger } from "../mod.ts";
 
 //         this.updateOptions()
 //     }
-
 
 //     private updateOptions = (): void => {
 //         this.options = []

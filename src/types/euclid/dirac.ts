@@ -67,15 +67,31 @@ activeAmnts: ${dirac.activeAmnts.concise()}`,
     );
   };
 
-  static generateWith = (param: Param) => randomChoice([
-    Dirac.generateFresh, 
-    Dirac.generateUsed
-  ])(param)
+  // static generateWith = (param: Param) =>
+  //   randomChoice([
+  //     Dirac.generateFresh,
+  //     Dirac.generateUsed,
+  //   ])(param);
 
-  static generateFresh = (param: Param) => Dirac.generateInner(param, Amounts.generateFresh(param), ActiveAssets.fresh)
-  static generateUsed = (param: Param) => Dirac.generateInner(param, Amounts.generateUsed(param), ActiveAssets.generateUsed(param))
+  // static generateFresh = (param: Param) =>
+  //   Dirac.generateInner(
+  //     param,
+  //     Amounts.generateFresh(param),
+  //     ActiveAssets.fresh,
+  //   );
+  static generateUsed = (param: Param) =>
+    Dirac.generateInner(
+      param,
+      Amounts.generateUsed(param),
+      ActiveAssets.generateUsed(param),
+    );
 
-  private static generateInner = (param: Param, generateAmounts: (prices: Prices) => Amounts, generateActiveAssets: () => ActiveAssets) => (): Dirac => {
+  private static generateInner = (
+    param: Param,
+    generateAmounts: (prices: Prices) => Amounts,
+    generateActiveAssets: () => ActiveAssets,
+  ) =>
+  (): Dirac => {
     const owner = param.owner;
 
     const paramNFT = ParamNFT.generateWith(
@@ -127,7 +143,7 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
         Dirac,
       ),
       [Dirac.assertWith(param)],
-      Dirac.generateWith(param),
+      Dirac.generateUsed(param),
     );
   }
 

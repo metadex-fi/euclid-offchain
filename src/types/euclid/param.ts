@@ -1,7 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
-abs,
+  abs,
   addValues,
   gMaxHashes,
   maxInteger,
@@ -26,7 +26,7 @@ import {
   PPrices,
   PRecord,
   t,
-Value,
+  Value,
 } from "../mod.ts";
 import { PJumpSizes } from "./jumpSizes.ts";
 import { PPaymentKeyHash } from "./owner.ts";
