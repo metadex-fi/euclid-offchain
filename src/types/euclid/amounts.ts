@@ -31,6 +31,7 @@ export class Amounts {
     return new Amounts(this.value.minSizedSubValue(minSize));
   };
 
+  // TODO this is incongruent with onchain, figure out which one's better
   public equivalentA0 = (prices: PositiveValue): bigint => {
     return mulValues(this.unsigned(), prices.unsigned()).mulAmounts();
   };
@@ -44,6 +45,10 @@ export class Amounts {
   //   amounts.initAmountOf(activeAsset, amount); // TODO this will probably crash out of the box, because when 0es
   //   return new Amounts(amounts);
   // };
+
+  static fresh(): Amounts {
+    return new Amounts(new PositiveValue());
+  }
 
   static generateUsed = (param: Param) => (prices: Prices): Amounts => {
     assert(

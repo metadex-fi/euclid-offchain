@@ -1,13 +1,11 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { abs, genNonNegative, leq, min, randomChoice } from "../../mod.ts";
+import { leq, randomChoice } from "../../mod.ts";
 import {
   Asset,
   Assets,
   CurrencySymbol,
   generateWithin,
   lSubValues,
-  newCompareWith,
-  newUnionWith,
   Param,
   PConstraint,
   PObject,
@@ -15,7 +13,6 @@ import {
   TokenName,
   Value,
 } from "../mod.ts";
-import { JumpSizes } from "./jumpSizes.ts";
 import {
   PositiveValue,
   PPositiveValue,
@@ -30,7 +27,9 @@ export class Prices {
     function inner(initPs: Value, currentPs: Value): Asset {
       let branch = "none";
       try {
-        const diff = lSubValues(currentPs, initPs);
+        const initNorm = initPs.tail().scaledWith(currentPs.firstAmount());
+        const currentNorm = currentPs.tail().scaledWith(initPs.firstAmount());
+        const diff = lSubValues(initNorm, currentNorm);
         switch (diff.size()) {
           case 0n:
             branch = `0n with ${initPs.concise()}`;
@@ -41,15 +40,9 @@ export class Prices {
           default: {
             branch =
               `default with \n${initPs.concise()}\n${currentPs.concise()}`;
-            let initTail = initPs.tail();
-            let currentTail = currentPs.tail();
-            const fstInit = initTail.firstAmount();
-            const fstCurrent = currentTail.firstAmount();
-            initTail = initTail.scaledWith(fstCurrent);
-            currentTail = currentTail.scaledWith(fstInit);
             return inner(
-              initTail,
-              currentTail,
+              initNorm,
+              currentNorm,
             );
           }
         }
