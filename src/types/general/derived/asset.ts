@@ -147,7 +147,7 @@ export class Assets {
     return true;
   };
 
-  public copy = (): Assets => {
+  public clone = (): Assets => {
     const assets = new Assets();
     for (const [ccy, tkns] of this.assets) {
       assets.assets.set(ccy, tkns.slice());
@@ -164,9 +164,21 @@ export class Assets {
   };
 
   public add = (asset: Asset): Assets => {
-    const assets = this.copy();
+    const assets = this.clone();
     assets.insert(asset);
     return assets;
+  };
+
+  public remove = (asset: Asset): void => {
+    const { currencySymbol, tokenName } = asset;
+    const tkns = this.assets.get(currencySymbol);
+    assert(tkns !== undefined, `${asset.show()} not in ${this.show()}`);
+    const i = tkns.indexOf(tokenName);
+    assert(i >= 0, `${asset.show()} not in ${this.show()}`);
+    tkns.splice(i, 1);
+    if (tkns.length === 0) {
+      this.assets.delete(currencySymbol);
+    }
   };
 
   public head = (): Asset => {

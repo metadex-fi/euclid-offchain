@@ -1,3 +1,4 @@
+import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   Address,
   Assets as LucidAssets,
@@ -11,6 +12,7 @@ import { EuclidState } from "../chain/euclidState.ts";
 import { DiracUtxo, ParamUtxo } from "../chain/euclidUtxo.ts";
 import {
   Amounts,
+  Asset,
   Assets,
   IdNFT,
   Param,
@@ -30,7 +32,7 @@ export class User {
   public readonly contract: Contract;
 
   public balance: Amounts | undefined;
-  public pools = new Map<ParamNFT, Pool>();
+  public pools = new Map<Asset, Pool>();
   public nextParamNFT: IdNFT;
 
   constructor(
@@ -52,6 +54,14 @@ export class User {
     user.balance = Amounts.genOfAssets(assets);
     return user;
   }
+
+  public addPool = (pool: Pool): void => {
+    assert(
+      !this.pools.has(pool.paramNFT),
+      `addPool: pool already exists for ${pool.paramNFT.show()}`,
+    );
+    this.pools.set(pool.paramNFT, pool);
+  };
 
   public update = async (): Promise<void> => {
     const utxos = await this.lucid.utxosAt(this.address);

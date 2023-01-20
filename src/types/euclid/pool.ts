@@ -14,6 +14,7 @@ import {
   Param,
   PAssets,
   PConstraint,
+  PDirac,
   PList,
   PObject,
   POwner,
@@ -34,7 +35,9 @@ export class Pool {
     public readonly param: Param,
     public readonly diracs: Dirac[],
     public readonly nfts: Assets,
-  ) {}
+  ) {
+    Pool.assert(this);
+  }
 
   public show = (tabs = ""): string => {
     const tt = tabs + t;
@@ -51,8 +54,31 @@ ${ttf}nfts: ${this.nfts.show(ttf)},
 ${tt})`;
   };
 
+  static assert(pool: Pool): void {
+    const owner = pool.param.owner;
+    const nfts = pool.nfts.clone();
+    nfts.remove(pool.paramNFT);
+    pool.diracs.forEach((dirac) => {
+      assert(dirac.owner === owner, `Wrong owner: ${dirac.owner} vs ${owner}`);
+      assert(
+        dirac.paramNFT.show() === pool.paramNFT.show(),
+        `Wrong paramNFT: ${dirac.paramNFT.show()} vs ${pool.paramNFT.show()}`,
+      );
+      nfts.remove(dirac.threadNFT);
+    });
+    assert(nfts.size() === 0, `leftover nfts: ${nfts.show()}`);
+    // TODO more here
+  }
+
   static assertForUser = (user: User) => (pool: Pool): void => {
-    // TODO
+    Pool.assert(pool);
+    Param.assertForUser(user)(pool.param);
+    // const pool_ = user.pools.get(pool.paramNFT);
+    // assert(pool_, `Pool not found for user: ${pool.paramNFT.show()}`);
+    // assert(
+    //   pool.show() === pool_.show(),
+    //   `Pools don't match: ${pool.show()} vs ${pool_.show()}`,
+    // );
   };
 
   static generateForUser = (user: User) => (): Pool => {
@@ -98,8 +124,9 @@ ${tt})`;
 
     // generator function for a single dirac based on its' prices
     const paramNFT = user.nextParamNFT;
+    nfts.insert(paramNFT.asset);
     function generateDirac(prices: Prices): Dirac {
-      nfts.add(threadNFT.asset);
+      nfts.insert(threadNFT.asset);
       return new Dirac(
         param.owner,
         threadNFT.asset,
@@ -138,9 +165,14 @@ ${tt})`;
       });
       diracs = diracs.concat(diracs_);
     });
-
+    assert(
+      diracs.length + 1 === nfts.size(),
+      `Wrong number of diracs: ${diracs.length} vs ${nfts.size()} - 1`,
+    );
+    const pool = new Pool(paramNFT.asset, param, diracs, nfts);
     user.nextParamNFT = threadNFT.next();
-    return new Pool(paramNFT.asset, param, diracs, nfts);
+    user.addPool(pool);
+    return pool;
   };
 }
 

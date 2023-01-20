@@ -114,8 +114,16 @@ ${tt})`;
       param.upperPriceBounds.assets().equals(assets),
       `assets must match, got ${param.upperPriceBounds.concise()}, expected ${assets.show()}`,
     );
-    // TODO assert leq
+    // TODO assert leq, and more
   }
+
+  static assertForUser = (user: User) => (param: Param): void => {
+    Param.assert(param);
+    assert(
+      user.address === param.owner,
+      `owner must match, got ${param.owner}, expected ${user.address}`,
+    );
+  };
 
   static generate(): Param {
     const owner = PPaymentKeyHash.genData();
