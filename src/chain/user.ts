@@ -5,6 +5,7 @@ import {
   Lucid,
   Tx,
   TxComplete,
+  Utils,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { EuclidState } from "../chain/euclidState.ts";
 import { DiracUtxo, ParamUtxo } from "../chain/euclidUtxo.ts";
@@ -45,9 +46,11 @@ export class User {
   // for propertytesting
   static generateDummy(): User {
     const lucid = new Lucid();
+    lucid.utils = new Utils(lucid);
     const address = PPaymentKeyHash.genData();
     const user = new User(lucid, address);
-    user.balance = Amounts.genOfAssets(Assets.generate(2n));
+    const assets = Assets.generate(2n);
+    user.balance = Amounts.genOfAssets(assets);
     return user;
   }
 
