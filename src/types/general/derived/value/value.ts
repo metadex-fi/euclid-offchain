@@ -271,9 +271,13 @@ export class Value {
 
   public fill = (assets: Assets, amount: bigint): Value => {
     const value = this.clone();
-    for (const asset of assets.toList()) {
+    assets.forEach((asset) => {
       value.fillAmountOf(asset, amount);
-    }
+    });
+    assert(
+      value.assets().equals(assets),
+      `fill: ${value.show()} != ${assets.show()}`,
+    );
     return value;
   };
 
@@ -439,7 +443,11 @@ export const newUnionWith = (
   };
 };
 
-export const addValues = newUnionWith((a, b) => a + b, undefined, 0n);
+export const addValues = newUnionWith((a, b) => a + b);
+export const mulValues = newUnionWith((a, b) => a * b);
+export const mulValues_ = newUnionWith((a, b) => a * b, undefined, 0n);
+export const divValues = newUnionWith((a, b) => a / b);
+
 export const lSubValues = newUnionWith((a, b) => a > b ? a - b : 0n, 0n);
 export const lSubValues_ = newUnionWith(
   (a, b) => a > b ? a - b : 0n,
@@ -447,8 +455,6 @@ export const lSubValues_ = newUnionWith(
   undefined,
   0n,
 );
-export const mulValues = newUnionWith((a, b) => a * b, undefined, 1n);
-export const divValues = newUnionWith((a, b) => a / b);
 
 export const generateWithin = newUnionWith(
   (a, b) => new PBounded(a, b).genData(),

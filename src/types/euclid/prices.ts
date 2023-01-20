@@ -87,10 +87,18 @@ export class Prices {
     );
   };
 
-  static generateInitial(): Prices {
-    const assets = Assets.generate(2n);
+  static genOfAssets = (assets: Assets): Prices => {
+    assert(
+      assets.size() >= 2n,
+      `Prices: less than two assets in ${assets.show()}`,
+    );
     const value = PositiveValue.genOfAssets(assets);
     return new Prices(value);
+  };
+
+  static generateInitial(): Prices {
+    const assets = Assets.generate(2n);
+    return Prices.genOfAssets(assets);
   }
 
   static generateCurrent = (param: Param) => (): Prices => {

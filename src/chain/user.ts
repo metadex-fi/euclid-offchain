@@ -10,7 +10,6 @@ import {
 import { EuclidState } from "../chain/euclidState.ts";
 import { DiracUtxo, ParamUtxo } from "../chain/euclidUtxo.ts";
 import {
-  addValues,
   Amounts,
   Assets,
   IdNFT,

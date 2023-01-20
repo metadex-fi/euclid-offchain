@@ -82,7 +82,7 @@ ${tt})`;
     const zeroes = param.initialPrices.zeroed();
     let numJumps = generateWithin(zeroes, param.maxJumps());
     let lowestPrices = addValues(
-      param.lowerPriceBounds.unsigned(),
+      param.filledLowerBounds().unsigned(),
       mulValues(param.jumpSizes.unsigned(), numJumps),
     );
 

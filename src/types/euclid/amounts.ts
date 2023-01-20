@@ -3,7 +3,7 @@ import { genNonNegative, maxInteger } from "../../mod.ts";
 import {
   Asset,
   Assets,
-  mulValues,
+  mulValues_,
   Param,
   PObject,
   PRecord,
@@ -32,7 +32,7 @@ export class Amounts {
   };
 
   public equivalentA0 = (prices: PositiveValue): bigint => {
-    return mulValues(this.unsigned(), prices.unsigned()).mulAmounts();
+    return mulValues_(this.unsigned(), prices.unsigned()).mulAmounts();
   };
 
   public lowest = (): bigint => {

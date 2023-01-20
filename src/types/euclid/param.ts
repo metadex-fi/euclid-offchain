@@ -1,18 +1,9 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import {
-  abs,
-  addValues,
-  gMaxHashes,
-  maxInteger,
-  min,
-  Prices,
-  User,
-} from "../../mod.ts";
+import { abs, gMaxHashes, maxInteger, min, Prices, User } from "../../mod.ts";
 import {
   Amount,
   Amounts,
-  Assets,
   boundPositive,
   f,
   JumpSizes,
@@ -160,11 +151,10 @@ ${tt})`;
       `balance must be at least 2, got ${user.balance.concise()}`,
     );
     const deposit = user.balance.minSizedSubAmounts(2n);
+    const assets = deposit.assets();
 
-    const initialPrices = Prices.generateInitial();
-    const assets = initialPrices.assets();
+    const initialPrices = Prices.genOfAssets(assets);
     const jumpSizes = JumpSizes.genOfAssets(assets);
-
     const upperBounds = PositiveValue.genOfAssets(assets);
     const lowerOffset = PositiveValue.genOfAssets(assets.randomSubset())
       .unsigned();
