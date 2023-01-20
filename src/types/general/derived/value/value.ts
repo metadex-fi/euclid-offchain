@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { genPositive, maxInteger } from "../../../../mod.ts";
+import { genPositive, max, maxInteger } from "../../../../mod.ts";
 import { f, PConstraint, PMap, PObject, PRecord, t } from "../../mod.ts";
 import {
   Asset,
@@ -76,6 +76,10 @@ export class Value {
 
   public increment = (): Value => {
     return newMapAmounts((a) => a + 1n)(this);
+  };
+
+  public flatDecrement = (): Value => {
+    return newMapAmounts((a) => max(0n, a - 1n))(this);
   };
 
   public numAssets = (): number => {

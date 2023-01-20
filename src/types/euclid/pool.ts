@@ -82,7 +82,7 @@ ${tt})`;
     // jump the lowerBounds a random number of jumpSizes,
     // but within upper bounds, to prepare getting the lowest dirac prices
     const zeroes = param.initialPrices.zeroed();
-    let numJumps = generateWithin(zeroes, param.maxJumps());
+    let numJumps = generateWithin(zeroes, param.maxJumps().flatDecrement());
     let lowestPrices = addValues(
       param.filledLowerBounds().unsigned(),
       mulValues(param.jumpSizes.unsigned(), numJumps),
@@ -90,7 +90,7 @@ ${tt})`;
 
     // jump the result a random number of ticks to get the lowest dirac prices
     const tickSizes = divValues(param.jumpSizes.unsigned(), numTicks);
-    // numJumps = generateWithin(zeroes, numTicks);
+    // numJumps = generateWithin(zeroes, numTicks.flatDecrement());
     // lowestPrices = addValues(
     //   lowestPrices,
     //   mulValues(tickSizes, numJumps),
