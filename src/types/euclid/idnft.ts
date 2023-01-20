@@ -180,7 +180,7 @@ export class PThreadNFT extends PIdNFT {
     return new PThreadNFT(
       placeholderCcy,
       paramNFTtkn,
-      param.boundedMaxDiracs(),
+      param.boundedMinDiracs(),
     );
   }
 }

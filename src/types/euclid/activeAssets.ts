@@ -1,11 +1,26 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Asset, Param, PAsset, PMap, PObject, PRecord } from "../mod.ts";
+import { maybeNdef } from "../../mod.ts";
+import { Asset, f, Param, PAsset, PMap, PObject, PRecord, t } from "../mod.ts";
 import { PPrices, Prices } from "./prices.ts";
 
 export class ActiveAssets {
   constructor(
     private activeAssets: Map<Prices, Asset>,
   ) {}
+
+  public show = (tabs = ""): string => {
+    const tt = tabs + t;
+    const ttf = tt + f;
+    const ttff = ttf + f;
+    const mn = this.activeAssets.size > 0 ? "\n" : "";
+    return `ActiveAssets(
+${ttf}activeAssets: {${mn}${
+      [...this.activeAssets.entries()].map(([location, asset]) =>
+        `${ttff}${location.concise(ttff)} => ${asset.show()}\n`
+      ).join(",")
+    }}
+${tt})`;
+  };
 
   public forEach(
     callbackfn: (value: Asset, key: Prices, map: Map<Prices, Asset>) => void,
@@ -19,7 +34,7 @@ export class ActiveAssets {
 
   static assertUsed = (param: Param) => (activeAssets: ActiveAssets): void => {
     activeAssets.forEach((asset, location) => {
-      const defaultAsset = location.defaultActiveAsset(param);
+      const defaultAsset = location.defaultActiveAsset(param.initialPrices);
       assert(
         asset !== defaultAsset,
         `default asset ${defaultAsset} should not be stored at location ${location}`,
@@ -38,7 +53,7 @@ export class ActiveAssets {
         location.assets().equals(assets),
         `location ${location} should have assets ${assets}`,
       );
-      const defaultAsset = location.defaultActiveAsset(param);
+      const defaultAsset = location.defaultActiveAsset(param.initialPrices);
       const asset = assets.randomChoice();
       if (asset !== defaultAsset) {
         activeAssets.set(location, asset);
@@ -50,17 +65,22 @@ export class ActiveAssets {
 
 export class PActiveAssets extends PObject<ActiveAssets> {
   constructor(
-    public readonly param: Param,
+    public readonly param?: Param,
   ) {
     super(
       new PRecord({
-        "activeAssets": new PMap(PPrices.initial(), PAsset.ptype), // TODO could constain PAsset more here, but that's nonessential
+        "activeAssets": new PMap(
+          param ? PPrices.current(param) : PPrices.initial(),
+          PAsset.ptype,
+        ), // TODO could constain PAsset more here, but that's nonessential
       }),
       ActiveAssets,
     );
   }
 
   static genPType(): PObject<ActiveAssets> {
-    return new PActiveAssets(Param.generate());
+    return new PActiveAssets(
+      maybeNdef(Param.generate)?.(),
+    );
   }
 }

@@ -18,10 +18,11 @@ import {
   ParamNFT,
   PositiveValue,
   PParamDatum,
-  PPoolDatums,
+  PPaymentKeyHash,
   randomChoice,
   Value,
 } from "../mod.ts";
+import { Pool } from "../types/euclid/pool.ts";
 import { Contract } from "./contract.ts";
 
 export class User {
@@ -29,7 +30,7 @@ export class User {
   public readonly contract: Contract;
 
   public balance: Amounts | undefined;
-  public pools = new Map<ParamUtxo, DiracUtxo[]>();
+  public pools = new Map<ParamNFT, Pool>();
   public nextParamNFT: IdNFT;
 
   constructor(
@@ -39,6 +40,15 @@ export class User {
     this.contract = new Contract(lucid);
     this.state = new EuclidState(this.lucid, this.contract.address);
     this.nextParamNFT = new ParamNFT(this.contract.policyId, this.address);
+  }
+
+  // for propertytesting
+  static generateDummy(): User {
+    const lucid = new Lucid();
+    const address = PPaymentKeyHash.genData();
+    const user = new User(lucid, address);
+    user.balance = Amounts.genOfAssets(Assets.generate(2n));
+    return user;
   }
 
   public update = async (): Promise<void> => {
@@ -56,93 +66,93 @@ export class User {
     return this.pools.size > 0;
   };
 
-  public genOpenTx = (): Tx => {
-    const deposit = this.balance!.minSizedSubAmounts(2n);
-    const param = Param.generateWith(this.address, deposit);
-    const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(param));
-    const pdiracDatums = PPoolDatums.fromParam(
-      param,
-      this.nextParamNFT,
-    );
-    const diracDatums = pdiracDatums.genData();
+  // public genOpenTx = (): Tx => {
+  //   const deposit = this.balance!.minSizedSubAmounts(2n);
+  //   const param = Param.generateWith(this.address, deposit);
+  //   const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(param));
+  //   const pdiracDatums = PPoolDatums.fromParam(
+  //     param,
+  //     this.nextParamNFT,
+  //   );
+  //   const diracDatums = pdiracDatums.genData();
 
-    let tx = this.lucid.newTx();
+  //   let tx = this.lucid.newTx();
 
-    const paramNFT = this.nextParamNFT.asset;
-    const threadNFTs = diracDatums.map((diracDatum) => diracDatum._0.threadNFT);
-    this.nextParamNFT = this.nextParamNFT.next(diracDatums.length);
+  //   const paramNFT = this.nextParamNFT.asset;
+  //   const threadNFTs = diracDatums.map((diracDatum) => diracDatum._0.threadNFT);
+  //   this.nextParamNFT = this.nextParamNFT.next(diracDatums.length);
 
-    const lucidIdNFTs = Assets.fromList([paramNFT, ...threadNFTs]).toLucidWith(
-      1n,
-    );
+  //   const lucidIdNFTs = Assets.fromList([paramNFT, ...threadNFTs]).toLucidWith(
+  //     1n,
+  //   );
 
-    tx = tx
-      .mintAssets(lucidIdNFTs)
-      .attachMintingPolicy(this.contract.mintingPolicy);
+  //   tx = tx
+  //     .mintAssets(lucidIdNFTs)
+  //     .attachMintingPolicy(this.contract.mintingPolicy);
 
-    tx = tx.payToContract(
-      this.contract.address,
-      {
-        inline: Data.to(paramDatum),
-        scriptRef: this.contract.validator, // for now, for simplicities' sake
-      },
-      paramNFT.toLucidWith(1n),
-    );
+  //   tx = tx.payToContract(
+  //     this.contract.address,
+  //     {
+  //       inline: Data.to(paramDatum),
+  //       scriptRef: this.contract.validator, // for now, for simplicities' sake
+  //     },
+  //     paramNFT.toLucidWith(1n),
+  //   );
 
-    pdiracDatums.pconstant(diracDatums).forEach((diracDatum, index) => {
-      tx = tx.payToContract(
-        this.contract.address,
-        {
-          inline: Data.to(diracDatum),
-        },
-        threadNFTs[index].toLucidWith(1n),
-        // TODO funds
-      );
-    });
+  //   pdiracDatums.pconstant(diracDatums).forEach((diracDatum, index) => {
+  //     tx = tx.payToContract(
+  //       this.contract.address,
+  //       {
+  //         inline: Data.to(diracDatum),
+  //       },
+  //       threadNFTs[index].toLucidWith(1n),
+  //       // TODO funds
+  //     );
+  //   });
 
-    return tx;
-  };
+  //   return tx;
+  // };
 
-  public genCloseTx = (param: ParamUtxo, diracs: DiracUtxo[]): Tx => {
-  };
+  // public genCloseTx = (param: ParamUtxo, diracs: DiracUtxo[]): Tx => {
+  // };
 
-  public genAdminTx = (param: ParamUtxo, diracs: DiracUtxo[]): Tx => {
-  };
+  // public genAdminTx = (param: ParamUtxo, diracs: DiracUtxo[]): Tx => {
+  // };
 
-  public genFlipTx = (): Tx => {
-  };
+  // public genFlipTx = (): Tx => {
+  // };
 
-  public genJumpTx = (): Tx => {
-  };
+  // public genJumpTx = (): Tx => {
+  // };
 
-  public genOwnerTx = (): Tx => {
-    const param = randomChoice(Array.from(this.pools.keys()));
-    const diracs = this.pools.get(param) ?? [];
-    return randomChoice([
-      this.genCloseTx,
-      this.genAdminTx,
-    ])(param, diracs);
-  };
+  // public genOwnerTx = (): Tx => {
+  //   const param = randomChoice(Array.from(this.pools.keys()));
+  //   const diracs = this.pools.get(param) ?? [];
+  //   return randomChoice([
+  //     this.genCloseTx,
+  //     this.genAdminTx,
+  //   ])(param, diracs);
+  // };
 
-  public genUserTx = (): Tx => {
-    return randomChoice([
-      this.genFlipTx,
-      this.genJumpTx,
-    ])();
-  };
+  // public genUserTx = (): Tx => {
+  //   return randomChoice([
+  //     this.genFlipTx,
+  //     this.genJumpTx,
+  //   ])();
+  // };
 
-  public genEuclidTx = async (): Promise<TxComplete> => {
-    await Promise.all([this.update(), this.state.update()]);
-    this.pools = this.state.get(this.address);
+  // public genEuclidTx = async (): Promise<TxComplete> => {
+  //   await Promise.all([this.update(), this.state.update()]);
+  //   this.pools = this.state.get(this.address);
 
-    const genTx = randomChoice([
-      ...this.isOwner() ? [this.genOwnerTx] : [],
-      this.genOpenTx,
-      this.genUserTx,
-    ]);
+  //   const genTx = randomChoice([
+  //     ...this.isOwner() ? [this.genOwnerTx] : [],
+  //     this.genOpenTx,
+  //     this.genUserTx,
+  //   ]);
 
-    return await genTx().complete();
-  };
+  //   return await genTx().complete();
+  // };
 }
 
 // function addLucidAssetsTo(a: LucidAssets, b: LucidAssets): void {

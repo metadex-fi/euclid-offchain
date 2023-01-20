@@ -31,15 +31,15 @@ export class PositiveValue {
   public assets = (): Assets => this.value.assets();
   public unsigned = (): Value => new Value(this.value.toMap());
   public unit = (): Value => this.value.unit();
+  public zeroed = (): Value => this.value.zeroed();
   public size = (): bigint => this.value.size();
   public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
   public firstAmount = (): bigint => this.value.firstAmount();
   public setAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.setAmountOf(asset, amount);
   public clone = (): PositiveValue => new PositiveValue(this.value.clone());
-  public addAmountOf = (asset: Asset, amount: bigint): PositiveValue => {
-    return new PositiveValue(this.value.addAmountOf(asset, amount));
-  };
+  public scaledWith = (factor: bigint): PositiveValue =>
+    new PositiveValue(this.value.scaledWith(factor));
   public fill = (assets: Assets, amount: bigint): PositiveValue => {
     assert(amount > 0n, `fill: amount must be positive, got ${amount}`);
     return new PositiveValue(this.value.fill(assets, amount));

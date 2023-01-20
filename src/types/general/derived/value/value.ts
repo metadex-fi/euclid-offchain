@@ -70,8 +70,8 @@ export class Value {
   //   return newSetAmounts(-maxInteger)(this);
   // };
 
-  public scaledWith = (amount: bigint): Value => {
-    return newMapAmounts((a) => a * amount)(this);
+  public scaledWith = (factor: bigint): Value => {
+    return newMapAmounts((a) => a * factor)(this);
   };
 
   public increment = (): Value => {
@@ -265,10 +265,8 @@ export class Value {
 
   public clone = (): Value => new Value(this.toMap());
 
-  public addAmountOf = (asset: Asset, amount: bigint): Value => {
-    const value = this.clone();
-    value.setAmountOf(asset, value.amountOf(asset) + amount);
-    return value;
+  public addAmountOf = (asset: Asset, amount: bigint): void => {
+    this.setAmountOf(asset, this.amountOf(asset) + amount);
   };
 
   public fill = (assets: Assets, amount: bigint): Value => {
@@ -450,11 +448,10 @@ export const lSubValues_ = newUnionWith(
   0n,
 );
 export const mulValues = newUnionWith((a, b) => a * b, undefined, 1n);
+export const divValues = newUnionWith((a, b) => a / b);
 
 export const generateWithin = newUnionWith(
   (a, b) => new PBounded(a, b).genData(),
-  undefined,
-  1n,
 );
 
 export const newBoundedWith = (bounds: PBounded) => (value: Value): Value => {

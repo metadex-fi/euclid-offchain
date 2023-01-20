@@ -1,7 +1,7 @@
-import euclidValidator from "../../plutarch/euclidValidator.json" assert {
+import euclidValidator from "../../contract/euclidValidator.json" assert {
   type: "json",
 };
-import euclidMinting from "../../plutarch/euclidMinting.json" assert {
+import euclidMinting from "../../contract/euclidMinting.json" assert {
   type: "json",
 };
 import {

@@ -7,6 +7,7 @@ import {
   maxInteger,
   min,
   Prices,
+  User,
 } from "../../mod.ts";
 import {
   Amount,
@@ -63,7 +64,7 @@ ${ttf}baseAmountA0: ${this.baseAmountA0}
 ${tt})`;
   };
 
-  private maxJumps = (
+  private maxJumpsFromTo = (
     from: PositiveValue,
     to: PositiveValue,
     maxJumps = gMaxJumps,
@@ -90,21 +91,26 @@ ${tt})`;
     );
   };
 
-  private maxDiracs = (): bigint => {
-    const lowerBounds = addValues(
-      this.lowerPriceBounds.unsigned(),
-      this.jumpSizes.unsigned().zeroed(),
-    );
-    const maxJumps = this.maxJumps(
-      new PositiveValue(lowerBounds),
+  public filledLowerBounds = (): PositiveValue => {
+    return this.lowerPriceBounds.fill(this.initialPrices.assets(), 1n);
+  };
+
+  public maxJumps = (): Value => {
+    const lowerBounds = this.filledLowerBounds();
+    return this.maxJumpsFromTo(
+      lowerBounds,
       this.upperPriceBounds,
       maxInteger,
     );
-    return maxJumps.increment().mulAmounts();
   };
 
-  public boundedMaxDiracs = (): bigint => {
-    return min(gMaxHashes, this.maxDiracs());
+  // i.e. in case of tickSizes >= jumpSizes
+  public minDiracs = (): bigint => {
+    return this.maxJumps().increment().mulAmounts();
+  };
+
+  public boundedMinDiracs = (): bigint => {
+    return min(gMaxHashes, this.minDiracs());
   };
 
   static assert(param: Param): void {
@@ -145,6 +151,43 @@ ${tt})`;
       upperBounds,
       baseAmountA0,
     );
+  }
+
+  static generateForUser(user: User): [Param, Amounts] {
+    assert(user.balance, `user balance not initialized for ${user.address}`);
+    assert(
+      user.balance.size() >= 2,
+      `balance must be at least 2, got ${user.balance.concise()}`,
+    );
+    const deposit = user.balance.minSizedSubAmounts(2n);
+
+    const initialPrices = Prices.generateInitial();
+    const assets = initialPrices.assets();
+    const jumpSizes = JumpSizes.genOfAssets(assets);
+
+    const upperBounds = PositiveValue.genOfAssets(assets);
+    const lowerOffset = PositiveValue.genOfAssets(assets.randomSubset())
+      .unsigned();
+
+    const lowerBounds = new PositiveValue(
+      boundPositive(lSubValues_(upperBounds.unsigned(), lowerOffset)),
+    );
+    const param = new Param(
+      user.address,
+      jumpSizes,
+      initialPrices,
+      lowerBounds,
+      upperBounds,
+      1n,
+    );
+    let minDiracs = param.minDiracs();
+    while (minDiracs > deposit.lowest()) {
+      param.jumpSizes.doubleRandom();
+      minDiracs = param.minDiracs();
+    }
+    param.baseAmountA0 = deposit.equivalentA0(param.filledLowerBounds()) /
+      minDiracs;
+    return [param, deposit];
   }
 }
 export class PParam extends PConstraint<PObject<Param>> {

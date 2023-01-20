@@ -31,9 +31,21 @@ export class Amounts {
     return new Amounts(this.value.minSizedSubValue(minSize));
   };
 
-  // TODO this is incongruent with onchain, figure out which one's better
   public equivalentA0 = (prices: PositiveValue): bigint => {
     return mulValues(this.unsigned(), prices.unsigned()).mulAmounts();
+  };
+
+  public lowest = (): bigint => {
+    let lowest: bigint | undefined = undefined;
+    for (const amounts of this.value.toMap().values()) {
+      for (const amount of amounts.values()) {
+        if (!lowest || amount < lowest) {
+          lowest = amount;
+        }
+      }
+    }
+    assert(lowest, `lowest: no lowest found in ${this.concise()}`);
+    return lowest;
   };
 
   // static generateFresh = (param: Param) => (prices: Prices): Amounts => {
@@ -82,6 +94,12 @@ export class Amounts {
       value.initAmountOf(asset, amount);
     });
     return new Amounts(new PositiveValue(value));
+  }
+
+  static genOfAssets(assets: Assets): Amounts {
+    return new Amounts(
+      PositiveValue.genOfAssets(assets),
+    );
   }
 }
 

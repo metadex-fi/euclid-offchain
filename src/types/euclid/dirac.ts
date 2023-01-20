@@ -4,6 +4,7 @@ import { maxInteger, randomChoice } from "../../mod.ts";
 import {
   Amounts,
   Asset,
+  f,
   gMaxHashes,
   newUnionWith,
   PAmounts,
@@ -17,6 +18,7 @@ import {
   PRecord,
   Prices,
   PThreadNFT,
+  t,
   ThreadNFT,
 } from "../mod.ts";
 import { ActiveAssets, PActiveAssets } from "./activeAssets.ts";
@@ -33,14 +35,16 @@ export class Dirac {
   ) {}
 
   public show = (tabs = ""): string => {
+    const tt = tabs + t;
+    const ttf = tt + f;
     return `Dirac(
-  owner: ${this.owner},
-  threadNFT: ${this.threadNFT.show()},
-  paramNFT: ${this.paramNFT.show()},
-  currentPrices: ${this.prices.concise(tabs)},
-  activeAmnts: ${this.activeAmnts.concise(tabs)},
-  )`;
-    // jumpStorage: ${this.jumpStorage.show(tabs)},
+${ttf}owner: ${this.owner},
+${ttf}threadNFT: ${this.threadNFT.show()},
+${ttf}paramNFT: ${this.paramNFT.show()},
+${ttf}currentPrices: ${this.prices.concise(ttf)},
+${ttf}activeAmnts: ${this.activeAmnts.concise(ttf)},
+${ttf}jumpStorage: ${this.jumpStorage.show(ttf)},
+${tt})`;
   };
 
   // TODO consider fees here
@@ -67,18 +71,6 @@ activeAmnts: ${dirac.activeAmnts.concise()}`,
     );
   };
 
-  // static generateWith = (param: Param) =>
-  //   randomChoice([
-  //     Dirac.generateFresh,
-  //     Dirac.generateUsed,
-  //   ])(param);
-
-  // static generateFresh = (param: Param) =>
-  //   Dirac.generateInner(
-  //     param,
-  //     Amounts.generateFresh(param),
-  //     ActiveAssets.fresh,
-  //   );
   static generateUsed = (param: Param) =>
     Dirac.generateInner(
       param,
@@ -101,7 +93,7 @@ activeAmnts: ${dirac.activeAmnts.concise()}`,
     );
     const threadNFT = ThreadNFT.generateWith(
       paramNFT,
-      param.boundedMaxDiracs(),
+      param.boundedMinDiracs(),
     );
 
     const prices = Prices.generateCurrent(param)();

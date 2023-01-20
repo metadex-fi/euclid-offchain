@@ -23,46 +23,32 @@ export class Prices {
     Prices.assertInitial(this);
   }
 
-  public defaultActiveAsset = (param: Param): Asset => {
+  public defaultActiveAsset = (initialPrices: Prices): Asset => {
     function inner(initPs: Value, currentPs: Value): Asset {
-      let branch = "none";
-      try {
-        const initNorm = initPs.tail().scaledWith(currentPs.firstAmount());
-        const currentNorm = currentPs.tail().scaledWith(initPs.firstAmount());
-        const diff = lSubValues(initNorm, currentNorm);
-        switch (diff.size()) {
-          case 0n:
-            branch = `0n with ${initPs.concise()}`;
-            return initPs.firstAsset();
-          case 1n:
-            branch = `1n with ${diff.concise()}`;
-            return diff.firstAsset();
-          default: {
-            branch =
-              `default with \n${initPs.concise()}\n${currentPs.concise()}`;
-            return inner(
-              initNorm,
-              currentNorm,
-            );
-          }
+      const initNorm = initPs.tail().scaledWith(currentPs.firstAmount());
+      const currentNorm = currentPs.tail().scaledWith(initPs.firstAmount());
+      const diff = lSubValues(initNorm, currentNorm);
+      switch (diff.size()) {
+        case 0n:
+          return initPs.firstAsset();
+        case 1n:
+          return diff.firstAsset();
+        default: {
+          return inner(
+            initNorm,
+            currentNorm,
+          );
         }
-      } catch (e) {
-        throw new Error(
-          `defaultActiveAsset(
-    initPs: ${initPs.concise()},
-    currentPs: ${currentPs.concise()},
-    branch: ${branch}
-    ): ${e}`,
-        );
       }
     }
-    return inner(param.initialPrices.unsigned(), this.unsigned());
+    return inner(initialPrices.unsigned(), this.unsigned());
   };
 
   public signed = (): PositiveValue => new PositiveValue(this.unsigned());
   public unsigned = (): Value => this.value.unsigned();
   public assets = (): Assets => this.value.assets();
   public unit = (): Value => this.value.unit();
+  public zeroed = (): Value => this.value.zeroed();
   public concise = (tabs = ""): string => `Prices ${this.value.concise(tabs)}`;
   public show = (tabs = ""): string => `Prices (\n${this.value.show(tabs)}\n)`;
   public size = (): bigint => this.value.size();
@@ -70,8 +56,6 @@ export class Prices {
   public setAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.setAmountOf(asset, amount);
   public clone = (): Prices => new Prices(this.value.clone());
-  public addAmountOf = (asset: Asset, amount: bigint): Prices =>
-    new Prices(this.value.addAmountOf(asset, amount));
   public toMap = (): Map<CurrencySymbol, Map<TokenName, bigint>> =>
     this.value.toMap();
 
@@ -112,7 +96,7 @@ export class Prices {
   static generateCurrent = (param: Param) => (): Prices => {
     return Prices.fromValue(
       generateWithin(
-        param.lowerPriceBounds.unsigned(),
+        param.filledLowerBounds().unsigned(),
         param.upperPriceBounds.unsigned(),
       ),
     );
