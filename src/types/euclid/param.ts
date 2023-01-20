@@ -125,12 +125,7 @@ ${tt})`;
     const jumpSizes = JumpSizes.genOfAssets(assets);
 
     const upperBounds = PositiveValue.genOfAssets(assets);
-    const lowerOffset = PositiveValue.genOfAssets(assets.randomSubset())
-      .unsigned();
-
-    const lowerBounds = new PositiveValue(
-      boundPositive(lSubValues_(upperBounds.unsigned(), lowerOffset)),
-    );
+    const lowerBounds = upperBounds.minSizedSubValue(0n);
 
     const baseAmountA0 = new PPositive().genData();
 
@@ -156,12 +151,7 @@ ${tt})`;
     const initialPrices = Prices.genOfAssets(assets);
     const jumpSizes = JumpSizes.genOfAssets(assets);
     const upperBounds = PositiveValue.genOfAssets(assets);
-    const lowerOffset = PositiveValue.genOfAssets(assets.randomSubset())
-      .unsigned();
-
-    const lowerBounds = new PositiveValue(
-      boundPositive(lSubValues_(upperBounds.unsigned(), lowerOffset)),
-    );
+    const lowerBounds = upperBounds.minSizedSubValue(0n);
     const param = new Param(
       user.address,
       jumpSizes,
@@ -175,8 +165,11 @@ ${tt})`;
       param.jumpSizes.doubleRandom();
       minDiracs = param.minDiracs();
     }
-    param.baseAmountA0 = deposit.equivalentA0(param.filledLowerBounds()) /
-      minDiracs;
+    param.baseAmountA0 = min(
+      maxInteger, // TODO
+      deposit.equivalentA0(param.filledLowerBounds()) /
+        minDiracs,
+    );
     return [param, deposit];
   }
 }

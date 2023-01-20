@@ -58,15 +58,22 @@ ${tt})`;
   static generateForUser = (user: User) => (): Pool => {
     const nfts = new Assets();
     const [param, deposit] = Param.generateForUser(user);
+    try {
+      PParam.ptype.pconstant(param);
+    } catch (e) {
+      throw new Error(`Param wrong: ${e}`);
+    }
+
     const assets = deposit.assets();
     // generate number of ticks per asset, such that
     // (numTicks * jumpSizes).mul <= deposit.lowest
     // and numTicks <= jumpSizes
     let tickBudget = deposit.lowest() / param.minDiracs();
     const numTicks = new Value();
+    const maxTicks = 4n;
     assets.forEach((asset) => {
       const ticks = genPositive(
-        min(tickBudget, param.jumpSizes.amountOf(asset)),
+        min(maxTicks, min(tickBudget, param.jumpSizes.amountOf(asset))),
       );
       tickBudget /= ticks;
       numTicks.initAmountOf(asset, ticks);
@@ -83,11 +90,11 @@ ${tt})`;
 
     // jump the result a random number of ticks to get the lowest dirac prices
     const tickSizes = divValues(param.jumpSizes.unsigned(), numTicks);
-    numJumps = generateWithin(zeroes, numTicks);
-    lowestPrices = addValues(
-      lowestPrices,
-      mulValues(tickSizes, numJumps),
-    );
+    // numJumps = generateWithin(zeroes, numTicks);
+    // lowestPrices = addValues(
+    //   lowestPrices,
+    //   mulValues(tickSizes, numJumps),
+    // );
 
     // generator function for a single dirac based on its' prices
     const paramNFT = user.nextParamNFT;
