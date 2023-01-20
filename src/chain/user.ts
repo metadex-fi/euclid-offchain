@@ -14,6 +14,7 @@ import {
   Amounts,
   Asset,
   Assets,
+  f,
   IdNFT,
   Param,
   ParamDatum,
@@ -32,7 +33,7 @@ export class User {
   public readonly contract: Contract;
 
   public balance: Amounts | undefined;
-  public pools = new Map<Asset, Pool>();
+  public pools = new Map<string, Pool>();
   public nextParamNFT: IdNFT;
 
   constructor(
@@ -56,11 +57,20 @@ export class User {
   }
 
   public addPool = (pool: Pool): void => {
+    const nft = pool.paramNFT.show();
     assert(
-      !this.pools.has(pool.paramNFT),
-      `addPool: pool already exists for ${pool.paramNFT.show()}`,
+      !this.pools.has(nft),
+      `addPool: pool already exists for ${nft}`,
     );
-    this.pools.set(pool.paramNFT, pool);
+    this.pools.set(nft, pool);
+  };
+
+  public showPools = (): string => {
+    return `Pools:\n${
+      [...this.pools.entries()].map(([nft, pool]) =>
+        `${f}${nft} => ${pool.show(f)}`
+      ).join(",\n")
+    }`;
   };
 
   public update = async (): Promise<void> => {

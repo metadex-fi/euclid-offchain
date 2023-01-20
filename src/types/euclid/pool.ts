@@ -73,12 +73,15 @@ ${tt})`;
   static assertForUser = (user: User) => (pool: Pool): void => {
     Pool.assert(pool);
     Param.assertForUser(user)(pool.param);
-    // const pool_ = user.pools.get(pool.paramNFT);
-    // assert(pool_, `Pool not found for user: ${pool.paramNFT.show()}`);
-    // assert(
-    //   pool.show() === pool_.show(),
-    //   `Pools don't match: ${pool.show()} vs ${pool_.show()}`,
-    // );
+    const pool_ = user.pools.get(pool.paramNFT.show());
+    assert(
+      pool_,
+      `Pool ${pool.paramNFT.show()} not found for user: ${user.showPools()}`,
+    );
+    assert(
+      pool.show() === pool_.show(),
+      `Pools don't match: ${pool.show()} vs ${pool_.show()}`,
+    );
   };
 
   static generateForUser = (user: User) => (): Pool => {
