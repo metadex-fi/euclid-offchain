@@ -81,18 +81,18 @@ export class ThreadNFT extends IdNFT {
   };
 }
 
-class PIdNFT extends PConstraint<PAsset> {
+export class PIdNFT extends PConstraint<PAsset> {
   protected constructor(
-    public readonly contractCurrency: CurrencySymbol,
-    public readonly firstHash: string,
-    public readonly maxHashes: bigint,
+    public readonly contractCurrency?: CurrencySymbol,
+    public readonly firstHash?: string,
+    public readonly maxHashes?: bigint,
   ) {
     super(
       PAsset.ptype,
-      [PIdNFT.assertAsset(contractCurrency, firstHash, maxHashes)],
-      PIdNFT.generateAsset(contractCurrency, firstHash, maxHashes),
+      contractCurrency ? [PIdNFT.assertAsset(contractCurrency, firstHash!, maxHashes!)] : PAsset.ptype.asserts,
+      contractCurrency ? PIdNFT.generateAsset(contractCurrency, firstHash!, maxHashes!) : PAsset.ptype.genData,
     );
-    this.population = Number(maxHashes + 1n);
+    this.population = maxHashes ? Number(maxHashes + 1n) : PAsset.ptype.population;
   }
 
   public showData = (data: Asset): string => {
@@ -102,6 +102,10 @@ class PIdNFT extends PConstraint<PAsset> {
   public showPType = (): string => {
     return `PObject: PIdNFT(${this.contractCurrency}, ${this.firstHash}, ${this.maxHashes})`;
   };
+
+  static unparsed(): PIdNFT {
+    return new PIdNFT();
+  }
 
   static assertAsset = (
     contractCurrency: CurrencySymbol,

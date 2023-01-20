@@ -1,4 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { Tx,Data } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { genPositive, maxInteger, min, User } from "../../mod.ts";
 import {
   addValues,
@@ -6,19 +7,21 @@ import {
   Asset,
   Assets,
   Dirac,
+  DiracDatum,
   divValues,
   f,
   generateWithin,
   mulValues,
   PAmounts,
   Param,
+  ParamDatum,
   PAssets,
   PConstraint,
-  PDirac,
   PList,
   PObject,
   POwner,
   PParam,
+  PParamDatum,
   PParamNFT,
   PPrices,
   PRecord,
@@ -32,9 +35,9 @@ import { ActiveAssets, PActiveAssets } from "./activeAssets.ts";
 export class Pool {
   constructor(
     public readonly paramNFT: Asset,
+    public readonly threadNFTs: Assets,
     public readonly param: Param,
     public readonly diracs: Dirac[],
-    public readonly nfts: Assets,
   ) {
     Pool.assert(this);
   }
@@ -46,18 +49,48 @@ export class Pool {
     const mn = this.diracs.length > 0 ? "\n" : "";
     return `Pool(
 ${ttf}paramNFT: ${this.paramNFT.show()},
+${ttf}threadNFTs: ${this.threadNFTs.show(ttf)},
 ${ttf}param: ${this.param.concise(ttf)},
 ${ttf}diracs: [${mn}${
       this.diracs.map((dirac) => `${ttff}${dirac.show(ttff)}\n`).join(",")
     }]
-${ttf}nfts: ${this.nfts.show(ttf)},
 ${tt})`;
   };
 
+  public openingTx = (user: User): Tx => {
+    const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(this.param));
+    const lucidNFTs = this.threadNFTs.add(this.paramNFT).toLucidWith(1n);
+
+    let tx = user.lucid.newTx()
+      .mintAssets(lucidNFTs)
+      .attachMintingPolicy(user.contract.mintingPolicy)
+      .payToContract(
+        user.contract.address,
+        {
+          inline: Data.to(paramDatum),
+          scriptRef: user.contract.validator, // for now, for simplicities' sake
+        },
+        this.paramNFT.toLucidWith(1n),
+      );
+
+    const threadNFTs = this.threadNFTs.toList()
+    this.diracs.forEach((dirac, index) => {
+      tx = tx.payToContract(
+        user.contract.address,
+        {
+          inline: Data.to(new DiracDatum(dirac)),
+        },
+        threadNFTs[index].toLucidWith(1n),
+        // TODO funds
+      );
+    })
+
+    return tx;
+  }
+
   static assert(pool: Pool): void {
     const owner = pool.param.owner;
-    const nfts = pool.nfts.clone();
-    nfts.remove(pool.paramNFT);
+    const threadNFTs = pool.threadNFTs.clone();
     const assertThreadNFT = PThreadNFT.assertAsset(
       pool.paramNFT.currencySymbol,
       pool.paramNFT.tokenName,
@@ -69,12 +102,12 @@ ${tt})`;
         dirac.paramNFT.show() === pool.paramNFT.show(),
         `Wrong paramNFT: ${dirac.paramNFT.show()} vs ${pool.paramNFT.show()}`,
       );
-      nfts.remove(dirac.threadNFT);
+      threadNFTs.remove(dirac.threadNFT);
       Prices.assertCurrent(pool.param)(dirac.prices);
       // Dirac.assertWith(pool.param)(dirac); // TODO
       assertThreadNFT(dirac.threadNFT);
     });
-    assert(nfts.size() === 0, `leftover nfts: ${nfts.show()}`);
+    assert(threadNFTs.size() === 0, `leftover nfts: ${threadNFTs.show()}`);
     // TODO consider more here
   }
 
@@ -183,7 +216,7 @@ ${tt})`;
       diracs.length + 1 === nfts.size(),
       `Wrong number of diracs: ${diracs.length} vs ${nfts.size()} - 1`,
     );
-    const pool = new Pool(paramNFT.asset, param, diracs, nfts);
+    const pool = new Pool(paramNFT.asset, nfts, param, diracs);
     user.nextParamNFT = threadNFT.next();
     user.addPool(pool);
     return pool;
@@ -203,6 +236,7 @@ export class PPool extends PConstraint<PObject<Pool>> {
       new PObject(
         new PRecord({
           "paramNFT": pparamNFT,
+          "threadNFTs": PAssets.ptype,
           "param": PParam.ptype,
           "diracs": new PList(
             new PObject(
@@ -221,7 +255,6 @@ export class PPool extends PConstraint<PObject<Pool>> {
               Dirac,
             ),
           ),
-          "nfts": PAssets.ptype,
         }),
         Pool,
       ),

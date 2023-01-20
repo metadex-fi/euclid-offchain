@@ -1,6 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { maxInteger, randomChoice } from "../../mod.ts";
+import { maxInteger, maybeNdef, randomChoice } from "../../mod.ts";
 import {
   Amounts,
   Asset,
@@ -11,6 +11,7 @@ import {
   Param,
   ParamNFT,
   PConstraint,
+  PIdNFT,
   placeholderCcy,
   PObject,
   PParamNFT,
@@ -22,7 +23,7 @@ import {
   ThreadNFT,
 } from "../mod.ts";
 import { ActiveAssets, PActiveAssets } from "./activeAssets.ts";
-import { POwner } from "./owner.ts";
+import { POwner, PPaymentKeyHash } from "./owner.ts";
 
 export class Dirac {
   constructor(
@@ -71,6 +72,11 @@ activeAmnts: ${dirac.activeAmnts.concise()}`,
     );
   };
 
+  static generateAny = (): Dirac => {
+    const param = Param.generate();
+    return Dirac.generateUsed(param)();
+  };
+
   static generateUsed = (param: Param) =>
     Dirac.generateInner(
       param,
@@ -112,31 +118,39 @@ activeAmnts: ${dirac.activeAmnts.concise()}`,
 }
 export class PDirac extends PConstraint<PObject<Dirac>> {
   private constructor(
-    public readonly param: Param,
+    public readonly param?: Param,
   ) {
+    const powner = param ? POwner.pliteral(param.owner) : PPaymentKeyHash
+    const pprices = param ? PPrices.current(param) : PPrices.initial();
+    const pthreadNFT = param ? new PThreadNFT(
+      placeholderCcy,
+      param.owner,
+      maxInteger,
+    ) : PIdNFT.unparsed();
+    const pparamNFT = param ? new PThreadNFT(
+      placeholderCcy,
+      param.owner,
+      maxInteger,
+    ) : PIdNFT.unparsed();
     super(
       new PObject(
         new PRecord({
-          "owner": POwner.pliteral(param.owner),
-          "threadNFT": new PThreadNFT(
-            placeholderCcy,
-            param.owner,
-            maxInteger,
-          ),
-          "paramNFT": new PParamNFT(
-            placeholderCcy,
-            param.owner,
-            maxInteger,
-          ),
-          "prices": PPrices.current(param),
+          "owner": powner,
+          "threadNFT": pthreadNFT,
+          "paramNFT": pparamNFT,
+          "prices": pprices,
           "activeAmnts": PAmounts.ptype,
           "jumpStorage": new PActiveAssets(param),
         }),
         Dirac,
       ),
-      [Dirac.assertWith(param)],
-      Dirac.generateUsed(param),
+      param ? [Dirac.assertWith(param)] : [],
+      param ? Dirac.generateUsed(param) : Dirac.generateAny,
     );
+  }
+
+  static unparsed(): PDirac {
+    return new PDirac();
   }
 
   static fromParam(param: Param): PDirac {
@@ -144,7 +158,7 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
   }
 
   static genPType(): PConstraint<PObject<Dirac>> {
-    const param = Param.generate();
+    const param = maybeNdef(Param.generate)?.();
     return new PDirac(param);
   }
 }
@@ -165,6 +179,11 @@ export class PDiracDatum extends PObject<DiracDatum> {
       }),
       DiracDatum,
     );
+  }
+
+  static unparsed(): PDiracDatum {
+    const pdirac = PDirac.unparsed();
+    return new PDiracDatum(pdirac);
   }
 
   static fromParam(param: Param): PDiracDatum {

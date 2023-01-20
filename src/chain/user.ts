@@ -14,6 +14,7 @@ import {
   Amounts,
   Asset,
   Assets,
+  DiracDatum,
   f,
   IdNFT,
   Param,
@@ -88,52 +89,9 @@ export class User {
     return this.pools.size > 0;
   };
 
-  // public genOpenTx = (): Tx => {
-  //   const deposit = this.balance!.minSizedSubAmounts(2n);
-  //   const param = Param.generateWith(this.address, deposit);
-  //   const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(param));
-  //   const pdiracDatums = PPoolDatums.fromParam(
-  //     param,
-  //     this.nextParamNFT,
-  //   );
-  //   const diracDatums = pdiracDatums.genData();
-
-  //   let tx = this.lucid.newTx();
-
-  //   const paramNFT = this.nextParamNFT.asset;
-  //   const threadNFTs = diracDatums.map((diracDatum) => diracDatum._0.threadNFT);
-  //   this.nextParamNFT = this.nextParamNFT.next(diracDatums.length);
-
-  //   const lucidIdNFTs = Assets.fromList([paramNFT, ...threadNFTs]).toLucidWith(
-  //     1n,
-  //   );
-
-  //   tx = tx
-  //     .mintAssets(lucidIdNFTs)
-  //     .attachMintingPolicy(this.contract.mintingPolicy);
-
-  //   tx = tx.payToContract(
-  //     this.contract.address,
-  //     {
-  //       inline: Data.to(paramDatum),
-  //       scriptRef: this.contract.validator, // for now, for simplicities' sake
-  //     },
-  //     paramNFT.toLucidWith(1n),
-  //   );
-
-  //   pdiracDatums.pconstant(diracDatums).forEach((diracDatum, index) => {
-  //     tx = tx.payToContract(
-  //       this.contract.address,
-  //       {
-  //         inline: Data.to(diracDatum),
-  //       },
-  //       threadNFTs[index].toLucidWith(1n),
-  //       // TODO funds
-  //     );
-  //   });
-
-  //   return tx;
-  // };
+  public genOpenTx = (): Tx => {
+    return Pool.generateForUser(this)().openingTx(this)
+  };
 
   // public genCloseTx = (param: ParamUtxo, diracs: DiracUtxo[]): Tx => {
   // };

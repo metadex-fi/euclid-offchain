@@ -326,6 +326,12 @@ export class Assets {
     );
     return assets_;
   };
+
+  static singleton = (asset: Asset): Assets => {
+    const assets = new Assets();
+    assets.insert(asset);
+    return assets;
+  }
 }
 
 export class PAssets extends PConstraint<PObject<Assets>> {
