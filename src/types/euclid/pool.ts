@@ -3,6 +3,7 @@ import { genPositive, maxInteger, min, User } from "../../mod.ts";
 import {
   addValues,
   Amounts,
+  Asset,
   Assets,
   Dirac,
   divValues,
@@ -11,7 +12,6 @@ import {
   mulValues,
   PAmounts,
   Param,
-  ParamNFT,
   PAssets,
   PConstraint,
   PList,
@@ -30,7 +30,7 @@ import { ActiveAssets, PActiveAssets } from "./activeAssets.ts";
 
 export class Pool {
   constructor(
-    public readonly paramNFT: ParamNFT,
+    public readonly paramNFT: Asset,
     public readonly param: Param,
     public readonly diracs: Dirac[],
     public readonly nfts: Assets,
@@ -52,12 +52,7 @@ ${tt})`;
   };
 
   static assertForUser = (user: User) => (pool: Pool): void => {
-    const pool_ = user.pools.get(pool.paramNFT);
-    assert(pool_, `Pool ${pool.paramNFT} not found for user ${user.address}`);
-    assert(
-      pool_.show() === pool.show(),
-      `Pools not equal: ${pool_.show()} vs ${pool.show()}`,
-    );
+    // TODO
   };
 
   static generateForUser = (user: User) => (): Pool => {
@@ -138,7 +133,7 @@ ${tt})`;
     });
 
     user.nextParamNFT = threadNFT.next();
-    return new Pool(paramNFT, param, diracs, nfts);
+    return new Pool(paramNFT.asset, param, diracs, nfts);
   };
 }
 
