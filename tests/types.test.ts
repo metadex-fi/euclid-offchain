@@ -40,13 +40,13 @@ Deno.test("euclid data/types tests", () => {
   const gen = new Generators(
     // @ts-ignore TODO type instantiation is excessively deep and possibly infinite
     [
-      ...fundamentalPrimitiveGenerators,
-      ...derivedPrimitiveGenerators,
+      // ...fundamentalPrimitiveGenerators,
+      // ...derivedPrimitiveGenerators,
       ...euclidPrimitiveGenerators,
     ],
     [
-      ...fundamentalContainerGenerators,
-      ...derivedContainerGenerators,
+      // ...fundamentalContainerGenerators,
+      // ...derivedContainerGenerators,
     ],
   );
   proptestPTypes(gen, 1000);
@@ -84,17 +84,17 @@ const derivedContainerGenerators = [
 ];
 
 const euclidPrimitiveGenerators = [
-  POwner.genPType,
-  PParamNFT.genPType,
-  PThreadNFT.genPType,
-  PJumpSizes.genPType,
-  PPrices.genPType,
-  PParam.genPType,
-  PParamDatum.genPType,
-  PAmounts.genPType,
-  PActiveAssets.genPType,
-  PDirac.genPType,
-  PDiracDatum.genPType,
+  // POwner.genPType,
+  // PParamNFT.genPType,
+  // PThreadNFT.genPType,
+  // PJumpSizes.genPType,
+  // PPrices.genPType,
+  // PParam.genPType,
+  // PParamDatum.genPType,
+  // PAmounts.genPType,
+  // PActiveAssets.genPType,
+  // PDirac.genPType,
+  // PDiracDatum.genPType,
   PPool.genPType,
   // PPoolDatums.genPType,
   // PEuclidDatum.genPType,

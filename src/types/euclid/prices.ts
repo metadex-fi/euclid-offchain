@@ -79,11 +79,11 @@ export class Prices {
     Prices.assertInitial(prices);
     assert(
       leq(param.lowerPriceBounds.unsigned(), prices.unsigned()),
-      `Prices: ${prices.show()} < ${param.lowerPriceBounds.show()}`,
+      `exceeding lowerPriceBounds: ${prices.show()} < ${param.lowerPriceBounds.show()}`,
     );
     assert(
       leq(prices.unsigned(), param.upperPriceBounds.unsigned()),
-      `Prices: ${prices.show()} > ${param.upperPriceBounds.show()}`,
+      `exceeding upperPriceBounds: ${prices.show()} > ${param.upperPriceBounds.show()}`,
     );
   };
 

@@ -58,6 +58,11 @@ ${tt})`;
     const owner = pool.param.owner;
     const nfts = pool.nfts.clone();
     nfts.remove(pool.paramNFT);
+    const assertThreadNFT = PThreadNFT.assertAsset(
+      pool.paramNFT.currencySymbol,
+      pool.paramNFT.tokenName,
+      BigInt(pool.diracs.length),
+    );
     pool.diracs.forEach((dirac) => {
       assert(dirac.owner === owner, `Wrong owner: ${dirac.owner} vs ${owner}`);
       assert(
@@ -65,9 +70,12 @@ ${tt})`;
         `Wrong paramNFT: ${dirac.paramNFT.show()} vs ${pool.paramNFT.show()}`,
       );
       nfts.remove(dirac.threadNFT);
+      Prices.assertCurrent(pool.param)(dirac.prices);
+      // Dirac.assertWith(pool.param)(dirac); // TODO
+      assertThreadNFT(dirac.threadNFT);
     });
     assert(nfts.size() === 0, `leftover nfts: ${nfts.show()}`);
-    // TODO more here
+    // TODO consider more here
   }
 
   static assertForUser = (user: User) => (pool: Pool): void => {
@@ -82,6 +90,7 @@ ${tt})`;
       pool.show() === pool_.show(),
       `Pools don't match: ${pool.show()} vs ${pool_.show()}`,
     );
+    // TODO consider more here
   };
 
   static generateForUser = (user: User) => (): Pool => {
@@ -111,8 +120,9 @@ ${tt})`;
     // jump the lowerBounds a random number of jumpSizes,
     // but within upper bounds, to prepare getting the lowest dirac prices
     const zeroes = param.initialPrices.zeroed();
-    let numJumps = generateWithin(zeroes, param.maxJumps().flatDecrement());
-    let lowestPrices = addValues(
+    const maxJumps = param.maxJumps();
+    const numJumps = generateWithin(zeroes, maxJumps.flatDecrement());
+    const lowestPrices = addValues(
       param.filledLowerBounds().unsigned(),
       mulValues(param.jumpSizes.unsigned(), numJumps),
     );
@@ -150,6 +160,7 @@ ${tt})`;
     // in that asset's dimension. "spread" means: add all other tick
     // offsets for that asset's price.
     assets.forEach((asset) => {
+      if (numJumps.amountOf(asset) === 0n) return;
       const ticks = numTicks.amountOf(asset);
       const tickSize = tickSizes.amountOf(asset);
       const diracs_ = new Array<Dirac>();

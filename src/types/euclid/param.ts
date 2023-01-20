@@ -60,16 +60,11 @@ ${tt})`;
     to: PositiveValue,
     maxJumps = gMaxJumps,
   ): Value => {
-    // jump the price of each asset from initial price,
-    // a random number of times,
-    // with the respective jump size,
-    // while respecting the bounds
     const maxSingleAsset = (
       from: bigint,
       to: bigint,
       jumpSize: bigint,
     ): bigint =>
-      // jumpSize === 0n ? 0n :
       min(
         maxJumps,
         abs(from - to) / jumpSize,
