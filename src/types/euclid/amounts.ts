@@ -55,7 +55,10 @@ export class Amounts {
   static fresh(param: Param, prices: Prices): Amounts {
     const activeAsset = prices.defaultActiveAsset(param.initialPrices);
     const amount = param.baseAmountA0 / prices.amountOf(activeAsset); // as in onchain
-    assert(amount > 0n, `Amounts.fresh: amount ${amount} <= 0`);
+    assert(
+      amount > 0n,
+      `Amounts.fresh: amount ${amount} <= 0 with ${param.concise()} and ${prices.concise()}}`,
+    );
     const amounts = new PositiveValue();
     amounts.initAmountOf(activeAsset, amount);
     return new Amounts(amounts);

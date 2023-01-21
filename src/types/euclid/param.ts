@@ -168,24 +168,20 @@ ${tt})`;
     const jumpSizes = JumpSizes.genOfAssets(assets);
     const upperBounds = PositiveValue.genOfAssets(assets);
     const lowerBounds = upperBounds.minSizedSubValue(0n);
+    const baseAmountA0 = new PPositive(upperBounds.biggestAmount()).genData();
     const param = new Param(
       user.address,
       jumpSizes,
       initialPrices,
       lowerBounds,
       upperBounds,
-      1n,
+      baseAmountA0,
     );
     let minDiracs = param.locationsPerDirac();
     while (minDiracs > deposit.smallestAmount()) {
-      param.jumpSizes.doubleRandomAmount();
+      param.jumpSizes.doubleRandomAmount(); // this should decrease diracs
       minDiracs = param.locationsPerDirac();
     }
-    param.baseAmountA0 = min(
-      maxInteger,
-      deposit.equivalentA0(param.filledLowerBounds()) /
-        minDiracs,
-    );
     return [param, deposit];
   }
 }
