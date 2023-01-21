@@ -150,6 +150,16 @@ export class Value {
     return tail_;
   };
 
+  public pop = (asset: Asset): bigint => {
+    const tkns = this.value.get(asset.currencySymbol);
+    assert(tkns, `no tokens for currency ${asset.currencySymbol}`);
+    const amnt = tkns.get(asset.tokenName);
+    assert(amnt, `no amount for token ${asset.tokenName}`);
+    tkns.delete(asset.tokenName);
+    if (tkns.size === 0) this.value.delete(asset.currencySymbol);
+    return amnt;
+  };
+
   public foldWith =
     (init: bigint, op: (a: bigint, b: bigint) => bigint) => (): bigint => {
       let agg = init;

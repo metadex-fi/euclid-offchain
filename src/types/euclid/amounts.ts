@@ -25,17 +25,25 @@ export class Amounts {
   public concise = (tabs = ""): string => `Amounts ${this.value.concise(tabs)}`;
   public size = (): bigint => this.value.size();
   public assets = (): Assets => this.value.assets();
+  public firstAsset = (): Asset => this.value.firstAsset();
   public firstAmount = (): bigint => this.value.firstAmount();
+  public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
+  public pop = (asset: Asset): bigint => this.value.pop(asset);
+  public addAmountOf = (asset: Asset, amount: bigint): void =>
+    this.value.addAmountOf(asset, amount);
+  public clone = (): Amounts => new Amounts(this.value.clone());
+  public initAmountOf = (asset: Asset, amount: bigint): void =>
+    this.value.initAmountOf(asset, amount);
 
   public minSizedSubAmounts = (minSize: bigint): Amounts => {
     return new Amounts(this.value.minSizedSubValue(minSize));
   };
 
   public equivalentA0 = (prices: PositiveValue): bigint => {
-    return mulValues_(this.unsigned(), prices.unsigned()).mulAmounts();
+    return mulValues_(this.unsigned(), prices.unsigned()).sumAmounts();
   };
 
-  public lowest = (): bigint => {
+  public lowestAmount = (): bigint => {
     let lowest: bigint | undefined = undefined;
     for (const amounts of this.value.toMap().values()) {
       for (const amount of amounts.values()) {
@@ -48,44 +56,47 @@ export class Amounts {
     return lowest;
   };
 
-  // static generateFresh = (param: Param) => (prices: Prices): Amounts => {
-  //   const currentPs = prices.unsigned();
-  //   const activeAsset = prices.defaultActiveAsset(param);
-  //   const amount = param.baseAmountA0 * currentPs.firstAmount() /
-  //     currentPs.amountOf(activeAsset);
-  //   const amounts = new PositiveValue();
-  //   amounts.initAmountOf(activeAsset, amount); // TODO this will probably crash out of the box, because when 0es
-  //   return new Amounts(amounts);
-  // };
+  public toLucid = (): LucidAssets => {
+    const assets: LucidAssets = {};
+    this.assets().forEach((asset) => {
+      assets[asset.toLucid()] = this.amountOf(asset);
+    });
+    return assets;
+  };
 
-  static fresh(): Amounts {
-    return new Amounts(new PositiveValue());
+  static fresh(param: Param, prices: Prices): Amounts {
+    const activeAsset = prices.defaultActiveAsset(param.initialPrices);
+    const amount = param.baseAmountA0 / prices.amountOf(activeAsset); // as in onchain
+    const amounts = new PositiveValue();
+    amounts.initAmountOf(activeAsset, amount);
+    return new Amounts(amounts);
   }
 
-  static generateUsed = (param: Param) => (prices: Prices): Amounts => {
-    assert(
-      prices.size() >= 2n,
-      `genAmounts: less than two assets in ${prices.concise()}`,
-    );
-    const assets = prices.assets();
-    const A0 = assets.head();
-    const p0 = prices.amountOf(A0);
-    let netWorth = param.baseAmountA0 * p0;
-    const amounts = new PositiveValue();
+  // static generateUsed = (param: Param) => (prices: Prices): Amounts => {
+  //   assert(
+  //     prices.size() >= 2n,
+  //     `genAmounts: less than two assets in ${prices.concise()}`,
+  //   );
+  //   const assets = prices.assets();
+  //   const A1 = assets.head();
+  //   const p1 = prices.amountOf(A1);
+  //   let netWorth = param.baseAmountA0;
+  //   const amounts = new PositiveValue();
 
-    for (const asset of assets.tail().toList()) {
-      const p = prices.amountOf(asset);
-      const received = genNonNegative(netWorth / p);
-      const spent = received * p;
-      if (received <= maxInteger && received > 0n && spent > 0n) {
-        netWorth -= spent;
-        amounts.initAmountOf(asset, received);
-      }
-    }
-    const remainingA0 = netWorth / p0 + (netWorth % p0 === 0n ? 0n : 1n);
-    if (remainingA0 > 0n) amounts.initAmountOf(A0, remainingA0);
-    return new Amounts(amounts);
-  };
+  //   for (const asset of assets.tail().toList()) {
+  //     const p = prices.amountOf(asset);
+  //     const received = genNonNegative(netWorth / p);
+  //     const spent = received * p;
+  //     if (received <= maxInteger && received > 0n && spent > 0n) {
+  //       netWorth -= spent;
+  //       amounts.initAmountOf(asset, received);
+  //     }
+  //   }
+  //   const amountA1 = netWorth / p1;
+  //   netWorth % p1 === 0n ? 0n : 1n;
+  //   if (amountA1 > 0n) amounts.initAmountOf(A1, amountA1);
+  //   return new Amounts(amounts);
+  // };
 
   static fromLucid(assets: LucidAssets): Amounts {
     const value = new Value();

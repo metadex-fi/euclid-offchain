@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Tx,Data } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Data, Tx } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { genPositive, maxInteger, min, User } from "../../mod.ts";
 import {
   addValues,
@@ -57,6 +57,10 @@ ${ttf}diracs: [${mn}${
 ${tt})`;
   };
 
+  public sharedAssets = (assets: Assets): Assets => {
+    return this.param.initialPrices.assets().intersect(assets);
+  };
+
   public openingTx = (user: User): Tx => {
     const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(this.param));
     const lucidNFTs = this.threadNFTs.add(this.paramNFT).toLucidWith(1n);
@@ -73,20 +77,21 @@ ${tt})`;
         this.paramNFT.toLucidWith(1n),
       );
 
-    const threadNFTs = this.threadNFTs.toList()
+    const threadNFTs = this.threadNFTs.toList();
     this.diracs.forEach((dirac, index) => {
+      const funds = dirac.activeAmnts.clone();
+      funds.initAmountOf(threadNFTs[index], 1n);
       tx = tx.payToContract(
         user.contract.address,
         {
           inline: Data.to(new DiracDatum(dirac)),
         },
-        threadNFTs[index].toLucidWith(1n),
-        // TODO funds
+        funds.toLucid(),
       );
-    })
+    });
 
     return tx;
-  }
+  };
 
   static assert(pool: Pool): void {
     const owner = pool.param.owner;
@@ -114,10 +119,11 @@ ${tt})`;
   static assertForUser = (user: User) => (pool: Pool): void => {
     Pool.assert(pool);
     Param.assertForUser(user)(pool.param);
-    const pool_ = user.pools.get(pool.paramNFT.show());
+    const paramNFT = pool.paramNFT.show();
+    const pool_ = user.pools?.find((p) => p.paramNFT.show() === paramNFT);
     assert(
       pool_,
-      `Pool ${pool.paramNFT.show()} not found for user: ${user.showPools()}`,
+      `Pool ${paramNFT} not found for user: ${user.showPools()}`,
     );
     assert(
       pool.show() === pool_.show(),
@@ -139,7 +145,7 @@ ${tt})`;
     // generate number of ticks per asset, such that
     // (numTicks * jumpSizes).mul <= deposit.lowest
     // and numTicks <= jumpSizes
-    let tickBudget = deposit.lowest() / param.minDiracs();
+    let tickBudget = deposit.lowestAmount() / param.locationsPerDirac();
     const numTicks = new Value();
     const maxTicks = 4n;
     assets.forEach((asset) => {
@@ -178,7 +184,7 @@ ${tt})`;
         threadNFT.asset,
         paramNFT.asset,
         prices,
-        Amounts.fresh(), // TODO this is wrong
+        Amounts.fresh(param, prices),
         ActiveAssets.fresh(),
       );
     }
@@ -217,8 +223,10 @@ ${tt})`;
       `Wrong number of diracs: ${diracs.length} vs ${nfts.size()} - 1`,
     );
     const pool = new Pool(paramNFT.asset, nfts, param, diracs);
-    user.nextParamNFT = threadNFT.next();
-    user.addPool(pool);
+    user.pendingConsequences = (u: User) => {
+      u.nextParamNFT = threadNFT.next();
+      u.addPool(pool);
+    };
     return pool;
   };
 }

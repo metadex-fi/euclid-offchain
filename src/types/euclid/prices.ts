@@ -52,6 +52,7 @@ export class Prices {
   public concise = (tabs = ""): string => `Prices ${this.value.concise(tabs)}`;
   public show = (tabs = ""): string => `Prices (\n${this.value.show(tabs)}\n)`;
   public size = (): bigint => this.value.size();
+  public firstAmount = (): bigint => this.value.firstAmount();
   public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
   public setAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.setAmountOf(asset, amount);
@@ -87,7 +88,7 @@ export class Prices {
     );
   };
 
-  static genOfAssets = (assets: Assets): Prices => {
+  static genOfAssets = (assets: Assets, baseAmountA0: bigint): Prices => {
     assert(
       assets.size() >= 2n,
       `Prices: less than two assets in ${assets.show()}`,
@@ -96,9 +97,9 @@ export class Prices {
     return new Prices(value);
   };
 
-  static generateInitial(): Prices {
+  static generateInitial(baseAmountA0: bigint): Prices {
     const assets = Assets.generate(2n);
-    return Prices.genOfAssets(assets);
+    return Prices.genOfAssets(assets, baseAmountA0);
   }
 
   static generateCurrent = (param: Param) => (): Prices => {

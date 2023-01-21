@@ -1,4 +1,3 @@
-import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   Address,
   Assets as LucidAssets,
@@ -7,42 +6,42 @@ import {
   Tx,
   TxComplete,
   Utils,
+  utxoToCore,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { EuclidState } from "../chain/euclidState.ts";
-import { DiracUtxo, ParamUtxo } from "../chain/euclidUtxo.ts";
 import {
   Amounts,
-  Asset,
   Assets,
+  Dirac,
   DiracDatum,
   f,
+  genPositive,
   IdNFT,
-  Param,
-  ParamDatum,
+  min,
   ParamNFT,
-  PositiveValue,
-  PParamDatum,
   PPaymentKeyHash,
   randomChoice,
-  Value,
 } from "../mod.ts";
 import { Pool } from "../types/euclid/pool.ts";
 import { Contract } from "./contract.ts";
+import { DiracUtxo, UtxoPool } from "./utxos.ts";
+
+type consequences = (u: User) => void;
 
 export class User {
-  public readonly state: EuclidState;
   public readonly contract: Contract;
 
   public balance: Amounts | undefined;
-  public pools = new Map<string, Pool>();
+  public pools?: Pool[]; // own creation recall
+  // public utxoPools?: UtxoPool[]; // from onchain
   public nextParamNFT: IdNFT;
+
+  public pendingConsequences?: consequences;
 
   constructor(
     public readonly lucid: Lucid,
     public readonly address: Address,
   ) {
     this.contract = new Contract(lucid);
-    this.state = new EuclidState(this.lucid, this.contract.address);
     this.nextParamNFT = new ParamNFT(this.contract.policyId, this.address);
   }
 
@@ -57,21 +56,21 @@ export class User {
     return user;
   }
 
+  public dealWithConsequences = (): void => {
+    if (this.pendingConsequences) {
+      this.pendingConsequences(this);
+      this.pendingConsequences = undefined;
+    }
+  };
+
   public addPool = (pool: Pool): void => {
-    const nft = pool.paramNFT.show();
-    assert(
-      !this.pools.has(nft),
-      `addPool: pool already exists for ${nft}`,
-    );
-    this.pools.set(nft, pool);
+    if (!this.pools) this.pools = [];
+    this.pools.push(pool);
   };
 
   public showPools = (): string => {
-    return `Pools:\n${
-      [...this.pools.entries()].map(([nft, pool]) =>
-        `${f}${nft} => ${pool.show(f)}`
-      ).join(",\n")
-    }`;
+    if (!this.pools) return "No pools";
+    return `Pools:\n${this.pools.map((p) => `${f}${p.show(f)}`).join(",\n")}`;
   };
 
   public update = async (): Promise<void> => {
@@ -85,54 +84,108 @@ export class User {
     this.balance = Amounts.fromLucid(assets);
   };
 
-  public isOwner = (): boolean => {
-    return this.pools.size > 0;
+  public ownsPools = (): boolean => {
+    return this.pools ? this.pools.length > 0 : false;
   };
 
   public genOpenTx = (): Tx => {
-    return Pool.generateForUser(this)().openingTx(this)
+    return Pool.generateForUser(this)().openingTx(this);
   };
 
-  // public genCloseTx = (param: ParamUtxo, diracs: DiracUtxo[]): Tx => {
+  // public genCloseTx = (pool: Pool): Tx => {
   // };
 
-  // public genAdminTx = (param: ParamUtxo, diracs: DiracUtxo[]): Tx => {
-  // };
-
-  // public genFlipTx = (): Tx => {
-  // };
-
-  // public genJumpTx = (): Tx => {
+  // public genAdminTx = (pool: Pool): Tx => {
   // };
 
   // public genOwnerTx = (): Tx => {
-  //   const param = randomChoice(Array.from(this.pools.keys()));
-  //   const diracs = this.pools.get(param) ?? [];
+  //   const utxoPools = this.contract.state!.utxoPools!.get(this.address);
+  //   const pool = randomChoice(this.pools!);
   //   return randomChoice([
   //     this.genCloseTx,
   //     this.genAdminTx,
-  //   ])(param, diracs);
+  //   ])(pool);
   // };
 
-  // public genUserTx = (): Tx => {
-  //   return randomChoice([
-  //     this.genFlipTx,
-  //     this.genJumpTx,
-  //   ])();
-  // };
+  public genFlipTx = (utxoPool: UtxoPool): Tx => {
+    const diracUtxo = randomChoice(utxoPool.flippable!);
+    const dirac = diracUtxo.dirac;
 
-  // public genEuclidTx = async (): Promise<TxComplete> => {
-  //   await Promise.all([this.update(), this.state.update()]);
-  //   this.pools = this.state.get(this.address);
+    const boughtAsset = dirac.activeAmnts.assets().randomChoice();
+    const boughtPrice = dirac.prices.amountOf(boughtAsset);
+    const maxBoughtA0 = dirac.activeAmnts.amountOf(boughtAsset) * boughtPrice;
 
-  //   const genTx = randomChoice([
-  //     ...this.isOwner() ? [this.genOwnerTx] : [],
-  //     this.genOpenTx,
-  //     this.genUserTx,
-  //   ]);
+    const otherAssets = diracUtxo.flippable!;
+    otherAssets.remove(boughtAsset);
+    const soldAsset = otherAssets.randomChoice();
+    const soldPrice = dirac.prices.amountOf(soldAsset);
+    const maxSoldA0 = dirac.activeAmnts.amountOf(soldAsset) * soldPrice;
 
-  //   return await genTx().complete();
-  // };
+    const flippedA0 = genPositive(min(maxBoughtA0, maxSoldA0));
+    const soldAmount = flippedA0 / soldPrice;
+    const boughtAmount = (soldAmount * soldPrice) / boughtPrice;
+
+    const newAmounts = dirac.activeAmnts.clone();
+    newAmounts.addAmountOf(boughtAsset, boughtAmount);
+    newAmounts.addAmountOf(soldAsset, -soldAmount);
+
+    const newBalance = diracUtxo.balance.clone();
+    newBalance.addAmountOf(boughtAsset, boughtAmount);
+    newBalance.addAmountOf(soldAsset, -soldAmount);
+
+    const diracDatum = new DiracDatum(
+      new Dirac(
+        dirac.owner,
+        dirac.threadNFT,
+        dirac.paramNFT,
+        dirac.prices,
+        newAmounts,
+        dirac.jumpStorage,
+      ),
+    );
+
+    const tx = this.lucid.newTx()
+      .readFrom([utxoPool.paramUtxo.utxo]) // for the script
+      .payToContract(
+        this.contract.address,
+        { inline: Data.to(diracDatum) },
+        newBalance.toLucid(),
+      );
+
+    tx.txBuilder.add_input( // TODO see if this works
+      utxoToCore(diracUtxo.utxo),
+      undefined, // TODO see if that's required
+    );
+
+    return tx;
+  };
+
+  public genJumpTx = (utxoPool: UtxoPool): Tx => {
+    throw new Error("Not implemented");
+  };
+
+  public genUserTx = (openUtxoPools: UtxoPool[]) => (): Tx => {
+    const utxoPool = randomChoice(openUtxoPools);
+    return randomChoice([
+      ...utxoPool.flippable!.length ? [this.genFlipTx] : [],
+      // ...utxoPool.jumpable!.length ? [this.genJumpTx] : [],
+    ])(utxoPool);
+  };
+
+  public genEuclidTx = async (): Promise<TxComplete> => {
+    await Promise.all([this.update(), this.contract.update()]);
+
+    const openUtxoPools = this.contract.state!.openForBusiness(
+      this.balance!.assets(),
+    );
+    const genTx = randomChoice([
+      // ...this.isOwner() ? [this.genOwnerTx] : [],
+      ...openUtxoPools ? [this.genUserTx(openUtxoPools)] : [],
+      this.genOpenTx,
+    ]);
+
+    return await genTx().complete();
+  };
 }
 
 // function addLucidAssetsTo(a: LucidAssets, b: LucidAssets): void {

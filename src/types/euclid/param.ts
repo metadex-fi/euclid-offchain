@@ -4,6 +4,7 @@ import { abs, gMaxHashes, maxInteger, min, Prices, User } from "../../mod.ts";
 import {
   Amount,
   Amounts,
+  Assets,
   boundPositive,
   f,
   JumpSizes,
@@ -77,6 +78,8 @@ ${tt})`;
     );
   };
 
+  public assets = (): Assets => this.initialPrices.assets();
+
   public filledLowerBounds = (): PositiveValue => {
     return this.lowerPriceBounds.fill(this.initialPrices.assets(), 1n);
   };
@@ -91,16 +94,20 @@ ${tt})`;
   };
 
   // i.e. in case of tickSizes >= jumpSizes
-  public minDiracs = (): bigint => {
+  public locationsPerDirac = (): bigint => {
     return this.maxJumps().increment().mulAmounts();
   };
 
   public boundedMinDiracs = (): bigint => {
-    return min(gMaxHashes, this.minDiracs());
+    return min(gMaxHashes, this.locationsPerDirac());
   };
 
   static assert(param: Param): void {
-    const assets = param.jumpSizes.assets();
+    const assets = param.assets();
+    assert(
+      param.jumpSizes.assets().equals(assets),
+      `assets must match, got ${param.jumpSizes.concise()}, expected ${assets.show()}`,
+    );
     assert(
       param.lowerPriceBounds.assets().equals(assets),
       `assets must match, got ${param.lowerPriceBounds.concise()}, expected ${assets.show()}`,
@@ -122,15 +129,14 @@ ${tt})`;
 
   static generate(): Param {
     const owner = PPaymentKeyHash.genData();
+    const baseAmountA0 = new PPositive().genData();
 
-    const initialPrices = Prices.generateInitial();
+    const initialPrices = Prices.generateInitial(baseAmountA0);
     const assets = initialPrices.assets();
     const jumpSizes = JumpSizes.genOfAssets(assets);
 
     const upperBounds = PositiveValue.genOfAssets(assets);
     const lowerBounds = upperBounds.minSizedSubValue(0n);
-
-    const baseAmountA0 = new PPositive().genData();
 
     return new Param(
       owner,
@@ -163,13 +169,13 @@ ${tt})`;
       upperBounds,
       1n,
     );
-    let minDiracs = param.minDiracs();
-    while (minDiracs > deposit.lowest()) {
-      param.jumpSizes.doubleRandom();
-      minDiracs = param.minDiracs();
+    let minDiracs = param.locationsPerDirac();
+    while (minDiracs > deposit.lowestAmount()) {
+      param.jumpSizes.doubleRandomAmount();
+      minDiracs = param.locationsPerDirac();
     }
     param.baseAmountA0 = min(
-      maxInteger, // TODO
+      maxInteger,
       deposit.equivalentA0(param.filledLowerBounds()) /
         minDiracs,
     );

@@ -20,7 +20,7 @@ export class JumpSizes {
   public toMap = (): Map<CurrencySymbol, Map<TokenName, bigint>> =>
     this.value.toMap();
 
-  public doubleRandom = (): void => {
+  public doubleRandomAmount = (): void => {
     const asset = this.assets().randomChoice();
     this.value.setAmountOf(
       asset,

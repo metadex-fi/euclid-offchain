@@ -34,7 +34,9 @@ export class PositiveValue {
   public zeroed = (): Value => this.value.zeroed();
   public size = (): bigint => this.value.size();
   public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
+  public firstAsset = (): Asset => this.value.firstAsset();
   public firstAmount = (): bigint => this.value.firstAmount();
+  public pop = (asset: Asset): bigint => this.value.pop(asset);
   public setAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.setAmountOf(asset, amount);
   public clone = (): PositiveValue => new PositiveValue(this.value.clone());
@@ -43,6 +45,19 @@ export class PositiveValue {
   public fill = (assets: Assets, amount: bigint): PositiveValue => {
     assert(amount > 0n, `fill: amount must be positive, got ${amount}`);
     return new PositiveValue(this.value.fill(assets, amount));
+  };
+
+  public addAmountOf = (asset: Asset, amount: bigint): void => {
+    const newAmount = this.amountOf(asset) + amount;
+    assert(
+      newAmount >= 0n,
+      `addAmountOf: newAmount must be positive, got ${newAmount}`,
+    );
+    if (newAmount === 0n) {
+      this.value.pop(asset);
+    } else {
+      this.value.setAmountOf(asset, amount);
+    }
   };
 
   public minSizedSubValue = (minSize: bigint): PositiveValue => {

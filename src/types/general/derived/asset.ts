@@ -1,5 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
+  ccyLength,
   gMaxLength,
   minSizedSubset,
   nonEmptySubSet,
@@ -48,7 +49,9 @@ export class Asset {
     if (name === "lovelace") {
       return new Asset("", "");
     }
-    return new Asset(name, ""); // TODO ccy should be prefix of fixed length, look that up
+    const ccy = name.slice(0, ccyLength);
+    const tkn = name.slice(ccyLength);
+    return new Asset(ccy, tkn);
   }
 
   static assert(asset: Asset): void {
@@ -252,6 +255,10 @@ export class Assets {
     return assets;
   };
 
+  public empty = (): boolean => {
+    return this.assets.size === 0;
+  };
+
   public size = (): number => {
     let size = 0;
     for (const tkns of this.assets.values()) {
@@ -309,6 +316,19 @@ export class Assets {
     return assets_;
   }
 
+  public intersect = (assets: Assets): Assets => {
+    const shared = new Map<CurrencySymbol, TokenName[]>();
+    const other = assets.toMap();
+    for (const [ccy, ownTkns] of this.assets) {
+      const otherTkns = other.get(ccy);
+      if (otherTkns) {
+        const sharedTkns = ownTkns.filter((tkn) => otherTkns.includes(tkn));
+        if (sharedTkns.length > 0) shared.set(ccy, sharedTkns);
+      }
+    }
+    return new Assets(shared);
+  };
+
   static assert(assets: Assets): void {
     assets.forEach((asset) => Asset.assert(asset));
   }
@@ -331,7 +351,7 @@ export class Assets {
     const assets = new Assets();
     assets.insert(asset);
     return assets;
-  }
+  };
 }
 
 export class PAssets extends PConstraint<PObject<Assets>> {

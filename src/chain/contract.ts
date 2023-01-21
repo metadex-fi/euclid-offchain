@@ -9,14 +9,17 @@ import {
   Lucid,
   MintingPolicy,
   PolicyId,
+  Utils,
   Validator,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Euclid } from "./state.ts";
 
 export class Contract {
   public readonly validator: Validator;
   public readonly mintingPolicy: MintingPolicy;
   public readonly address: Address;
   public readonly policyId: PolicyId;
+  public state?: Euclid;
 
   constructor(
     public readonly lucid: Lucid,
@@ -34,4 +37,18 @@ export class Contract {
     this.address = lucid.utils.validatorToAddress(this.validator);
     this.policyId = lucid.utils.mintingPolicyToId(this.mintingPolicy);
   }
+
+  static dummy = (): Contract => {
+    const lucid = new Lucid();
+    lucid.utils = new Utils(lucid);
+    return new Contract(lucid);
+  };
+
+  public update = async (): Promise<void> => {
+    const utxos = await this.lucid.utxosAt(this.address);
+    this.state = Euclid.ingest(utxos, this.policyId);
+    this.state.digest();
+  };
 }
+
+export const ccyLength = Contract.dummy().policyId.length;

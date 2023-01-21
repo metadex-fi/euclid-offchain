@@ -65,11 +65,12 @@ export class ParamNFT extends IdNFT {
 
   static generateWith = (
     contractCurrency: CurrencySymbol,
-    owner: PaymentKeyHash,
-    maxParamHashes: bigint,
+    owner?: PaymentKeyHash,
+    maxParamHashes?: bigint,
   ): ParamNFT => {
-    const numHashes = genNonNegative(maxParamHashes);
-    const tokenName = hashNTimes(owner, numHashes);
+    const tokenName = owner
+      ? hashNTimes(owner, genNonNegative(maxParamHashes))
+      : "";
     return new ParamNFT(contractCurrency, tokenName);
   };
 }
@@ -83,16 +84,18 @@ export class ThreadNFT extends IdNFT {
 
 export class PIdNFT extends PConstraint<PAsset> {
   protected constructor(
-    public readonly contractCurrency?: CurrencySymbol,
+    public readonly contractCurrency: CurrencySymbol,
     public readonly firstHash?: string,
     public readonly maxHashes?: bigint,
   ) {
     super(
       PAsset.ptype,
-      contractCurrency ? [PIdNFT.assertAsset(contractCurrency, firstHash!, maxHashes!)] : PAsset.ptype.asserts,
-      contractCurrency ? PIdNFT.generateAsset(contractCurrency, firstHash!, maxHashes!) : PAsset.ptype.genData,
+      [PIdNFT.assertAsset(contractCurrency, firstHash, maxHashes)],
+      PIdNFT.generateAsset(contractCurrency, firstHash, maxHashes),
     );
-    this.population = maxHashes ? Number(maxHashes + 1n) : PAsset.ptype.population;
+    this.population = maxHashes
+      ? Number(maxHashes + 1n)
+      : PAsset.ptype.population;
   }
 
   public showData = (data: Asset): string => {
@@ -103,14 +106,14 @@ export class PIdNFT extends PConstraint<PAsset> {
     return `PObject: PIdNFT(${this.contractCurrency}, ${this.firstHash}, ${this.maxHashes})`;
   };
 
-  static unparsed(): PIdNFT {
-    return new PIdNFT();
+  static unparsed(contractCurrency: CurrencySymbol): PIdNFT {
+    return new PIdNFT(contractCurrency);
   }
 
   static assertAsset = (
     contractCurrency: CurrencySymbol,
-    firstHash: string,
-    maxHashes: bigint,
+    firstHash?: string,
+    maxHashes?: bigint,
   ) =>
   (asset: Asset): void => {
     assert(
@@ -118,26 +121,28 @@ export class PIdNFT extends PConstraint<PAsset> {
       `currencySymbol: ${asset.currencySymbol} of ${asset.show()} is not contractCurrency: ${contractCurrency}`,
     );
 
-    let hash = firstHash;
-    // const log = [hash];
-    for (let i = 0n; i <= maxHashes; i++) {
-      if (asset.tokenName === hash) {
-        return;
+    if (firstHash) {
+      let hash = firstHash;
+      // const log = [hash];
+      for (let i = 0n; i <= maxHashes!; i++) {
+        if (asset.tokenName === hash) {
+          return;
+        }
+        hash = nextHash(hash);
+        // log.push(hash);
       }
-      hash = nextHash(hash);
-      // log.push(hash);
+      throw new Error(
+        `ID-Asset verification failure for\n${asset.show()}\nwithin ${maxHashes} hashes`, //:\n${f}${
+        //   log.join(`\n${f}`)
+        // }`,
+      );
     }
-    throw new Error(
-      `ID-Asset verification failure for\n${asset.show()}\nwithin ${maxHashes} hashes`, //:\n${f}${
-      //   log.join(`\n${f}`)
-      // }`,
-    );
   };
 
   static generateAsset = (
     contractCurrency: CurrencySymbol,
-    firstHash: string,
-    maxHashes: bigint,
+    firstHash?: string,
+    maxHashes?: bigint,
   ) =>
   (): Asset => {
     return ParamNFT.generateWith( // bit of an abuse here
