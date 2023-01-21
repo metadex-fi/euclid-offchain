@@ -295,6 +295,32 @@ export class Value {
     return value;
   };
 
+  public smallestAmount = (): bigint => {
+    let smallest: bigint | undefined = undefined;
+    for (const amounts of this.value.values()) {
+      for (const amount of amounts.values()) {
+        if (!smallest || amount < smallest) {
+          smallest = amount;
+        }
+      }
+    }
+    assert(smallest, `smallestAmount: no smallest found in ${this.concise()}`);
+    return smallest;
+  };
+
+  public biggestAmount = (): bigint => {
+    let biggest: bigint | undefined = undefined;
+    for (const amounts of this.value.values()) {
+      for (const amount of amounts.values()) {
+        if (!biggest || biggest < amount) {
+          biggest = amount;
+        }
+      }
+    }
+    assert(biggest, `biggestAmount: no biggest found in ${this.concise()}`);
+    return biggest;
+  };
+
   static nullOfAssets = (assets: Assets): Value => {
     const value = new Map<CurrencySymbol, Map<TokenName, bigint>>();
     for (const [currencySymbol, tokens] of assets.toMap()) {

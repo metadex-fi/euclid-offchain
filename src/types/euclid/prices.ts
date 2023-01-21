@@ -88,7 +88,7 @@ export class Prices {
     );
   };
 
-  static genOfAssets = (assets: Assets, baseAmountA0: bigint): Prices => {
+  static genOfAssets = (assets: Assets): Prices => {
     assert(
       assets.size() >= 2n,
       `Prices: less than two assets in ${assets.show()}`,
@@ -97,9 +97,9 @@ export class Prices {
     return new Prices(value);
   };
 
-  static generateInitial(baseAmountA0: bigint): Prices {
+  static generateInitial(): Prices {
     const assets = Assets.generate(2n);
-    return Prices.genOfAssets(assets, baseAmountA0);
+    return Prices.genOfAssets(assets);
   }
 
   static generateCurrent = (param: Param) => (): Prices => {

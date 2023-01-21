@@ -119,7 +119,7 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
       )
       : PIdNFT.unparsed(contractCurrency);
     const pparamNFT = param
-      ? new PThreadNFT(
+      ? new PParamNFT(
         contractCurrency,
         param.owner,
         maxInteger,
@@ -151,7 +151,7 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
   }
 
   static genPType(): PConstraint<PObject<Dirac>> {
-    const param = Param.generate(); //maybeNdef(Param.generate)?.(); TODO reactivate
+    const param = maybeNdef(Param.generate)?.();
     return new PDirac(param);
   }
 }

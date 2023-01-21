@@ -51,4 +51,4 @@ export class Contract {
   };
 }
 
-export const ccyLength = Contract.dummy().policyId.length;
+export const ccyLength = 0; //ontract.dummy().policyId.length; TODO FIXME

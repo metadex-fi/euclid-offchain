@@ -1,14 +1,20 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { abs, gMaxHashes, maxInteger, min, Prices, User } from "../../mod.ts";
+import {
+  abs,
+  genPositive,
+  gMaxHashes,
+  maxInteger,
+  min,
+  Prices,
+  User,
+} from "../../mod.ts";
 import {
   Amount,
   Amounts,
   Assets,
-  boundPositive,
   f,
   JumpSizes,
-  lSubValues_,
   newUnionWith,
   PByteString,
   PConstraint,
@@ -129,14 +135,15 @@ ${tt})`;
 
   static generate(): Param {
     const owner = PPaymentKeyHash.genData();
-    const baseAmountA0 = new PPositive().genData();
 
-    const initialPrices = Prices.generateInitial(baseAmountA0);
+    const initialPrices = Prices.generateInitial();
     const assets = initialPrices.assets();
     const jumpSizes = JumpSizes.genOfAssets(assets);
 
     const upperBounds = PositiveValue.genOfAssets(assets);
     const lowerBounds = upperBounds.minSizedSubValue(0n);
+
+    const baseAmountA0 = new PPositive(upperBounds.biggestAmount()).genData();
 
     return new Param(
       owner,
@@ -170,7 +177,7 @@ ${tt})`;
       1n,
     );
     let minDiracs = param.locationsPerDirac();
-    while (minDiracs > deposit.lowestAmount()) {
+    while (minDiracs > deposit.smallestAmount()) {
       param.jumpSizes.doubleRandomAmount();
       minDiracs = param.locationsPerDirac();
     }

@@ -29,6 +29,7 @@ export class Amounts {
   public firstAmount = (): bigint => this.value.firstAmount();
   public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
   public pop = (asset: Asset): bigint => this.value.pop(asset);
+  public smallestAmount = (): bigint => this.value.smallestAmount();
   public addAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.addAmountOf(asset, amount);
   public clone = (): Amounts => new Amounts(this.value.clone());
@@ -43,19 +44,6 @@ export class Amounts {
     return mulValues_(this.unsigned(), prices.unsigned()).sumAmounts();
   };
 
-  public lowestAmount = (): bigint => {
-    let lowest: bigint | undefined = undefined;
-    for (const amounts of this.value.toMap().values()) {
-      for (const amount of amounts.values()) {
-        if (!lowest || amount < lowest) {
-          lowest = amount;
-        }
-      }
-    }
-    assert(lowest, `lowest: no lowest found in ${this.concise()}`);
-    return lowest;
-  };
-
   public toLucid = (): LucidAssets => {
     const assets: LucidAssets = {};
     this.assets().forEach((asset) => {
@@ -67,6 +55,7 @@ export class Amounts {
   static fresh(param: Param, prices: Prices): Amounts {
     const activeAsset = prices.defaultActiveAsset(param.initialPrices);
     const amount = param.baseAmountA0 / prices.amountOf(activeAsset); // as in onchain
+    assert(amount > 0n, `Amounts.fresh: amount ${amount} <= 0`);
     const amounts = new PositiveValue();
     amounts.initAmountOf(activeAsset, amount);
     return new Amounts(amounts);

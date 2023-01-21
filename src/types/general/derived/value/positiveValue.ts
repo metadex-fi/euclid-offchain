@@ -37,6 +37,8 @@ export class PositiveValue {
   public firstAsset = (): Asset => this.value.firstAsset();
   public firstAmount = (): bigint => this.value.firstAmount();
   public pop = (asset: Asset): bigint => this.value.pop(asset);
+  public smallestAmount = (): bigint => this.value.smallestAmount();
+  public biggestAmount = (): bigint => this.value.biggestAmount();
   public setAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.setAmountOf(asset, amount);
   public clone = (): PositiveValue => new PositiveValue(this.value.clone());

@@ -133,7 +133,7 @@ ${tt})`;
   };
 
   static generateForUser = (user: User) => (): Pool => {
-    const nfts = new Assets();
+    const threadNFTs = new Assets();
     const [param, deposit] = Param.generateForUser(user);
     try {
       PParam.ptype.pconstant(param);
@@ -145,7 +145,7 @@ ${tt})`;
     // generate number of ticks per asset, such that
     // (numTicks * jumpSizes).mul <= deposit.lowest
     // and numTicks <= jumpSizes
-    let tickBudget = deposit.lowestAmount() / param.locationsPerDirac();
+    let tickBudget = deposit.smallestAmount() / param.locationsPerDirac();
     const numTicks = new Value();
     const maxTicks = 4n;
     assets.forEach((asset) => {
@@ -176,9 +176,8 @@ ${tt})`;
 
     // generator function for a single dirac based on its' prices
     const paramNFT = user.nextParamNFT;
-    nfts.insert(paramNFT.asset);
     function generateDirac(prices: Prices): Dirac {
-      nfts.insert(threadNFT.asset);
+      threadNFTs.insert(threadNFT.asset);
       return new Dirac(
         param.owner,
         threadNFT.asset,
@@ -219,10 +218,10 @@ ${tt})`;
       diracs = diracs.concat(diracs_);
     });
     assert(
-      diracs.length + 1 === nfts.size(),
-      `Wrong number of diracs: ${diracs.length} vs ${nfts.size()} - 1`,
+      diracs.length === threadNFTs.size(),
+      `Wrong number of diracs: ${diracs.length} vs ${threadNFTs.size()}`,
     );
-    const pool = new Pool(paramNFT.asset, nfts, param, diracs);
+    const pool = new Pool(paramNFT.asset, threadNFTs, param, diracs);
     user.pendingConsequences = (u: User) => {
       u.nextParamNFT = threadNFT.next();
       u.addPool(pool);
