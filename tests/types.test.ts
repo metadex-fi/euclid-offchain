@@ -95,7 +95,7 @@ const euclidPrimitiveGenerators = [
   PActiveAssets.genPType,
   PDirac.genPType,
   PDiracDatum.genPType,
-  // PPool.genPType,
+  PPool.genPType,
   // PPoolDatums.genPType,
   // PEuclidDatum.genPType,
 ];

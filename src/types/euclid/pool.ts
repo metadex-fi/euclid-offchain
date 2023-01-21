@@ -266,7 +266,11 @@ export class PPool extends PConstraint<PObject<Pool>> {
         Pool,
       ),
       [Pool.assertForUser(user)],
-      Pool.generateForUser(user),
+      () => {
+        const pool = Pool.generateForUser(user)();
+        user.dealWithConsequences();
+        return pool;
+      },
     );
   }
 
