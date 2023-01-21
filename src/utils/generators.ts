@@ -1,10 +1,11 @@
 // TODO consider generating wrong cases as well
 
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { PData } from "../mod.ts";
+import { Address, Lucid } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Amounts, Assets, PData, User } from "../mod.ts";
 
 export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
-export const gMaxStringBytes = 2n; // TODO higher
+export const gMaxStringBytes = 64n; // TODO higher
 export const gMaxLength = 3n;
 export const gMaxDepth = 4n;
 const dropChance = 0.5;
@@ -76,7 +77,7 @@ export function nonEmptySubSet<T>(set: T[]): T[] {
 }
 
 export function minSizedSubset<T>(set: T[], minSize: bigint): T[] {
-  assert(minSize <= set.length, `minSizedSubset: minSize > set.length`);
+  assert(minSize <= set.length, `minSizedSubset: ${minSize} > ${set.length}`);
   const subset = [];
   const pickedIndices: number[] = [];
   while (subset.length < minSize) {
@@ -112,9 +113,14 @@ export function genNumber(maxValue = maxInteger): bigint {
   return randomChoice([n, -n]);
 }
 
-export function genString(alph: string, minBytes = 0n): string {
+export function genString(
+  alph: string,
+  minBytes = 0n,
+  maxBytes = gMaxStringBytes,
+): string {
   assert(minBytes >= 0n, `genString: minBytes < 0`);
-  assert(gMaxStringBytes >= minBytes, `genString: maxStringBytes < minBytes`);
+  assert(gMaxStringBytes >= maxBytes, `genString: maxStringBytes < minBytes`);
+  assert(maxBytes >= minBytes, `genString: maxBytes < minBytes`);
   function genChar(): string {
     const choice = Math.floor(Math.random() * (alph.length + 10));
     if (choice < alph.length) {
@@ -124,7 +130,7 @@ export function genString(alph: string, minBytes = 0n): string {
     }
   }
   const l: string[] = [];
-  const maxi = 8n * (minBytes + genNonNegative(gMaxStringBytes - minBytes));
+  const maxi = 8n * (minBytes + genNonNegative(maxBytes - minBytes));
   for (let i = 0n; i < maxi; i++) {
     l.push(genChar());
   }
@@ -139,6 +145,23 @@ export function genName(): string {
   return genString(alph);
 }
 
-// export function genKeyHash(): string {
-//   return genString("abcdef", 1n);
-// }
+export async function genUsers(): Promise<User[]> {
+  const users = new Array<User>();
+  const allAssets = Assets.generate(2n);
+  const lucid = await Lucid.new(undefined, "Custom");
+
+  const numUsers = 10n; //genPositive(gMaxLength);
+  let canOpenPool = 10n; //genPositive(numUsers);
+  const addresses = new Array<Address>();
+  while (users.length < numUsers) {
+    const user = await User.generateWith(lucid);
+    if (!addresses.includes(user.address)) {
+      addresses.push(user.address);
+      user.balance = Amounts.genOfAssets(
+        allAssets.minSizedSubset(canOpenPool-- > 0 ? 2n : 0n),
+      );
+      users.push(user);
+    }
+  }
+  return users;
+}

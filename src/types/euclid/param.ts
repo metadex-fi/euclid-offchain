@@ -1,5 +1,8 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import {
+  fromText,
+  PaymentKeyHash,
+} from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
   abs,
   genPositive,
@@ -170,7 +173,7 @@ ${tt})`;
     const lowerBounds = upperBounds.minSizedSubValue(0n);
     const baseAmountA0 = new PPositive(upperBounds.biggestAmount()).genData();
     const param = new Param(
-      user.address,
+      fromText(user.address),
       jumpSizes,
       initialPrices,
       lowerBounds,
@@ -190,7 +193,7 @@ export class PParam extends PConstraint<PObject<Param>> {
     super(
       new PObject(
         new PRecord({
-          "owner": new PByteString(1n),
+          "owner": PPaymentKeyHash,
           "jumpSizes": PJumpSizes.ptype,
           "initialPrices": PPrices.initial(),
           "lowerPriceBounds": new PPositiveValue(),

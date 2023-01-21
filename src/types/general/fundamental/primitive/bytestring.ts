@@ -12,6 +12,7 @@ export class PByteString implements PType<string, string> {
 
   constructor(
     public readonly minBytes = 0n,
+    public readonly maxBytes?: bigint,
   ) {}
 
   public plift = (s: string): string => {
@@ -31,7 +32,7 @@ export class PByteString implements PType<string, string> {
   };
 
   public genData = (): string => {
-    return genString("abcdef", this.minBytes);
+    return genString("abcdef", this.minBytes, this.maxBytes);
   };
 
   public showData = (data: string): string => {

@@ -30,6 +30,18 @@ export class IdNFT {
     public readonly tokenName: TokenName,
   ) {
     this.asset = new Asset(this.contractCurrency, tokenName);
+    try {
+      fromHex(this.contractCurrency);
+    } catch (e) {
+      throw new Error(
+        `Invalid contractCurrency: ${this.contractCurrency}\n${e}`,
+      );
+    }
+    try {
+      fromHex(this.tokenName);
+    } catch (e) {
+      throw new Error(`Invalid tokenName: ${this.tokenName}\n${e}`);
+    }
   }
 
   public next = (skip = 0): IdNFT => {

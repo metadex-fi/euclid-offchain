@@ -6,6 +6,7 @@ import euclidMinting from "../../contract/euclidMinting.json" assert {
 };
 import {
   Address,
+  Emulator,
   Lucid,
   MintingPolicy,
   PolicyId,
@@ -38,17 +39,9 @@ export class Contract {
     this.policyId = lucid.utils.mintingPolicyToId(this.mintingPolicy);
   }
 
-  static dummy = (): Contract => {
-    const lucid = new Lucid();
-    lucid.utils = new Utils(lucid);
-    return new Contract(lucid);
-  };
-
   public update = async (): Promise<void> => {
     const utxos = await this.lucid.utxosAt(this.address);
     this.state = Euclid.ingest(utxos, this.policyId);
     this.state.digest();
   };
 }
-
-export const ccyLength = 0; //ontract.dummy().policyId.length; TODO FIXME

@@ -34,7 +34,7 @@ export class ParamUtxo {
     contractCurrency: CurrencySymbol,
   ) {
     this.param = PParamDatum.ptype.plift(fields)._0;
-    const balance = Amounts.fromLucid(utxo.assets);
+    const balance = Amounts.fromLucid(utxo.assets, contractCurrency.length);
     assert(
       balance.size() === 1n,
       `expected exactly id-NFT in ${balance.concise()}`,
@@ -66,7 +66,7 @@ export class DiracUtxo {
     const pdiracDatum = PDiracDatum.unparsed(contractCurrency);
     this.dirac = pdiracDatum.plift(fields)._0;
     this.id = this.dirac.threadNFT.tokenName;
-    this.balance = Amounts.fromLucid(utxo.assets);
+    this.balance = Amounts.fromLucid(utxo.assets, contractCurrency.length);
     const nftAmnt = this.balance.pop(this.dirac.threadNFT);
     assert(nftAmnt === 1n, `wrong threadNFT amount: ${nftAmnt}`);
     assert(

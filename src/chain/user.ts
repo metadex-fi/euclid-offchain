@@ -1,10 +1,17 @@
+import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   Address,
   Assets as LucidAssets,
   Data,
+  Emulator,
+  fromText,
+  generatePrivateKey,
+  getAddressDetails,
   Lucid,
   Tx,
   TxComplete,
+  TxHash,
+  TxSigned,
   Utils,
   utxoToCore,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
@@ -23,26 +30,49 @@ import {
 } from "../mod.ts";
 import { Pool } from "../types/euclid/pool.ts";
 import { Contract } from "./contract.ts";
-import { DiracUtxo, UtxoPool } from "./utxos.ts";
+import { UtxoPool } from "./utxos.ts";
 
 type consequences = (u: User) => void;
 
 export class User {
   public readonly contract: Contract;
 
-  public balance: Amounts | undefined;
+  public balance?: Amounts;
   public pools?: Pool[]; // own creation recall
   // public utxoPools?: UtxoPool[]; // from onchain
   public nextParamNFT: IdNFT;
 
   public pendingConsequences?: consequences;
 
-  constructor(
+  private constructor(
     public readonly lucid: Lucid,
     public readonly address: Address,
+    public readonly privateKey: string,
   ) {
     this.contract = new Contract(lucid);
-    this.nextParamNFT = new ParamNFT(this.contract.policyId, this.address);
+    this.nextParamNFT = new ParamNFT(
+      this.contract.policyId,
+      fromText(this.address),
+    );
+  }
+
+  static async from(
+    lucid: Lucid,
+    privateKey: string,
+  ): Promise<User> {
+    const address = await lucid.selectWalletFromPrivateKey(privateKey).wallet
+      .address();
+    return new User(lucid, address, privateKey);
+  }
+
+  static async generateWith(
+    lucid: Lucid,
+  ): Promise<User> {
+    const privateKey = generatePrivateKey();
+    const address = await lucid.selectWalletFromPrivateKey(privateKey).wallet
+      .address();
+    const user = new User(lucid, address, privateKey);
+    return user;
   }
 
   // for propertytesting
@@ -50,11 +80,19 @@ export class User {
     const lucid = new Lucid();
     lucid.utils = new Utils(lucid);
     const address = PPaymentKeyHash.genData();
-    const user = new User(lucid, address);
+    const privateKey = generatePrivateKey();
+    const user = new User(lucid, address, privateKey);
     const assets = Assets.generate(2n);
     user.balance = Amounts.genOfAssets(assets);
     return user;
   }
+
+  public account = (): { address: Address; assets: LucidAssets } => {
+    return {
+      address: this.address,
+      assets: this.balance!.toLucid(),
+    };
+  };
 
   public dealWithConsequences = (): void => {
     if (this.pendingConsequences) {
@@ -74,14 +112,14 @@ export class User {
   };
 
   public update = async (): Promise<void> => {
-    const utxos = await this.lucid.utxosAt(this.address);
+    const utxos = await this.lucid.utxosAt(this.address!);
     const assets: LucidAssets = {};
     utxos.forEach((utxo) => {
       Object.entries(utxo.assets).forEach(([asset, amount]) => {
-        assets[asset] = amount + assets[asset] ?? 0n;
+        assets[asset] = amount + BigInt(assets[asset] ?? 0);
       });
     });
-    this.balance = Amounts.fromLucid(assets);
+    this.balance = Amounts.fromLucid(assets, this.contract.policyId.length);
   };
 
   public ownsPools = (): boolean => {
@@ -172,19 +210,30 @@ export class User {
     ])(utxoPool);
   };
 
-  public genEuclidTx = async (): Promise<TxComplete> => {
+  public txOptions = async (): Promise<(() => Tx)[]> => {
     await Promise.all([this.update(), this.contract.update()]);
 
     const openUtxoPools = this.contract.state!.openForBusiness(
       this.balance!.assets(),
     );
-    const genTx = randomChoice([
+    return [
       // ...this.isOwner() ? [this.genOwnerTx] : [],
-      ...openUtxoPools ? [this.genUserTx(openUtxoPools)] : [],
-      this.genOpenTx,
-    ]);
+      // ...openUtxoPools.length ? [this.genUserTx(openUtxoPools)] : [],
+      ...this.balance!.size() >= 2n ? [this.genOpenTx] : [],
+    ];
+  };
 
-    return await genTx().complete();
+  public genEuclidTx = async (options: (() => Tx)[]): Promise<TxHash> => {
+    const genTx = randomChoice(options);
+    const tx = genTx();
+    try {
+      const complete = await tx.complete();
+      const signed = await complete.sign().complete();
+      return await signed.submit();
+    } catch (e) {
+      console.log(e);
+      return "";
+    }
   };
 }
 

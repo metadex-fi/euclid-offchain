@@ -1,6 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { PByteString, PLiteral } from "../mod.ts";
+import { PByteString } from "../general/fundamental/primitive/bytestring.ts";
+import { PLiteral } from "../mod.ts";
 
 export const PPaymentKeyHash = new PByteString(1n);
 

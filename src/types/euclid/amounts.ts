@@ -90,10 +90,10 @@ export class Amounts {
   //   return new Amounts(amounts);
   // };
 
-  static fromLucid(assets: LucidAssets): Amounts {
+  static fromLucid(assets: LucidAssets, ccyLength: number): Amounts {
     const value = new Value();
     Object.entries(assets).forEach(([name, amount]) => {
-      const asset = Asset.fromLucid(name);
+      const asset = Asset.fromLucid(name, ccyLength);
       value.initAmountOf(asset, amount);
     });
     return new Amounts(new PositiveValue(value));

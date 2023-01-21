@@ -31,6 +31,7 @@ import {
   Value,
 } from "../mod.ts";
 import { ActiveAssets, PActiveAssets } from "./activeAssets.ts";
+import { PDiracDatum } from "./dirac.ts";
 
 export class Pool {
   constructor(
@@ -65,30 +66,32 @@ ${tt})`;
     const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(this.param));
     const lucidNFTs = this.threadNFTs.add(this.paramNFT).toLucidWith(1n);
 
-    let tx = user.lucid.newTx()
-      .mintAssets(lucidNFTs)
-      .attachMintingPolicy(user.contract.mintingPolicy)
-      .payToContract(
-        user.contract.address,
-        {
-          inline: Data.to(paramDatum),
-          scriptRef: user.contract.validator, // for now, for simplicities' sake
-        },
-        this.paramNFT.toLucidWith(1n),
-      );
+    let tx = user.lucid.newTx();
+    //   .mintAssets(lucidNFTs)
+    //   .attachMintingPolicy(user.contract.mintingPolicy)
+    //   .payToContract(
+    //     user.contract.address,
+    //     {
+    //       inline: Data.to(paramDatum),
+    //       scriptRef: user.contract.validator, // for now, for simplicities' sake
+    //     },
+    //     this.paramNFT.toLucidWith(1n),
+    //   );
 
-    const threadNFTs = this.threadNFTs.toList();
-    this.diracs.forEach((dirac, index) => {
-      const funds = dirac.activeAmnts.clone();
-      funds.initAmountOf(threadNFTs[index], 1n);
-      tx = tx.payToContract(
-        user.contract.address,
-        {
-          inline: Data.to(new DiracDatum(dirac)),
-        },
-        funds.toLucid(),
-      );
-    });
+    // const threadNFTs = this.threadNFTs.toList();
+    // const pdatum = PDiracDatum.fromParam(this.param, user.contract.policyId);
+    // this.diracs.forEach((dirac, index) => {
+    //   const funds = dirac.activeAmnts.clone();
+    //   funds.initAmountOf(threadNFTs[index], 1n);
+    //   const datum = pdatum.pconstant(new DiracDatum(dirac));
+    //   tx = tx.payToContract(
+    //     user.contract.address,
+    //     {
+    //       inline: Data.to(datum),
+    //     },
+    //     funds.toLucid(),
+    //   );
+    // });
 
     return tx;
   };

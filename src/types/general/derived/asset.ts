@@ -1,6 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
-  ccyLength,
   gMaxLength,
   minSizedSubset,
   nonEmptySubSet,
@@ -15,11 +14,11 @@ import { Assets as LucidAssets } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 
 export type CurrencySymbol = string;
 export type PCurrencySymbol = PByteString;
-export const PCurrencySymbol = new PByteString();
+export const PCurrencySymbol = new PByteString(0n, 4n);
 
 export type TokenName = string;
 export type PTokenName = PByteString;
-export const PTokenName = new PByteString();
+export const PTokenName = new PByteString(0n, 4n);
 
 export class Asset {
   constructor(
@@ -45,7 +44,7 @@ export class Asset {
     };
   };
 
-  static fromLucid(name: string): Asset {
+  static fromLucid(name: string, ccyLength: number): Asset {
     if (name === "lovelace") {
       return new Asset("", "");
     }
@@ -237,8 +236,8 @@ export class Assets {
     return assets_;
   };
 
-  public minSizedSubset = (minSize: bigint): Asset[] => {
-    return minSizedSubset(this.toList(), minSize);
+  public minSizedSubset = (minSize: bigint): Assets => {
+    return Assets.fromList(minSizedSubset(this.toList(), minSize));
   };
 
   public has = (asset: Asset): boolean => {
