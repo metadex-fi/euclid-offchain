@@ -9,9 +9,10 @@ import {
 import { Amounts, Assets, PData, User } from "../mod.ts";
 
 export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
-export const gMaxStringBytes = 64n; // TODO higher
+export const gMaxStringLength = 64n; // TODO higher
 export const gMaxLength = 3n;
 export const gMaxDepth = 4n;
+export const letters = `abcdefghijklmnopqrstuvwxyz`;
 const dropChance = 0.5;
 
 export class Generators {
@@ -119,12 +120,13 @@ export function genNumber(maxValue = maxInteger): bigint {
 
 function genString(
   alph: string,
-  minBytes = 0n,
-  maxBytes = gMaxStringBytes,
+  minLength: bigint,
+  maxLength: bigint,
+  stepSize: bigint,
 ): string {
-  assert(minBytes >= 0n, `genString: minBytes < 0`);
-  assert(gMaxStringBytes >= maxBytes, `genString: maxStringBytes < minBytes`);
-  assert(maxBytes >= minBytes, `genString: maxBytes < minBytes`);
+  assert(minLength >= 0n, `genString: minBytes < 0`);
+  assert(gMaxStringLength >= maxLength, `genString: maxStringBytes < minBytes`);
+  assert(maxLength >= minLength, `genString: maxBytes < minBytes`);
   function genChar(): string {
     const choice = Math.floor(Math.random() * (alph.length + 10));
     if (choice < alph.length) {
@@ -134,7 +136,7 @@ function genString(
     }
   }
   const l: string[] = [];
-  const maxi = 8n * (minBytes + genNonNegative(maxBytes - minBytes));
+  const maxi = stepSize * (minLength + genNonNegative(maxLength - minLength));
   for (let i = 0n; i < maxi; i++) {
     l.push(genChar());
   }
@@ -144,16 +146,16 @@ function genString(
 
 export function genByteString(
   minBytes = 0n,
-  maxBytes = gMaxStringBytes,
+  maxBytes = gMaxStringLength / 8n,
 ): Uint8Array {
-  return fromHex(genString("abcdef", minBytes, maxBytes));
+  return fromHex(genString("abcdef", minBytes, maxBytes, 8n));
 }
 
-export function genName(minBytes = 0n): string {
-  const lower = "abcdefghijklmnopqrstuvwxyz";
+export function genName(minLength = 0n, maxLength = gMaxStringLength): string {
+  const lower = letters;
   const upper = lower.toUpperCase();
   const alph = lower + upper; // TODO special characters
-  return genString(alph, minBytes);
+  return genString(alph, minLength, maxLength, 1n);
 }
 
 export async function genUsers(): Promise<User[]> {

@@ -1,12 +1,29 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { fromHex } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { genByteString } from "../../../../mod.ts";
+import {
+  genByteString,
+  genNonNegative,
+  gMaxStringLength,
+  maybeNdef,
+} from "../../../../utils/generators.ts";
 import { PType } from "../type.ts";
 
 export class PByteString implements PType<Uint8Array, Uint8Array> {
-  public readonly population = Infinity;
+  public readonly population;
 
-  constructor() {}
+  constructor(
+    public readonly minBytes = 0n,
+    public readonly maxBytes = gMaxStringLength / 8n,
+  ) {
+    assert(
+      minBytes >= 0n,
+      `PByteString: minBytes must be non-negative, got ${minBytes}`,
+    );
+    assert(
+      maxBytes >= minBytes,
+      `PByteString: maxBytes must be greater than or equal to minBytes, got ${maxBytes} < ${minBytes}`,
+    );
+    this.population = maxBytes ? Infinity : 1; // NOTE inaccurate, but serves, and quickly
+  }
 
   public plift = (s: Uint8Array): Uint8Array => {
     assert(
@@ -21,11 +38,11 @@ export class PByteString implements PType<Uint8Array, Uint8Array> {
       data instanceof Uint8Array,
       `PByteString.pconstant: expected Uint8Array, got ${data} (${typeof data})`,
     );
-    return data;
+    return new Uint8Array(data);
   };
 
   public genData = (): Uint8Array => {
-    return genByteString();
+    return genByteString(this.minBytes, this.maxBytes);
   };
 
   public showData = (data: Uint8Array): string => {
@@ -41,7 +58,13 @@ export class PByteString implements PType<Uint8Array, Uint8Array> {
   };
 
   static ptype = new PByteString();
+
   static genPType(): PByteString {
-    return PByteString.ptype;
+    const minBytes = maybeNdef(genNonNegative)?.(gMaxStringLength / 8n);
+    const maxBytes = maybeNdef(() =>
+      (minBytes ??
+        0n) + genNonNegative((gMaxStringLength / 8n) - (minBytes ?? 0n))
+    )?.();
+    return new PByteString(minBytes, maxBytes);
   }
 }

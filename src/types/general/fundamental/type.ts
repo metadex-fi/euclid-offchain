@@ -45,7 +45,7 @@ export const Data = {
     } else if (data instanceof Constr) {
       return new Constr(data.index, data.fields.map(Data.plutus));
     } else {
-      throw new Error(`byty: unknown data type ${data}`);
+      throw new Error(`bytey: unknown data type ${data}`);
     }
   },
 

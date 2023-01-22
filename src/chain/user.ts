@@ -64,11 +64,12 @@ export class User {
         assert(paymentKeyHash === paymentKeyHash_);
       }
       this.paymentKeyHash = paymentKeyHash_;
+    } else {
+      assert(paymentKeyHash, `neither address nor paymentKeyHash provided`);
+      this.paymentKeyHash = paymentKeyHash;
     }
-    assert(paymentKeyHash, `neither address nor paymentKeyHash provided`);
-    this.paymentKeyHash = paymentKeyHash;
     this.nextParamNFT = new ParamNFT(
-      fromHex(this.contract.policyId),
+      this.contract.currency,
       this.paymentKeyHash,
     );
   }
@@ -79,7 +80,7 @@ export class User {
   ): Promise<User> {
     const address = await lucid.selectWalletFromPrivateKey(privateKey).wallet
       .address();
-    return new User(lucid, address, privateKey);
+    return new User(lucid, privateKey, address);
   }
 
   static async generateWith(
@@ -88,7 +89,7 @@ export class User {
     const privateKey = generatePrivateKey();
     const address = await lucid.selectWalletFromPrivateKey(privateKey).wallet
       .address();
-    const user = new User(lucid, address, privateKey);
+    const user = new User(lucid, privateKey, address);
     return user;
   }
 
@@ -106,9 +107,10 @@ export class User {
 
   public account = (): { address: Address; assets: LucidAssets } => {
     assert(this.address, "No address");
+    assert(this.balance, "No balance");
     return {
       address: this.address,
-      assets: this.balance!.toLucid(),
+      assets: this.balance.toLucid(),
     };
   };
 

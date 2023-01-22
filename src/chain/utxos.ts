@@ -3,7 +3,7 @@ import { UTxO } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
   Amounts,
   Assets,
-  CurrencySymbol,
+  Currency,
   Data,
   Dirac,
   leq,
@@ -11,7 +11,7 @@ import {
   PDiracDatum,
   Pool,
   PParamDatum,
-  TokenName,
+  Token,
 } from "../mod.ts";
 
 // function getNFT(utxo: UTxO, contractCurrency: CurrencySymbol): TokenName {
@@ -28,11 +28,11 @@ import {
 
 export class ParamUtxo {
   public readonly param: Param;
-  public readonly id: TokenName;
+  public readonly id: Token;
   constructor(
     public readonly utxo: UTxO,
     fields: Data[],
-    contractCurrency: CurrencySymbol,
+    contractCurrency: Currency,
   ) {
     this.param = PParamDatum.ptype.plift(fields)._0;
     const balance = Amounts.fromLucid(utxo.assets, contractCurrency.length);
@@ -46,27 +46,27 @@ export class ParamUtxo {
     );
     const idNFT = balance.firstAsset();
     assert(
-      idNFT.currencySymbol === contractCurrency,
+      idNFT.currency === contractCurrency,
       `id-NFT ${idNFT.show()} has wrong currency, expected ${contractCurrency}`,
     );
-    this.id = balance.firstAsset().tokenName;
+    this.id = balance.firstAsset().token;
   }
 }
 
 export class DiracUtxo {
   public dirac: Dirac;
-  public readonly id: TokenName;
+  public readonly id: Token;
   public readonly balance: Amounts;
   public flippable?: Assets;
   public jumpable?: Assets;
   constructor(
     public readonly utxo: UTxO,
     public readonly fields: Data[],
-    public readonly contractCurrency: CurrencySymbol,
+    public readonly contractCurrency: Currency,
   ) {
     const pdiracDatum = PDiracDatum.unparsed(contractCurrency);
     this.dirac = pdiracDatum.plift(fields)._0;
-    this.id = this.dirac.threadNFT.tokenName;
+    this.id = this.dirac.threadNFT.token;
     this.balance = Amounts.fromLucid(utxo.assets, contractCurrency.length);
     const nftAmnt = this.balance.pop(this.dirac.threadNFT);
     assert(nftAmnt === 1n, `wrong threadNFT amount: ${nftAmnt}`);

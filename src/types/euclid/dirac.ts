@@ -3,7 +3,7 @@ import {
   Amounts,
   Asset,
   Assets,
-  CurrencySymbol,
+  Currency,
   f,
   PAmounts,
   Param,
@@ -134,11 +134,11 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
     );
   }
 
-  static unparsed(contractCurrency: CurrencySymbol): PDirac {
+  static unparsed(contractCurrency: Currency): PDirac {
     return new PDirac(undefined, contractCurrency);
   }
 
-  static fromParam(param: Param, contractCurrency?: CurrencySymbol): PDirac {
+  static fromParam(param: Param, contractCurrency?: Currency): PDirac {
     return new PDirac(param, contractCurrency);
   }
 
@@ -166,14 +166,14 @@ export class PDiracDatum extends PObject<DiracDatum> {
     );
   }
 
-  static unparsed(contractCurrency: CurrencySymbol): PDiracDatum {
+  static unparsed(contractCurrency: Currency): PDiracDatum {
     const pdirac = PDirac.unparsed(contractCurrency);
     return new PDiracDatum(pdirac);
   }
 
   static fromParam(
     param: Param,
-    contractCurrency?: CurrencySymbol,
+    contractCurrency?: Currency,
   ): PDiracDatum {
     const pdirac = PDirac.fromParam(param, contractCurrency);
     return new PDiracDatum(pdirac);

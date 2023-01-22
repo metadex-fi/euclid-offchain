@@ -8,3 +8,4 @@ export * from "./map.ts";
 export * from "./object.ts";
 export * from "./sum.ts";
 export * from "./record.ts";
+export * from "./wrapper.ts";

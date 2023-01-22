@@ -17,49 +17,89 @@ import {
   toHex,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 
-export type CurrencySymbol = Uint8Array;
-export class PCurrencySymbol extends PConstraint<PByteString> {
+export class Currency extends Uint8Array {
+  constructor(public readonly symbol: Uint8Array) {
+    assert(symbol.length <= Currency.maxLength, `Currency too long: ${symbol}`);
+    super(symbol);
+  }
+
+  static fromHex = (hex: string): Currency => {
+    return new Currency(fromHex(hex));
+  };
+
+  static maxLength = 32n;
+  static ADA = new Currency(new Uint8Array(0));
+}
+
+export class PCurrency extends PByteString {
   constructor() {
     super(
-      PByteString.ptype,
-      [PCurrencySymbol.assert],
-      PCurrencySymbol.generate,
+      7n,
+      7n,
     );
   }
 
-  static assert(data: Uint8Array): void {
-    assert(data.length <= 32, "currencySymbol must be <= 32 bytes");
-  }
-
-  static generate(): CurrencySymbol {
-    return genByteString(0n, 4n);
-  }
-
-  static ptype = new PCurrencySymbol();
-  static genPType(): PConstraint<PByteString> {
-    return PCurrencySymbol.ptype;
+  static ptype = new PCurrency();
+  static genPType(): PByteString {
+    return PCurrency.ptype;
   }
 }
 
-export type TokenName = string;
-export const PTokenName = new PString();
+export class Token {
+  constructor(public readonly name: string) {
+    assert(name.length <= Token.maxLength, `Token too long: ${name}`);
+  }
+
+  static toHex = (hex: Uint8Array): Token => {
+    return new Token(toHex(hex));
+  };
+
+  static maxLength = 32n;
+  static lovelace = new Token("");
+}
+
+export class PToken extends PString {
+  constructor() {
+    super(
+      0n,
+      Token.maxLength,
+    );
+  }
+
+  static ptype = new PToken();
+  static genPType(): PString {
+    return PToken.ptype;
+  }
+}
 
 export class Asset {
   constructor(
-    public readonly currencySymbol: CurrencySymbol,
-    public readonly tokenName: TokenName,
+    public readonly currency: Currency,
+    public readonly token: Token,
   ) {
-    Asset.assert(this);
+    Asset.assertADAlovelace(this);
   }
 
   public show = (): string => {
-    return `Asset(${this.currencySymbol}, ${this.tokenName})`;
+    return `Asset(${this.currency.symbol}, ${this.token.name})`;
   };
 
   public toLucid = (): string => {
-    return toHex(this.currencySymbol) === ""
-      ? "lovelace"
-      : `${this.currencySymbol}${this.tokenName}`;
+    try {
+      const ccy = toHex(this.currency.symbol);
+      if (ccy === "") {
+        return "lovelace";
+      }
+      const tkn = PToken.ptype.pconstant(this.token.name);
+      console.log(`
+    ccy: ${ccy}
+    tkn: ${this.token}
+    tkn: ${PToken.ptype.pconstant(this.token.name)}
+    tkn: ${tkn}`);
+      return `${ccy}${tkn}`;
+    } catch (e) {
+      throw new Error(`${e}\ncould not encode ${this.show()})`);
+    }
   };
 
   public toLucidWith = (amount: bigint): LucidAssets => {
@@ -69,27 +109,39 @@ export class Asset {
   };
 
   static fromLucid(name: string, ccyLength: number): Asset {
-    if (name === "lovelace") {
-      return new Asset(fromHex(""), "");
+    try {
+      if (name === "lovelace") {
+        return Asset.ADA();
+      }
+      const ccy = name.slice(0, ccyLength);
+      const tkn = PToken.ptype.plift(fromHex(name.slice(ccyLength)));
+      return new Asset(Currency.fromHex(ccy), new Token(tkn as string));
+    } catch (e) {
+      throw new Error(`${e}\ncould not decode ${name} (${ccyLength}))`);
     }
-    const ccy = name.slice(0, ccyLength);
-    const tkn = name.slice(ccyLength);
-    return new Asset(fromHex(ccy), tkn);
   }
 
-  static assert(asset: Asset): void {
-    if (toHex(asset.currencySymbol) === "") {
+  static assertADAlovelace(asset: Asset): void {
+    if (toHex(asset.currency.symbol) === "") {
       assert(
-        asset.tokenName === "",
-        `ADA must have lovelace, got ${asset.tokenName}`,
+        asset.token.name === "",
+        `ADA must have lovelace, got ${asset.show()}`,
       );
     }
   }
 
+  private static ADA = (): Asset => {
+    return new Asset(Currency.ADA, Token.lovelace);
+  };
+
+  private static generateNonADA = (): Asset => {
+    const ccy = PCurrency.ptype.genData();
+    const tkn = PToken.ptype.genData();
+    return new Asset(new Currency(ccy), new Token(tkn));
+  };
+
   static generate(): Asset {
-    const ccy = PCurrencySymbol.generate();
-    const tkn = toHex(ccy) === "" ? "" : PTokenName.genData();
-    return new Asset(ccy, tkn);
+    return randomChoice([Asset.ADA, Asset.generateNonADA])();
   }
 }
 
@@ -99,13 +151,13 @@ export class PAsset extends PConstraint<PObject<Asset>> {
       new PObject(
         new PRecord(
           {
-            "currencySymbol": PCurrencySymbol.ptype,
-            "tokenName": PTokenName,
+            "currency": PCurrency.ptype,
+            "token": PToken.ptype,
           },
         ),
         Asset,
       ),
-      [Asset.assert],
+      [Asset.assertADAlovelace],
       Asset.generate,
     );
   }
@@ -128,11 +180,11 @@ export class PAsset extends PConstraint<PObject<Asset>> {
   }
 }
 
-const PNonEmptyTokenList = new PNonEmptyList(PTokenName);
+const PNonEmptyTokenList = new PNonEmptyList(PToken.ptype);
 
 export class Assets {
   constructor(
-    private assets: Map<CurrencySymbol, Array<TokenName>> = new Map(),
+    private assets: Map<Currency, Array<Token>> = new Map(),
   ) {
     for (const [ccy, tkns] of this.assets) {
       assert(tkns.length > 0, `empty token list for ${ccy}`);
@@ -143,17 +195,17 @@ export class Assets {
     const ttf = tabs + t + f;
     const ttff = ttf + f;
     const ccys = [`Assets:`];
-    for (const [currencySymbol, tokens] of this.assets) {
+    for (const [currency, tokens] of this.assets) {
       ccys.push(
-        `${ttf}${toHex(currencySymbol) === "" ? "ADA" : currencySymbol}:`,
+        `${ttf}${toHex(currency.symbol) === "" ? "ADA" : currency.symbol}:`,
       );
       const tkns = [];
-      for (const tokenName of tokens) {
+      for (const token of tokens) {
         tkns.push(
           `${ttff}${
-            tokenName === ""
-              ? toHex(currencySymbol) === "" ? "lovelace" : "_"
-              : tokenName
+            token.name === ""
+              ? toHex(currency.symbol) === "" ? "lovelace" : "_"
+              : token.name
           }`,
         );
       }
@@ -184,11 +236,11 @@ export class Assets {
   };
 
   public insert = (asset: Asset): void => {
-    const { currencySymbol, tokenName } = asset;
-    const tkns = this.assets.get(currencySymbol) ?? [];
-    assert(!tkns.includes(tokenName), `${asset} already in ${this.show()}`);
-    tkns.push(tokenName);
-    this.assets.set(currencySymbol, tkns);
+    const { currency, token } = asset;
+    const tkns = this.assets.get(currency) ?? [];
+    assert(!tkns.includes(token), `${asset} already in ${this.show()}`);
+    tkns.push(token);
+    this.assets.set(currency, tkns);
   };
 
   public add = (asset: Asset): Assets => {
@@ -198,14 +250,14 @@ export class Assets {
   };
 
   public remove = (asset: Asset): void => {
-    const { currencySymbol, tokenName } = asset;
-    const tkns = this.assets.get(currencySymbol);
+    const { currency, token } = asset;
+    const tkns = this.assets.get(currency);
     assert(tkns !== undefined, `${asset.show()} not in ${this.show()}`);
-    const i = tkns.indexOf(tokenName);
+    const i = tkns.indexOf(token);
     assert(i >= 0, `${asset.show()} not in ${this.show()}`);
     tkns.splice(i, 1);
     if (tkns.length === 0) {
-      this.assets.delete(currencySymbol);
+      this.assets.delete(currency);
     }
   };
 
@@ -218,7 +270,7 @@ export class Assets {
 
   public tail = (): Assets => {
     assert(this.assets.size > 0, "empty assets tell no tails");
-    const tail = new Map<CurrencySymbol, TokenName[]>();
+    const tail = new Map<Currency, Token[]>();
     let first = true;
     for (const ccy of [...this.assets.keys()].sort()) {
       const tkns = this.assets.get(ccy)!.slice(0).sort();
@@ -267,13 +319,13 @@ export class Assets {
   };
 
   public has = (asset: Asset): boolean => {
-    const { currencySymbol, tokenName } = asset;
-    const tkns = this.assets.get(currencySymbol);
-    return tkns !== undefined && tkns.includes(tokenName);
+    const { currency, token } = asset;
+    const tkns = this.assets.get(currency);
+    return tkns !== undefined && tkns.includes(token);
   };
 
-  public toMap = (): Map<CurrencySymbol, TokenName[]> => {
-    const assets = new Map<CurrencySymbol, TokenName[]>();
+  public toMap = (): Map<Currency, Token[]> => {
+    const assets = new Map<Currency, Token[]>();
     for (const [ccy, tkns] of this.assets) {
       assets.set(ccy, tkns.slice());
     }
@@ -342,7 +394,7 @@ export class Assets {
   }
 
   public intersect = (assets: Assets): Assets => {
-    const shared = new Map<CurrencySymbol, TokenName[]>();
+    const shared = new Map<Currency, Token[]>();
     const other = assets.toMap();
     for (const [ccy, ownTkns] of this.assets) {
       const otherTkns = other.get(ccy);
@@ -355,7 +407,7 @@ export class Assets {
   };
 
   static assert(assets: Assets): void {
-    assets.forEach((asset) => Asset.assert(asset));
+    assets.forEach((asset) => Asset.assertADAlovelace(asset));
   }
 
   static generate = (minLength = 0n): Assets => {
@@ -384,7 +436,7 @@ export class PAssets extends PConstraint<PObject<Assets>> {
     super(
       new PObject(
         new PRecord({
-          assets: new PMap(PCurrencySymbol.ptype, PNonEmptyTokenList),
+          assets: new PMap(PCurrency.ptype, PNonEmptyTokenList),
         }),
         Assets,
       ),

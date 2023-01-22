@@ -43,7 +43,7 @@ export class POwner extends PLiteral<PKeyHash> {
     super(PKeyHash.ptype, paymentKeyHash);
   }
 
-  static genPType(): PLiteral<PByteString> {
+  static genPType(): PLiteral<PKeyHash> {
     const paymentKeyHash = PKeyHash.ptype.genData();
     return new POwner(paymentKeyHash);
   }

@@ -4,7 +4,7 @@ import { PByteString, PInteger } from "../mod.ts";
 import { Data, f, PData, PType, t } from "../type.ts";
 import { PRecord } from "./record.ts";
 
-const filterFunctions = <O extends Object>(o: O) =>
+export const filterFunctions = <O extends Object>(o: O) =>
   Object.fromEntries(
     Object.entries(o).filter(([_, v]) => typeof v !== "function"),
   );

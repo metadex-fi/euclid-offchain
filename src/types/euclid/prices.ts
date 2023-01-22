@@ -3,14 +3,14 @@ import { leq, randomChoice } from "../../mod.ts";
 import {
   Asset,
   Assets,
-  CurrencySymbol,
+  Currency,
   generateWithin,
   lSubValues,
   Param,
   PConstraint,
   PObject,
   PRecord,
-  TokenName,
+  Token,
   Value,
 } from "../mod.ts";
 import {
@@ -57,14 +57,13 @@ export class Prices {
   public setAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.setAmountOf(asset, amount);
   public clone = (): Prices => new Prices(this.value.clone());
-  public toMap = (): Map<CurrencySymbol, Map<TokenName, bigint>> =>
-    this.value.toMap();
+  public toMap = (): Map<Currency, Map<Token, bigint>> => this.value.toMap();
 
   static fromValue = (prices: Value): Prices => {
     return new Prices(new PositiveValue(prices));
   };
   static fromMap = (
-    prices: Map<CurrencySymbol, Map<TokenName, bigint>>,
+    prices: Map<Currency, Map<Token, bigint>>,
   ): Prices => {
     return Prices.fromValue(new Value(prices));
   };

@@ -1,5 +1,4 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { fromText } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { abs, maxInteger, min, Prices, User } from "../../mod.ts";
 import {
   Amount,

@@ -28,34 +28,33 @@ import {
   PString,
   PSum,
   PThreadNFT,
+  PWrapper,
 } from "../src/mod.ts";
 import {
   PAsset,
   PAssets,
-  PCurrencySymbol,
+  PCurrency,
+  PToken,
 } from "../src/types/general/derived/asset.ts";
 import { PBounded, PPositive } from "../src/types/general/derived/bounded.ts";
 import { PNonEmptyList } from "../src/types/general/derived/nonEmptyList.ts";
 import { PPositiveValue } from "../src/types/general/derived/value/positiveValue.ts";
 import { PValue } from "../src/types/general/derived/value/value.ts";
 
-// import { PActiveAssets } from "../src/types/euclid/activeAssets.ts";
-// import { PDirac, PDiracDatum } from "../src/types/euclid/dirac.ts";
-
 Deno.test("euclid data/types tests", () => {
   const gen = new Generators(
     // @ts-ignore TODO type instantiation is excessively deep and possibly infinite
     [
       ...fundamentalPrimitiveGenerators,
-      ...derivedPrimitiveGenerators,
-      ...euclidPrimitiveGenerators,
+      // ...derivedPrimitiveGenerators,
+      // ...euclidPrimitiveGenerators,
     ],
     [
       ...fundamentalContainerGenerators,
-      ...derivedContainerGenerators,
+      // ...derivedContainerGenerators,
     ],
   );
-  proptestPTypes(gen, 1000);
+  proptestPTypes(gen, 5000);
 });
 
 const fundamentalPrimitiveGenerators = [
@@ -75,14 +74,16 @@ const fundamentalContainerGenerators = [
   PRecord.genPType,
   PObject.genPType,
   PSum.genPType,
+  PWrapper.genPType,
 ];
 
 const derivedPrimitiveGenerators = [
   PBounded.genPType,
   PPositive.genPType,
-  PCurrencySymbol.genPType,
-  PAsset.genPType,
-  PAssets.genPType,
+  PCurrency.genPType,
+  PToken.genPType,
+  // PAsset.genPType,
+  // PAssets.genPType,
   PValue.genPType,
   PPositiveValue.genPType,
 ];

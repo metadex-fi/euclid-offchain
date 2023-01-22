@@ -1,11 +1,12 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Data, fromHex, Tx } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { genPositive, maxInteger, min, User } from "../../mod.ts";
+import { Tx } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { genPositive, min, User } from "../../mod.ts";
 import {
   addValues,
   Amounts,
   Asset,
   Assets,
+  Data,
   Dirac,
   DiracDatum,
   divValues,
@@ -66,32 +67,32 @@ ${tt})`;
     const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(this.param));
     const lucidNFTs = this.threadNFTs.add(this.paramNFT).toLucidWith(1n);
 
-    let tx = user.lucid.newTx();
-    //   .mintAssets(lucidNFTs)
-    //   .attachMintingPolicy(user.contract.mintingPolicy)
-    //   .payToContract(
-    //     user.contract.address,
-    //     {
-    //       inline: Data.to(paramDatum),
-    //       scriptRef: user.contract.validator, // for now, for simplicities' sake
-    //     },
-    //     this.paramNFT.toLucidWith(1n),
-    //   );
+    let tx = user.lucid.newTx()
+      .mintAssets(lucidNFTs)
+      .attachMintingPolicy(user.contract.mintingPolicy)
+      .payToContract(
+        user.contract.address,
+        {
+          inline: Data.to(paramDatum),
+          scriptRef: user.contract.validator, // for now, for simplicities' sake
+        },
+        this.paramNFT.toLucidWith(1n),
+      );
 
-    // const threadNFTs = this.threadNFTs.toList();
-    // const pdatum = PDiracDatum.fromParam(this.param, user.contract.policyId);
-    // this.diracs.forEach((dirac, index) => {
-    //   const funds = dirac.activeAmnts.clone();
-    //   funds.initAmountOf(threadNFTs[index], 1n);
-    //   const datum = pdatum.pconstant(new DiracDatum(dirac));
-    //   tx = tx.payToContract(
-    //     user.contract.address,
-    //     {
-    //       inline: Data.to(datum),
-    //     },
-    //     funds.toLucid(),
-    //   );
-    // });
+    const threadNFTs = this.threadNFTs.toList();
+    const pdatum = PDiracDatum.fromParam(this.param, user.contract.currency);
+    this.diracs.forEach((dirac, index) => {
+      const funds = dirac.activeAmnts.clone();
+      funds.initAmountOf(threadNFTs[index], 1n);
+      const datum = pdatum.pconstant(new DiracDatum(dirac));
+      tx = tx.payToContract(
+        user.contract.address,
+        {
+          inline: Data.to(datum),
+        },
+        funds.toLucid(),
+      );
+    });
 
     return tx;
   };
@@ -99,9 +100,9 @@ ${tt})`;
   static assert(pool: Pool): void {
     const owner = pool.param.owner;
     const threadNFTs = pool.threadNFTs.clone();
-    PParamNFT.assertAsset(pool.paramNFT.currencySymbol, owner)(pool.paramNFT);
+    PParamNFT.assertAsset(pool.paramNFT.currency, owner)(pool.paramNFT);
     const assertThreadNFT = PThreadNFT.assertAsset(
-      pool.paramNFT.currencySymbol,
+      pool.paramNFT.currency,
       owner,
     );
     pool.diracs.forEach((dirac) => {
