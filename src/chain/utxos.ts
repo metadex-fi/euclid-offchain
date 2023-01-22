@@ -1,9 +1,10 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Data, UTxO } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { UTxO } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
   Amounts,
   Assets,
   CurrencySymbol,
+  Data,
   Dirac,
   leq,
   Param,

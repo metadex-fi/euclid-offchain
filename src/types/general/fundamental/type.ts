@@ -7,7 +7,66 @@ plift parses, pconstant composes.
 T is the equivalent concrete type.
 */
 
-import { Data } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import {
+  Constr,
+  Data as LucidData,
+  Datum,
+  fromHex,
+  Redeemer,
+  toHex,
+} from "https://deno.land/x/lucid@0.8.6/mod.ts";
+
+export type Data =
+  | Uint8Array
+  | bigint
+  | Data[]
+  | Map<Data, Data>
+  | Constr<Data>;
+
+export const Data = {
+  to: (data: Data): Datum | Redeemer => {
+    return LucidData.to(Data.lucid(data));
+  },
+  from: (raw: Datum | Redeemer): Data => {
+    return Data.plutus(LucidData.from(raw));
+  },
+
+  plutus: (data: LucidData): Data => {
+    if (typeof data === "string") {
+      return fromHex(data);
+    } else if (typeof data === "bigint") {
+      return data;
+    } else if (data instanceof Array) {
+      return data.map(Data.plutus);
+    } else if (data instanceof Map) {
+      return new Map(
+        [...data.entries()].map(([k, v]) => [Data.plutus(k), Data.plutus(v)]),
+      );
+    } else if (data instanceof Constr) {
+      return new Constr(data.index, data.fields.map(Data.plutus));
+    } else {
+      throw new Error(`byty: unknown data type ${data}`);
+    }
+  },
+
+  lucid: (data: Data): LucidData => {
+    if (data instanceof Uint8Array) {
+      return toHex(data);
+    } else if (typeof data === "bigint") {
+      return data;
+    } else if (data instanceof Array) {
+      return data.map(Data.lucid);
+    } else if (data instanceof Map) {
+      return new Map(
+        [...data.entries()].map(([k, v]) => [Data.lucid(k), Data.lucid(v)]),
+      );
+    } else if (data instanceof Constr) {
+      return new Constr(data.index, data.fields.map(Data.lucid));
+    } else {
+      throw new Error(`stringy: unknown data type ${data}`);
+    }
+  },
+};
 
 export type RecordOfMaybe<T> = Record<string, T | undefined>;
 

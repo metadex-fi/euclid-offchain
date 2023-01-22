@@ -1,11 +1,17 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   Constr,
-  Data,
   PaymentKeyHash,
   UTxO,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { Asset, Assets, CurrencySymbol, Pool, TokenName } from "../mod.ts";
+import {
+  Asset,
+  Assets,
+  CurrencySymbol,
+  Data,
+  Pool,
+  TokenName,
+} from "../mod.ts";
 import { DiracUtxo, ParamUtxo, UtxoPool } from "./utxos.ts";
 
 export class Euclid {

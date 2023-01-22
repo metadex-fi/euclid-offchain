@@ -36,21 +36,21 @@ import { PValue } from "../src/types/general/derived/value/value.ts";
 // import { PActiveAssets } from "../src/types/euclid/activeAssets.ts";
 // import { PDirac, PDiracDatum } from "../src/types/euclid/dirac.ts";
 
-// Deno.test("euclid data/types tests", () => {
-//   const gen = new Generators(
-//     // @ts-ignore TODO type instantiation is excessively deep and possibly infinite
-//     [
-//       ...fundamentalPrimitiveGenerators,
-//       ...derivedPrimitiveGenerators,
-//       ...euclidPrimitiveGenerators,
-//     ],
-//     [
-//       ...fundamentalContainerGenerators,
-//       ...derivedContainerGenerators,
-//     ],
-//   );
-//   proptestPTypes(gen, 1000);
-// });
+Deno.test("euclid data/types tests", () => {
+  const gen = new Generators(
+    // @ts-ignore TODO type instantiation is excessively deep and possibly infinite
+    [
+      ...fundamentalPrimitiveGenerators,
+      // ...derivedPrimitiveGenerators,
+      // ...euclidPrimitiveGenerators,
+    ],
+    [
+      ...fundamentalContainerGenerators,
+      // ...derivedContainerGenerators,
+    ],
+  );
+  proptestPTypes(gen, 1000);
+});
 
 const fundamentalPrimitiveGenerators = [
   // PAny.genPType,

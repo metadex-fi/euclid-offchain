@@ -1,9 +1,11 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   fromHex,
+  fromText,
   PaymentKeyHash,
   sha256,
   toHex,
+  toText,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
   genNonNegative,
@@ -30,18 +32,6 @@ export class IdNFT {
     public readonly tokenName: TokenName,
   ) {
     this.asset = new Asset(this.contractCurrency, tokenName);
-    try {
-      fromHex(this.contractCurrency);
-    } catch (e) {
-      throw new Error(
-        `Invalid contractCurrency: ${this.contractCurrency}\n${e}`,
-      );
-    }
-    try {
-      fromHex(this.tokenName);
-    } catch (e) {
-      throw new Error(`Invalid tokenName: ${this.tokenName}\n${e}`);
-    }
   }
 
   public next = (skip = 0): IdNFT => {
@@ -57,14 +47,15 @@ export class IdNFT {
 }
 
 export function nextHash(hash: string): string {
-  return toHex(sha256(fromHex(hash)));
+  return toText(toHex(sha256(fromHex(fromText(hash)))));
 }
 
 export function hashNTimes(hash: string, n: bigint): string {
+  let h = fromHex(fromText(hash));
   for (let i = 0n; i < n; i++) {
-    hash = nextHash(hash);
+    h = sha256(h);
   }
-  return hash;
+  return toText(toHex(h));
 }
 
 export class ParamNFT extends IdNFT {

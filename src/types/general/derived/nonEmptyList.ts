@@ -5,7 +5,8 @@ import {
   gMaxLength,
   maybeNdef,
 } from "../../../mod.ts";
-import { PConstraint, PData, PLifted, PList } from "../mod.ts";
+import { PData, PLifted, PList } from "../mod.ts";
+import { PConstraint } from "./../fundamental/container/constraint.ts";
 
 export class PNonEmptyList<PElem extends PData> extends PConstraint<
   PList<PElem>

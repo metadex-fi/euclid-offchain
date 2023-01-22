@@ -5,7 +5,7 @@ import { Address, Lucid } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { Amounts, Assets, PData, User } from "../mod.ts";
 
 export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
-export const gMaxStringBytes = 64n; // TODO higher
+export const gMaxStringSize = 64n; // TODO higher
 export const gMaxLength = 3n;
 export const gMaxDepth = 4n;
 const dropChance = 0.5;
@@ -115,12 +115,12 @@ export function genNumber(maxValue = maxInteger): bigint {
 
 export function genString(
   alph: string,
-  minBytes = 0n,
-  maxBytes = gMaxStringBytes,
+  minSize = 0n,
+  maxSize = gMaxStringSize,
 ): string {
-  assert(minBytes >= 0n, `genString: minBytes < 0`);
-  assert(gMaxStringBytes >= maxBytes, `genString: maxStringBytes < minBytes`);
-  assert(maxBytes >= minBytes, `genString: maxBytes < minBytes`);
+  assert(minSize >= 0n, `genString: minBytes < 0`);
+  assert(gMaxStringSize >= maxSize, `genString: maxStringBytes < minBytes`);
+  assert(maxSize >= minSize, `genString: maxBytes < minBytes`);
   function genChar(): string {
     const choice = Math.floor(Math.random() * (alph.length + 10));
     if (choice < alph.length) {
@@ -130,7 +130,7 @@ export function genString(
     }
   }
   const l: string[] = [];
-  const maxi = 8n * (minBytes + genNonNegative(maxBytes - minBytes));
+  const maxi = minSize + genNonNegative(maxSize - minSize);
   for (let i = 0n; i < maxi; i++) {
     l.push(genChar());
   }

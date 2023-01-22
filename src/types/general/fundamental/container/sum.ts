@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Constr, Data } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Constr } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
   genPositive,
   minSizedSubset,
@@ -8,7 +8,7 @@ import {
   PRecord,
   randomChoice,
 } from "../../../../mod.ts";
-import { f, PType, t } from "../type.ts";
+import { Data, f, PType, t } from "../type.ts";
 import { PObject } from "./object.ts";
 
 export class PSum<Os extends Object> implements PType<Constr<Data>, Os> {

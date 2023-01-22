@@ -3,7 +3,7 @@ import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { PByteString } from "../general/fundamental/primitive/bytestring.ts";
 import { PLiteral } from "../mod.ts";
 
-export const PPaymentKeyHash = new PByteString(1n);
+export const PPaymentKeyHash = new PByteString();
 
 export class Owner {
   constructor(

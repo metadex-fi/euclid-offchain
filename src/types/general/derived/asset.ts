@@ -13,12 +13,32 @@ import { PByteString, PMap } from "../fundamental/mod.ts";
 import { Assets as LucidAssets } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 
 export type CurrencySymbol = string;
-export type PCurrencySymbol = PByteString;
-export const PCurrencySymbol = new PByteString(0n, 4n);
+export class PCurrencySymbol extends PConstraint<PByteString> {
+  constructor() {
+    super(
+      PCurrencySymbol.byteString,
+      [],
+      PCurrencySymbol.generate,
+    );
+  }
+  static byteString = new PByteString();
+
+  static generate(): CurrencySymbol {
+    return randomChoice([
+      () => "",
+      PCurrencySymbol.byteString
+        .genData,
+    ])();
+  }
+
+  static ptype = new PCurrencySymbol();
+  static genPType(): PConstraint<PByteString> {
+    return PCurrencySymbol.ptype;
+  }
+}
 
 export type TokenName = string;
-export type PTokenName = PByteString;
-export const PTokenName = new PByteString(0n, 4n);
+export const PTokenName = new PByteString();
 
 export class Asset {
   constructor(
@@ -63,7 +83,7 @@ export class Asset {
   }
 
   static generate(): Asset {
-    const ccy = randomChoice([() => "", PCurrencySymbol.genData])();
+    const ccy = PCurrencySymbol.generate();
     const tkn = ccy === "" ? "" : PTokenName.genData();
     return new Asset(ccy, tkn);
   }
@@ -75,7 +95,7 @@ export class PAsset extends PConstraint<PObject<Asset>> {
       new PObject(
         new PRecord(
           {
-            "currencySymbol": PCurrencySymbol,
+            "currencySymbol": PCurrencySymbol.ptype,
             "tokenName": PTokenName,
           },
         ),
@@ -358,7 +378,7 @@ export class PAssets extends PConstraint<PObject<Assets>> {
     super(
       new PObject(
         new PRecord({
-          assets: new PMap(PCurrencySymbol, PNonEmptyTokenList),
+          assets: new PMap(PCurrencySymbol.ptype, PNonEmptyTokenList),
         }),
         Assets,
       ),

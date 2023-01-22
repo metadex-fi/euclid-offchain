@@ -354,7 +354,10 @@ export class PValue extends PConstraint<PObject<Value>> {
     super(
       new PObject(
         new PRecord({
-          value: new PMap(PCurrencySymbol, new PMap(PTokenName, pbounded)),
+          value: new PMap(
+            PCurrencySymbol.ptype,
+            new PMap(PTokenName, pbounded),
+          ),
         }),
         Value,
       ),

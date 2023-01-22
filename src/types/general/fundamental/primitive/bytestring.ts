@@ -1,38 +1,36 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
-  genNonNegative,
-  genString,
-  gMaxStringBytes,
-  maybeNdef,
-} from "../../../../mod.ts";
+  fromHex,
+  fromText,
+  toHex,
+  toText,
+} from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { genName } from "../../../../mod.ts";
 import { PType } from "../type.ts";
 
-export class PByteString implements PType<string, string> {
+export class PByteString implements PType<Uint8Array, string> {
   public readonly population = Infinity;
 
-  constructor(
-    public readonly minBytes = 0n,
-    public readonly maxBytes?: bigint,
-  ) {}
+  constructor() {}
 
-  public plift = (s: string): string => {
+  public plift = (s: Uint8Array): string => {
     assert(
-      typeof s === `string`,
-      `PByteString.plift: expected String, got ${s} (${typeof s})`,
+      s instanceof Uint8Array,
+      `PByteString.plift: expected Uint8Array, got ${s} (${typeof s})`,
     );
-    return s;
+    return toText(toHex(s));
   };
 
-  public pconstant = (data: string): string => {
+  public pconstant = (data: string): Uint8Array => {
     assert(
       typeof data === `string`,
       `PByteString.pconstant: expected String, got ${data} (${typeof data})`,
     );
-    return data;
+    return fromHex(fromText(data));
   };
 
   public genData = (): string => {
-    return genString("abcdef", this.minBytes, this.maxBytes);
+    return genName();
   };
 
   public showData = (data: string): string => {
@@ -48,7 +46,6 @@ export class PByteString implements PType<string, string> {
   };
 
   static genPType(): PByteString {
-    const minBytes = maybeNdef(() => genNonNegative(gMaxStringBytes))?.();
-    return new PByteString(minBytes);
+    return new PByteString();
   }
 }

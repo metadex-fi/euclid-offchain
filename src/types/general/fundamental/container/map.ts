@@ -1,12 +1,11 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Data } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
   Generators,
   genNonNegative,
   gMaxLength,
   maybeNdef,
 } from "../../../../mod.ts";
-import { f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
+import { Data, f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
 import { PList } from "./list.ts";
 
 function census(numKeys: number, numValues: number, size: bigint): number {
