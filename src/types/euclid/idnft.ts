@@ -20,7 +20,8 @@ import { Asset, CurrencySymbol, f, PAsset, PConstraint } from "../mod.ts";
 // TODO prod: derive this from observed number of diracs in pool
 // export const gMaxHashes = 1n + maxTicks ** gMaxLength;
 
-export const gMaxHashes = 128n;
+export const gMaxGenerationHashes = 128n;
+export const gMaxAssertionHashes = 2n * gMaxGenerationHashes;
 export const placeholderCcy = fromHex("cc");
 
 export class IdNFT {
@@ -67,18 +68,20 @@ export class ParamNFT extends IdNFT {
   static generateWith = (
     contractCurrency: CurrencySymbol,
     owner?: PaymentKeyHash,
-    maxParamHashes?: bigint,
   ): ParamNFT => {
     const tokenName = owner
-      ? hashNTimes(owner, genNonNegative(maxParamHashes))
+      ? hashNTimes(owner, genNonNegative(gMaxGenerationHashes))
       : "";
     return new ParamNFT(contractCurrency, tokenName);
   };
 }
 
 export class ThreadNFT extends IdNFT {
-  static generateWith = (paramNFT: ParamNFT, maxDiracs: bigint): IdNFT => {
-    const tokenName = hashNTimes(paramNFT.tokenName, genPositive(maxDiracs));
+  static generateWith = (paramNFT: ParamNFT): IdNFT => {
+    const tokenName = hashNTimes(
+      paramNFT.tokenName,
+      genPositive(gMaxGenerationHashes),
+    );
     return new ThreadNFT(paramNFT.contractCurrency, tokenName);
   };
 }
@@ -87,16 +90,13 @@ export class PIdNFT extends PConstraint<PAsset> {
   protected constructor(
     public readonly contractCurrency: CurrencySymbol,
     public readonly firstHash?: string,
-    public readonly maxHashes?: bigint,
   ) {
     super(
       PAsset.ptype,
-      [PIdNFT.assertAsset(contractCurrency, firstHash, maxHashes)],
-      PIdNFT.generateAsset(contractCurrency, firstHash, maxHashes),
+      [PIdNFT.assertAsset(contractCurrency, firstHash)],
+      PIdNFT.generateAsset(contractCurrency, firstHash),
     );
-    this.population = maxHashes
-      ? Number(maxHashes + 1n)
-      : PAsset.ptype.population;
+    this.population = PAsset.ptype.population;
   }
 
   public showData = (data: Asset): string => {
@@ -104,7 +104,7 @@ export class PIdNFT extends PConstraint<PAsset> {
   };
 
   public showPType = (): string => {
-    return `PObject: PIdNFT(${this.contractCurrency}, ${this.firstHash}, ${this.maxHashes})`;
+    return `PObject: PIdNFT(${this.contractCurrency}, ${this.firstHash})`;
   };
 
   static unparsed(contractCurrency: CurrencySymbol): PIdNFT {
@@ -114,7 +114,6 @@ export class PIdNFT extends PConstraint<PAsset> {
   static assertAsset = (
     contractCurrency: CurrencySymbol,
     firstHash?: string,
-    maxHashes?: bigint,
   ) =>
   (asset: Asset): void => {
     assert(
@@ -125,7 +124,7 @@ export class PIdNFT extends PConstraint<PAsset> {
     if (firstHash) {
       let hash = firstHash;
       const log = [hash];
-      for (let i = 0n; i <= maxHashes!; i++) {
+      for (let i = 0n; i <= gMaxAssertionHashes!; i++) {
         if (asset.tokenName === hash) {
           return;
         }
@@ -133,7 +132,7 @@ export class PIdNFT extends PConstraint<PAsset> {
         log.push(hash);
       }
       throw new Error(
-        `ID-Asset verification failure for\n${asset.show()}\nwithin ${maxHashes} hashes, :\n${f}${
+        `ID-Asset verification failure for\n${asset.show()}\nwithin ${gMaxAssertionHashes} hashes, :\n${f}${
           log.join(`\n${f}`)
         }`,
       );
@@ -143,13 +142,11 @@ export class PIdNFT extends PConstraint<PAsset> {
   static generateAsset = (
     contractCurrency: CurrencySymbol,
     firstHash?: string,
-    maxHashes?: bigint,
   ) =>
   (): Asset => {
     return ParamNFT.generateWith( // bit of an abuse here
       contractCurrency,
       firstHash,
-      maxHashes,
     ).asset;
   };
 }
@@ -158,16 +155,14 @@ export class PParamNFT extends PIdNFT {
   constructor(
     public contractCurrency: CurrencySymbol,
     public owner: PaymentKeyHash,
-    public maxHashes: bigint,
   ) {
-    super(contractCurrency, owner, maxHashes);
+    super(contractCurrency, owner);
   }
 
   static genPType(): PConstraint<PAsset> {
     return new PParamNFT(
       placeholderCcy,
       toHex(PPaymentKeyHash.ptype.genData()),
-      gMaxHashes,
     );
   }
 }
@@ -176,21 +171,19 @@ export class PThreadNFT extends PIdNFT {
   constructor(
     public contractCurrency: CurrencySymbol,
     public paramNFTtkn: TokenName,
-    public maxHashes: bigint,
   ) {
-    super(contractCurrency, nextHash(paramNFTtkn), maxHashes);
+    super(contractCurrency, nextHash(paramNFTtkn));
   }
 
   static genPType(): PConstraint<PAsset> {
     const param = Param.generate();
     const paramNFTtkn = hashNTimes(
       param.owner,
-      1n + genNonNegative(gMaxHashes),
+      genPositive(gMaxGenerationHashes),
     );
     return new PThreadNFT(
       placeholderCcy,
       paramNFTtkn,
-      param.boundedMinDiracs(),
     );
   }
 }

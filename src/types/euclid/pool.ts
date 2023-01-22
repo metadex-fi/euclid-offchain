@@ -102,7 +102,6 @@ ${tt})`;
     const assertThreadNFT = PThreadNFT.assertAsset(
       pool.paramNFT.currencySymbol,
       pool.paramNFT.tokenName,
-      BigInt(pool.diracs.length),
     );
     pool.diracs.forEach((dirac) => {
       assert(dirac.owner === owner, `Wrong owner: ${dirac.owner} vs ${owner}`);
@@ -240,7 +239,6 @@ export class PPool extends PConstraint<PObject<Pool>> {
     const pparamNFT = new PParamNFT(
       fromHex(user.contract.policyId),
       user.address,
-      maxInteger,
     );
     super(
       new PObject(
@@ -255,7 +253,6 @@ export class PPool extends PConstraint<PObject<Pool>> {
                 "threadNFT": new PThreadNFT(
                   fromHex(user.contract.policyId),
                   user.address,
-                  maxInteger,
                 ),
                 "paramNFT": pparamNFT,
                 "prices": PPrices.initial(),

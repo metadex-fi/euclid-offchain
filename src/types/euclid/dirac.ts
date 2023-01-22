@@ -7,8 +7,6 @@ import {
   Assets,
   CurrencySymbol,
   f,
-  gMaxHashes,
-  newUnionWith,
   PAmounts,
   Param,
   ParamNFT,
@@ -82,11 +80,9 @@ ${tt})`;
     const paramNFT = ParamNFT.generateWith(
       placeholderCcy,
       param.owner,
-      gMaxHashes,
     );
     const threadNFT = ThreadNFT.generateWith(
       paramNFT,
-      param.boundedMinDiracs(),
     );
 
     const prices = Prices.generateCurrent(param)();
@@ -115,14 +111,12 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
       ? new PThreadNFT(
         contractCurrency,
         param.owner,
-        maxInteger,
       )
       : PIdNFT.unparsed(contractCurrency);
     const pparamNFT = param
       ? new PParamNFT(
         contractCurrency,
         param.owner,
-        maxInteger,
       )
       : PIdNFT.unparsed(contractCurrency);
     super(

@@ -4,15 +4,7 @@ import {
   PaymentKeyHash,
   toHex,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import {
-  abs,
-  genPositive,
-  gMaxHashes,
-  maxInteger,
-  min,
-  Prices,
-  User,
-} from "../../mod.ts";
+import { abs, maxInteger, min, Prices, User } from "../../mod.ts";
 import {
   Amount,
   Amounts,
@@ -20,7 +12,6 @@ import {
   f,
   JumpSizes,
   newUnionWith,
-  PByteString,
   PConstraint,
   PObject,
   PositiveValue,
@@ -106,10 +97,6 @@ ${tt})`;
   // i.e. in case of tickSizes >= jumpSizes
   public locationsPerDirac = (): bigint => {
     return this.maxJumps().increment().mulAmounts();
-  };
-
-  public boundedMinDiracs = (): bigint => {
-    return min(gMaxHashes, this.locationsPerDirac());
   };
 
   static assert(param: Param): void {

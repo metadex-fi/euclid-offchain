@@ -18,6 +18,7 @@ import {
   PParam,
   PParamDatum,
   PParamNFT,
+  PPaymentKeyHash,
   PPool,
   // PPool,
   // PPoolDatums,
@@ -28,7 +29,11 @@ import {
   PSum,
   PThreadNFT,
 } from "../src/mod.ts";
-import { PAsset, PAssets } from "../src/types/general/derived/asset.ts";
+import {
+  PAsset,
+  PAssets,
+  PCurrencySymbol,
+} from "../src/types/general/derived/asset.ts";
 import { PBounded, PPositive } from "../src/types/general/derived/bounded.ts";
 import { PNonEmptyList } from "../src/types/general/derived/nonEmptyList.ts";
 import { PPositiveValue } from "../src/types/general/derived/value/positiveValue.ts";
@@ -43,7 +48,7 @@ Deno.test("euclid data/types tests", () => {
     [
       ...fundamentalPrimitiveGenerators,
       ...derivedPrimitiveGenerators,
-      // ...euclidPrimitiveGenerators,
+      ...euclidPrimitiveGenerators,
     ],
     [
       ...fundamentalContainerGenerators,
@@ -75,6 +80,7 @@ const fundamentalContainerGenerators = [
 const derivedPrimitiveGenerators = [
   PBounded.genPType,
   PPositive.genPType,
+  PCurrencySymbol.genPType,
   PAsset.genPType,
   PAssets.genPType,
   PValue.genPType,
@@ -86,13 +92,14 @@ const derivedContainerGenerators = [
 ];
 
 const euclidPrimitiveGenerators = [
+  PPaymentKeyHash.genPType,
   POwner.genPType,
-  PParamNFT.genPType,
+  // PParamNFT.genPType,
   // PThreadNFT.genPType,
   PJumpSizes.genPType,
   PPrices.genPType,
-  PParam.genPType,
-  PParamDatum.genPType,
+  // PParam.genPType,
+  // PParamDatum.genPType,
   PAmounts.genPType,
   PActiveAssets.genPType,
   // PDirac.genPType,

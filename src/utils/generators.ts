@@ -149,11 +149,11 @@ export function genByteString(
   return fromHex(genString("abcdef", minBytes, maxBytes));
 }
 
-export function genName(): string {
+export function genName(minBytes = 0n): string {
   const lower = "abcdefghijklmnopqrstuvwxyz";
   const upper = lower.toUpperCase();
   const alph = lower + upper; // TODO special characters
-  return genString(alph);
+  return genString(alph, minBytes);
 }
 
 export async function genUsers(): Promise<User[]> {

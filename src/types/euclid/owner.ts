@@ -23,12 +23,12 @@ export class PPaymentKeyHash extends PConstraint<PByteString> {
   }
 
   static generate(): Uint8Array {
-    return fromHex(fromText(genName()));
+    return fromHex(fromText(genName(1n)));
   }
 
   static ptype = new PPaymentKeyHash();
   static genPType(): PConstraint<PByteString> {
-    return this.ptype;
+    return PPaymentKeyHash.ptype;
   }
 }
 
