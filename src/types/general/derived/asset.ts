@@ -10,17 +10,16 @@ import {
 import { f, PConstraint, PObject, PRecord, t } from "../mod.ts";
 import { newGenInRange } from "./bounded.ts";
 import { PNonEmptyList } from "./nonEmptyList.ts";
-import { PByteString, PMap, PString } from "../fundamental/mod.ts";
+import { PByteString, PMap, PString, PWrapped } from "../fundamental/mod.ts";
 import {
   Assets as LucidAssets,
   fromHex,
   toHex,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 
-export class Currency extends Uint8Array {
+export class Currency {
   constructor(public readonly symbol: Uint8Array) {
     assert(symbol.length <= Currency.maxLength, `Currency too long: ${symbol}`);
-    super(symbol);
   }
 
   static fromHex = (hex: string): Currency => {
@@ -31,16 +30,16 @@ export class Currency extends Uint8Array {
   static ADA = new Currency(new Uint8Array(0));
 }
 
-export class PCurrency extends PByteString {
+export class PCurrency extends PWrapped<Currency> {
   constructor() {
     super(
-      7n,
-      7n,
+      new PByteString(7n, 7n),
+      Currency,
     );
   }
 
   static ptype = new PCurrency();
-  static genPType(): PByteString {
+  static genPType(): PWrapped<Currency> {
     return PCurrency.ptype;
   }
 }
@@ -58,16 +57,16 @@ export class Token {
   static lovelace = new Token("");
 }
 
-export class PToken extends PString {
+export class PToken extends PWrapped<Token> {
   constructor() {
     super(
-      0n,
-      Token.maxLength,
+      new PString(0n, Token.maxLength),
+      Token,
     );
   }
 
   static ptype = new PToken();
-  static genPType(): PString {
+  static genPType(): PWrapped<Token> {
     return PToken.ptype;
   }
 }
@@ -90,11 +89,11 @@ export class Asset {
       if (ccy === "") {
         return "lovelace";
       }
-      const tkn = PToken.ptype.pconstant(this.token.name);
+      const tkn = PToken.ptype.pconstant(this.token);
       console.log(`
     ccy: ${ccy}
     tkn: ${this.token}
-    tkn: ${PToken.ptype.pconstant(this.token.name)}
+    tkn: ${PToken.ptype.pconstant(this.token)}
     tkn: ${tkn}`);
       return `${ccy}${tkn}`;
     } catch (e) {
@@ -115,7 +114,7 @@ export class Asset {
       }
       const ccy = name.slice(0, ccyLength);
       const tkn = PToken.ptype.plift(fromHex(name.slice(ccyLength)));
-      return new Asset(Currency.fromHex(ccy), new Token(tkn as string));
+      return new Asset(Currency.fromHex(ccy), tkn);
     } catch (e) {
       throw new Error(`${e}\ncould not decode ${name} (${ccyLength}))`);
     }
@@ -137,7 +136,7 @@ export class Asset {
   private static generateNonADA = (): Asset => {
     const ccy = PCurrency.ptype.genData();
     const tkn = PToken.ptype.genData();
-    return new Asset(new Currency(ccy), new Token(tkn));
+    return new Asset(ccy, tkn);
   };
 
   static generate(): Asset {
@@ -431,13 +430,11 @@ export class Assets {
   };
 }
 
-export class PAssets extends PConstraint<PObject<Assets>> {
+export class PAssets extends PConstraint<PWrapped<Assets>> {
   private constructor() {
     super(
-      new PObject(
-        new PRecord({
-          assets: new PMap(PCurrency.ptype, PNonEmptyTokenList),
-        }),
+      new PWrapped(
+        new PMap(PCurrency.ptype, PNonEmptyTokenList),
         Assets,
       ),
       [Assets.assert],
@@ -446,7 +443,7 @@ export class PAssets extends PConstraint<PObject<Assets>> {
   }
 
   static ptype = new PAssets();
-  static genPType(): PConstraint<PObject<Assets>> {
+  static genPType(): PConstraint<PWrapped<Assets>> {
     return PAssets.ptype;
   }
 }

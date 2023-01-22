@@ -28,7 +28,7 @@ import {
   PString,
   PSum,
   PThreadNFT,
-  PWrapper,
+  PWrapped,
 } from "../src/mod.ts";
 import {
   PAsset,
@@ -46,7 +46,7 @@ Deno.test("euclid data/types tests", () => {
     // @ts-ignore TODO type instantiation is excessively deep and possibly infinite
     [
       ...fundamentalPrimitiveGenerators,
-      // ...derivedPrimitiveGenerators,
+      ...derivedPrimitiveGenerators,
       // ...euclidPrimitiveGenerators,
     ],
     [
@@ -74,7 +74,7 @@ const fundamentalContainerGenerators = [
   PRecord.genPType,
   PObject.genPType,
   PSum.genPType,
-  PWrapper.genPType,
+  PWrapped.genPType,
 ];
 
 const derivedPrimitiveGenerators = [
@@ -82,8 +82,8 @@ const derivedPrimitiveGenerators = [
   PPositive.genPType,
   PCurrency.genPType,
   PToken.genPType,
-  // PAsset.genPType,
-  // PAssets.genPType,
+  PAsset.genPType,
+  PAssets.genPType,
   PValue.genPType,
   PPositiveValue.genPType,
 ];

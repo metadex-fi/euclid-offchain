@@ -5,12 +5,12 @@ import { filterFunctions } from "./object.ts";
 
 // like PObject, but only one field in the PRecord.
 // Purpose is removing the extra Arrays around pconstanted wrappers.
-export class PWrapper<O extends Object> implements PType<Data, O> {
+export class PWrapped<O extends Object> implements PType<Data, O> {
   population: number;
 
   constructor(
     public readonly pinner: PData,
-    public readonly O: new (arg: unknown) => O,
+    public readonly O: new (arg: any) => O,
   ) {
     this.population = pinner.population;
     assert(
@@ -44,7 +44,7 @@ export class PWrapper<O extends Object> implements PType<Data, O> {
     const values = Object.values(inner);
     assert(values.length === 1, `showData: expected one value`);
 
-    return `Wrapper: ${this.O.name} (
+    return `Wrapped: ${this.O.name} (
 ${ttf}${
       this.pinner.showData(
         values[0],
@@ -58,7 +58,7 @@ ${tt})`;
     const tt = tabs + t;
     const ttf = tt + f;
 
-    return `PObject: PWrapper (
+    return `PObject: PWrapped (
 ${ttf}population: ${this.population},
 ${ttf}pinner: ${this.pinner.showPType(ttf)},
 ${ttf}O: ${this.O.name}
@@ -68,10 +68,10 @@ ${tt})`;
   static genPType(
     gen: Generators,
     maxDepth: bigint,
-  ): PWrapper<any> {
+  ): PWrapped<any> {
     const pinner = gen.generate(maxDepth);
 
-    return new PWrapper(pinner, WrapperClass);
+    return new PWrapped(pinner, WrapperClass);
   }
 }
 

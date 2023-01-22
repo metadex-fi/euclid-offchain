@@ -1,7 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { fromHex, toHex } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { genPositive, max, maxInteger } from "../../../../mod.ts";
-import { f, PConstraint, PMap, PObject, PRecord, t } from "../../mod.ts";
+import { f, PConstraint, PMap, PWrapped, t } from "../../mod.ts";
 import { Asset, Assets, Currency, PCurrency, PToken, Token } from "../asset.ts";
 import { bothExtreme, PBounded } from "../bounded.ts";
 
@@ -19,16 +19,16 @@ export class Value {
     const ttf = tabs + t + f;
     const ttff = ttf + f;
     const ccys = [`Value:`];
-    for (const [currencySymbol, tokenMap] of this.value) {
+    for (const [currency, tokenMap] of this.value) {
       ccys.push(
-        `${ttf}${toHex(currencySymbol) === "" ? "ADA" : currencySymbol}:`,
+        `${ttf}${toHex(currency.symbol) === "" ? "ADA" : currency.symbol}:`,
       );
       const t = [];
       for (const [token, amount] of tokenMap) {
         t.push(
           `${ttff}${
             token.name === ""
-              ? toHex(currencySymbol) === "" ? "lovelace" : "_"
+              ? toHex(currency.symbol) === "" ? "lovelace" : "_"
               : token.name
           }: ${amount}`,
         );
@@ -343,25 +343,23 @@ export class Value {
   };
 }
 
-export class PValue extends PConstraint<PObject<Value>> {
+export class PValue extends PConstraint<PWrapped<Value>> {
   constructor(
     public pbounded: PBounded,
   ) {
     super(
-      new PObject(
-        new PRecord({
-          value: new PMap(
-            PCurrency.ptype,
-            new PMap(PToken.ptype, pbounded),
-          ),
-        }),
+      new PWrapped(
+        new PMap(
+          PCurrency.ptype,
+          new PMap(PToken.ptype, pbounded),
+        ),
         Value,
       ),
       [Value.assert],
       Value.generateWith(pbounded),
     );
   }
-  static genPType(): PConstraint<PObject<Value>> {
+  static genPType(): PConstraint<PWrapped<Value>> {
     return new PValue(PBounded.genPType() as PBounded);
   }
 }
