@@ -4,10 +4,12 @@ import {
   Assets as LucidAssets,
   Data,
   Emulator,
+  fromHex,
   fromText,
   generatePrivateKey,
   getAddressDetails,
   Lucid,
+  toHex,
   Tx,
   TxComplete,
   TxHash,
@@ -21,6 +23,7 @@ import {
   Dirac,
   DiracDatum,
   f,
+  genName,
   genPositive,
   IdNFT,
   min,
@@ -51,7 +54,7 @@ export class User {
   ) {
     this.contract = new Contract(lucid);
     this.nextParamNFT = new ParamNFT(
-      this.contract.policyId,
+      fromHex(this.contract.policyId),
       fromText(this.address),
     );
   }
@@ -79,7 +82,7 @@ export class User {
   static generateDummy(): User {
     const lucid = new Lucid();
     lucid.utils = new Utils(lucid);
-    const address = PPaymentKeyHash.genData();
+    const address = genName();
     const privateKey = generatePrivateKey();
     const user = new User(lucid, address, privateKey);
     const assets = Assets.generate(2n);

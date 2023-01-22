@@ -1,4 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { fromHex, toHex } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { genPositive, max, maxInteger } from "../../../../mod.ts";
 import { f, PConstraint, PMap, PObject, PRecord, t } from "../../mod.ts";
 import {
@@ -26,13 +27,15 @@ export class Value {
     const ttff = ttf + f;
     const ccys = [`Value:`];
     for (const [currencySymbol, tokenMap] of this.value) {
-      ccys.push(`${ttf}${currencySymbol === "" ? "ADA" : currencySymbol}:`);
+      ccys.push(
+        `${ttf}${toHex(currencySymbol) === "" ? "ADA" : currencySymbol}:`,
+      );
       const t = [];
       for (const [tokenName, amount] of tokenMap) {
         t.push(
           `${ttff}${
             tokenName === ""
-              ? currencySymbol === "" ? "lovelace" : "_"
+              ? toHex(currencySymbol) === "" ? "lovelace" : "_"
               : tokenName
           }: ${amount}`,
         );

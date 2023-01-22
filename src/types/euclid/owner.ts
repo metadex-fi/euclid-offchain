@@ -1,9 +1,36 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import {
+  fromHex,
+  fromText,
+  PaymentKeyHash,
+  toHex,
+} from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { genName } from "../../mod.ts";
 import { PByteString } from "../general/fundamental/primitive/bytestring.ts";
-import { PLiteral } from "../mod.ts";
+import { PConstraint, PLiteral } from "../mod.ts";
 
-export const PPaymentKeyHash = new PByteString();
+export class PPaymentKeyHash extends PConstraint<PByteString> {
+  private constructor() {
+    super(
+      new PByteString(),
+      [PPaymentKeyHash.assert],
+      PPaymentKeyHash.generate,
+    );
+  }
+
+  static assert(data: Uint8Array): void {
+    assert(data.length > 0, "paymentKeyHash must be non-empty");
+  }
+
+  static generate(): Uint8Array {
+    return fromHex(fromText(genName()));
+  }
+
+  static ptype = new PPaymentKeyHash();
+  static genPType(): PConstraint<PByteString> {
+    return this.ptype;
+  }
+}
 
 export class Owner {
   constructor(
@@ -13,15 +40,15 @@ export class Owner {
   }
 }
 
-export class POwner extends PLiteral<PByteString> {
+export class POwner extends PLiteral<PPaymentKeyHash> {
   private constructor(
     public paymentKeyHash: PaymentKeyHash,
   ) {
-    super(PPaymentKeyHash, paymentKeyHash);
+    super(PPaymentKeyHash.ptype, fromHex(paymentKeyHash));
   }
 
   static genPType(): PLiteral<PByteString> {
-    const paymentKeyHash = PPaymentKeyHash.genData();
+    const paymentKeyHash = toHex(PPaymentKeyHash.ptype.genData());
     return new POwner(paymentKeyHash);
   }
 

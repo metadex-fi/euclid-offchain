@@ -2,6 +2,7 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   fromText,
   PaymentKeyHash,
+  toHex,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
   abs,
@@ -137,7 +138,7 @@ ${tt})`;
   };
 
   static generate(): Param {
-    const owner = PPaymentKeyHash.genData();
+    const owner = toHex(PPaymentKeyHash.ptype.genData());
 
     const initialPrices = Prices.generateInitial();
     const assets = initialPrices.assets();
@@ -193,7 +194,7 @@ export class PParam extends PConstraint<PObject<Param>> {
     super(
       new PObject(
         new PRecord({
-          "owner": PPaymentKeyHash,
+          "owner": PPaymentKeyHash.ptype,
           "jumpSizes": PJumpSizes.ptype,
           "initialPrices": PPrices.initial(),
           "lowerPriceBounds": new PPositiveValue(),

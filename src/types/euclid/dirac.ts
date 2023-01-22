@@ -109,7 +109,7 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
     public readonly param?: Param,
     public readonly contractCurrency = placeholderCcy,
   ) {
-    const powner = param ? POwner.pliteral(param.owner) : PPaymentKeyHash;
+    const powner = param ? POwner.pliteral(param.owner) : PPaymentKeyHash.ptype;
     const pprices = param ? PPrices.current(param) : PPrices.initial();
     const pthreadNFT = param
       ? new PThreadNFT(

@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Data, Tx } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Data, fromHex, Tx } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { genPositive, maxInteger, min, User } from "../../mod.ts";
 import {
   addValues,
@@ -238,7 +238,7 @@ export class PPool extends PConstraint<PObject<Pool>> {
     public readonly user: User,
   ) {
     const pparamNFT = new PParamNFT(
-      user.contract.policyId,
+      fromHex(user.contract.policyId),
       user.address,
       maxInteger,
     );
@@ -253,7 +253,7 @@ export class PPool extends PConstraint<PObject<Pool>> {
               new PRecord({
                 "owner": POwner.pliteral(user.address),
                 "threadNFT": new PThreadNFT(
-                  user.contract.policyId,
+                  fromHex(user.contract.policyId),
                   user.address,
                   maxInteger,
                 ),

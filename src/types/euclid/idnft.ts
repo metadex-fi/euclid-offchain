@@ -10,10 +10,8 @@ import {
 import {
   genNonNegative,
   genPositive,
-  maxInteger,
   Param,
   PPaymentKeyHash,
-  randomChoice,
   TokenName,
 } from "../../mod.ts";
 import { Asset, CurrencySymbol, f, PAsset, PConstraint } from "../mod.ts";
@@ -23,7 +21,7 @@ import { Asset, CurrencySymbol, f, PAsset, PConstraint } from "../mod.ts";
 // export const gMaxHashes = 1n + maxTicks ** gMaxLength;
 
 export const gMaxHashes = 128n;
-export const placeholderCcy = "cc";
+export const placeholderCcy = fromHex("cc");
 
 export class IdNFT {
   public readonly asset: Asset;
@@ -126,18 +124,18 @@ export class PIdNFT extends PConstraint<PAsset> {
 
     if (firstHash) {
       let hash = firstHash;
-      // const log = [hash];
+      const log = [hash];
       for (let i = 0n; i <= maxHashes!; i++) {
         if (asset.tokenName === hash) {
           return;
         }
         hash = nextHash(hash);
-        // log.push(hash);
+        log.push(hash);
       }
       throw new Error(
-        `ID-Asset verification failure for\n${asset.show()}\nwithin ${maxHashes} hashes`, //:\n${f}${
-        //   log.join(`\n${f}`)
-        // }`,
+        `ID-Asset verification failure for\n${asset.show()}\nwithin ${maxHashes} hashes, :\n${f}${
+          log.join(`\n${f}`)
+        }`,
       );
     }
   };
@@ -168,7 +166,7 @@ export class PParamNFT extends PIdNFT {
   static genPType(): PConstraint<PAsset> {
     return new PParamNFT(
       placeholderCcy,
-      PPaymentKeyHash.genData(),
+      toHex(PPaymentKeyHash.ptype.genData()),
       gMaxHashes,
     );
   }

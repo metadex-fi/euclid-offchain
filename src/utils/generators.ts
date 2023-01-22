@@ -1,11 +1,15 @@
 // TODO consider generating wrong cases as well
 
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Address, Lucid } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import {
+  Address,
+  fromHex,
+  Lucid,
+} from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { Amounts, Assets, PData, User } from "../mod.ts";
 
 export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
-export const gMaxStringSize = 64n; // TODO higher
+export const gMaxStringBytes = 64n; // TODO higher
 export const gMaxLength = 3n;
 export const gMaxDepth = 4n;
 const dropChance = 0.5;
@@ -113,14 +117,14 @@ export function genNumber(maxValue = maxInteger): bigint {
   return randomChoice([n, -n]);
 }
 
-export function genString(
+function genString(
   alph: string,
-  minSize = 0n,
-  maxSize = gMaxStringSize,
+  minBytes = 0n,
+  maxBytes = gMaxStringBytes,
 ): string {
-  assert(minSize >= 0n, `genString: minBytes < 0`);
-  assert(gMaxStringSize >= maxSize, `genString: maxStringBytes < minBytes`);
-  assert(maxSize >= minSize, `genString: maxBytes < minBytes`);
+  assert(minBytes >= 0n, `genString: minBytes < 0`);
+  assert(gMaxStringBytes >= maxBytes, `genString: maxStringBytes < minBytes`);
+  assert(maxBytes >= minBytes, `genString: maxBytes < minBytes`);
   function genChar(): string {
     const choice = Math.floor(Math.random() * (alph.length + 10));
     if (choice < alph.length) {
@@ -130,12 +134,19 @@ export function genString(
     }
   }
   const l: string[] = [];
-  const maxi = minSize + genNonNegative(maxSize - minSize);
+  const maxi = 8n * (minBytes + genNonNegative(maxBytes - minBytes));
   for (let i = 0n; i < maxi; i++) {
     l.push(genChar());
   }
   const s = l.join("");
   return s;
+}
+
+export function genByteString(
+  minBytes = 0n,
+  maxBytes = gMaxStringBytes,
+): Uint8Array {
+  return fromHex(genString("abcdef", minBytes, maxBytes));
 }
 
 export function genName(): string {

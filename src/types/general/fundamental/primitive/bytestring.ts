@@ -1,42 +1,37 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  fromHex,
-  fromText,
-  toHex,
-  toText,
-} from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { genName } from "../../../../mod.ts";
+import { fromHex } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { genByteString } from "../../../../mod.ts";
 import { PType } from "../type.ts";
 
-export class PByteString implements PType<Uint8Array, string> {
+export class PByteString implements PType<Uint8Array, Uint8Array> {
   public readonly population = Infinity;
 
   constructor() {}
 
-  public plift = (s: Uint8Array): string => {
+  public plift = (s: Uint8Array): Uint8Array => {
     assert(
       s instanceof Uint8Array,
       `PByteString.plift: expected Uint8Array, got ${s} (${typeof s})`,
     );
-    return toText(toHex(s));
+    return s;
   };
 
-  public pconstant = (data: string): Uint8Array => {
+  public pconstant = (data: Uint8Array): Uint8Array => {
     assert(
-      typeof data === `string`,
-      `PByteString.pconstant: expected String, got ${data} (${typeof data})`,
+      data instanceof Uint8Array,
+      `PByteString.pconstant: expected Uint8Array, got ${data} (${typeof data})`,
     );
-    return fromHex(fromText(data));
+    return data;
   };
 
-  public genData = (): string => {
-    return genName();
+  public genData = (): Uint8Array => {
+    return genByteString();
   };
 
-  public showData = (data: string): string => {
+  public showData = (data: Uint8Array): string => {
     assert(
-      typeof data === `string`,
-      `PByteString.showData: expected String, got ${data} (${typeof data})`,
+      data instanceof Uint8Array,
+      `PByteString.showData: expected Uint8Array, got ${data} (${typeof data})`,
     );
     return `ByteString: ${data}`;
   };
@@ -45,7 +40,8 @@ export class PByteString implements PType<Uint8Array, string> {
     return `PByteString`;
   };
 
+  static ptype = new PByteString();
   static genPType(): PByteString {
-    return new PByteString();
+    return PByteString.ptype;
   }
 }

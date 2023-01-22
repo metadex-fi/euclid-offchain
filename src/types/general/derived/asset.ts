@@ -1,5 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
+  genByteString,
   gMaxLength,
   minSizedSubset,
   nonEmptySubSet,
@@ -9,26 +10,29 @@ import {
 import { f, PConstraint, PObject, PRecord, t } from "../mod.ts";
 import { newGenInRange } from "./bounded.ts";
 import { PNonEmptyList } from "./nonEmptyList.ts";
-import { PByteString, PMap } from "../fundamental/mod.ts";
-import { Assets as LucidAssets } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { PByteString, PMap, PString } from "../fundamental/mod.ts";
+import {
+  Assets as LucidAssets,
+  fromHex,
+  toHex,
+} from "https://deno.land/x/lucid@0.8.6/mod.ts";
 
-export type CurrencySymbol = string;
+export type CurrencySymbol = Uint8Array;
 export class PCurrencySymbol extends PConstraint<PByteString> {
   constructor() {
     super(
-      PCurrencySymbol.byteString,
-      [],
+      PByteString.ptype,
+      [PCurrencySymbol.assert],
       PCurrencySymbol.generate,
     );
   }
-  static byteString = new PByteString();
+
+  static assert(data: Uint8Array): void {
+    assert(data.length <= 32, "currencySymbol must be <= 32 bytes");
+  }
 
   static generate(): CurrencySymbol {
-    return randomChoice([
-      () => "",
-      PCurrencySymbol.byteString
-        .genData,
-    ])();
+    return genByteString(0n, 4n);
   }
 
   static ptype = new PCurrencySymbol();
@@ -38,7 +42,7 @@ export class PCurrencySymbol extends PConstraint<PByteString> {
 }
 
 export type TokenName = string;
-export const PTokenName = new PByteString();
+export const PTokenName = new PString();
 
 export class Asset {
   constructor(
@@ -53,7 +57,7 @@ export class Asset {
   };
 
   public toLucid = (): string => {
-    return this.currencySymbol === ""
+    return toHex(this.currencySymbol) === ""
       ? "lovelace"
       : `${this.currencySymbol}${this.tokenName}`;
   };
@@ -66,15 +70,15 @@ export class Asset {
 
   static fromLucid(name: string, ccyLength: number): Asset {
     if (name === "lovelace") {
-      return new Asset("", "");
+      return new Asset(fromHex(""), "");
     }
     const ccy = name.slice(0, ccyLength);
     const tkn = name.slice(ccyLength);
-    return new Asset(ccy, tkn);
+    return new Asset(fromHex(ccy), tkn);
   }
 
   static assert(asset: Asset): void {
-    if (asset.currencySymbol === "") {
+    if (toHex(asset.currencySymbol) === "") {
       assert(
         asset.tokenName === "",
         `ADA must have lovelace, got ${asset.tokenName}`,
@@ -84,7 +88,7 @@ export class Asset {
 
   static generate(): Asset {
     const ccy = PCurrencySymbol.generate();
-    const tkn = ccy === "" ? "" : PTokenName.genData();
+    const tkn = toHex(ccy) === "" ? "" : PTokenName.genData();
     return new Asset(ccy, tkn);
   }
 }
@@ -140,13 +144,15 @@ export class Assets {
     const ttff = ttf + f;
     const ccys = [`Assets:`];
     for (const [currencySymbol, tokens] of this.assets) {
-      ccys.push(`${ttf}${currencySymbol === "" ? "ADA" : currencySymbol}:`);
+      ccys.push(
+        `${ttf}${toHex(currencySymbol) === "" ? "ADA" : currencySymbol}:`,
+      );
       const tkns = [];
       for (const tokenName of tokens) {
         tkns.push(
           `${ttff}${
             tokenName === ""
-              ? currencySymbol === "" ? "lovelace" : "_"
+              ? toHex(currencySymbol) === "" ? "lovelace" : "_"
               : tokenName
           }`,
         );

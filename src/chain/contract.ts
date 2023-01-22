@@ -7,6 +7,7 @@ import euclidMinting from "../../contract/euclidMinting.json" assert {
 import {
   Address,
   Emulator,
+  fromHex,
   Lucid,
   MintingPolicy,
   PolicyId,
@@ -41,7 +42,7 @@ export class Contract {
 
   public update = async (): Promise<void> => {
     const utxos = await this.lucid.utxosAt(this.address);
-    this.state = Euclid.ingest(utxos, this.policyId);
+    this.state = Euclid.ingest(utxos, fromHex(this.policyId));
     this.state.digest();
   };
 }
