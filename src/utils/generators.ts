@@ -166,6 +166,7 @@ export async function genUsers(): Promise<User[]> {
   const addresses = new Array<Address>();
   while (users.length < numUsers) {
     const user = await User.generateWith(lucid);
+    assert(user.address, `user.address is undefined`);
     if (!addresses.includes(user.address)) {
       addresses.push(user.address);
       user.balance = Amounts.genOfAssets(

@@ -124,7 +124,7 @@ export class PIdNFT extends PConstraint<PAsset> {
   ) =>
   (asset: Asset): void => {
     assert(
-      asset.currencySymbol === contractCurrency,
+      toHex(asset.currencySymbol) === toHex(contractCurrency),
       `currencySymbol: ${asset.currencySymbol} of ${asset.show()} is not contractCurrency: ${contractCurrency}`,
     );
 

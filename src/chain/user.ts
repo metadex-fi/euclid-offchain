@@ -26,8 +26,10 @@ import {
   genName,
   genPositive,
   IdNFT,
+  KeyHash,
   min,
   ParamNFT,
+  PKeyHash,
   randomChoice,
 } from "../mod.ts";
 import { Pool } from "../types/euclid/pool.ts";
@@ -37,8 +39,8 @@ import { UtxoPool } from "./utxos.ts";
 type consequences = (u: User) => void;
 
 export class User {
-  public paymentKeyHash: Uint8Array;
   public readonly contract: Contract;
+  public readonly paymentKeyHash: KeyHash;
 
   public balance?: Amounts;
   public pools?: Pool[]; // own creation recall
@@ -49,13 +51,22 @@ export class User {
 
   private constructor(
     public readonly lucid: Lucid,
-    public readonly address: Address,
     public readonly privateKey: string,
+    public readonly address?: Address,
+    paymentKeyHash?: KeyHash,
   ) {
     this.contract = new Contract(lucid);
-    const addressDetails = this.lucid.utils.getAddressDetails(address);
-    assert(addressDetails.paymentCredential, "No payment credential");
-    this.paymentKeyHash = fromHex(addressDetails.paymentCredential.hash);
+    if (address) {
+      const addressDetails = this.lucid.utils.getAddressDetails(address);
+      assert(addressDetails.paymentCredential, "No payment credential");
+      const paymentKeyHash_ = fromHex(addressDetails.paymentCredential.hash);
+      if (paymentKeyHash) {
+        assert(paymentKeyHash === paymentKeyHash_);
+      }
+      this.paymentKeyHash = paymentKeyHash_;
+    }
+    assert(paymentKeyHash, `neither address nor paymentKeyHash provided`);
+    this.paymentKeyHash = paymentKeyHash;
     this.nextParamNFT = new ParamNFT(
       fromHex(this.contract.policyId),
       this.paymentKeyHash,
@@ -85,15 +96,16 @@ export class User {
   static generateDummy(): User {
     const lucid = new Lucid();
     lucid.utils = new Utils(lucid);
-    const address = genName();
     const privateKey = generatePrivateKey();
-    const user = new User(lucid, address, privateKey);
+    const paymentKeyHash = PKeyHash.generate();
+    const user = new User(lucid, privateKey, undefined, paymentKeyHash);
     const assets = Assets.generate(2n);
     user.balance = Amounts.genOfAssets(assets);
     return user;
   }
 
   public account = (): { address: Address; assets: LucidAssets } => {
+    assert(this.address, "No address");
     return {
       address: this.address,
       assets: this.balance!.toLucid(),
