@@ -1,4 +1,5 @@
 import { maybeNdef } from "../../mod.ts";
+import { genNonNegative, gMaxLength } from "../../utils/generators.ts";
 import {
   Amounts,
   Asset,
@@ -7,21 +8,17 @@ import {
   f,
   PAmounts,
   Param,
-  ParamNFT,
   PConstraint,
-  PIdNFT,
   placeholderCcy,
   PObject,
-  PParamNFT,
   PPrices,
   PRecord,
   Prices,
-  PThreadNFT,
   t,
-  ThreadNFT,
 } from "../mod.ts";
 import { ActiveAssets, PActiveAssets } from "./activeAssets.ts";
-import { KeyHash, PKeyHash, POwner } from "./owner.ts";
+import { Hash, KeyHash, PKeyHash, POwner } from "./hash.ts";
+import { gMaxHashesPerPool, PIdNFT } from "./mod.ts";
 
 export class Dirac {
   constructor(
@@ -75,13 +72,16 @@ ${tt})`;
   static generateFresh = (param: Param) => (): Dirac => {
     const owner = param.owner;
 
-    const paramNFT = ParamNFT.generateWith(
+    const paramNFT = PIdNFT.fromOwner(
+      genNonNegative(PDirac.maxPreviousPools),
       placeholderCcy,
       param.owner,
-    );
-    const threadNFT = ThreadNFT.generateWith(
+    ).genData();
+
+    const threadNFT = PIdNFT.fromPrevious(
+      placeholderCcy,
       paramNFT,
-    );
+    ).genData();
 
     const prices = Prices.generateCurrent(param)();
     const activeAmnts = Amounts.fresh(param, prices);
@@ -89,8 +89,8 @@ ${tt})`;
 
     return new Dirac(
       owner,
-      threadNFT.asset,
-      paramNFT.asset,
+      threadNFT,
+      paramNFT,
       prices,
       activeAmnts,
       jumpStorage,
@@ -106,13 +106,15 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
     const powner = param ? POwner.pliteral(param.owner) : PKeyHash.ptype;
     const pprices = param ? PPrices.current(param) : PPrices.initial();
     const pthreadNFT = param
-      ? new PThreadNFT(
+      ? PIdNFT.fromOwner(
+        PDirac.maxPreviousPools + 1n,
         contractCurrency,
         param.owner,
       )
       : PIdNFT.unparsed(contractCurrency);
     const pparamNFT = param
-      ? new PParamNFT(
+      ? PIdNFT.fromOwner(
+        PDirac.maxPreviousPools,
         contractCurrency,
         param.owner,
       )
@@ -146,6 +148,8 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
     const param = maybeNdef(Param.generate)?.();
     return new PDirac(param);
   }
+
+  static maxPreviousPools = 10n; // TODO get this from user later
 }
 
 export class DiracDatum {

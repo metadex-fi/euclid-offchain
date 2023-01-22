@@ -6,7 +6,7 @@ import {
   fromHex,
   Lucid,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { Amounts, Assets, PData, User } from "../mod.ts";
+import { Amounts, Assets, PData } from "../mod.ts";
 
 export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
 export const gMaxStringLength = 64n; // TODO higher
@@ -158,24 +158,24 @@ export function genName(minLength = 0n, maxLength = gMaxStringLength): string {
   return genString(alph, minLength, maxLength, 1n);
 }
 
-export async function genUsers(): Promise<User[]> {
-  const users = new Array<User>();
-  const allAssets = Assets.generate(2n);
-  const lucid = await Lucid.new(undefined, "Custom");
+// export async function genUsers(): Promise<User[]> {
+//   const users = new Array<User>();
+//   const allAssets = Assets.generate(2n);
+//   const lucid = await Lucid.new(undefined, "Custom");
 
-  const numUsers = 10n; //genPositive(gMaxLength);
-  let canOpenPool = 10n; //genPositive(numUsers);
-  const addresses = new Array<Address>();
-  while (users.length < numUsers) {
-    const user = await User.generateWith(lucid);
-    assert(user.address, `user.address is undefined`);
-    if (!addresses.includes(user.address)) {
-      addresses.push(user.address);
-      user.balance = Amounts.genOfAssets(
-        allAssets.minSizedSubset(canOpenPool-- > 0 ? 2n : 0n),
-      );
-      users.push(user);
-    }
-  }
-  return users;
-}
+//   const numUsers = 10n; //genPositive(gMaxLength);
+//   let canOpenPool = 10n; //genPositive(numUsers);
+//   const addresses = new Array<Address>();
+//   while (users.length < numUsers) {
+//     const user = await User.generateWith(lucid);
+//     assert(user.address, `user.address is undefined`);
+//     if (!addresses.includes(user.address)) {
+//       addresses.push(user.address);
+//       user.balance = Amounts.genOfAssets(
+//         allAssets.minSizedSubset(canOpenPool-- > 0 ? 2n : 0n),
+//       );
+//       users.push(user);
+//     }
+//   }
+//   return users;
+// }

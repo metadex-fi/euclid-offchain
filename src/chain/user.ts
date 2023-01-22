@@ -59,9 +59,11 @@ export class User {
     if (address) {
       const addressDetails = this.lucid.utils.getAddressDetails(address);
       assert(addressDetails.paymentCredential, "No payment credential");
-      const paymentKeyHash_ = fromHex(addressDetails.paymentCredential.hash);
+      const paymentKeyHash_ = KeyHash.fromCredential(
+        addressDetails.paymentCredential,
+      );
       if (paymentKeyHash) {
-        assert(paymentKeyHash === paymentKeyHash_);
+        assert(paymentKeyHash.show() === paymentKeyHash_.show());
       }
       this.paymentKeyHash = paymentKeyHash_;
     } else {
@@ -98,7 +100,7 @@ export class User {
     const lucid = new Lucid();
     lucid.utils = new Utils(lucid);
     const privateKey = generatePrivateKey();
-    const paymentKeyHash = PKeyHash.generate();
+    const paymentKeyHash = PKeyHash.ptype.genData();
     const user = new User(lucid, privateKey, undefined, paymentKeyHash);
     const assets = Assets.generate(2n);
     user.balance = Amounts.genOfAssets(assets);

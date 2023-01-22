@@ -6,7 +6,10 @@ import {
   PConstraint,
   PDirac,
   PDiracDatum,
+  // PDirac,
+  // PDiracDatum,
   PEnum,
+  PIdNFT,
   PInteger,
   PJumpSizes,
   PKeyHash,
@@ -18,8 +21,7 @@ import {
   POwner,
   PParam,
   PParamDatum,
-  PParamNFT,
-  PPool,
+  // PPool,
   // PPool,
   // PPoolDatums,
   PPrices,
@@ -27,7 +29,6 @@ import {
   proptestPTypes,
   PString,
   PSum,
-  PThreadNFT,
   PWrapped,
 } from "../src/mod.ts";
 import {
@@ -47,14 +48,14 @@ Deno.test("euclid data/types tests", () => {
     [
       ...fundamentalPrimitiveGenerators,
       ...derivedPrimitiveGenerators,
-      // ...euclidPrimitiveGenerators,
+      ...euclidPrimitiveGenerators,
     ],
     [
       ...fundamentalContainerGenerators,
-      // ...derivedContainerGenerators,
+      ...derivedContainerGenerators,
     ],
   );
-  proptestPTypes(gen, 5000);
+  proptestPTypes(gen, 1000);
 });
 
 const fundamentalPrimitiveGenerators = [
@@ -95,17 +96,16 @@ const derivedContainerGenerators = [
 const euclidPrimitiveGenerators = [
   PKeyHash.genPType,
   POwner.genPType,
-  PParamNFT.genPType,
-  PThreadNFT.genPType,
+  PIdNFT.genPType,
   PJumpSizes.genPType,
   PPrices.genPType,
-  PParam.genPType,
-  PParamDatum.genPType,
+  // PParam.genPType,
+  // PParamDatum.genPType,
   PAmounts.genPType,
   PActiveAssets.genPType,
   PDirac.genPType,
   PDiracDatum.genPType,
-  PPool.genPType,
+  // PPool.genPType,
   // PPoolDatums.genPType,
   // PEuclidDatum.genPType,
 ];

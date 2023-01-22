@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { abs, maxInteger, min, Prices, User } from "../../mod.ts";
+import { abs, maxInteger, min, Prices } from "../../mod.ts";
 import {
   Amount,
   Amounts,
@@ -18,7 +18,7 @@ import {
   Value,
 } from "../mod.ts";
 import { PJumpSizes } from "./jumpSizes.ts";
-import { KeyHash, PKeyHash } from "./owner.ts";
+import { KeyHash, PKeyHash } from "./hash.ts";
 
 // TODO a flag somewhere to deactivate it, so owner can start closing.
 // or can we just "break" it?
@@ -111,13 +111,13 @@ ${tt})`;
     // TODO assert leq, and more
   }
 
-  static assertForUser = (user: User) => (param: Param): void => {
-    Param.assert(param);
-    assert(
-      user.paymentKeyHash === param.owner,
-      `owner must match, got ${param.owner}, expected ${user.address}`,
-    );
-  };
+  // static assertForUser = (user: User) => (param: Param): void => {
+  //   Param.assert(param);
+  //   assert(
+  //     user.paymentKeyHash === param.owner,
+  //     `owner must match, got ${param.owner}, expected ${user.address}`,
+  //   );
+  // };
 
   static generate(): Param {
     const owner = PKeyHash.ptype.genData();
@@ -141,36 +141,37 @@ ${tt})`;
     );
   }
 
-  static generateForUser(user: User): [Param, Amounts] {
-    assert(user.balance, `user balance not initialized for ${user.address}`);
-    assert(
-      user.balance.size() >= 2,
-      `balance must be at least 2, got ${user.balance.concise()}`,
-    );
-    const deposit = user.balance.minSizedSubAmounts(2n);
-    const assets = deposit.assets();
+  // static generateForUser(user: User): [Param, Amounts] {
+  //   assert(user.balance, `user balance not initialized for ${user.address}`);
+  //   assert(
+  //     user.balance.size() >= 2,
+  //     `balance must be at least 2, got ${user.balance.concise()}`,
+  //   );
+  //   const deposit = user.balance.minSizedSubAmounts(2n);
+  //   const assets = deposit.assets();
 
-    const initialPrices = Prices.genOfAssets(assets);
-    const jumpSizes = JumpSizes.genOfAssets(assets);
-    const upperBounds = PositiveValue.genOfAssets(assets);
-    const lowerBounds = upperBounds.minSizedSubValue(0n);
-    const baseAmountA0 = new PPositive(upperBounds.biggestAmount()).genData();
-    const param = new Param(
-      user.paymentKeyHash,
-      jumpSizes,
-      initialPrices,
-      lowerBounds,
-      upperBounds,
-      baseAmountA0,
-    );
-    let minDiracs = param.locationsPerDirac();
-    while (minDiracs > deposit.smallestAmount()) {
-      param.jumpSizes.doubleRandomAmount(); // this should decrease diracs
-      minDiracs = param.locationsPerDirac();
-    }
-    return [param, deposit];
-  }
+  //   const initialPrices = Prices.genOfAssets(assets);
+  //   const jumpSizes = JumpSizes.genOfAssets(assets);
+  //   const upperBounds = PositiveValue.genOfAssets(assets);
+  //   const lowerBounds = upperBounds.minSizedSubValue(0n);
+  //   const baseAmountA0 = new PPositive(upperBounds.biggestAmount()).genData();
+  //   const param = new Param(
+  //     user.paymentKeyHash,
+  //     jumpSizes,
+  //     initialPrices,
+  //     lowerBounds,
+  //     upperBounds,
+  //     baseAmountA0,
+  //   );
+  //   let minDiracs = param.locationsPerDirac();
+  //   while (minDiracs > deposit.smallestAmount()) {
+  //     param.jumpSizes.doubleRandomAmount(); // this should decrease diracs
+  //     minDiracs = param.locationsPerDirac();
+  //   }
+  //   return [param, deposit];
+  // }
 }
+
 export class PParam extends PConstraint<PObject<Param>> {
   private constructor() {
     super(

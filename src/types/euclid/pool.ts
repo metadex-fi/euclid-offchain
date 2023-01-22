@@ -18,17 +18,17 @@ import {
   ParamDatum,
   PAssets,
   PConstraint,
+  PIdNFT,
   PList,
   PObject,
   POwner,
   PParam,
   PParamDatum,
-  PParamNFT,
   PPrices,
   PRecord,
   Prices,
-  PThreadNFT,
   t,
+  Token,
   Value,
 } from "../mod.ts";
 import { ActiveAssets, PActiveAssets } from "./activeAssets.ts";
@@ -100,11 +100,11 @@ ${tt})`;
   static assert(pool: Pool): void {
     const owner = pool.param.owner;
     const threadNFTs = pool.threadNFTs.clone();
-    PParamNFT.assertAsset(pool.paramNFT.currency, owner)(pool.paramNFT);
-    const assertThreadNFT = PThreadNFT.assertAsset(
+    const assertIdNFT = PIdNFT.assertAsset(
       pool.paramNFT.currency,
-      owner,
+      owner.hash(),
     );
+    assertIdNFT(pool.paramNFT);
     pool.diracs.forEach((dirac) => {
       assert(dirac.owner === owner, `Wrong owner: ${dirac.owner} vs ${owner}`);
       assert(
@@ -114,7 +114,7 @@ ${tt})`;
       threadNFTs.remove(dirac.threadNFT);
       Prices.assertCurrent(pool.param)(dirac.prices);
       // Dirac.assertWith(pool.param)(dirac); // TODO
-      assertThreadNFT(dirac.threadNFT);
+      assertIdNFT(dirac.threadNFT);
     });
     assert(threadNFTs.size() === 0, `leftover nfts: ${threadNFTs.show()}`);
     // TODO consider more here
@@ -238,25 +238,22 @@ export class PPool extends PConstraint<PObject<Pool>> {
   private constructor(
     public readonly user: User,
   ) {
-    const pparamNFT = new PParamNFT(
+    const pidNFT = PIdNFT.fromOwner(
       user.contract.currency,
       user.paymentKeyHash,
     );
     super(
       new PObject(
         new PRecord({
-          "paramNFT": pparamNFT,
+          "paramNFT": pidNFT,
           "threadNFTs": PAssets.ptype,
           "param": PParam.ptype,
           "diracs": new PList(
             new PObject(
               new PRecord({
                 "owner": POwner.pliteral(user.paymentKeyHash),
-                "threadNFT": new PThreadNFT(
-                  user.contract.currency,
-                  user.paymentKeyHash,
-                ),
-                "paramNFT": pparamNFT,
+                "threadNFT": pidNFT,
+                "paramNFT": pidNFT,
                 "prices": PPrices.initial(),
                 "activeAmnts": PAmounts.ptype,
                 "jumpStorage": new PActiveAssets(),

@@ -2,6 +2,8 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   genByteString,
   gMaxLength,
+  Hash,
+  KeyHash,
   minSizedSubset,
   nonEmptySubSet,
   randomChoice,
@@ -14,7 +16,10 @@ import { PByteString, PMap, PString, PWrapped } from "../fundamental/mod.ts";
 import {
   Assets as LucidAssets,
   fromHex,
+  fromText,
+  sha256,
   toHex,
+  toText,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 
 export class Currency {
@@ -43,17 +48,27 @@ export class PCurrency extends PWrapped<Currency> {
     return PCurrency.ptype;
   }
 }
-
 export class Token {
   constructor(public readonly name: string) {
-    assert(name.length <= Token.maxLength, `Token too long: ${name}`);
+    assert(
+      name.length <= Token.maxLength,
+      `Token too long: ${name}, ${name.length}`,
+    );
   }
 
-  static toHex = (hex: Uint8Array): Token => {
-    return new Token(toHex(hex));
+  public hash = (skip = 1n): Hash => {
+    return new Hash(fromHex(this.name)).hash(skip);
   };
 
-  static maxLength = 32n;
+  static fromHash = (hash: Hash): Token => {
+    return new Token(hash.toString());
+  };
+
+  static fromOwner = (owner: KeyHash) => {
+    return new Token(toText(toHex(owner.bytes)));
+  };
+
+  static maxLength = 64n;
   static lovelace = new Token("");
 }
 
