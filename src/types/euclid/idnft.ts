@@ -131,15 +131,14 @@ export class PIdNFT extends PConstraint<PAsset> {
     if (firstHash) {
       let hash = firstHash;
       const log = [hash];
-      let assetTkn;
       try {
-        assetTkn = fromHex(asset.tokenName);
+        fromHex(asset.tokenName);
       } catch (_e) {
         throw new Error(`ID-Asset tokenName is not hex: ${asset.show()}`);
       }
 
       for (let i = 0n; i <= gMaxAssertionHashes!; i++) {
-        if (assetTkn === hash) {
+        if (asset.tokenName === toHex(hash)) {
           return;
         }
         hash = nextHash(hash);
@@ -148,7 +147,7 @@ export class PIdNFT extends PConstraint<PAsset> {
       throw new Error(
         `ID-Asset verification failure for\n${asset.show()}\nwithin ${gMaxAssertionHashes} hashes, :\n${f}${
           log.join(`\n${f}`)
-        }`,
+        };\nfirstHash: ${firstHash}`,
       );
     }
   };
