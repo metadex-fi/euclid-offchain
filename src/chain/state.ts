@@ -1,14 +1,11 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  Constr,
-  PaymentKeyHash,
-  UTxO,
-} from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Constr, UTxO } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
   Asset,
   Assets,
   CurrencySymbol,
   Data,
+  KeyHash,
   Pool,
   TokenName,
 } from "../mod.ts";
@@ -17,17 +14,17 @@ import { DiracUtxo, ParamUtxo, UtxoPool } from "./utxos.ts";
 export class Euclid {
   // owner -> id -> utxo
   private ownerIdParamUtxos = new Map<
-    PaymentKeyHash,
+    KeyHash,
     Map<TokenName, ParamUtxo>
   >();
   private ownerIdDiracUtxos = new Map<
-    PaymentKeyHash,
+    KeyHash,
     Map<TokenName, DiracUtxo>
   >();
   public invalidDiracs = new Map<string, DiracUtxo[]>();
   public invalidUtxos = new Map<string, UTxO[]>();
-  public emptyPoolParams?: Map<PaymentKeyHash, Map<TokenName, ParamUtxo>>;
-  public ownerUtxoPools?: Map<PaymentKeyHash, UtxoPool[]>;
+  public emptyPoolParams?: Map<KeyHash, Map<TokenName, ParamUtxo>>;
+  public ownerUtxoPools?: Map<KeyHash, UtxoPool[]>;
 
   constructor(
     public readonly contractCurrency: CurrencySymbol,
@@ -83,7 +80,7 @@ export class Euclid {
   public digest = (): void => {
     // owner -> param-id -> pool
     const pools = new Map<
-      PaymentKeyHash,
+      KeyHash,
       Map<TokenName, {
         paramNFT: Asset;
         threadNFTs: Assets;
@@ -94,7 +91,7 @@ export class Euclid {
     // pairing up params and diracs by owner and param-id
     const emptyParamOwners = new Set(this.ownerIdParamUtxos.keys());
     const emptyOwnerParams = new Map<
-      PaymentKeyHash,
+      KeyHash,
       Map<TokenName, ParamUtxo>
     >();
     for (const [owner, idDiracUtxos] of this.ownerIdDiracUtxos) {
@@ -154,7 +151,7 @@ export class Euclid {
     }
     this.emptyPoolParams = emptyOwnerParams;
 
-    const result = new Map<PaymentKeyHash, UtxoPool[]>();
+    const result = new Map<KeyHash, UtxoPool[]>();
     for (const [owner, pools_] of pools) {
       result.set(
         owner,

@@ -28,7 +28,6 @@ import {
   IdNFT,
   min,
   ParamNFT,
-  PPaymentKeyHash,
   randomChoice,
 } from "../mod.ts";
 import { Pool } from "../types/euclid/pool.ts";
@@ -38,6 +37,7 @@ import { UtxoPool } from "./utxos.ts";
 type consequences = (u: User) => void;
 
 export class User {
+  public paymentKeyHash: Uint8Array;
   public readonly contract: Contract;
 
   public balance?: Amounts;
@@ -53,9 +53,12 @@ export class User {
     public readonly privateKey: string,
   ) {
     this.contract = new Contract(lucid);
+    const addressDetails = this.lucid.utils.getAddressDetails(address);
+    assert(addressDetails.paymentCredential, "No payment credential");
+    this.paymentKeyHash = fromHex(addressDetails.paymentCredential.hash);
     this.nextParamNFT = new ParamNFT(
       fromHex(this.contract.policyId),
-      fromText(this.address),
+      this.paymentKeyHash,
     );
   }
 

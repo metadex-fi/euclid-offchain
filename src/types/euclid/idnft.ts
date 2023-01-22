@@ -2,7 +2,6 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   fromHex,
   fromText,
-  PaymentKeyHash,
   sha256,
   toHex,
   toText,
@@ -11,10 +10,17 @@ import {
   genNonNegative,
   genPositive,
   Param,
-  PPaymentKeyHash,
+  PKeyHash,
   TokenName,
 } from "../../mod.ts";
-import { Asset, CurrencySymbol, f, PAsset, PConstraint } from "../mod.ts";
+import {
+  Asset,
+  CurrencySymbol,
+  f,
+  KeyHash,
+  PAsset,
+  PConstraint,
+} from "../mod.ts";
 
 // export const maxTicks = 5n; // per dimension
 // TODO prod: derive this from observed number of diracs in pool
@@ -28,9 +34,9 @@ export class IdNFT {
   public readonly asset: Asset;
   protected constructor(
     public readonly contractCurrency: CurrencySymbol,
-    public readonly tokenName: TokenName,
+    public readonly tokenName: Uint8Array,
   ) {
-    this.asset = new Asset(this.contractCurrency, tokenName);
+    this.asset = new Asset(this.contractCurrency, toHex(tokenName));
   }
 
   public next = (skip = 0): IdNFT => {
@@ -45,33 +51,34 @@ export class IdNFT {
   };
 }
 
-export function nextHash(hash: string): string {
-  return toText(toHex(sha256(fromHex(fromText(hash)))));
-}
+export const nextHash = sha256;
 
-export function hashNTimes(hash: string, n: bigint): string {
-  let h = fromHex(fromText(hash));
+export function hashNTimes(
+  paymentKeyHash: KeyHash,
+  n: bigint,
+): Uint8Array {
+  let hash = paymentKeyHash;
   for (let i = 0n; i < n; i++) {
-    h = sha256(h);
+    hash = sha256(hash);
   }
-  return toText(toHex(h));
+  return hash;
 }
 
 export class ParamNFT extends IdNFT {
   constructor(
     contractCurrency: CurrencySymbol,
-    tokenName: PaymentKeyHash,
+    tokenName: KeyHash,
   ) {
     super(contractCurrency, tokenName);
   }
 
   static generateWith = (
     contractCurrency: CurrencySymbol,
-    owner?: PaymentKeyHash,
+    owner?: KeyHash,
   ): ParamNFT => {
     const tokenName = owner
       ? hashNTimes(owner, genNonNegative(gMaxGenerationHashes))
-      : "";
+      : PKeyHash.ptype.genData();
     return new ParamNFT(contractCurrency, tokenName);
   };
 }
@@ -89,7 +96,7 @@ export class ThreadNFT extends IdNFT {
 export class PIdNFT extends PConstraint<PAsset> {
   protected constructor(
     public readonly contractCurrency: CurrencySymbol,
-    public readonly firstHash?: string,
+    public readonly firstHash?: Uint8Array,
   ) {
     super(
       PAsset.ptype,
@@ -113,7 +120,7 @@ export class PIdNFT extends PConstraint<PAsset> {
 
   static assertAsset = (
     contractCurrency: CurrencySymbol,
-    firstHash?: string,
+    firstHash?: Uint8Array,
   ) =>
   (asset: Asset): void => {
     assert(
@@ -124,8 +131,15 @@ export class PIdNFT extends PConstraint<PAsset> {
     if (firstHash) {
       let hash = firstHash;
       const log = [hash];
+      let assetTkn;
+      try {
+        assetTkn = fromHex(asset.tokenName);
+      } catch (_e) {
+        throw new Error(`ID-Asset tokenName is not hex: ${asset.show()}`);
+      }
+
       for (let i = 0n; i <= gMaxAssertionHashes!; i++) {
-        if (asset.tokenName === hash) {
+        if (assetTkn === hash) {
           return;
         }
         hash = nextHash(hash);
@@ -141,7 +155,7 @@ export class PIdNFT extends PConstraint<PAsset> {
 
   static generateAsset = (
     contractCurrency: CurrencySymbol,
-    firstHash?: string,
+    firstHash?: Uint8Array,
   ) =>
   (): Asset => {
     return ParamNFT.generateWith( // bit of an abuse here
@@ -154,7 +168,7 @@ export class PIdNFT extends PConstraint<PAsset> {
 export class PParamNFT extends PIdNFT {
   constructor(
     public contractCurrency: CurrencySymbol,
-    public owner: PaymentKeyHash,
+    public owner: KeyHash,
   ) {
     super(contractCurrency, owner);
   }
@@ -162,7 +176,7 @@ export class PParamNFT extends PIdNFT {
   static genPType(): PConstraint<PAsset> {
     return new PParamNFT(
       placeholderCcy,
-      toHex(PPaymentKeyHash.ptype.genData()),
+      PKeyHash.ptype.genData(),
     );
   }
 }
@@ -170,7 +184,7 @@ export class PParamNFT extends PIdNFT {
 export class PThreadNFT extends PIdNFT {
   constructor(
     public contractCurrency: CurrencySymbol,
-    public paramNFTtkn: TokenName,
+    public paramNFTtkn: Uint8Array,
   ) {
     super(contractCurrency, nextHash(paramNFTtkn));
   }

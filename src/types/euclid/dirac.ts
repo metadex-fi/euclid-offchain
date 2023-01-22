@@ -1,6 +1,4 @@
-import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { PaymentKeyHash } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { genPositive, maxInteger, maybeNdef, randomChoice } from "../../mod.ts";
+import { maybeNdef } from "../../mod.ts";
 import {
   Amounts,
   Asset,
@@ -23,11 +21,11 @@ import {
   ThreadNFT,
 } from "../mod.ts";
 import { ActiveAssets, PActiveAssets } from "./activeAssets.ts";
-import { POwner, PPaymentKeyHash } from "./owner.ts";
+import { KeyHash, PKeyHash, POwner } from "./owner.ts";
 
 export class Dirac {
   constructor(
-    public owner: PaymentKeyHash,
+    public owner: KeyHash,
     public threadNFT: Asset,
     public paramNFT: Asset,
     public prices: Prices,
@@ -105,7 +103,7 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
     public readonly param?: Param,
     public readonly contractCurrency = placeholderCcy,
   ) {
-    const powner = param ? POwner.pliteral(param.owner) : PPaymentKeyHash.ptype;
+    const powner = param ? POwner.pliteral(param.owner) : PKeyHash.ptype;
     const pprices = param ? PPrices.current(param) : PPrices.initial();
     const pthreadNFT = param
       ? new PThreadNFT(

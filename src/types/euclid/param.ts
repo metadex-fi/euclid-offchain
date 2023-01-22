@@ -1,9 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  fromText,
-  PaymentKeyHash,
-  toHex,
-} from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { fromText } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { abs, maxInteger, min, Prices, User } from "../../mod.ts";
 import {
   Amount,
@@ -23,7 +19,7 @@ import {
   Value,
 } from "../mod.ts";
 import { PJumpSizes } from "./jumpSizes.ts";
-import { PPaymentKeyHash } from "./owner.ts";
+import { KeyHash, PKeyHash } from "./owner.ts";
 
 // TODO a flag somewhere to deactivate it, so owner can start closing.
 // or can we just "break" it?
@@ -32,7 +28,7 @@ const gMaxJumps = 3n;
 
 export class Param {
   constructor(
-    public owner: PaymentKeyHash,
+    public owner: KeyHash,
     public jumpSizes: JumpSizes,
     public initialPrices: Prices,
     public lowerPriceBounds: PositiveValue,
@@ -119,13 +115,13 @@ ${tt})`;
   static assertForUser = (user: User) => (param: Param): void => {
     Param.assert(param);
     assert(
-      user.address === param.owner,
+      user.paymentKeyHash === param.owner,
       `owner must match, got ${param.owner}, expected ${user.address}`,
     );
   };
 
   static generate(): Param {
-    const owner = toHex(PPaymentKeyHash.ptype.genData());
+    const owner = PKeyHash.ptype.genData();
 
     const initialPrices = Prices.generateInitial();
     const assets = initialPrices.assets();
@@ -161,7 +157,7 @@ ${tt})`;
     const lowerBounds = upperBounds.minSizedSubValue(0n);
     const baseAmountA0 = new PPositive(upperBounds.biggestAmount()).genData();
     const param = new Param(
-      fromText(user.address),
+      user.paymentKeyHash,
       jumpSizes,
       initialPrices,
       lowerBounds,
@@ -181,7 +177,7 @@ export class PParam extends PConstraint<PObject<Param>> {
     super(
       new PObject(
         new PRecord({
-          "owner": PPaymentKeyHash.ptype,
+          "owner": PKeyHash.ptype,
           "jumpSizes": PJumpSizes.ptype,
           "initialPrices": PPrices.initial(),
           "lowerPriceBounds": new PPositiveValue(),

@@ -15,12 +15,14 @@ import {
   Validator,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { Euclid } from "./state.ts";
+import { CurrencySymbol } from "../mod.ts";
 
 export class Contract {
   public readonly validator: Validator;
   public readonly mintingPolicy: MintingPolicy;
   public readonly address: Address;
   public readonly policyId: PolicyId;
+  public readonly currency: CurrencySymbol;
   public state?: Euclid;
 
   constructor(
@@ -38,11 +40,12 @@ export class Contract {
 
     this.address = lucid.utils.validatorToAddress(this.validator);
     this.policyId = lucid.utils.mintingPolicyToId(this.mintingPolicy);
+    this.currency = fromHex(this.policyId);
   }
 
   public update = async (): Promise<void> => {
     const utxos = await this.lucid.utxosAt(this.address);
-    this.state = Euclid.ingest(utxos, fromHex(this.policyId));
+    this.state = Euclid.ingest(utxos, this.currency);
     this.state.digest();
   };
 }

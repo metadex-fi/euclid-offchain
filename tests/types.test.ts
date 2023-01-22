@@ -9,6 +9,7 @@ import {
   PEnum,
   PInteger,
   PJumpSizes,
+  PKeyHash,
   PList,
   PLiteral,
   PMap,
@@ -18,7 +19,6 @@ import {
   PParam,
   PParamDatum,
   PParamNFT,
-  PPaymentKeyHash,
   PPool,
   // PPool,
   // PPoolDatums,
@@ -92,14 +92,14 @@ const derivedContainerGenerators = [
 ];
 
 const euclidPrimitiveGenerators = [
-  PPaymentKeyHash.genPType,
+  PKeyHash.genPType,
   POwner.genPType,
   // PParamNFT.genPType,
   // PThreadNFT.genPType,
   PJumpSizes.genPType,
   PPrices.genPType,
-  // PParam.genPType,
-  // PParamDatum.genPType,
+  PParam.genPType,
+  PParamDatum.genPType,
   PAmounts.genPType,
   PActiveAssets.genPType,
   // PDirac.genPType,

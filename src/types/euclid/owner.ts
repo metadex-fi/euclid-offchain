@@ -1,20 +1,16 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  fromHex,
-  fromText,
-  PaymentKeyHash,
-  toHex,
-} from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { fromHex, fromText } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { genName } from "../../mod.ts";
 import { PByteString } from "../general/fundamental/primitive/bytestring.ts";
 import { PConstraint, PLiteral } from "../mod.ts";
 
-export class PPaymentKeyHash extends PConstraint<PByteString> {
+export type KeyHash = Uint8Array;
+export class PKeyHash extends PConstraint<PByteString> {
   private constructor() {
     super(
       new PByteString(),
-      [PPaymentKeyHash.assert],
-      PPaymentKeyHash.generate,
+      [PKeyHash.assert],
+      PKeyHash.generate,
     );
   }
 
@@ -26,33 +22,33 @@ export class PPaymentKeyHash extends PConstraint<PByteString> {
     return fromHex(fromText(genName(1n)));
   }
 
-  static ptype = new PPaymentKeyHash();
+  static ptype = new PKeyHash();
   static genPType(): PConstraint<PByteString> {
-    return PPaymentKeyHash.ptype;
+    return PKeyHash.ptype;
   }
 }
 
 export class Owner {
   constructor(
-    public paymentKeyHash: PaymentKeyHash,
+    public paymentKeyHash: KeyHash,
   ) {
     assert(paymentKeyHash.length > 0, "paymentKeyHash must be non-empty");
   }
 }
 
-export class POwner extends PLiteral<PPaymentKeyHash> {
+export class POwner extends PLiteral<PKeyHash> {
   private constructor(
-    public paymentKeyHash: PaymentKeyHash,
+    public paymentKeyHash: KeyHash,
   ) {
-    super(PPaymentKeyHash.ptype, fromHex(paymentKeyHash));
+    super(PKeyHash.ptype, paymentKeyHash);
   }
 
   static genPType(): PLiteral<PByteString> {
-    const paymentKeyHash = toHex(PPaymentKeyHash.ptype.genData());
+    const paymentKeyHash = PKeyHash.ptype.genData();
     return new POwner(paymentKeyHash);
   }
 
-  static pliteral(paymentKeyHash: PaymentKeyHash): POwner {
+  static pliteral(paymentKeyHash: KeyHash): POwner {
     return new POwner(paymentKeyHash);
   }
 }
