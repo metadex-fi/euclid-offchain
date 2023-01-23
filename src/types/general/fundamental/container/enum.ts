@@ -52,7 +52,7 @@ export class PEnum<PT extends PData>
     tabs = "",
     maxDepth?: bigint,
   ): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "Enum ( … )";
     const str = this.pliteral.showData(data);
     const index = this.strs.indexOf(str);
     assert(
@@ -71,7 +71,7 @@ ${tt})`;
   };
 
   public showPType = (tabs = "", maxDepth?: bigint): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "PEnum ( … )";
     const tt = tabs + t;
     const ttf = tt + f;
     const ttft = ttf + t;

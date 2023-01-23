@@ -12,7 +12,13 @@ import {
 import { f, PConstraint, PObject, PRecord, t } from "../mod.ts";
 import { newGenInRange } from "./bounded.ts";
 import { PNonEmptyList } from "./nonEmptyList.ts";
-import { PByteString, PMap, PString, PWrapped } from "../fundamental/mod.ts";
+import {
+  PByteString,
+  PList,
+  PMap,
+  PString,
+  PWrapped,
+} from "../fundamental/mod.ts";
 import {
   Assets as LucidAssets,
   fromHex,
@@ -208,11 +214,12 @@ export class PAsset extends PConstraint<PObject<Asset>> {
   }
 }
 
+export const ccysTkns = new AssocMap<PCurrency, PList<PToken>>(PCurrency.ptype);
 const PNonEmptyTokenList = new PNonEmptyList(PToken.ptype);
 
 export class Assets {
   constructor(
-    private assets = new AssocMap<Currency, Array<Token>>(),
+    private assets = ccysTkns.anew,
   ) {
     for (const [ccy, tkns] of this.assets) {
       assert(tkns.length > 0, `empty token list for ${ccy}`);
@@ -297,7 +304,7 @@ export class Assets {
 
   public tail = (): Assets => {
     assert(this.assets.size > 0, "empty assets tell no tails");
-    const tail = new AssocMap<Currency, Token[]>();
+    const tail = this.assets.anew;
     let first = true;
     for (const ccy of [...this.assets.keys()].sort()) {
       const tkns = this.assets.get(ccy)!.slice(0).sort();
@@ -421,7 +428,7 @@ export class Assets {
   }
 
   public intersect = (assets: Assets): Assets => {
-    const shared = new AssocMap<Currency, Token[]>();
+    const shared = this.assets.anew;
     const other = assets.toMap();
     for (const [ccy, ownTkns] of this.assets) {
       const otherTkns = other.get(ccy);

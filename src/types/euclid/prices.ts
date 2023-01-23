@@ -9,8 +9,12 @@ import {
   lSubValues,
   Param,
   PConstraint,
+  PCurrency,
+  PInteger,
+  PMap,
   PObject,
   PRecord,
+  PToken,
   Token,
   Value,
 } from "../mod.ts";
@@ -58,14 +62,13 @@ export class Prices {
   public setAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.setAmountOf(asset, amount);
   public clone = (): Prices => new Prices(this.value.clone());
-  public toMap = (): AssocMap<Currency, AssocMap<Token, bigint>> =>
-    this.value.toMap();
+  public toMap = () => this.value.toMap();
 
   static fromValue = (prices: Value): Prices => {
     return new Prices(new PositiveValue(prices));
   };
   static fromMap = (
-    prices: AssocMap<Currency, AssocMap<Token, bigint>>,
+    prices: AssocMap<PCurrency, PMap<PToken, PInteger>>,
   ): Prices => {
     return Prices.fromValue(new Value(prices));
   };

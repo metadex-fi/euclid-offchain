@@ -128,7 +128,7 @@ status: ${Object.keys(r).join(`,\n${f}`)}`,
     tabs = "",
     maxDepth?: bigint,
   ): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "Record { … }";
     this.checkFields(data);
     if (data.size === 0) return "Record {}";
     const tt = tabs + t;
@@ -159,7 +159,7 @@ ${tt}}`;
   };
 
   public showPType = (tabs = "", maxDepth?: bigint): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "PRecord ( … )";
     const tt = tabs + t;
     const ttf = tt + f;
     const ttff = ttf + f;

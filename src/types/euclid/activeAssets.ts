@@ -14,9 +14,11 @@ import {
 } from "../mod.ts";
 import { PPrices, Prices } from "./prices.ts";
 
+const pricesAssets = new AssocMap<PPrices, PAsset>(PPrices.initial());
+
 export class ActiveAssets {
   constructor(
-    private activeAssets: AssocMap<Prices, Asset>,
+    private activeAssets: AssocMap<PPrices, PAsset>,
   ) {}
 
   public show = (tabs = ""): string => {
@@ -37,14 +39,14 @@ ${tt})`;
     callbackfn: (
       value: Asset,
       key: Prices,
-      map: AssocMap<Prices, Asset>,
+      map: AssocMap<PPrices, PAsset>,
     ) => void,
   ): void {
     this.activeAssets.forEach(callbackfn);
   }
 
   static fresh(): ActiveAssets {
-    return new ActiveAssets(new AssocMap<Prices, Asset>());
+    return new ActiveAssets(pricesAssets.anew);
   }
 
   static assertUsed = (param: Param) => (activeAssets: ActiveAssets): void => {
@@ -60,7 +62,7 @@ ${tt})`;
   // TODO this might lead to some paradoxes, let's see, we might learn something
   static generateUsed = (param: Param) => (): ActiveAssets => {
     const assets = param.initialPrices.assets();
-    const activeAssets = new AssocMap<Prices, Asset>();
+    const activeAssets = pricesAssets.anew;
     const pprices = PPrices.current(param);
     const locations: Prices[] = PMap.genKeys(pprices);
     for (const location of locations) {

@@ -69,7 +69,7 @@ export class PSum<Os extends Object> implements PType<Constr<Data>, Os> {
   };
 
   public showData(data: Os, tabs = "", maxDepth?: bigint): string {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "Sum ( … )";
     const tt = tabs + t;
     const ttf = tt + f;
 
@@ -81,7 +81,7 @@ ${tt})`;
   }
 
   public showPType(tabs = "", maxDepth?: bigint): string {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "PSum ( … )";
     const tt = tabs + t;
     const ttf = tt + f;
 

@@ -37,7 +37,7 @@ export class PWrapped<O extends Object> implements PType<Data, O> {
   };
 
   public showData = (data: O, tabs = "", maxDepth?: bigint): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "Wrapped ( … )";
     const tt = tabs + t;
     const ttf = tt + f;
 
@@ -57,7 +57,9 @@ ${tt})`;
   };
 
   public showPType = (tabs = "", maxDepth?: bigint): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) {
+      return "PObject: PWrapped ( … )";
+    }
     const tt = tabs + t;
     const ttf = tt + f;
 

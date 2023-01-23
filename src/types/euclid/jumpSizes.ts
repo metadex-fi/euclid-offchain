@@ -1,5 +1,14 @@
 import { Assets, Currency, PositiveValue, Token, Value } from "../mod.ts";
-import { Asset, PObject, PPositiveValue, PRecord } from "../general/mod.ts";
+import {
+  Asset,
+  PCurrency,
+  PInteger,
+  PMap,
+  PObject,
+  PPositiveValue,
+  PRecord,
+  PToken,
+} from "../general/mod.ts";
 import { AssocMap, maxInteger, min } from "../../mod.ts";
 
 export class JumpSizes {
@@ -11,8 +20,7 @@ export class JumpSizes {
   public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
   public scaledWith = (factor: bigint): JumpSizes =>
     new JumpSizes(this.value.scaledWith(factor));
-  public toMap = (): AssocMap<Currency, AssocMap<Token, bigint>> =>
-    this.value.toMap();
+  public toMap = () => this.value.toMap();
 
   public doubleRandomAmount = (): void => {
     const asset = this.assets().randomChoice();
@@ -28,7 +36,7 @@ export class JumpSizes {
     );
   }
 
-  static fromMap(m: AssocMap<Currency, AssocMap<Token, bigint>>): JumpSizes {
+  static fromMap(m: AssocMap<PCurrency, PMap<PToken, PInteger>>): JumpSizes {
     return new JumpSizes(new PositiveValue(new Value(m)));
   }
 }

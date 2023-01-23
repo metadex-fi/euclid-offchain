@@ -18,65 +18,70 @@ function census(numKeys: number, numValues: number, size: bigint): number {
   return population;
 }
 
-export class AssocMap<K, V> {
+export class AssocMap<PKey extends PData, PValue extends PData> {
   private readonly inner = new Map<
     string,
-    [K, V]
+    [PLifted<PKey>, PLifted<PValue>]
   >();
 
-  private key(k: K): string {
-    if (k instanceof Object) return k.toString();
-    else return `${k}`;
-  }
+  constructor(private readonly pkey: PKey) {}
 
   public get size(): number {
     return this.inner.size;
   }
 
-  public set(k: K, v: V): void {
-    this.inner.set(this.key(k), [k, v]);
+  public get anew(): AssocMap<PKey, PValue> {
+    return new AssocMap(this.pkey);
   }
 
-  public get(k: K): V | undefined {
-    return this.inner.get(this.key(k))?.[1];
+  public set(k: PLifted<PKey>, v: PLifted<PValue>): void {
+    this.inner.set(this.pkey.showData(k), [k, v]);
   }
 
-  public has(k: K): boolean {
-    return this.inner.has(this.key(k));
+  public get(k: PLifted<PKey>): PLifted<PValue> | undefined {
+    return this.inner.get(this.pkey.showData(k))?.[1];
   }
 
-  public delete(k: K): boolean {
-    return this.inner.delete(this.key(k));
+  public has(k: PLifted<PKey>): boolean {
+    return this.inner.has(this.pkey.showData(k));
+  }
+
+  public delete(k: PLifted<PKey>): boolean {
+    return this.inner.delete(this.pkey.showData(k));
   }
 
   public clear(): void {
     this.inner.clear();
   }
 
-  public *keys(): Generator<K> {
+  public *keys(): Generator<PLifted<PKey>> {
     for (const [_, entry] of this.inner) {
       yield entry[0];
     }
   }
 
-  public *values(): Generator<V> {
+  public *values(): Generator<PLifted<PValue>> {
     for (const [_, entry] of this.inner) {
       yield entry[1];
     }
   }
 
-  public *entries(): Generator<[K, V]> {
+  public *entries(): Generator<[PLifted<PKey>, PLifted<PValue>]> {
     for (const [_, entry] of this.inner) {
       yield entry;
     }
   }
 
-  public *[Symbol.iterator](): Generator<[K, V]> {
+  public *[Symbol.iterator](): Generator<[PLifted<PKey>, PLifted<PValue>]> {
     yield* this.entries();
   }
 
   public forEach(
-    callbackfn: (value: V, key: K, map: AssocMap<K, V>) => void,
+    callbackfn: (
+      value: PLifted<PValue>,
+      key: PLifted<PKey>,
+      map: AssocMap<PKey, PValue>,
+    ) => void,
     thisArg?: any,
   ): void {
     for (const [k, v] of this) {
@@ -88,7 +93,7 @@ export class AssocMap<K, V> {
 export class PMap<PKey extends PData, PValue extends PData> implements
   PType<
     Map<PConstanted<PKey>, PConstanted<PValue>>,
-    AssocMap<PLifted<PKey>, PLifted<PValue>>
+    AssocMap<PKey, PValue>
   > {
   public readonly population: number;
 
@@ -123,14 +128,14 @@ export class PMap<PKey extends PData, PValue extends PData> implements
 
   public plift = (
     m: Map<PConstanted<PKey>, PConstanted<PValue>>,
-  ): AssocMap<PLifted<PKey>, PLifted<PValue>> => {
+  ): AssocMap<PKey, PValue> => {
     assert(m instanceof Map, `plift: expected Map`);
     assert(
       !this.size || this.size === BigInt(m.size),
       `plift: wrong size`,
     );
 
-    const data = new AssocMap<PLifted<PKey>, PLifted<PValue>>();
+    const data = new AssocMap<PKey, PValue>(this.pkey);
     let i = 0;
     m.forEach((value, key) => {
       const k = this.pkey.plift(key) as PLifted<PKey>;
@@ -146,7 +151,7 @@ export class PMap<PKey extends PData, PValue extends PData> implements
   };
 
   public pconstant = (
-    data: AssocMap<PLifted<PKey>, PLifted<PValue>>,
+    data: AssocMap<PKey, PValue>,
   ): Map<PConstanted<PKey>, PConstanted<PValue>> => {
     assert(data instanceof AssocMap, `AssocMap.pconstant: expected AssocMap`);
     assert(
@@ -233,12 +238,12 @@ ${t}pkey: ${pkey.showPType(t)}`,
     pkey: PKey,
     pvalue: PValue,
     size: bigint,
-  ): AssocMap<PLifted<PKey>, PLifted<PValue>> {
+  ): AssocMap<PKey, PValue> {
     assert(
       Number(size) <= pkey.population,
       `PMap: not enough keys for size ${Number(size)} in ${pkey.showPType()}`,
     );
-    const m = new AssocMap<PLifted<PKey>, PLifted<PValue>>();
+    const m = new AssocMap<PKey, PValue>(pkey);
     const keys = PMap.genKeys(pkey, size);
     // console.log(`generating Map with keys: ${JSON.stringify(keys)}`);
     keys.forEach((key) => {
@@ -247,10 +252,10 @@ ${t}pkey: ${pkey.showPType(t)}`,
     return m;
   }
 
-  public genData = (): AssocMap<PLifted<PKey>, PLifted<PValue>> => {
+  public genData = (): AssocMap<PKey, PValue> => {
     if (this.keys) {
       // console.log(`populating Map with keys: ${JSON.stringify(this.keys)}`);
-      const m = new AssocMap<PLifted<PKey>, PLifted<PValue>>();
+      const m = new AssocMap<PKey, PValue>(this.pkey);
       this.keys.forEach((key) => {
         m.set(key, this.pvalue.genData() as PLifted<PValue>);
       });
@@ -266,11 +271,11 @@ ${t}pkey: ${pkey.showPType(t)}`,
   };
 
   public showData = (
-    data: AssocMap<PLifted<PKey>, PLifted<PValue>>,
+    data: AssocMap<PKey, PValue>,
     tabs = "",
     maxDepth?: bigint,
   ): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "Map { … }";
     assert(
       data instanceof AssocMap,
       `PMap.showData: expected AssocMap, got ${data}`,
@@ -292,7 +297,7 @@ ${tt}}`;
   };
 
   public showPType = (tabs = "", maxDepth?: bigint): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "PMap ( … )";
     const tt = tabs + t;
     const ttf = tt + f;
     const ttft = ttf + t;

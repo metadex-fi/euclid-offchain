@@ -1,17 +1,38 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { fromHex, toHex } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { AssocMap, genPositive, max, maxInteger } from "../../../../mod.ts";
-import { f, PConstraint, PMap, PWrapped, t } from "../../mod.ts";
-import { Asset, Assets, Currency, PCurrency, PToken, Token } from "../asset.ts";
+import {
+  f,
+  PConstraint,
+  PInteger,
+  PList,
+  PMap,
+  PWrapped,
+  t,
+} from "../../mod.ts";
+import {
+  Asset,
+  Assets,
+  ccysTkns,
+  Currency,
+  PCurrency,
+  PToken,
+  Token,
+} from "../asset.ts";
 import { bothExtreme, PBounded } from "../bounded.ts";
+
+export const ccysTknsAmnts = new AssocMap<PCurrency, PMap<PToken, PInteger>>(
+  PCurrency.ptype,
+);
+export const tknsAmnts = new AssocMap<PToken, PInteger>(PToken.ptype);
 
 export class Value {
   constructor(
-    private value = new AssocMap<Currency, AssocMap<Token, bigint>>(),
+    private value = ccysTknsAmnts.anew,
   ) {
     assert(
       this.value instanceof AssocMap,
-      `Value must be a AssocMap, not ${JSON.stringify(this.value)}`,
+      `Value must be a AssocMap, not ${this.value}`,
     );
   }
 
@@ -88,7 +109,7 @@ export class Value {
   };
 
   public assets = (): Assets => {
-    const assets = new AssocMap<Currency, Token[]>();
+    const assets = ccysTkns.anew;
     for (const [currencySymbol, tokens] of this.value) {
       assets.set(currencySymbol, [...tokens.keys()]);
     }
@@ -120,7 +141,7 @@ export class Value {
   public tail = (): Value => {
     const size = this.size();
     assert(size > 0, "empty values tell no tails");
-    const tail = new AssocMap<Currency, AssocMap<Token, bigint>>();
+    const tail = this.value.anew;
     let first = true;
     for (const ccy of [...this.value.keys()].sort()) {
       const tkns = this.value.get(ccy);
@@ -128,7 +149,7 @@ export class Value {
       if (first) {
         assert(tkns.size > 0, "empty token map");
         if (tkns.size > 1) {
-          const tail_ = new AssocMap<Token, bigint>();
+          const tail_ = tknsAmnts.anew;
           for (const tkn of [...tkns.keys()].sort().slice(1)) {
             const amnt = tkns.get(tkn);
             assert(amnt, `no amount for token ${tkn}`);
@@ -214,7 +235,7 @@ export class Value {
       );
       tokens.set(asset.token, amount);
     } else {
-      const tokens = new AssocMap<Token, bigint>();
+      const tokens = tknsAmnts.anew;
       tokens.set(asset.token, amount);
       this.value.set(asset.currency, tokens);
     }
@@ -227,7 +248,7 @@ export class Value {
         tokens.set(asset.token, amount);
       }
     } else {
-      const tokens = new AssocMap<Token, bigint>();
+      const tokens = tknsAmnts.anew;
       tokens.set(asset.token, amount);
       this.value.set(asset.currency, tokens);
     }
@@ -238,7 +259,7 @@ export class Value {
     for (const [currencySymbol, tokens] of this.value) {
       const assets_ = assets.toMap();
       if (assets_.has(currencySymbol)) {
-        const tokens_ = new AssocMap<Token, bigint>();
+        const tokens_ = tknsAmnts.anew;
         for (const tokenName of tokens.keys()) {
           if (assets_.get(currencySymbol)?.includes(tokenName)) {
             tokens_.set(tokenName, tokens.get(tokenName)!);
@@ -250,10 +271,10 @@ export class Value {
     return value;
   };
 
-  public toMap = (): AssocMap<Currency, AssocMap<Token, bigint>> => {
-    const map = new AssocMap<Currency, AssocMap<Token, bigint>>();
+  public toMap = (): AssocMap<PCurrency, PMap<PToken, PInteger>> => {
+    const map = this.value.anew;
     for (const [currencySymbol, tokens] of this.value) {
-      const tokens_ = new AssocMap<Token, bigint>();
+      const tokens_ = tknsAmnts.anew;
       for (const [tokenName, amount] of tokens) {
         tokens_.set(tokenName, amount);
       }
@@ -315,9 +336,9 @@ export class Value {
   };
 
   static nullOfAssets = (assets: Assets): Value => {
-    const value = new AssocMap<Currency, AssocMap<Token, bigint>>();
+    const value = ccysTknsAmnts.anew;
     for (const [currencySymbol, tokens] of assets.toMap()) {
-      const tokens_ = new AssocMap<Token, bigint>();
+      const tokens_ = tknsAmnts.anew;
       for (const tokenName of tokens) {
         tokens_.set(tokenName, 0n);
       }
@@ -364,7 +385,7 @@ export class PValue extends PConstraint<PWrapped<Value>> {
 export function assetsOf(
   ...values: Value[]
 ): Assets {
-  const assets = new AssocMap<Currency, Token[]>();
+  const assets = ccysTkns.anew;
   for (const value of values) {
     for (const [currencySymbol, tokenMap] of value.toMap()) {
       if (!assets.has(currencySymbol)) {
@@ -382,8 +403,8 @@ export function assetsOf(
 }
 
 export function singleton(asset: Asset, amount: bigint): Value {
-  const value = new AssocMap<Currency, AssocMap<Token, bigint>>();
-  const tokens = new AssocMap<Token, bigint>();
+  const value = ccysTknsAmnts.anew;
+  const tokens = tknsAmnts.anew;
   tokens.set(asset.token, amount);
   value.set(asset.currency, tokens);
   return new Value(value);

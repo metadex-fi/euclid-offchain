@@ -49,7 +49,7 @@ export class PConstraint<PInner extends PData>
     tabs = "",
     maxDepth?: bigint,
   ): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "Constraint ( … )";
     const tt = tabs + t;
     const ttf = tt + f;
 
@@ -59,7 +59,7 @@ ${tt})`;
   };
 
   public showPType = (tabs = "", maxDepth?: bigint): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "PConstraint ( … )";
     const tt = tabs + t;
     const ttf = tt + f;
 

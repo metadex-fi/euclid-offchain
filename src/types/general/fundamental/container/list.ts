@@ -66,7 +66,7 @@ export class PList<PElem extends PData>
     tabs = "",
     maxDepth?: bigint,
   ): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "List [ … ]";
     assert(
       data instanceof Array,
       `PList.showData: expected Array, got ${data}`,
@@ -86,7 +86,7 @@ ${tt}]`;
   };
 
   public showPType = (tabs = "", maxDepth?: bigint): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "PList ( … )";
     const tt = tabs + t;
     const ttf = tt + f;
 

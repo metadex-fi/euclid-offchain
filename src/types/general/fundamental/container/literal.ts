@@ -40,7 +40,7 @@ export class PLiteral<PT extends PData>
     tabs = "",
     maxDepth?: bigint,
   ): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "Literal ( … )";
     assert(
       this.pliteral.showData(data) === this.str,
       `Literal.showData: Literal does not match, got:\n${
@@ -56,7 +56,7 @@ ${tt})`;
   };
 
   public showPType = (tabs = "", maxDepth?: bigint): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "PLiteral ( … )";
     const tt = tabs + t;
     const ttf = tt + f;
 

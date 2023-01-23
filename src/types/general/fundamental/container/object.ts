@@ -53,7 +53,7 @@ export class PObject<O extends Object> implements PType<Array<Data>, O> {
   };
 
   public showData = (data: O, tabs = "", maxDepth?: bigint): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "Object ( … )";
     const tt = tabs + t;
     const ttf = tt + f;
 
@@ -69,7 +69,7 @@ ${tt})`;
   };
 
   public showPType = (tabs = "", maxDepth?: bigint): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "PObject ( … )";
     const tt = tabs + t;
     const ttf = tt + f;
 
