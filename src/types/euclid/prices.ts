@@ -4,18 +4,14 @@ import {
   Asset,
   Assets,
   AssocMap,
-  Currency,
   generateWithin,
   lSubValues,
   Param,
   PConstraint,
   PCurrency,
-  PInteger,
-  PMap,
   PObject,
   PRecord,
   PToken,
-  Token,
   Value,
 } from "../mod.ts";
 import {
@@ -68,7 +64,7 @@ export class Prices {
     return new Prices(new PositiveValue(prices));
   };
   static fromMap = (
-    prices: AssocMap<PCurrency, PMap<PToken, PInteger>>,
+    prices: AssocMap<PCurrency, AssocMap<PToken, bigint>>,
   ): Prices => {
     return Prices.fromValue(new Value(prices));
   };

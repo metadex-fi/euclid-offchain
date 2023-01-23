@@ -21,10 +21,10 @@ import {
 } from "../asset.ts";
 import { bothExtreme, PBounded } from "../bounded.ts";
 
-export const ccysTknsAmnts = new AssocMap<PCurrency, PMap<PToken, PInteger>>(
+export const ccysTknsAmnts = new AssocMap<PCurrency, AssocMap<PToken, bigint>>(
   PCurrency.ptype,
 );
-export const tknsAmnts = new AssocMap<PToken, PInteger>(PToken.ptype);
+export const tknsAmnts = new AssocMap<PToken, bigint>(PToken.ptype);
 
 export class Value {
   constructor(
@@ -168,14 +168,14 @@ export class Value {
     return tail_;
   };
 
-  public pop = (asset: Asset): bigint => {
-    const tkns = this.value.get(asset.currency);
-    assert(tkns, `no tokens for currency ${asset.currency}`);
-    const amnt = tkns.get(asset.token);
-    assert(amnt, `no amount for token ${asset.token}`);
-    tkns.delete(asset.token);
-    if (tkns.size === 0) this.value.delete(asset.currency);
-    return amnt;
+  public popNFT = (nft: Asset): void => {
+    const tknsAmnts = this.value.get(nft.currency);
+    assert(tknsAmnts, `no tokens for currency ${nft.currency}`);
+    assert(tknsAmnts.size === 1, `more than one tokenNames for ${nft.show()}`); // this is only because of our specific use case
+    const amnt = tknsAmnts.get(nft.token);
+    assert(amnt, `no amount for token ${nft.token}`);
+    assert(amnt === 1n, `amount ${amnt} != 1 for ${nft.show()}`);
+    this.value.delete(nft.currency);
   };
 
   public foldWith =
@@ -271,7 +271,7 @@ export class Value {
     return value;
   };
 
-  public toMap = (): AssocMap<PCurrency, PMap<PToken, PInteger>> => {
+  public toMap = (): AssocMap<PCurrency, AssocMap<PToken, bigint>> => {
     const map = this.value.anew;
     for (const [currencySymbol, tokens] of this.value) {
       const tokens_ = tknsAmnts.anew;
@@ -296,6 +296,22 @@ export class Value {
   };
 
   public clone = (): Value => new Value(this.toMap());
+
+  public drop = (asset: Asset): void => {
+    const tokens = this.value.get(asset.currency);
+    assert(
+      tokens,
+      `drop: tokens not found for asset ${asset.show()} in ${this.show()}`,
+    );
+    assert(
+      tokens.has(asset.token),
+      `drop: amount not found for asset ${asset.show()} in ${this.show()}`,
+    );
+    tokens.delete(asset.token);
+    if (tokens.size === 0) {
+      this.value.delete(asset.currency);
+    }
+  };
 
   public addAmountOf = (asset: Asset, amount: bigint): void => {
     this.setAmountOf(asset, this.amountOf(asset) + amount);

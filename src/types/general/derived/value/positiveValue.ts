@@ -35,7 +35,8 @@ export class PositiveValue {
   public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
   public firstAsset = (): Asset => this.value.firstAsset();
   public firstAmount = (): bigint => this.value.firstAmount();
-  public pop = (asset: Asset): bigint => this.value.pop(asset);
+  public popNFT = (nft: Asset) => this.value.popNFT(nft);
+  public drop = (asset: Asset): void => this.value.drop(asset);
   public smallestAmount = (): bigint => this.value.smallestAmount();
   public biggestAmount = (): bigint => this.value.biggestAmount();
   public setAmountOf = (asset: Asset, amount: bigint): void =>
@@ -55,7 +56,7 @@ export class PositiveValue {
       `addAmountOf: newAmount must be positive, got ${newAmount}`,
     );
     if (newAmount === 0n) {
-      this.value.pop(asset);
+      this.value.drop(asset);
     } else {
       this.value.setAmountOf(asset, amount);
     }

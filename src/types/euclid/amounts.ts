@@ -3,10 +3,14 @@ import { genNonNegative, maxInteger } from "../../mod.ts";
 import {
   Asset,
   Assets,
+  AssocMap,
+  Currency,
   mulValues_,
   Param,
+  PInteger,
   PObject,
   PRecord,
+  PToken,
   Value,
 } from "../mod.ts";
 import { Prices } from "./prices.ts";
@@ -28,7 +32,7 @@ export class Amounts {
   public firstAsset = (): Asset => this.value.firstAsset();
   public firstAmount = (): bigint => this.value.firstAmount();
   public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
-  public pop = (asset: Asset): bigint => this.value.pop(asset);
+  public popNFT = (nft: Asset) => this.value.popNFT(nft);
   public smallestAmount = (): bigint => this.value.smallestAmount();
   public addAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.addAmountOf(asset, amount);
@@ -51,6 +55,15 @@ export class Amounts {
     });
     return assets;
   };
+
+  static fromLucid(assets: LucidAssets): Amounts {
+    const value = new Value();
+    Object.entries(assets).forEach(([name, amount]) => {
+      const asset = Asset.fromLucid(name);
+      value.initAmountOf(asset, amount);
+    });
+    return new Amounts(new PositiveValue(value));
+  }
 
   static fresh(param: Param, prices: Prices): Amounts {
     const activeAsset = prices.defaultActiveAsset(param.initialPrices);
@@ -89,15 +102,6 @@ export class Amounts {
   //   if (amountA1 > 0n) amounts.initAmountOf(A1, amountA1);
   //   return new Amounts(amounts);
   // };
-
-  static fromLucid(assets: LucidAssets, ccyLength: number): Amounts {
-    const value = new Value();
-    Object.entries(assets).forEach(([name, amount]) => {
-      const asset = Asset.fromLucid(name, ccyLength);
-      value.initAmountOf(asset, amount);
-    });
-    return new Amounts(new PositiveValue(value));
-  }
 
   static genOfAssets(assets: Assets): Amounts {
     return new Amounts(

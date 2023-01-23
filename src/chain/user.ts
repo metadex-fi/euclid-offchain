@@ -19,21 +19,20 @@ import {
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
   Amounts,
+  Asset,
   Assets,
   Dirac,
   DiracDatum,
   f,
   genName,
   genPositive,
-  IdNFT,
   KeyHash,
   min,
-  ParamNFT,
   PKeyHash,
   randomChoice,
 } from "../mod.ts";
-import { Pool } from "../types/euclid/pool.ts";
 import { Contract } from "./contract.ts";
+import { Pool } from "./pool.ts";
 import { UtxoPool } from "./utxos.ts";
 
 type consequences = (u: User) => void;
@@ -45,7 +44,7 @@ export class User {
   public balance?: Amounts;
   public pools?: Pool[]; // own creation recall
   // public utxoPools?: UtxoPool[]; // from onchain
-  public nextParamNFT: IdNFT;
+  public lastIdNFT: Asset;
 
   public pendingConsequences?: consequences;
 
@@ -70,11 +69,19 @@ export class User {
       assert(paymentKeyHash, `neither address nor paymentKeyHash provided`);
       this.paymentKeyHash = paymentKeyHash;
     }
-    this.nextParamNFT = new ParamNFT(
-      this.contract.currency,
-      this.paymentKeyHash,
-    );
+    // this.lastThreadNFT = new ParamNFT(
+    //   this.contract.currency,
+    //   this.paymentKeyHash,
+    // );
   }
+
+  public nextParamNFT = (): Asset => {
+  };
+
+  public numPools = (): bigint => {
+    assert(this.pools, "no pools");
+    return BigInt(this.pools.length);
+  };
 
   static async from(
     lucid: Lucid,
@@ -141,7 +148,7 @@ export class User {
         assets[asset] = amount + BigInt(assets[asset] ?? 0);
       });
     });
-    this.balance = Amounts.fromLucid(assets, this.contract.policyId.length);
+    this.balance = Amounts.fromLucid(assets);
   };
 
   public ownsPools = (): boolean => {

@@ -14,11 +14,11 @@ import {
 } from "../mod.ts";
 import { PPrices, Prices } from "./prices.ts";
 
-const pricesAssets = new AssocMap<PPrices, PAsset>(PPrices.initial());
+const pricesAssets = new AssocMap<PPrices, Asset>(PPrices.initial());
 
 export class ActiveAssets {
   constructor(
-    private activeAssets: AssocMap<PPrices, PAsset>,
+    private activeAssets: AssocMap<PPrices, Asset>,
   ) {}
 
   public show = (tabs = ""): string => {
@@ -39,7 +39,7 @@ ${tt})`;
     callbackfn: (
       value: Asset,
       key: Prices,
-      map: AssocMap<PPrices, PAsset>,
+      map: AssocMap<PPrices, Asset>,
     ) => void,
   ): void {
     this.activeAssets.forEach(callbackfn);
@@ -82,11 +82,11 @@ ${tt})`;
 
 export class PActiveAssets extends PWrapped<ActiveAssets> {
   constructor(
-    public readonly param?: Param,
+    public readonly pprices: PPrices,
   ) {
     super(
       new PMap(
-        param ? PPrices.current(param) : PPrices.initial(),
+        pprices,
         PAsset.ptype,
       ), // TODO could constain PAsset more here, but that's nonessential
       ActiveAssets,
@@ -94,8 +94,6 @@ export class PActiveAssets extends PWrapped<ActiveAssets> {
   }
 
   static genPType(): PWrapped<ActiveAssets> {
-    return new PActiveAssets(
-      maybeNdef(Param.generate)?.(),
-    );
+    return new PActiveAssets(PPrices.genPType());
   }
 }

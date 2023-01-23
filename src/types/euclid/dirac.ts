@@ -1,5 +1,10 @@
-import { maybeNdef } from "../../mod.ts";
-import { genNonNegative, gMaxLength } from "../../utils/generators.ts";
+import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { maybeNdef, User } from "../../mod.ts";
+import {
+  Generators,
+  genNonNegative,
+  gMaxLength,
+} from "../../utils/generators.ts";
 import {
   Amounts,
   Asset,
@@ -8,6 +13,7 @@ import {
   f,
   PAmounts,
   Param,
+  PAsset,
   PConstraint,
   placeholderCcy,
   PObject,
@@ -15,6 +21,7 @@ import {
   PRecord,
   Prices,
   t,
+  Token,
 } from "../mod.ts";
 import { ActiveAssets, PActiveAssets } from "./activeAssets.ts";
 import { Hash, KeyHash, PKeyHash, POwner } from "./hash.ts";
@@ -46,110 +53,101 @@ ${tt})`;
   public assets = (): Assets => this.prices.assets();
 
   // TODO consider fees here
-  static assertWith = (param: Param) => (dirac: Dirac): void => {
-    // TODO FIXME
-    //     const prices = dirac.prices.signed();
-    //     const equivalentA0 = dirac.activeAmnts.equivalentA0(prices);
-    //     // const lower = param.baseAmountA0 * prices.firstAmount();
-    //     // const upper = lower + prices.firstAmount();
-    //     assert(
-    //       // lower <= equivalentA0 && equivalentA0 <= upper,
-    //       // `expected ${lower} <= ${equivalentA0} <= ${upper} with
-    //       param.baseAmountA0 === equivalentA0,
-    //       `expected ${param.baseAmountA0} === ${equivalentA0} with
-    // baseAmountA0: ${param.baseAmountA0},
-    // A1: ${prices.firstAsset().show()},
-    // prices: ${dirac.prices.concise()},
-    // activeAmnts: ${dirac.activeAmnts.concise()}`,
-    //     );
-  };
+  // static assertWith = (param: Param) => (dirac: Dirac): void => {
+  // TODO FIXME
+  //     const prices = dirac.prices.signed();
+  //     const equivalentA0 = dirac.activeAmnts.equivalentA0(prices);
+  //     // const lower = param.baseAmountA0 * prices.firstAmount();
+  //     // const upper = lower + prices.firstAmount();
+  //     assert(
+  //       // lower <= equivalentA0 && equivalentA0 <= upper,
+  //       // `expected ${lower} <= ${equivalentA0} <= ${upper} with
+  //       param.baseAmountA0 === equivalentA0,
+  //       `expected ${param.baseAmountA0} === ${equivalentA0} with
+  // baseAmountA0: ${param.baseAmountA0},
+  // A1: ${prices.firstAsset().show()},
+  // prices: ${dirac.prices.concise()},
+  // activeAmnts: ${dirac.activeAmnts.concise()}`,
+  //     );
+  // };
 
-  static generateAny = (): Dirac => {
-    const param = Param.generate();
-    return Dirac.generateFresh(param)();
-  };
+  static generateFresh =
+    (param: Param, paramNFT: Asset, numDiracs: bigint) => (): Dirac => {
+      const threadNFT = PIdNFT.pthreadNFT(
+        paramNFT,
+        numDiracs,
+      ).genData();
+      const prices = Prices.generateCurrent(param)();
+      const activeAmnts = Amounts.fresh(param, prices);
+      const jumpStorage = ActiveAssets.fresh();
 
-  static generateFresh = (param: Param) => (): Dirac => {
-    const owner = param.owner;
+      return new Dirac(
+        param.owner,
+        threadNFT,
+        paramNFT,
+        prices,
+        activeAmnts,
+        jumpStorage,
+      );
+    };
+}
 
-    const paramNFT = PIdNFT.fromOwner(
-      genNonNegative(PDirac.maxPreviousPools),
-      placeholderCcy,
-      param.owner,
-    ).genData();
-
-    const threadNFT = PIdNFT.fromPrevious(
-      placeholderCcy,
-      paramNFT,
-    ).genData();
-
-    const prices = Prices.generateCurrent(param)();
-    const activeAmnts = Amounts.fresh(param, prices);
-    const jumpStorage = ActiveAssets.fresh();
-
-    return new Dirac(
-      owner,
-      threadNFT,
-      paramNFT,
-      prices,
-      activeAmnts,
-      jumpStorage,
+export class PPreDirac extends PObject<Dirac> {
+  constructor() {
+    const pprices = PPrices.initial();
+    super(
+      new PRecord({
+        "owner": PKeyHash.ptype,
+        "threadNFT": PAsset.ptype,
+        "paramNFT": PAsset.ptype,
+        "prices": pprices,
+        "activeAmnts": PAmounts.ptype,
+        "jumpStorage": new PActiveAssets(pprices),
+      }),
+      Dirac,
     );
-  };
+  }
+
+  static ptype = new PPreDirac();
+  static genPType(): PObject<Dirac> {
+    return PPreDirac.ptype;
+  }
 }
 
 export class PDirac extends PConstraint<PObject<Dirac>> {
-  private constructor(
-    public readonly param?: Param,
-    public readonly contractCurrency = placeholderCcy,
+  constructor(
+    public readonly param: Param,
+    public readonly paramNFT: Asset,
+    public readonly numDiracs: bigint,
   ) {
-    const powner = param ? POwner.pliteral(param.owner) : PKeyHash.ptype;
+    const pparamNFT = PIdNFT.pparamNFT(paramNFT);
+    const pthreadNFT = PIdNFT.pthreadNFT(paramNFT, numDiracs);
     const pprices = param ? PPrices.current(param) : PPrices.initial();
-    const pthreadNFT = param
-      ? PIdNFT.fromOwner(
-        PDirac.maxPreviousPools + 1n,
-        contractCurrency,
-        param.owner,
-      )
-      : PIdNFT.unparsed(contractCurrency);
-    const pparamNFT = param
-      ? PIdNFT.fromOwner(
-        PDirac.maxPreviousPools,
-        contractCurrency,
-        param.owner,
-      )
-      : PIdNFT.unparsed(contractCurrency);
     super(
       new PObject(
         new PRecord({
-          "owner": powner,
+          "owner": POwner.pliteral(param.owner),
           "threadNFT": pthreadNFT,
           "paramNFT": pparamNFT,
           "prices": pprices,
           "activeAmnts": PAmounts.ptype,
-          "jumpStorage": new PActiveAssets(param),
+          "jumpStorage": new PActiveAssets(pprices),
         }),
         Dirac,
       ),
-      param ? [Dirac.assertWith(param)] : [],
-      param ? Dirac.generateFresh(param) : Dirac.generateAny,
+      [], //param ? [Dirac.assertWith(param)] : [],
+      Dirac.generateFresh(param, paramNFT, numDiracs),
     );
   }
 
-  static unparsed(contractCurrency: Currency): PDirac {
-    return new PDirac(undefined, contractCurrency);
-  }
-
-  static fromParam(param: Param, contractCurrency?: Currency): PDirac {
-    return new PDirac(param, contractCurrency);
-  }
-
   static genPType(): PConstraint<PObject<Dirac>> {
-    const param = maybeNdef(Param.generate)?.();
-    return new PDirac(param);
+    const param = Param.generate();
+    const paramNFT = new Asset(
+      placeholderCcy,
+      Token.fromHash(param.owner.hash().hash(genNonNegative())),
+    );
+    return new PDirac(param, paramNFT, genNonNegative());
   }
-
-  static maxPreviousPools = 10n; // TODO get this from user later
 }
 
 export class DiracDatum {
@@ -160,7 +158,7 @@ export class DiracDatum {
 
 export class PDiracDatum extends PObject<DiracDatum> {
   private constructor(
-    public readonly pdirac: PDirac,
+    public readonly pdirac: PDirac | PPreDirac,
   ) {
     super(
       new PRecord({
@@ -170,17 +168,14 @@ export class PDiracDatum extends PObject<DiracDatum> {
     );
   }
 
-  static unparsed(contractCurrency: Currency): PDiracDatum {
-    const pdirac = PDirac.unparsed(contractCurrency);
-    return new PDiracDatum(pdirac);
-  }
+  static pre: PDiracDatum = new PDiracDatum(PPreDirac.ptype);
 
-  static fromParam(
+  static parse(
     param: Param,
-    contractCurrency?: Currency,
+    paramNFT: Asset,
+    numDiracs: bigint,
   ): PDiracDatum {
-    const pdirac = PDirac.fromParam(param, contractCurrency);
-    return new PDiracDatum(pdirac);
+    return new PDiracDatum(new PDirac(param, paramNFT, numDiracs));
   }
 
   static genPType(): PObject<DiracDatum> {

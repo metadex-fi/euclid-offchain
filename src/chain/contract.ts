@@ -13,7 +13,7 @@ import {
   PolicyId,
   Validator,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { Euclid } from "./state.ts";
+import { Euclid } from "./euclid.ts";
 import { Currency } from "../mod.ts";
 
 export class Contract {
@@ -44,7 +44,6 @@ export class Contract {
 
   public update = async (): Promise<void> => {
     const utxos = await this.lucid.utxosAt(this.address);
-    this.state = Euclid.ingest(utxos, this.currency);
-    this.state.digest();
+    this.state = new Euclid(utxos, this.currency);
   };
 }

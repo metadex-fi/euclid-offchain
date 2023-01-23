@@ -1,43 +1,34 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { UTxO } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Tx, UTxO } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
   Amounts,
+  Asset,
   Assets,
   Currency,
   Data,
   Dirac,
+  DiracDatum,
   leq,
   Param,
+  ParamDatum,
   PDiracDatum,
-  Pool,
   PParamDatum,
-  Token,
+  User,
 } from "../mod.ts";
 
-// function getNFT(utxo: UTxO, contractCurrency: CurrencySymbol): TokenName {
-//   let id: TokenName | undefined;
-//   Object.entries(utxo.assets).forEach(([asset, amount]) => {
-//     if (asset.startsWith(contractCurrency) && amount === 1n) {
-//       assert(id === undefined, "multiple NFTs found");
-//       id = asset.slice(contractCurrency.length);
-//     }
-//   });
-//   assert(id !== undefined, "no NFT found");
-//   return id;
-// }
-
 export class ParamUtxo {
-  public readonly param: Param;
-  public readonly id: Token;
   constructor(
-    public readonly utxo: UTxO,
+    public readonly param: Param,
+    public readonly paramNFT: Asset,
+  ) {}
+
+  static parse(
+    utxo: UTxO,
     fields: Data[],
-    contractCurrency: Currency,
-  ) {
-    this.param = PParamDatum.ptype.plift(fields)._0;
+  ): ParamUtxo {
+    const param = PParamDatum.ptype.plift(fields)._0;
     const balance = Amounts.fromLucid(
       utxo.assets,
-      contractCurrency.symbol.length,
     );
     assert(
       balance.size() === 1n,
@@ -47,83 +38,98 @@ export class ParamUtxo {
       balance.firstAmount() === 1n,
       `expected exactly 1 id-NFT in ${balance.concise()}`,
     );
-    const idNFT = balance.firstAsset();
-    assert(
-      idNFT.currency === contractCurrency,
-      `id-NFT ${idNFT.show()} has wrong currency, expected ${contractCurrency}`,
-    );
-    this.id = balance.firstAsset().token;
+    const paramNFT = balance.firstAsset();
+
+    return new ParamUtxo(param, paramNFT);
   }
+
+  public openingTx = (user: User): Tx => {
+    const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(this.param));
+    const paramNFT = new Assets().add(this.paramNFT).toLucidWith(1n);
+
+    return user.lucid.newTx()
+      .mintAssets(paramNFT)
+      .attachMintingPolicy(user.contract.mintingPolicy)
+      .payToContract(
+        user.contract.address,
+        {
+          inline: Data.to(paramDatum),
+          scriptRef: user.contract.validator, // for now, for simplicities' sake
+        },
+        paramNFT,
+      );
+  };
 }
 
-export class DiracUtxo {
-  public dirac: Dirac;
-  public readonly id: Token;
-  public readonly balance: Amounts;
-  public flippable?: Assets;
-  public jumpable?: Assets;
+export class PreDiracUtxo {
+  public readonly dirac: Dirac;
   constructor(
     public readonly utxo: UTxO,
     public readonly fields: Data[],
-    public readonly contractCurrency: Currency,
   ) {
-    const pdiracDatum = PDiracDatum.unparsed(contractCurrency);
-    this.dirac = pdiracDatum.plift(fields)._0;
-    this.id = this.dirac.threadNFT.token;
-    this.balance = Amounts.fromLucid(
-      utxo.assets,
-      contractCurrency.symbol.length,
-    );
-    const nftAmnt = this.balance.pop(this.dirac.threadNFT);
-    assert(nftAmnt === 1n, `wrong threadNFT amount: ${nftAmnt}`);
-    assert(
-      leq(this.dirac.activeAmnts.unsigned(), this.balance.unsigned()),
-      `dirac activeAmnts ${this.dirac.activeAmnts.concise()} > balance ${this.balance.concise()}`,
-    );
-    // TODO consider checking amounts for all locations
+    this.dirac = PDiracDatum.pre.plift(this.fields)._0;
   }
 
-  public parseWith = (param: Param): void => {
-    const pdiracDatum = PDiracDatum.fromParam(param, this.contractCurrency);
-    this.dirac = pdiracDatum.plift(this.fields)._0;
-  };
-
-  public openForFlipping = (assets: Assets): boolean => {
-    const sharedAssets = this.dirac.assets().intersect(assets);
-    if (sharedAssets.empty()) return false;
-    this.flippable = sharedAssets;
-    return true;
-  };
-
-  public openForJumping = (assets: Assets): boolean => {
-    throw new Error("not implemented");
-    // return this.dirac.isJumpable(assets);
+  public parse = (pdiracDatum: PDiracDatum): DiracUtxo | undefined => {
+    try {
+      return DiracUtxo.parse(this, pdiracDatum);
+    } catch (_e) { // TODO log this somewhere
+      return undefined;
+    }
   };
 }
 
-export class UtxoPool {
-  private sharedAssets?: Assets;
-  public flippable?: DiracUtxo[];
-  public jumpable?: DiracUtxo[];
+export class DiracUtxo {
+  // public readonly balance: Amounts; // might want this later again
+  public flippable?: Assets;
+  public jumpable?: Assets;
+
   constructor(
-    public readonly pool: Pool,
-    public readonly paramUtxo: ParamUtxo,
-    public readonly diracUtxos: DiracUtxo[],
+    public readonly dirac: Dirac,
+    public readonly pdiracDatum: PDiracDatum,
   ) {}
 
-  public openForBusiness = (assets: Assets): boolean => {
-    const sharedAssets = this.pool.sharedAssets(assets);
-    if (sharedAssets.empty()) {
-      return false;
-    } else {
-      this.sharedAssets = sharedAssets;
-      this.flippable = this.diracUtxos.filter((diracUtxo) => {
-        diracUtxo.openForFlipping(this.sharedAssets!);
-      });
-      this.jumpable = this.diracUtxos.filter((diracUtxo) => {
-        diracUtxo.openForJumping(this.sharedAssets!);
-      });
-      return true;
-    }
+  static parse(
+    from: PreDiracUtxo,
+    pdiracDatum: PDiracDatum,
+  ): DiracUtxo {
+    const dirac = pdiracDatum.plift(from.fields)._0;
+    const balance = Amounts.fromLucid(
+      from.utxo.assets,
+    );
+    balance.popNFT(dirac.threadNFT);
+    assert(
+      leq(dirac.activeAmnts.unsigned(), balance.unsigned()),
+      `dirac activeAmnts ${dirac.activeAmnts.concise()} > balance ${balance.concise()}`,
+    );
+    // TODO consider checking amounts for all locations
+
+    return new DiracUtxo(dirac, pdiracDatum);
+  }
+
+  public openingTx = (user: User, tx: Tx): Tx => {
+    const funds = this.dirac.activeAmnts.clone(); // not strictly required, as the utxo will be obsolete anyways
+    funds.initAmountOf(this.dirac.threadNFT, 1n);
+    const datum = this.pdiracDatum.pconstant(new DiracDatum(this.dirac));
+    tx = tx.payToContract(
+      user.contract.address,
+      {
+        inline: Data.to(datum),
+      },
+      funds.toLucid(),
+    );
+    return tx;
   };
+
+  // public openForFlipping = (assets: Assets): boolean => {
+  //   const sharedAssets = this.dirac.assets().intersect(assets);
+  //   if (sharedAssets.empty()) return false;
+  //   this.flippable = sharedAssets;
+  //   return true;
+  // };
+
+  // public openForJumping = (assets: Assets): boolean => {
+  //   throw new Error("not implemented");
+  //   // return this.dirac.isJumpable(assets);
+  // };
 }

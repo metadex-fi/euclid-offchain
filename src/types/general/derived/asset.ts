@@ -17,18 +17,23 @@ import {
   PList,
   PMap,
   PString,
+  PType,
   PWrapped,
 } from "../fundamental/mod.ts";
 import {
   Assets as LucidAssets,
   fromHex,
+  fromText,
   toHex,
   toText,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 
 export class Currency {
   constructor(public readonly symbol: Uint8Array) {
-    assert(symbol.length <= Currency.maxLength, `Currency too long: ${symbol}`);
+    assert(
+      symbol.length === 0 || symbol.length === Number(Currency.numBytes),
+      `Currency wrong size: ${symbol}`,
+    );
   }
 
   public toString = (): string => {
@@ -41,18 +46,26 @@ export class Currency {
 
   public valueOf = this.show;
 
+  public toLucid = (): string => {
+    return toHex(this.symbol);
+  };
+
+  static fromLucid(hexCurrencySymbol: string): Currency {
+    return new Currency(fromHex(hexCurrencySymbol));
+  }
+
   static fromHex = (hex: string): Currency => {
     return new Currency(fromHex(hex));
   };
 
-  static maxLength = 32n;
+  static numBytes = 7n;
   static ADA = new Currency(new Uint8Array(0));
 }
 
 export class PCurrency extends PWrapped<Currency> {
   constructor() {
     super(
-      new PByteString(7n, 7n),
+      new PByteString(Currency.numBytes, Currency.numBytes),
       Currency,
     );
   }
@@ -76,9 +89,25 @@ export class Token {
 
   public valueOf = this.show;
 
-  public hash = (skip = 1n): Hash => {
-    return new Hash(fromHex(this.name)).hash(skip);
+  public toHash = (): Hash => {
+    return new Hash(fromHex(this.name));
   };
+
+  public hash = (skip = 1n): Hash => {
+    return this.toHash().hash(skip);
+  };
+
+  public next = (): Token => {
+    return Token.fromHash(this.hash());
+  };
+
+  public toLucid = (): string => {
+    return fromText(this.name);
+  };
+
+  static fromLucid(hexTokenName: string): Token {
+    return new Token(toText(hexTokenName));
+  }
 
   static fromHash = (hash: Hash): Token => {
     return new Token(hash.toString());
@@ -88,7 +117,7 @@ export class Token {
     return new Token(toText(toHex(owner.bytes)));
   };
 
-  static maxLength = 64n;
+  static maxLength = 64n; // TODO revisit
   static lovelace = new Token("");
 }
 
@@ -119,40 +148,20 @@ export class Asset {
   };
 
   public toLucid = (): string => {
-    try {
-      const ccy = toHex(this.currency.symbol);
-      if (ccy === "") {
-        return "lovelace";
-      }
-      const tkn = PToken.ptype.pconstant(this.token);
-      console.log(`
-    ccy: ${ccy}
-    tkn: ${this.token}
-    tkn: ${PToken.ptype.pconstant(this.token)}
-    tkn: ${tkn}`);
-      return `${ccy}${tkn}`;
-    } catch (e) {
-      throw new Error(`${e}\ncould not encode ${this.show()})`);
-    }
+    if (this.currency.symbol.length === 0) return "lovelace";
+    else return `${this.currency.toLucid()}${this.token.toLucid()}`;
   };
 
   public toLucidWith = (amount: bigint): LucidAssets => {
-    return {
-      [this.toLucid()]: amount,
-    };
+    return { [this.toLucid()]: amount };
   };
 
-  static fromLucid(name: string, ccyLength: number): Asset {
-    try {
-      if (name === "lovelace") {
-        return Asset.ADA();
-      }
-      const ccy = name.slice(0, ccyLength);
-      const tkn = PToken.ptype.plift(fromHex(name.slice(ccyLength)));
-      return new Asset(Currency.fromHex(ccy), tkn);
-    } catch (e) {
-      throw new Error(`${e}\ncould not decode ${name} (${ccyLength}))`);
-    }
+  static fromLucid(hexAsset: string): Asset {
+    if (hexAsset === "lovelace") return Asset.ADA();
+    else {return new Asset(
+        Currency.fromLucid(hexAsset.slice(0, Number(Currency.numBytes * 8n))),
+        Token.fromLucid(hexAsset.slice(Number(Currency.numBytes * 8n))),
+      );}
   }
 
   static assertADAlovelace(asset: Asset): void {
@@ -214,7 +223,7 @@ export class PAsset extends PConstraint<PObject<Asset>> {
   }
 }
 
-export const ccysTkns = new AssocMap<PCurrency, PList<PToken>>(PCurrency.ptype);
+export const ccysTkns = new AssocMap<PCurrency, Token[]>(PCurrency.ptype);
 const PNonEmptyTokenList = new PNonEmptyList(PToken.ptype);
 
 export class Assets {
@@ -399,18 +408,6 @@ export class Assets {
     return assets;
   };
 
-  public toLucidWith = (amount: bigint): LucidAssets => {
-    const names: string[] = [];
-    const assets: LucidAssets = {};
-    this.forEach((asset) => {
-      const name = asset.toLucid();
-      assert(!names.includes(name), `duplicate asset name ${name}`);
-      names.push(name);
-      assets[name] = amount;
-    });
-    return assets;
-  };
-
   public forEach = (
     f: (value: Asset, index?: number, array?: Asset[]) => void,
   ) => this.toList().forEach(f);
@@ -438,6 +435,12 @@ export class Assets {
       }
     }
     return new Assets(shared);
+  };
+
+  public toLucidWith = (amount: bigint): LucidAssets => {
+    const assets: LucidAssets = {};
+    this.forEach((asset) => assets[asset.toLucid()] = amount);
+    return assets;
   };
 
   static assert(assets: Assets): void {
