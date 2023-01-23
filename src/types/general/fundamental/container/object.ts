@@ -52,13 +52,15 @@ export class PObject<O extends Object> implements PType<Array<Data>, O> {
     }
   };
 
-  public showData = (data: O, tabs = ""): string => {
+  public showData = (data: O, tabs = "", maxDepth?: bigint): string => {
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
     const tt = tabs + t;
     const ttf = tt + f;
 
     const record = this.precord.showData(
       filterFunctions(data),
       ttf,
+      maxDepth ? maxDepth - 1n : maxDepth,
     );
 
     return `Object: ${this.O.name} (
@@ -66,13 +68,16 @@ ${ttf}${record}
 ${tt})`;
   };
 
-  public showPType = (tabs = ""): string => {
+  public showPType = (tabs = "", maxDepth?: bigint): string => {
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
     const tt = tabs + t;
     const ttf = tt + f;
 
     return `PObject (
 ${ttf}population: ${this.population},
-${ttf}precord: ${this.precord.showPType(ttf)},
+${ttf}precord: ${
+      this.precord.showPType(ttf, maxDepth ? maxDepth - 1n : maxDepth)
+    },
 ${ttf}O: ${this.O.name}
 ${tt})`;
   };

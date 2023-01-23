@@ -68,23 +68,29 @@ export class PSum<Os extends Object> implements PType<Constr<Data>, Os> {
     return randomChoice(this.pconstrs).genData() as Os;
   };
 
-  public showData(data: Os, tabs = ""): string {
+  public showData(data: Os, tabs = "", maxDepth?: bigint): string {
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
     const tt = tabs + t;
     const ttf = tt + f;
 
     const [index, match] = this.matchData(data);
     return `Sum (
 ${ttf}index: ${index}, 
-${ttf}object: ${match.showData(data, ttf)}
+${ttf}object: ${match.showData(data, ttf, maxDepth ? maxDepth - 1n : maxDepth)}
 ${tt})`;
   }
 
-  public showPType(tabs = ""): string {
+  public showPType(tabs = "", maxDepth?: bigint): string {
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
     const tt = tabs + t;
     const ttf = tt + f;
 
     return `PSum (
-${ttf}${this.pconstrs.map((pconstr) => pconstr.showPType(ttf)).join(`,\n`)}
+${ttf}${
+      this.pconstrs.map((pconstr) =>
+        pconstr.showPType(ttf, maxDepth ? maxDepth - 1n : maxDepth)
+      ).join(`,\n`)
+    }
 ${tt})`;
   }
 

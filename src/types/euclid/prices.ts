@@ -3,6 +3,7 @@ import { leq, randomChoice } from "../../mod.ts";
 import {
   Asset,
   Assets,
+  AssocMap,
   Currency,
   generateWithin,
   lSubValues,
@@ -57,13 +58,14 @@ export class Prices {
   public setAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.setAmountOf(asset, amount);
   public clone = (): Prices => new Prices(this.value.clone());
-  public toMap = (): Map<Currency, Map<Token, bigint>> => this.value.toMap();
+  public toMap = (): AssocMap<Currency, AssocMap<Token, bigint>> =>
+    this.value.toMap();
 
   static fromValue = (prices: Value): Prices => {
     return new Prices(new PositiveValue(prices));
   };
   static fromMap = (
-    prices: Map<Currency, Map<Token, bigint>>,
+    prices: AssocMap<Currency, AssocMap<Token, bigint>>,
   ): Prices => {
     return Prices.fromValue(new Value(prices));
   };

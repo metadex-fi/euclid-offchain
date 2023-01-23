@@ -4,6 +4,8 @@ import {
 } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Data, Generators, gMaxDepth, PData } from "../mod.ts";
 
+export const maxShowDepth = 2n;
+
 export function proptestPTypes(gen: Generators, iterations: number) {
   const popErrs = new Map<string, number>();
   const dataErrs = new Map<string, number>();

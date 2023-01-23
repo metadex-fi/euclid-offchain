@@ -79,8 +79,8 @@ export interface PType<D extends Data, L extends unknown> {
   plift(data: D): L;
   pconstant(data: L): D;
   genData(): L;
-  showData(data: L, tabs?: string): string;
-  showPType(tabs?: string): string;
+  showData(data: L, tabs?: string, maxDepth?: bigint): string;
+  showPType(tabs?: string, maxDepth?: bigint): string;
 }
 
 export type PData = PType<Data, unknown>;

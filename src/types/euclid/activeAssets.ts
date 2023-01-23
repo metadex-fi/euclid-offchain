@@ -1,11 +1,22 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { maybeNdef } from "../../mod.ts";
-import { Asset, f, Param, PAsset, PMap, PObject, PRecord, t } from "../mod.ts";
+import {
+  Asset,
+  AssocMap,
+  f,
+  Param,
+  PAsset,
+  PMap,
+  PObject,
+  PRecord,
+  PWrapped,
+  t,
+} from "../mod.ts";
 import { PPrices, Prices } from "./prices.ts";
 
 export class ActiveAssets {
   constructor(
-    private activeAssets: Map<Prices, Asset>,
+    private activeAssets: AssocMap<Prices, Asset>,
   ) {}
 
   public show = (tabs = ""): string => {
@@ -23,13 +34,17 @@ ${tt})`;
   };
 
   public forEach(
-    callbackfn: (value: Asset, key: Prices, map: Map<Prices, Asset>) => void,
+    callbackfn: (
+      value: Asset,
+      key: Prices,
+      map: AssocMap<Prices, Asset>,
+    ) => void,
   ): void {
     this.activeAssets.forEach(callbackfn);
   }
 
   static fresh(): ActiveAssets {
-    return new ActiveAssets(new Map<Prices, Asset>());
+    return new ActiveAssets(new AssocMap<Prices, Asset>());
   }
 
   static assertUsed = (param: Param) => (activeAssets: ActiveAssets): void => {
@@ -45,7 +60,7 @@ ${tt})`;
   // TODO this might lead to some paradoxes, let's see, we might learn something
   static generateUsed = (param: Param) => (): ActiveAssets => {
     const assets = param.initialPrices.assets();
-    const activeAssets = new Map<Prices, Asset>();
+    const activeAssets = new AssocMap<Prices, Asset>();
     const pprices = PPrices.current(param);
     const locations: Prices[] = PMap.genKeys(pprices);
     for (const location of locations) {
@@ -63,22 +78,20 @@ ${tt})`;
   };
 }
 
-export class PActiveAssets extends PObject<ActiveAssets> {
+export class PActiveAssets extends PWrapped<ActiveAssets> {
   constructor(
     public readonly param?: Param,
   ) {
     super(
-      new PRecord({
-        "activeAssets": new PMap(
-          param ? PPrices.current(param) : PPrices.initial(),
-          PAsset.ptype,
-        ), // TODO could constain PAsset more here, but that's nonessential
-      }),
+      new PMap(
+        param ? PPrices.current(param) : PPrices.initial(),
+        PAsset.ptype,
+      ), // TODO could constain PAsset more here, but that's nonessential
       ActiveAssets,
     );
   }
 
-  static genPType(): PObject<ActiveAssets> {
+  static genPType(): PWrapped<ActiveAssets> {
     return new PActiveAssets(
       maybeNdef(Param.generate)?.(),
     );

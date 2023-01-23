@@ -126,7 +126,9 @@ status: ${Object.keys(r).join(`,\n${f}`)}`,
   public showData = (
     data: RecordOfMaybe<PLifted<PFields>>,
     tabs = "",
+    maxDepth?: bigint,
   ): string => {
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
     this.checkFields(data);
     if (data.size === 0) return "Record {}";
     const tt = tabs + t;
@@ -147,7 +149,7 @@ status: ${Object.keys(r).join(`,\n${f}`)}`,
           `PRecord.showData: value undefined for pfield ${pfield.showPType()} at key ${key}`,
         );
         return `${ttf}${key.length === 0 ? "_" : key}: ${
-          pfield.showData(value, ttft)
+          pfield.showData(value, ttft, maxDepth ? maxDepth - 1n : maxDepth)
         }`;
       }
     }).join(",\n");
@@ -156,14 +158,16 @@ ${fields}
 ${tt}}`;
   };
 
-  public showPType = (tabs = ""): string => {
+  public showPType = (tabs = "", maxDepth?: bigint): string => {
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
     const tt = tabs + t;
     const ttf = tt + f;
     const ttff = ttf + f;
 
     const fields = Object.entries(this.pfields).map(([key, pfield]) => {
       return `\n${ttff}${key.length === 0 ? "_" : key}: ${
-        pfield?.showPType(ttff) ?? "undefined"
+        pfield?.showPType(ttff, maxDepth ? maxDepth - 1n : maxDepth) ??
+          "undefined"
       }`;
     });
     return `PRecord (

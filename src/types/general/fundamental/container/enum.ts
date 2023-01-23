@@ -47,7 +47,12 @@ export class PEnum<PT extends PData>
     return randomChoice(this.literals);
   };
 
-  public showData = (data: PLifted<PT>, tabs = ""): string => {
+  public showData = (
+    data: PLifted<PT>,
+    tabs = "",
+    maxDepth?: bigint,
+  ): string => {
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
     const str = this.pliteral.showData(data);
     const index = this.strs.indexOf(str);
     assert(
@@ -61,11 +66,12 @@ export class PEnum<PT extends PData>
     const ttf = tt + f;
 
     return `Enum (
-${ttf}${this.pliteral.showData(data, ttf)}
+${ttf}${this.pliteral.showData(data, ttf, maxDepth ? maxDepth - 1n : maxDepth)}
 ${tt})`;
   };
 
-  public showPType = (tabs = ""): string => {
+  public showPType = (tabs = "", maxDepth?: bigint): string => {
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
     const tt = tabs + t;
     const ttf = tt + f;
     const ttft = ttf + t;
@@ -73,10 +79,14 @@ ${tt})`;
 
     return `PEnum (
 ${ttf}population: ${this.population},
-${ttf}pliteral: ${this.pliteral.showPType(ttf)},
+${ttf}pliteral: ${
+      this.pliteral.showPType(ttf, maxDepth ? maxDepth - 1n : maxDepth)
+    },
 ${ttf}literals: [
 ${ttftf}${
-      this.literals.map((l) => this.pliteral.showData(l, ttftf)).join(
+      this.literals.map((l) =>
+        this.pliteral.showData(l, ttftf, maxDepth ? maxDepth - 1n : maxDepth)
+      ).join(
         `,\n${ttftf}`,
       )
     }

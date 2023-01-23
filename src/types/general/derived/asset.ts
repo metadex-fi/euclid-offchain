@@ -1,6 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
-  genByteString,
+  AssocMap,
   gMaxLength,
   Hash,
   KeyHash,
@@ -16,8 +16,6 @@ import { PByteString, PMap, PString, PWrapped } from "../fundamental/mod.ts";
 import {
   Assets as LucidAssets,
   fromHex,
-  fromText,
-  sha256,
   toHex,
   toText,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
@@ -26,6 +24,16 @@ export class Currency {
   constructor(public readonly symbol: Uint8Array) {
     assert(symbol.length <= Currency.maxLength, `Currency too long: ${symbol}`);
   }
+
+  public toString = (): string => {
+    return toHex(this.symbol);
+  };
+
+  public show = (): string => {
+    return `Currency(${this.toString()})`;
+  };
+
+  public valueOf = this.show;
 
   static fromHex = (hex: string): Currency => {
     return new Currency(fromHex(hex));
@@ -55,6 +63,12 @@ export class Token {
       `Token too long: ${name}, ${name.length}`,
     );
   }
+
+  public show = (): string => {
+    return `Token(${this.name})`;
+  };
+
+  public valueOf = this.show;
 
   public hash = (skip = 1n): Hash => {
     return new Hash(fromHex(this.name)).hash(skip);
@@ -95,7 +109,7 @@ export class Asset {
   }
 
   public show = (): string => {
-    return `Asset(${this.currency.symbol}, ${this.token.name})`;
+    return `Asset(${this.currency.toString()}, ${this.token.name})`;
   };
 
   public toLucid = (): string => {
@@ -198,7 +212,7 @@ const PNonEmptyTokenList = new PNonEmptyList(PToken.ptype);
 
 export class Assets {
   constructor(
-    private assets: Map<Currency, Array<Token>> = new Map(),
+    private assets = new AssocMap<Currency, Array<Token>>(),
   ) {
     for (const [ccy, tkns] of this.assets) {
       assert(tkns.length > 0, `empty token list for ${ccy}`);
@@ -210,16 +224,15 @@ export class Assets {
     const ttff = ttf + f;
     const ccys = [`Assets:`];
     for (const [currency, tokens] of this.assets) {
+      const symbol = currency.toString();
       ccys.push(
-        `${ttf}${toHex(currency.symbol) === "" ? "ADA" : currency.symbol}:`,
+        `${ttf}${symbol === "" ? "ADA" : symbol}:`,
       );
       const tkns = [];
       for (const token of tokens) {
         tkns.push(
           `${ttff}${
-            token.name === ""
-              ? toHex(currency.symbol) === "" ? "lovelace" : "_"
-              : token.name
+            token.name === "" ? symbol === "" ? "lovelace" : "_" : token.name
           }`,
         );
       }
@@ -235,7 +248,7 @@ export class Assets {
       if (tkns_ === undefined) return false;
       if (tkns.length !== tkns_.length) return false;
       for (const tkn of tkns) {
-        if (!tkns_.includes(tkn)) return false;
+        if (!tkns_.map((t) => t.name).includes(tkn.name)) return false;
       }
     }
     return true;
@@ -284,7 +297,7 @@ export class Assets {
 
   public tail = (): Assets => {
     assert(this.assets.size > 0, "empty assets tell no tails");
-    const tail = new Map<Currency, Token[]>();
+    const tail = new AssocMap<Currency, Token[]>();
     let first = true;
     for (const ccy of [...this.assets.keys()].sort()) {
       const tkns = this.assets.get(ccy)!.slice(0).sort();
@@ -408,7 +421,7 @@ export class Assets {
   }
 
   public intersect = (assets: Assets): Assets => {
-    const shared = new Map<Currency, Token[]>();
+    const shared = new AssocMap<Currency, Token[]>();
     const other = assets.toMap();
     for (const [ccy, ownTkns] of this.assets) {
       const otherTkns = other.get(ccy);

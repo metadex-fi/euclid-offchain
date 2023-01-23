@@ -3,6 +3,7 @@ import {
   Generators,
   genNonNegative,
   gMaxLength,
+  maxShowDepth,
   maybeNdef,
 } from "../../../../mod.ts";
 import { Data, f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
@@ -17,10 +18,77 @@ function census(numKeys: number, numValues: number, size: bigint): number {
   return population;
 }
 
+export class AssocMap<K, V> {
+  private readonly inner = new Map<
+    string,
+    [K, V]
+  >();
+
+  private key(k: K): string {
+    if (k instanceof Object) return k.toString();
+    else return `${k}`;
+  }
+
+  public get size(): number {
+    return this.inner.size;
+  }
+
+  public set(k: K, v: V): void {
+    this.inner.set(this.key(k), [k, v]);
+  }
+
+  public get(k: K): V | undefined {
+    return this.inner.get(this.key(k))?.[1];
+  }
+
+  public has(k: K): boolean {
+    return this.inner.has(this.key(k));
+  }
+
+  public delete(k: K): boolean {
+    return this.inner.delete(this.key(k));
+  }
+
+  public clear(): void {
+    this.inner.clear();
+  }
+
+  public *keys(): Generator<K> {
+    for (const [_, entry] of this.inner) {
+      yield entry[0];
+    }
+  }
+
+  public *values(): Generator<V> {
+    for (const [_, entry] of this.inner) {
+      yield entry[1];
+    }
+  }
+
+  public *entries(): Generator<[K, V]> {
+    for (const [_, entry] of this.inner) {
+      yield entry;
+    }
+  }
+
+  public *[Symbol.iterator](): Generator<[K, V]> {
+    yield* this.entries();
+  }
+
+  public forEach(
+    callbackfn: (value: V, key: K, map: AssocMap<K, V>) => void,
+    thisArg?: any,
+  ): void {
+    for (const [k, v] of this) {
+      callbackfn.call(thisArg, v, k, this);
+    }
+  }
+}
+
 export class PMap<PKey extends PData, PValue extends PData> implements
   PType<
     Map<PConstanted<PKey>, PConstanted<PValue>>,
-    Map<PLifted<PKey>, PLifted<PValue>>
+    AssocMap<PLifted<PKey>, PLifted<PValue>>
   > {
   public readonly population: number;
 
@@ -55,21 +123,21 @@ export class PMap<PKey extends PData, PValue extends PData> implements
 
   public plift = (
     m: Map<PConstanted<PKey>, PConstanted<PValue>>,
-  ): Map<PLifted<PKey>, PLifted<PValue>> => {
+  ): AssocMap<PLifted<PKey>, PLifted<PValue>> => {
     assert(m instanceof Map, `plift: expected Map`);
     assert(
       !this.size || this.size === BigInt(m.size),
       `plift: wrong size`,
     );
 
-    const data = new Map<PLifted<PKey>, PLifted<PValue>>();
+    const data = new AssocMap<PLifted<PKey>, PLifted<PValue>>();
     let i = 0;
     m.forEach((value, key) => {
       const k = this.pkey.plift(key) as PLifted<PKey>;
       assert(
         !this.dataKeys || Data.to(this.dataKeys[i++]) === Data.to(key),
         `PMap.pconstant: wrong key of ptype
-        ${this.pkey.showPType()}
+        ${this.pkey.showPType("", maxShowDepth)}
         : ${key.toString()}`,
       );
       data.set(k, this.pvalue.plift(value) as PLifted<PValue>);
@@ -78,12 +146,14 @@ export class PMap<PKey extends PData, PValue extends PData> implements
   };
 
   public pconstant = (
-    data: Map<PLifted<PKey>, PLifted<PValue>>,
+    data: AssocMap<PLifted<PKey>, PLifted<PValue>>,
   ): Map<PConstanted<PKey>, PConstanted<PValue>> => {
-    assert(data instanceof Map, `pconstant: expected Map`);
+    assert(data instanceof AssocMap, `AssocMap.pconstant: expected AssocMap`);
     assert(
       !this.size || this.size === BigInt(data.size),
-      `pconstant: wrong size: ${this.size} vs. ${data.size}`,
+      `AssocMap.pconstant: wrong size: ${this.size} vs. ${data.size} of ${
+        this.showData(data, "", maxShowDepth)
+      }`,
     );
 
     const m = new Map<PConstanted<PKey>, PConstanted<PValue>>();
@@ -163,12 +233,12 @@ ${t}pkey: ${pkey.showPType(t)}`,
     pkey: PKey,
     pvalue: PValue,
     size: bigint,
-  ): Map<PLifted<PKey>, PLifted<PValue>> {
+  ): AssocMap<PLifted<PKey>, PLifted<PValue>> {
     assert(
       Number(size) <= pkey.population,
       `PMap: not enough keys for size ${Number(size)} in ${pkey.showPType()}`,
     );
-    const m = new Map<PLifted<PKey>, PLifted<PValue>>();
+    const m = new AssocMap<PLifted<PKey>, PLifted<PValue>>();
     const keys = PMap.genKeys(pkey, size);
     // console.log(`generating Map with keys: ${JSON.stringify(keys)}`);
     keys.forEach((key) => {
@@ -177,10 +247,10 @@ ${t}pkey: ${pkey.showPType(t)}`,
     return m;
   }
 
-  public genData = (): Map<PLifted<PKey>, PLifted<PValue>> => {
+  public genData = (): AssocMap<PLifted<PKey>, PLifted<PValue>> => {
     if (this.keys) {
       // console.log(`populating Map with keys: ${JSON.stringify(this.keys)}`);
-      const m = new Map<PLifted<PKey>, PLifted<PValue>>();
+      const m = new AssocMap<PLifted<PKey>, PLifted<PValue>>();
       this.keys.forEach((key) => {
         m.set(key, this.pvalue.genData() as PLifted<PValue>);
       });
@@ -196,25 +266,33 @@ ${t}pkey: ${pkey.showPType(t)}`,
   };
 
   public showData = (
-    data: Map<PLifted<PKey>, PLifted<PValue>>,
+    data: AssocMap<PLifted<PKey>, PLifted<PValue>>,
     tabs = "",
+    maxDepth?: bigint,
   ): string => {
-    assert(data instanceof Map, `PMap.showData: expected Map, got ${data}`);
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
+    assert(
+      data instanceof AssocMap,
+      `PMap.showData: expected AssocMap, got ${data}`,
+    );
     const tt = tabs + t;
     const ttf = tt + f;
 
     return `Map {
 ${
       [...data.entries()].map(([key, value]) =>
-        `${ttf}${this.pkey.showData(key, ttf)} => ${
-          this.pvalue.showData(value, ttf)
+        `${ttf}${
+          this.pkey.showData(key, ttf, maxDepth ? maxDepth - 1n : maxDepth)
+        } => ${
+          this.pvalue.showData(value, ttf, maxDepth ? maxDepth - 1n : maxDepth)
         }`
       ).join(",\n")
     }
 ${tt}}`;
   };
 
-  public showPType = (tabs = ""): string => {
+  public showPType = (tabs = "", maxDepth?: bigint): string => {
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
     const tt = tabs + t;
     const ttf = tt + f;
     const ttft = ttf + t;
@@ -225,8 +303,10 @@ ${tt}}`;
 
     return `PMap (
 ${ttf}population: ${this.population},
-${ttf}pkey: ${this.pkey.showPType(ttf)},
-${ttf}pvalue: ${this.pvalue.showPType(ttf)},
+${ttf}pkey: ${this.pkey.showPType(ttf, maxDepth ? maxDepth - 1n : maxDepth)},
+${ttf}pvalue: ${
+      this.pvalue.showPType(ttf, maxDepth ? maxDepth - 1n : maxDepth)
+    },
 ${ttf}size?: ${this.size},
 ${ttf}keys?: ${keys}
 ${tt})`;

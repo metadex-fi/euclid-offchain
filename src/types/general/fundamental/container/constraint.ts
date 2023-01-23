@@ -44,16 +44,22 @@ export class PConstraint<PInner extends PData>
     return this.genInnerData();
   };
 
-  public showData = (data: PLifted<PInner>, tabs = ""): string => {
+  public showData = (
+    data: PLifted<PInner>,
+    tabs = "",
+    maxDepth?: bigint,
+  ): string => {
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
     const tt = tabs + t;
     const ttf = tt + f;
 
     return `Constraint (
-${ttf}${this.pinner.showData(data, ttf)}
+${ttf}${this.pinner.showData(data, ttf, maxDepth ? maxDepth - 1n : maxDepth)}
 ${tt})`;
   };
 
-  public showPType = (tabs = ""): string => {
+  public showPType = (tabs = "", maxDepth?: bigint): string => {
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
     const tt = tabs + t;
     const ttf = tt + f;
 
@@ -67,7 +73,9 @@ ${tt})`;
       this.details ? `\n${ttf}details: ${this.details}` : ""
     }
 ${ttf}population: ${this.population},
-${ttf}pinner: ${this.pinner.showPType(ttf)},
+${ttf}pinner: ${
+      this.pinner.showPType(ttf, maxDepth ? maxDepth - 1n : maxDepth)
+    },
 ${tt})`;
     // ${ttf}asserts: \${asserts},
     // ${ttf}genInnerData: \${this.genInnerData.toString()}

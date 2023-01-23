@@ -61,7 +61,12 @@ export class PList<PElem extends PData>
     return PList.genList(this.pelem.genData, length) as PLifted<PElem>[];
   };
 
-  public showData = (data: PLifted<PElem>[], tabs = ""): string => {
+  public showData = (
+    data: PLifted<PElem>[],
+    tabs = "",
+    maxDepth?: bigint,
+  ): string => {
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
     assert(
       data instanceof Array,
       `PList.showData: expected Array, got ${data}`,
@@ -70,17 +75,24 @@ export class PList<PElem extends PData>
     const ttf = tt + f;
 
     return `List [
-${data.map((d) => `${ttf}${this.pelem.showData(d, ttf)}`).join(",\n")}
+${
+      data.map((d) =>
+        `${ttf}${
+          this.pelem.showData(d, ttf, maxDepth ? maxDepth - 1n : maxDepth)
+        }`
+      ).join(",\n")
+    }
 ${tt}]`;
   };
 
-  public showPType = (tabs = ""): string => {
+  public showPType = (tabs = "", maxDepth?: bigint): string => {
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
     const tt = tabs + t;
     const ttf = tt + f;
 
     return `PList (
 ${ttf}population: ${this.population},
-${ttf}pelem: ${this.pelem.showPType(ttf)},
+${ttf}pelem: ${this.pelem.showPType(ttf, maxDepth ? maxDepth - 1n : maxDepth)},
 ${ttf}length?: ${this.length}
 ${tt})`;
   };

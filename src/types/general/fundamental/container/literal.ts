@@ -35,7 +35,12 @@ export class PLiteral<PT extends PData>
     return this.literal;
   };
 
-  public showData = (data: PLifted<PT>, tabs = ""): string => {
+  public showData = (
+    data: PLifted<PT>,
+    tabs = "",
+    maxDepth?: bigint,
+  ): string => {
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
     assert(
       this.pliteral.showData(data) === this.str,
       `Literal.showData: Literal does not match, got:\n${
@@ -46,18 +51,27 @@ export class PLiteral<PT extends PData>
     const ttf = tt + f;
 
     return `Literal (
-${ttf}${this.pliteral.showData(data, ttf)}
+${ttf}${this.pliteral.showData(data, ttf, maxDepth ? maxDepth - 1n : maxDepth)}
 ${tt})`;
   };
 
-  public showPType = (tabs = ""): string => {
+  public showPType = (tabs = "", maxDepth?: bigint): string => {
+    if (maxDepth !== undefined && maxDepth <= 0n) return "…";
     const tt = tabs + t;
     const ttf = tt + f;
 
     return `PLiteral (
 ${ttf}population: ${this.population},
-${ttf}pliteral: ${this.pliteral.showPType(ttf)},
-${ttf}literal: ${this.pliteral.showData(this.literal, ttf)}
+${ttf}pliteral: ${
+      this.pliteral.showPType(ttf, maxDepth ? maxDepth - 1n : maxDepth)
+    },
+${ttf}literal: ${
+      this.pliteral.showData(
+        this.literal,
+        ttf,
+        maxDepth ? maxDepth - 1n : maxDepth,
+      )
+    }
 ${tt})`;
   };
 
