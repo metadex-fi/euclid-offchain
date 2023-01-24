@@ -287,7 +287,7 @@ export class Assets {
     return assets;
   };
 
-  public remove = (asset: Asset): void => {
+  public drop = (asset: Asset): Assets => {
     const { currency, token } = asset;
     const tkns = this.assets.get(currency);
     assert(tkns !== undefined, `${asset.show()} not in ${this.show()}`);
@@ -297,6 +297,7 @@ export class Assets {
     if (tkns.length === 0) {
       this.assets.delete(currency);
     }
+    return this;
   };
 
   public head = (): Asset => {
@@ -370,9 +371,9 @@ export class Assets {
     return assets;
   };
 
-  public empty = (): boolean => {
+  public get empty(): boolean {
     return this.assets.size === 0;
-  };
+  }
 
   public size = (): number => {
     let size = 0;

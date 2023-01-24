@@ -54,22 +54,22 @@ export class PrePool {
 }
 
 export class Pool {
-  private sharedAssets?: Assets;
-  public flippable?: DiracUtxo[];
-  public jumpable?: DiracUtxo[];
+  // private sharedAssets?: Assets;
+  // public flippable?: DiracUtxo[];
+  // public jumpable?: DiracUtxo[];
   constructor(
     public readonly paramUtxo: ParamUtxo,
     public readonly diracUtxos: DiracUtxo[],
   ) {}
 
-  public openingTx = (user: User): Lucid.Tx => {
+  public openingTx = (tx: Lucid.Tx, user: User): Lucid.Tx => {
     console.log(`opening pool`);
-    let tx = this.paramUtxo.openingTx(user);
-    // this.diracUtxos.forEach((diracUtxo) => tx = diracUtxo.openingTx(user, tx));
-    return tx;
+    let tx_ = this.paramUtxo.openingTx(tx, user);
+    this.diracUtxos.forEach((diracUtxo) => tx_ = diracUtxo.openingTx(user, tx_));
+    return tx_;
   };
 
-  static generate = (user: User): Pool => {
+  static generateForUser = (user: User): Pool => {
     const [param, deposit] = Param.generateForUser(user);
     try {
       PParam.ptype.pconstant(param);
@@ -167,19 +167,24 @@ export class Pool {
     return pool;
   };
 
-  public openForBusiness = (assets: Assets): boolean => {
-    const sharedAssets = this.paramUtxo.sharedAssets(assets);
-    if (sharedAssets.empty()) {
-      return false;
-    } else {
-      this.sharedAssets = sharedAssets;
-      this.flippable = this.diracUtxos.filter((diracUtxo) => {
-        diracUtxo.openForFlipping(this.sharedAssets!);
-      });
-      this.jumpable = this.diracUtxos.filter((diracUtxo) => {
-        diracUtxo.openForJumping(this.sharedAssets!);
-      });
-      return this.flippable.length > 0 || this.jumpable.length > 0;
-    }
+  public sharedAssets = (assets: Assets): Assets => {
+    return this.paramUtxo.sharedAssets(assets);
   };
+
+  // public openForBusiness = (assets: Assets): boolean => {
+  //   if (this.flippable || this.jumpable) return true;
+  //   const sharedAssets = this.paramUtxo.sharedAssets(assets);
+  //   if (sharedAssets.empty()) {
+  //     return false;
+  //   } else {
+  //     this.sharedAssets = sharedAssets;
+  //     this.flippable = this.diracUtxos.filter((diracUtxo) => {
+  //       diracUtxo.openForFlipping(this.sharedAssets!);
+  //     });
+  //     this.jumpable = this.diracUtxos.filter((diracUtxo) => {
+  //       diracUtxo.openForJumping(this.sharedAssets!);
+  //     });
+  //     return this.flippable.length > 0 || this.jumpable.length > 0;
+  //   }
+  // };
 }

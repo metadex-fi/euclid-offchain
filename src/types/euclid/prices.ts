@@ -57,7 +57,9 @@ export class Prices {
   public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
   public setAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.setAmountOf(asset, amount);
-  public clone = (): Prices => new Prices(this.value.clone());
+  public get clone(): Prices {
+    return new Prices(this.value.clone);
+  }
   public toMap = () => this.value.toMap();
 
   static fromValue = (prices: Value): Prices => {

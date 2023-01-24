@@ -1,5 +1,12 @@
 import { Lucid } from "../lucid.mod.ts";
-import { Action, genName, genUsers, randomChoice, User } from "../src/mod.ts";
+import {
+  Actionable,
+  genName,
+  genUsers,
+  randomChoice,
+  randomSubset,
+  User,
+} from "../src/mod.ts";
 
 Deno.test("lucid-example", async () => {
   const l = 32n; // empirical maximum = 32n
@@ -62,25 +69,32 @@ Deno.test("lucid-example", async () => {
 });
 
 Deno.test("emulator", async () => {
-  const users = await genUsers();
+  const allUsers = await genUsers();
   const accounts = users.map((u) => u.account());
   console.log(`accounts: ${accounts}`);
   const emulator = new Lucid.Emulator(accounts);
   const iterations = 10;
   const timeout = 10;
   let timeout_ = timeout;
-  const trace = [];
+  const traces: string[][] = [];
   const lucid = await Lucid.Lucid.new(emulator);
   while (trace.length < iterations) {
-    console.log(`\ni: ${trace.length}`);
-    const user = await User.from(lucid, randomChoice(users).privateKey);
-    const action = new Action(user);
-    const options = await action.txOptions();
-    if (options.length) {
-      console.log(`contract: ${user.contract.concise()}`);
-      timeout_ = timeout;
-      const txHash = await action.genEuclidTx(options);
-      trace.push(txHash);
-    } else if (timeout_-- < 0) throw new Error("timeout");
+    console.log(`\ni: ${traces.length}`);
+    const trace = [];
+    const users = await Promise.all(
+      randomSubset(allUsers).map(async (user) => {
+        const lucid = await Lucid.Lucid.new(emulator);
+        return User.from(lucid, user.privateKey);
+      }),
+    );
+    const actions = users.map((user) => new Action(user));
+    for (const action of actions) {
+      const options = await action.txOptions();
+      if (options.length) {
+        timeout_ = timeout;
+        const txHash = await action.genEuclidTx(options);
+        trace.push(txHash);
+      } else if (timeout_-- < 0) throw new Error("timeout");
+    }
   }
 });

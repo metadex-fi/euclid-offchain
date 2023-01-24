@@ -34,7 +34,9 @@ export class Amounts {
     this.value.increaseAmountOf(asset, amount);
   public addAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.addAmountOf(asset, amount);
-  public clone = (): Amounts => new Amounts(this.value.clone());
+  public get clone(): Amounts {
+    return new Amounts(this.value.clone);
+  }
   public initAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.initAmountOf(asset, amount);
 

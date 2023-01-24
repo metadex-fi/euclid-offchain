@@ -282,7 +282,9 @@ export class Value {
     return tokens ? tokens.has(asset.token) : false;
   };
 
-  public clone = (): Value => new Value(this.toMap());
+  public get clone(): Value {
+    return new Value(this.toMap());
+  }
 
   public drop = (asset: Asset): void => {
     const tokens = this.value.get(asset.currency);

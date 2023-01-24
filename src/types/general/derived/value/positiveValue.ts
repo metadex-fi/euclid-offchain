@@ -40,7 +40,9 @@ export class PositiveValue {
   public biggestAmount = (): bigint => this.value.biggestAmount();
   public setAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.setAmountOf(asset, amount);
-  public clone = (): PositiveValue => new PositiveValue(this.value.clone());
+  public get clone(): PositiveValue {
+    return new PositiveValue(this.value.clone);
+  }
   public has = (asset: Asset): boolean => this.value.has(asset);
   public scaledWith = (factor: bigint): PositiveValue =>
     new PositiveValue(this.value.scaledWith(factor));

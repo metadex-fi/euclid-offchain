@@ -46,6 +46,8 @@ ${tt})`;
   };
 
   public assets = (): Assets => this.prices.assets();
+  public sharedAssets = (assets: Assets): Assets =>
+    this.assets().intersect(assets);
 
   // TODO consider fees here
   // static assertWith = (param: Param) => (dirac: Dirac): void => {

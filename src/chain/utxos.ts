@@ -43,28 +43,28 @@ export class ParamUtxo {
     return new ParamUtxo(param, paramNFT, utxo);
   }
 
-  public sharedAssets = (assets: Assets): Assets =>
-    this.param.sharedAssets(assets);
-
-  public openingTx = (user: User): Lucid.Tx => {
+  public openingTx = (tx: Lucid.Tx, user: User): Lucid.Tx => {
     console.log(`paramUTxo: ${this.show()}`);
     const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(this.param));
     const paramNFT = this.paramNFT.toLucidNFT();
 
     console.log(this.paramNFT.show());
 
-    return user.lucid.newTx()
+    return tx
       .attachMintingPolicy(user.contract.mintingPolicy)
-      .mintAssets(paramNFT, Lucid.Data.void());
-    // .payToContract(
-    //   user.contract.address,
-    //   {
-    //     inline: Data.to(paramDatum),
-    //     scriptRef: user.contract.validator, // for now, for simplicities' sake
-    //   },
-    //   paramNFT,
-    // );
+      .mintAssets(paramNFT, Lucid.Data.void())
+      .payToContract(
+        user.contract.address,
+        {
+          inline: Data.to(paramDatum),
+          scriptRef: user.contract.validator, // for now, for simplicities' sake
+        },
+        paramNFT,
+      );
   };
+
+  public sharedAssets = (assets: Assets): Assets =>
+    this.param.sharedAssets(assets);
 
   public show = (tabs = ""): string => {
     const tt = tabs + t;
@@ -138,17 +138,9 @@ export class DiracUtxo {
     return tx;
   };
 
-  public openForFlipping = (assets: Assets): boolean => {
-    const sharedAssets = this.dirac.assets().intersect(assets);
-    if (sharedAssets.empty()) return false;
-    this.flippable = sharedAssets;
-    return true;
-  };
-
-  public openForJumping = (assets: Assets): boolean => {
-    throw new Error("not implemented");
-    // return this.dirac.isJumpable(assets);
-  };
+  public assets = (): Assets => this.dirac.assets();
+  public sharedAssets = (assets: Assets): Assets =>
+    this.dirac.sharedAssets(assets);
 
   public show = (tabs = ""): string => {
     const tt = tabs + t;

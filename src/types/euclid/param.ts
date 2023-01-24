@@ -75,10 +75,8 @@ ${tt})`;
   };
 
   public assets = (): Assets => this.initialPrices.assets();
-
-  public sharedAssets = (assets: Assets): Assets => {
-    return this.assets().intersect(assets);
-  };
+  public sharedAssets = (assets: Assets): Assets =>
+    this.assets().intersect(assets);
 
   public filledLowerBounds = (): PositiveValue => {
     return this.lowerPriceBounds.fill(this.initialPrices.assets(), 1n);
