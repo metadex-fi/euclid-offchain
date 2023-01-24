@@ -5,6 +5,7 @@ import {
   Assets,
   AssocMap,
   Currency,
+  IdNFT,
   mulValues_,
   Param,
   PInteger,
@@ -32,7 +33,7 @@ export class Amounts {
   public firstAsset = (): Asset => this.value.firstAsset();
   public firstAmount = (): bigint => this.value.firstAmount();
   public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
-  public popNFT = (nft: Asset) => this.value.popNFT(nft);
+  public popIdNFT = (nft: IdNFT) => this.value.popIdNFT(nft);
   public smallestAmount = (): bigint => this.value.smallestAmount();
   public addAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.addAmountOf(asset, amount);
@@ -57,12 +58,20 @@ export class Amounts {
   };
 
   static fromLucid(assets: LucidAssets): Amounts {
-    const value = new Value();
-    Object.entries(assets).forEach(([name, amount]) => {
-      const asset = Asset.fromLucid(name);
-      value.initAmountOf(asset, amount);
-    });
-    return new Amounts(new PositiveValue(value));
+    try {
+      const value = new Value();
+      Object.entries(assets).forEach(([name, amount]) => {
+        const asset = Asset.fromLucid(name);
+        value.initAmountOf(asset, amount);
+      });
+      return new Amounts(new PositiveValue(value));
+    } catch (e) {
+      throw new Error(
+        `Amounts.fromLucid ${
+          Object.entries(assets).map(([ass, amnt]) => `${ass}: ${amnt}\n`)
+        }:${e}`,
+      );
+    }
   }
 
   static fresh(param: Param, prices: Prices): Amounts {

@@ -19,13 +19,14 @@ import {
 } from "../mod.ts";
 import { ActiveAssets, PActiveAssets } from "./activeAssets.ts";
 import { KeyHash, PKeyHash, POwner } from "./hash.ts";
+import { IdNFT } from "./idnft.ts";
 import { PIdNFT } from "./mod.ts";
 
 export class Dirac {
   constructor(
     public owner: KeyHash,
-    public threadNFT: Asset,
-    public paramNFT: Asset,
+    public threadNFT: IdNFT,
+    public paramNFT: IdNFT,
     public prices: Prices,
     public activeAmnts: Amounts,
     public jumpStorage: ActiveAssets,
@@ -66,7 +67,7 @@ ${tt})`;
   // };
 
   static generateFresh =
-    (param: Param, paramNFT: Asset, numDiracs: bigint) => (): Dirac => {
+    (param: Param, paramNFT: IdNFT, numDiracs: bigint) => (): Dirac => {
       const threadNFT = PIdNFT.pthreadNFT(
         paramNFT,
         numDiracs,
@@ -111,7 +112,7 @@ export class PPreDirac extends PObject<Dirac> {
 export class PDirac extends PConstraint<PObject<Dirac>> {
   constructor(
     public readonly param: Param,
-    public readonly paramNFT: Asset,
+    public readonly paramNFT: IdNFT,
     public readonly numDiracs: bigint,
   ) {
     assert(numDiracs > 0n, "PDirac.numDiracs must be positive");
@@ -137,9 +138,9 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
 
   static genPType(): PConstraint<PObject<Dirac>> {
     const param = Param.generate();
-    const paramNFT = new Asset(
+    const paramNFT = new IdNFT(
       Currency.dummy,
-      Token.fromHash(param.owner.hash().hash(genNonNegative())),
+      param.owner.hash().hash(genNonNegative()),
     );
     return new PDirac(param, paramNFT, genPositive());
   }
@@ -167,7 +168,7 @@ export class PDiracDatum extends PObject<DiracDatum> {
 
   static parse(
     param: Param,
-    paramNFT: Asset,
+    paramNFT: IdNFT,
     numDiracs: bigint,
   ): PDiracDatum {
     return new PDiracDatum(new PDirac(param, paramNFT, numDiracs));

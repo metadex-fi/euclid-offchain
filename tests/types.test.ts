@@ -9,6 +9,7 @@ import {
   // PDirac,
   // PDiracDatum,
   PEnum,
+  PHash,
   PIdNFT,
   PInteger,
   PJumpSizes,
@@ -95,6 +96,7 @@ const derivedContainerGenerators = [
 
 const euclidPrimitiveGenerators = [
   PKeyHash.genPType,
+  PHash.genPType,
   POwner.genPType,
   PIdNFT.genPType,
   PJumpSizes.genPType,

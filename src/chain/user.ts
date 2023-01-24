@@ -18,6 +18,7 @@ import {
   DiracDatum,
   f,
   genPositive,
+  IdNFT,
   KeyHash,
   min,
   PKeyHash,
@@ -36,7 +37,7 @@ export class User {
   public balance?: Amounts;
   public pools?: Pool[]; // own creation recall
   // public utxoPools?: UtxoPool[]; // from onchain
-  public lastIdNFT: Asset;
+  private lastIdNFT?: IdNFT;
 
   public pendingConsequences?: consequences;
 
@@ -61,11 +62,16 @@ export class User {
       assert(paymentKeyHash, `neither address nor paymentKeyHash provided`);
       this.paymentKeyHash = paymentKeyHash;
     }
-    this.lastIdNFT = new Asset(
-      this.contract.currency,
-      Token.fromOwner(this.paymentKeyHash),
-    );
   }
+
+  public nextParamNFT = (): IdNFT => {
+    if (this.lastIdNFT) return this.lastIdNFT.next();
+    else return new IdNFT(this.contract.currency, this.paymentKeyHash.hash());
+  };
+
+  public setLastIdNFT = (idNFT: IdNFT): void => {
+    this.lastIdNFT = idNFT;
+  };
 
   public numPools = (): bigint => {
     assert(this.pools, "no pools");

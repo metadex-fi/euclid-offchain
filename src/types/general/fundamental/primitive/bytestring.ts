@@ -2,7 +2,7 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   genByteString,
   genNonNegative,
-  gMaxStringLength,
+  gMaxStringBytes,
   maybeNdef,
 } from "../../../../utils/generators.ts";
 import { PType } from "../type.ts";
@@ -12,7 +12,7 @@ export class PByteString implements PType<Uint8Array, Uint8Array> {
 
   constructor(
     public readonly minBytes = 0n,
-    public readonly maxBytes = gMaxStringLength / 8n,
+    public readonly maxBytes = gMaxStringBytes,
   ) {
     assert(
       minBytes >= 0n,
@@ -60,10 +60,10 @@ export class PByteString implements PType<Uint8Array, Uint8Array> {
   static ptype = new PByteString();
 
   static genPType(): PByteString {
-    const minBytes = maybeNdef(genNonNegative)?.(gMaxStringLength / 8n);
+    const minBytes = maybeNdef(genNonNegative)?.(gMaxStringBytes);
     const maxBytes = maybeNdef(() =>
       (minBytes ??
-        0n) + genNonNegative((gMaxStringLength / 8n) - (minBytes ?? 0n))
+        0n) + genNonNegative((gMaxStringBytes) - (minBytes ?? 0n))
     )?.();
     return new PByteString(minBytes, maxBytes);
   }

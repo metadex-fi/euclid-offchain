@@ -4,6 +4,7 @@ import {
   gMaxLength,
   Hash,
   KeyHash,
+  maxInteger,
   minSizedSubset,
   nonEmptySubSet,
   randomChoice,
@@ -58,7 +59,7 @@ export class Currency {
     return new Currency(fromHex(hex));
   };
 
-  static numBytes = 7n;
+  static numBytes = 28n;
   static ADA = new Currency(new Uint8Array(0));
   static dummy = new Currency(fromHex("cc"));
 }
@@ -90,24 +91,16 @@ export class Token {
 
   public valueOf = this.show;
 
-  public toHash = (): Hash => {
-    return new Hash(fromHex(this.name));
-  };
-
-  public hash = (skip = 1n): Hash => {
-    return this.toHash().hash(skip);
-  };
-
-  public next = (): Token => {
-    return Token.fromHash(this.hash());
-  };
-
   public toLucid = (): string => {
     return fromText(this.name);
   };
 
   static fromLucid(hexTokenName: string): Token {
-    return new Token(toText(hexTokenName));
+    try {
+      return new Token(toText(hexTokenName));
+    } catch (e) {
+      throw new Error(`Token.fromLucid ${hexTokenName}:\n${e}`);
+    }
   }
 
   static fromHash = (hash: Hash): Token => {
@@ -115,10 +108,10 @@ export class Token {
   };
 
   static fromOwner = (owner: KeyHash) => {
-    return new Token(toText(toHex(owner.bytes)));
+    return new Token(toText(toHex(owner.keyHash)));
   };
 
-  static maxLength = 64n; // TODO revisit
+  static maxLength = 32n; // empirical maximum (at least with lucid)
   static lovelace = new Token("");
 }
 
@@ -158,11 +151,15 @@ export class Asset {
   };
 
   static fromLucid(hexAsset: string): Asset {
-    if (hexAsset === "lovelace") return Asset.ADA();
-    else {return new Asset(
-        Currency.fromLucid(hexAsset.slice(0, Number(Currency.numBytes * 8n))),
-        Token.fromLucid(hexAsset.slice(Number(Currency.numBytes * 8n))),
-      );}
+    try {
+      if (hexAsset === "lovelace") return Asset.ADA();
+      else {return new Asset(
+          Currency.fromLucid(hexAsset.slice(0, Number(Currency.numBytes * 2n))),
+          Token.fromLucid(hexAsset.slice(Number(Currency.numBytes * 2n))),
+        );}
+    } catch (e) {
+      throw new Error(`Asset.fromLucid ${hexAsset}:\n${e}`);
+    }
   }
 
   static assertADAlovelace(asset: Asset): void {

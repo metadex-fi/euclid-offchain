@@ -5,7 +5,7 @@ import {
   AssocMap,
   Currency,
   Data,
-  PAsset,
+  PIdNFT,
   PKeyHash,
   PString,
 } from "../mod.ts";
@@ -18,13 +18,13 @@ export class Euclid {
   // private invalidDiracs = new AssocMap<PErrorMessage, PreDiracUtxo[]>(PString.ptype);
   private invalidUtxos = new AssocMap<PErrorMessage, UTxO[]>(PString.ptype);
   // public emptyPoolParams!: AssocMap<PKeyHash, AssocMap<PToken, ParamUtxo>>;
-  public pools: AssocMap<PKeyHash, AssocMap<PAsset, Pool>>;
+  public pools: AssocMap<PKeyHash, AssocMap<PIdNFT, Pool>>;
 
   constructor(
     utxos: UTxO[],
     contractCurrency: Currency,
   ) {
-    const prePools = new AssocMap<PAsset, PrePool>(PAsset.ptype);
+    const prePools = new AssocMap<PIdNFT, PrePool>(PIdNFT.pdummy);
     utxos.forEach((utxo) => {
       try {
         // TODO assert scriptref, and all the other fields if it makes sense
@@ -65,11 +65,11 @@ export class Euclid {
     const pools = prePools.map((prePool: PrePool) =>
       prePool.parse(contractCurrency)
     );
-    this.pools = new AssocMap<PKeyHash, AssocMap<PAsset, Pool>>(PKeyHash.ptype);
+    this.pools = new AssocMap<PKeyHash, AssocMap<PIdNFT, Pool>>(PKeyHash.ptype);
     for (const [paramNFT, pool] of pools) {
       const owner = pool.paramUtxo.param.owner;
       const inner = this.pools.get(owner) ??
-        new AssocMap<PAsset, Pool>(PAsset.ptype);
+        new AssocMap<PIdNFT, Pool>(PIdNFT.pdummy);
       inner.set(paramNFT, pool);
       this.pools.set(owner, inner);
     }

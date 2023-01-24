@@ -8,6 +8,7 @@ import {
   Data,
   Dirac,
   DiracDatum,
+  IdNFT,
   leq,
   Param,
   ParamDatum,
@@ -19,7 +20,7 @@ import {
 export class ParamUtxo {
   constructor(
     public readonly param: Param,
-    public readonly paramNFT: Asset,
+    public readonly paramNFT: IdNFT,
     public readonly utxo?: UTxO,
   ) {}
 
@@ -35,11 +36,7 @@ export class ParamUtxo {
       balance.size() === 1n,
       `expected exactly id-NFT in ${balance.concise()}`,
     );
-    assert(
-      balance.firstAmount() === 1n,
-      `expected exactly 1 id-NFT in ${balance.concise()}`,
-    );
-    const paramNFT = balance.firstAsset();
+    const paramNFT = IdNFT.from(balance.firstAsset());
 
     return new ParamUtxo(param, paramNFT, utxo);
   }
@@ -49,7 +46,7 @@ export class ParamUtxo {
 
   public openingTx = (user: User): Tx => {
     const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(this.param));
-    const paramNFT = new Assets().add(this.paramNFT).toLucidWith(1n);
+    const paramNFT = new Assets().add(this.paramNFT.asset()).toLucidWith(1n);
 
     return user.lucid.newTx()
       .mintAssets(paramNFT)
@@ -102,7 +99,7 @@ export class DiracUtxo {
     const balance = Amounts.fromLucid(
       from.utxo.assets,
     );
-    balance.popNFT(dirac.threadNFT);
+    balance.popIdNFT(dirac.threadNFT);
     assert(
       leq(dirac.activeAmnts.unsigned(), balance.unsigned()),
       `dirac activeAmnts ${dirac.activeAmnts.concise()} > balance ${balance.concise()}`,
@@ -114,7 +111,7 @@ export class DiracUtxo {
 
   public openingTx = (user: User, tx: Tx): Tx => {
     const funds = this.dirac.activeAmnts.clone(); // not strictly required, as the utxo will be obsolete anyways
-    funds.initAmountOf(this.dirac.threadNFT, 1n);
+    funds.initAmountOf(this.dirac.threadNFT.asset(), 1n);
     const datum = this.pdiracDatum.pconstant(new DiracDatum(this.dirac));
     tx = tx.payToContract(
       user.contract.address,

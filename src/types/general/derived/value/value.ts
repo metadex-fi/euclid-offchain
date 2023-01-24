@@ -1,6 +1,12 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { fromHex, toHex } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { AssocMap, genPositive, max, maxInteger } from "../../../../mod.ts";
+import {
+  AssocMap,
+  genPositive,
+  IdNFT,
+  max,
+  maxInteger,
+} from "../../../../mod.ts";
 import {
   f,
   PConstraint,
@@ -168,11 +174,11 @@ export class Value {
     return tail_;
   };
 
-  public popNFT = (nft: Asset): void => {
+  public popIdNFT = (nft: IdNFT): void => {
     const tknsAmnts = this.value.get(nft.currency);
     assert(tknsAmnts, `no tokens for currency ${nft.currency}`);
     assert(tknsAmnts.size === 1, `more than one tokenNames for ${nft.show()}`); // this is only because of our specific use case
-    const amnt = tknsAmnts.get(nft.token);
+    const amnt = tknsAmnts.get(Token.fromHash(nft.token));
     assert(amnt, `no amount for token ${nft.token}`);
     assert(amnt === 1n, `amount ${amnt} != 1 for ${nft.show()}`);
     this.value.delete(nft.currency);

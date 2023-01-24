@@ -1,13 +1,21 @@
 // import {
 //   Emulator,
+//   fromHex,
 //   fromText,
 //   generatePrivateKey,
 //   getAddressDetails,
 //   Lucid,
+//   toHex,
 //   toUnit,
 //   TxHash,
 // } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-// import { genUsers, randomChoice, User } from "../src/mod.ts";
+// import {
+//   genName,
+//   genUsers,
+//   maxInteger,
+//   randomChoice,
+//   User,
+// } from "../src/mod.ts";
 
 // Deno.test("lucid-example", async () => {
 //   const privateKey = generatePrivateKey();
@@ -38,11 +46,17 @@
 //   });
 
 //   const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
+//   console.log(fromHex(policyId));
+//   console.log(policyId);
+//   const l = 32n; // empirical maximum
+//   const token = genName(l, l);
+//   console.log(token);
+//   console.log(fromText(token));
 
 //   async function mint(): Promise<TxHash> {
 //     const tx = await lucid.newTx()
 //       .mintAssets({
-//         [toUnit(policyId, fromText("Wow"))]: 123n,
+//         [toUnit(policyId, fromText(token))]: 123n,
 //       })
 //       .validTo(emulator.now() + 30000)
 //       .attachMintingPolicy(mintingPolicy)

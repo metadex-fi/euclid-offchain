@@ -111,7 +111,7 @@ export class Pool {
     // );
 
     // generator function for a single dirac based on its' prices
-    const paramNFT = PIdNFT.next(user.lastIdNFT);
+    const paramNFT = user.nextParamNFT();
     function generateDirac(prices: Prices): Dirac {
       return new Dirac(
         param.owner,
@@ -124,7 +124,7 @@ export class Pool {
     }
 
     // generate the lowest prices dirac
-    let threadNFT = PIdNFT.next(paramNFT);
+    let threadNFT = paramNFT.next();
     let diracs = [
       generateDirac(Prices.fromValue(lowestPrices)),
     ];
@@ -144,7 +144,7 @@ export class Pool {
             asset,
             prices.amountOf(asset) + i * tickSize,
           );
-          threadNFT = PIdNFT.next(paramNFT);
+          threadNFT = threadNFT.next();
           diracs_.push(
             generateDirac(prices),
           );
@@ -161,7 +161,7 @@ export class Pool {
     const diracUtxos = diracs.map((dirac) => new DiracUtxo(dirac, pdiracDatum));
     const pool = new Pool(paramUtxo, diracUtxos);
     user.pendingConsequences = (u: User) => {
-      u.lastIdNFT = threadNFT;
+      u.setLastIdNFT(threadNFT);
       u.addPool(pool);
     };
     return pool;

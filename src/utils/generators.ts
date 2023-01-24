@@ -6,13 +6,15 @@ import {
   fromHex,
   Lucid,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { Amounts, Assets, PData } from "../mod.ts";
+import { Amounts, Assets, PData, User } from "../mod.ts";
 
 export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
-export const gMaxStringLength = 64n; // TODO higher
+export const gMaxStringLength = maxInteger;
+export const gMaxStringBytes = gMaxStringLength / 2n;
 export const gMaxLength = 3n;
 export const gMaxDepth = 4n;
-export const letters = `abcdefghijklmnopqrstuvwxyz`;
+const letters = `abcdefghijklmnopqrstuvwxyz`;
+const symbols = "!@#$%^&*()_-+={[}]|\\;:'\",<.>/?`~";
 const dropChance = 0.5;
 
 export class Generators {
@@ -100,7 +102,7 @@ export function maybeNdef<T>(value: T) {
 }
 
 export function genNonNegative(maxValue = maxInteger): bigint {
-  assert(maxValue >= 0n, `genNonNegative: maxValue < 1`);
+  assert(maxValue >= 0n, `genNonNegative: maxValue < 0: ${maxValue}`);
   return randomChoice([
     0n,
     BigInt(Math.floor(Math.random() * Number(maxValue))),
@@ -109,7 +111,7 @@ export function genNonNegative(maxValue = maxInteger): bigint {
 }
 
 export function genPositive(maxValue = maxInteger): bigint {
-  assert(maxValue >= 1n, `genPositive: maxValue < 1`);
+  assert(maxValue >= 1n, `genPositive: maxValue < 1: ${maxValue}`);
   return 1n + genNonNegative(maxValue - 1n);
 }
 
@@ -146,36 +148,36 @@ function genString(
 
 export function genByteString(
   minBytes = 0n,
-  maxBytes = gMaxStringLength / 8n,
+  maxBytes = gMaxStringBytes,
 ): Uint8Array {
-  return fromHex(genString("abcdef", minBytes, maxBytes, 8n));
+  return fromHex(genString("abcdef", minBytes, maxBytes, 2n));
 }
 
 export function genName(minLength = 0n, maxLength = gMaxStringLength): string {
   const lower = letters;
   const upper = lower.toUpperCase();
-  const alph = lower + upper; // TODO special characters
+  const alph = lower + upper + symbols;
   return genString(alph, minLength, maxLength, 1n);
 }
 
-// export async function genUsers(): Promise<User[]> {
-//   const users = new Array<User>();
-//   const allAssets = Assets.generate(2n);
-//   const lucid = await Lucid.new(undefined, "Custom");
+export async function genUsers(): Promise<User[]> {
+  const users = new Array<User>();
+  const allAssets = Assets.generate(2n);
+  const lucid = await Lucid.new(undefined, "Custom");
 
-//   const numUsers = 10n; //genPositive(gMaxLength);
-//   let canOpenPool = 10n; //genPositive(numUsers);
-//   const addresses = new Array<Address>();
-//   while (users.length < numUsers) {
-//     const user = await User.generateWith(lucid);
-//     assert(user.address, `user.address is undefined`);
-//     if (!addresses.includes(user.address)) {
-//       addresses.push(user.address);
-//       user.balance = Amounts.genOfAssets(
-//         allAssets.minSizedSubset(canOpenPool-- > 0 ? 2n : 0n),
-//       );
-//       users.push(user);
-//     }
-//   }
-//   return users;
-// }
+  const numUsers = 10n; //genPositive(gMaxLength);
+  let canOpenPool = 10n; //genPositive(numUsers);
+  const addresses = new Array<Address>();
+  while (users.length < numUsers) {
+    const user = await User.generateWith(lucid);
+    assert(user.address, `user.address is undefined`);
+    if (!addresses.includes(user.address)) {
+      addresses.push(user.address);
+      user.balance = Amounts.genOfAssets(
+        allAssets.minSizedSubset(canOpenPool-- > 0 ? 2n : 0n),
+      );
+      users.push(user);
+    }
+  }
+  return users;
+}

@@ -4,14 +4,37 @@ import {
   genPositive,
   PKeyHash,
   randomChoice,
-  Token,
 } from "../../mod.ts";
-import { Asset, f, Hash, PAsset, PConstraint } from "../mod.ts";
-import { Currency } from "../general/derived/asset.ts";
+import { f, Hash, PConstraint, PHash, PObject, PRecord } from "../mod.ts";
+import { Asset, Currency, PCurrency, Token } from "../general/derived/asset.ts";
 
-export class PIdNFT extends PConstraint<PAsset> {
+export class IdNFT {
+  constructor(
+    public readonly currency: Currency,
+    public readonly token: Hash,
+  ) {}
+
+  public show = (): string => {
+    return `IdNFT (${this.currency.show()}, ${this.token.show()})`;
+  };
+
+  public next = (): IdNFT => {
+    return new IdNFT(this.currency, this.token.hash());
+  };
+
+  public asset = (): Asset => {
+    return new Asset(this.currency, Token.fromHash(this.token));
+  };
+
+  static from(asset: Asset): IdNFT {
+    return new IdNFT(asset.currency, Hash.from(asset.token.name));
+  }
+}
+
+// this is supposed to hace the same onchain-representation as PAsset
+export class PIdNFT extends PConstraint<PObject<IdNFT>> {
   private constructor(
-    public readonly paramNFT: Asset,
+    public readonly paramNFT: IdNFT,
     public readonly numDiracs?: bigint,
   ) {
     assert(
@@ -19,7 +42,13 @@ export class PIdNFT extends PConstraint<PAsset> {
       "PIdNFT.numDiracs must be undefined (paramNFT) or positive (diracNFT)",
     );
     super(
-      PAsset.ptype,
+      new PObject(
+        new PRecord({
+          currency: PCurrency.ptype,
+          token: PHash.ptype,
+        }),
+        IdNFT,
+      ),
       [
         numDiracs
           ? PIdNFT.assertThreadNFT(paramNFT, numDiracs)
@@ -32,7 +61,7 @@ export class PIdNFT extends PConstraint<PAsset> {
     this.population = Number(numDiracs ?? 1n);
   }
 
-  public showData = (data: Asset): string => {
+  public showData = (data: IdNFT): string => {
     return `IdNFT ${data.show()}`;
   };
 
@@ -41,7 +70,7 @@ export class PIdNFT extends PConstraint<PAsset> {
   };
 
   static pparamNFT(
-    paramNFT: Asset,
+    paramNFT: IdNFT,
   ): PIdNFT {
     return new PIdNFT(
       paramNFT,
@@ -49,7 +78,7 @@ export class PIdNFT extends PConstraint<PAsset> {
   }
 
   static pthreadNFT(
-    paramNFT: Asset,
+    paramNFT: IdNFT,
     numDiracs: bigint,
   ): PIdNFT {
     assert(numDiracs > 0n, "pthreadNFT.numDiracs must be positive");
@@ -59,26 +88,21 @@ export class PIdNFT extends PConstraint<PAsset> {
     );
   }
 
-  static next(idNFT: Asset): Asset {
-    return new Asset(idNFT.currency, idNFT.token.next());
-  }
-
-  private static assertAsset = (
-    contractCurrency: Currency,
-    firstHash: Hash,
+  private static assertIdNFT = (
+    paramNFT: IdNFT,
     maxHashes: bigint,
   ) =>
-  (asset: Asset): void => {
+  (nft: IdNFT): void => {
     assert(
-      asset.currency.show() === contractCurrency.show(),
-      `currency of ${asset.show()} does not fit ${contractCurrency.show()}`,
+      nft.currency.show() === paramNFT.currency.show(),
+      `currency of ${nft.show()} does not fit ${paramNFT.currency.show()}`,
     );
 
-    let hash = firstHash;
+    let hash = paramNFT.token;
     let hashString = hash.toString();
     const log = [hashString];
     for (let i = 0n; i <= maxHashes; i++) {
-      if (asset.token.name === hashString) {
+      if (nft.token.toString() === hashString) {
         return;
       }
       hash = hash.hash();
@@ -87,39 +111,41 @@ export class PIdNFT extends PConstraint<PAsset> {
     }
     throw new Error(
       `ID-Asset verification failure for
-      ${asset.show()}
+      ${nft.show()}
       within ${maxHashes} hashes:\n${f}${log.join(`\n${f}`)}`,
     );
   };
 
   static assertParamNFT = (
-    paramNFT: Asset,
-  ) => this.assertAsset(paramNFT.currency, paramNFT.token.toHash(), 0n);
+    paramNFT: IdNFT,
+  ) => this.assertIdNFT(paramNFT, 0n);
 
   static assertThreadNFT = (
-    paramNFT: Asset,
+    paramNFT: IdNFT,
     numDiracs: bigint,
-  ) => this.assertAsset(paramNFT.currency, paramNFT.token.hash(), numDiracs);
+  ) => this.assertIdNFT(paramNFT, numDiracs);
 
   private static generateThreadNFT = (
-    paramNFT: Asset,
+    paramNFT: IdNFT,
     maxHashes: bigint,
   ) =>
-  (): Asset => {
-    return new Asset(
+  (): IdNFT => {
+    return new IdNFT(
       paramNFT.currency,
-      Token.fromHash(paramNFT.token.hash(genPositive(maxHashes))),
+      paramNFT.token.hash(genPositive(maxHashes)),
     );
   };
 
-  static genPType = (): PConstraint<PAsset> => {
-    const paramNFT = new Asset(
+  static genPType = (): PConstraint<PObject<IdNFT>> => {
+    const paramNFT = new IdNFT(
       Currency.dummy,
-      Token.fromHash(PKeyHash.ptype.genData().hash().hash(genNonNegative())),
+      PKeyHash.ptype.genData().hash().hash(genNonNegative()),
     );
     return randomChoice([
       () => PIdNFT.pparamNFT(paramNFT),
       () => PIdNFT.pthreadNFT(paramNFT, genPositive()),
     ])();
   };
+
+  static pdummy = PIdNFT.pparamNFT(new IdNFT(Currency.dummy, Hash.dummy));
 }
