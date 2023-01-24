@@ -3,17 +3,10 @@ import {
   Address,
   Assets as LucidAssets,
   Data,
-  Emulator,
-  fromHex,
-  fromText,
   generatePrivateKey,
-  getAddressDetails,
   Lucid,
-  toHex,
   Tx,
-  TxComplete,
   TxHash,
-  TxSigned,
   Utils,
   utxoToCore,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
@@ -24,16 +17,15 @@ import {
   Dirac,
   DiracDatum,
   f,
-  genName,
   genPositive,
   KeyHash,
   min,
   PKeyHash,
   randomChoice,
+  Token,
 } from "../mod.ts";
 import { Contract } from "./contract.ts";
 import { Pool } from "./pool.ts";
-import { UtxoPool } from "./utxos.ts";
 
 type consequences = (u: User) => void;
 
@@ -69,14 +61,11 @@ export class User {
       assert(paymentKeyHash, `neither address nor paymentKeyHash provided`);
       this.paymentKeyHash = paymentKeyHash;
     }
-    // this.lastThreadNFT = new ParamNFT(
-    //   this.contract.currency,
-    //   this.paymentKeyHash,
-    // );
+    this.lastIdNFT = new Asset(
+      this.contract.currency,
+      Token.fromOwner(this.paymentKeyHash),
+    );
   }
-
-  public nextParamNFT = (): Asset => {
-  };
 
   public numPools = (): bigint => {
     assert(this.pools, "no pools");
@@ -135,11 +124,6 @@ export class User {
     this.pools.push(pool);
   };
 
-  public showPools = (): string => {
-    if (!this.pools) return "No pools";
-    return `Pools:\n${this.pools.map((p) => `${f}${p.show(f)}`).join(",\n")}`;
-  };
-
   public update = async (): Promise<void> => {
     const utxos = await this.lucid.utxosAt(this.address!);
     const assets: LucidAssets = {};
@@ -156,7 +140,7 @@ export class User {
   };
 
   public genOpenTx = (): Tx => {
-    return Pool.generateForUser(this)().openingTx(this);
+    return Pool.generate(this).openingTx(this);
   };
 
   // public genCloseTx = (pool: Pool): Tx => {
@@ -174,8 +158,8 @@ export class User {
   //   ])(pool);
   // };
 
-  public genFlipTx = (utxoPool: UtxoPool): Tx => {
-    const diracUtxo = randomChoice(utxoPool.flippable!);
+  public genFlipTx = (pool: Pool): Tx => {
+    const diracUtxo = randomChoice(pool.flippable!);
     const dirac = diracUtxo.dirac;
 
     const boughtAsset = dirac.activeAmnts.assets().randomChoice();
@@ -196,6 +180,7 @@ export class User {
     newAmounts.addAmountOf(boughtAsset, boughtAmount);
     newAmounts.addAmountOf(soldAsset, -soldAmount);
 
+    assert(diracUtxo.balance, `diracUtxo.balance is undefined`);
     const newBalance = diracUtxo.balance.clone();
     newBalance.addAmountOf(boughtAsset, boughtAmount);
     newBalance.addAmountOf(soldAsset, -soldAmount);
@@ -211,14 +196,16 @@ export class User {
       ),
     );
 
+    assert(pool.paramUtxo.utxo, `pool.paramUtxo.utxo is undefined`);
     const tx = this.lucid.newTx()
-      .readFrom([utxoPool.paramUtxo.utxo]) // for the script
+      .readFrom([pool.paramUtxo.utxo]) // for the script
       .payToContract(
         this.contract.address,
         { inline: Data.to(diracDatum) },
         newBalance.toLucid(),
       );
 
+    assert(diracUtxo.utxo, `diracUtxo.utxo is undefined`);
     tx.txBuilder.add_input( // TODO see if this works
       utxoToCore(diracUtxo.utxo),
       undefined, // TODO see if that's required
@@ -227,11 +214,11 @@ export class User {
     return tx;
   };
 
-  public genJumpTx = (utxoPool: UtxoPool): Tx => {
+  public genJumpTx = (pool: Pool): Tx => {
     throw new Error("Not implemented");
   };
 
-  public genUserTx = (openUtxoPools: UtxoPool[]) => (): Tx => {
+  public genUserTx = (openUtxoPools: Pool[]) => (): Tx => {
     const utxoPool = randomChoice(openUtxoPools);
     return randomChoice([
       ...utxoPool.flippable!.length ? [this.genFlipTx] : [],
@@ -246,7 +233,7 @@ export class User {
       this.balance!.assets(),
     );
     return [
-      // ...this.isOwner() ? [this.genOwnerTx] : [],
+      // ...this.isOwner() ? [this.genOwnerTx] : [], // TODO get pools from contract.state
       // ...openUtxoPools.length ? [this.genUserTx(openUtxoPools)] : [],
       ...this.balance!.size() >= 2n ? [this.genOpenTx] : [],
     ];

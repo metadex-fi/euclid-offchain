@@ -75,13 +75,8 @@ export class Euclid {
     }
   }
 
-  // public openForBusiness = (assets: Assets): Pool[] => {
-  //   assert(
-  //     this.ownerUtxoPools,
-  //     "digest() must be called before openForBusiness()",
-  //   );
-  //   return [...this.ownerUtxoPools.values()].flat().filter((utxoPool) =>
-  //     utxoPool.openForBusiness(assets)
-  //   );
-  // };
+  public openForBusiness = (assets: Assets): Pool[] => {
+    return [...this.pools.values()].map((pools) => [...pools.values()]).flat()
+      .filter((pool) => pool.openForBusiness(assets));
+  };
 }

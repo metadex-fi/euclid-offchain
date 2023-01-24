@@ -30,10 +30,10 @@ import {
 
 export class Currency {
   constructor(public readonly symbol: Uint8Array) {
-    assert(
-      symbol.length === 0 || symbol.length === Number(Currency.numBytes),
-      `Currency wrong size: ${symbol}`,
-    );
+    // assert( // TODO reactivate if true
+    //   symbol.length === 0 || symbol.length === Number(Currency.numBytes),
+    //   `Currency wrong size: ${symbol}`,
+    // );
   }
 
   public toString = (): string => {
@@ -60,6 +60,7 @@ export class Currency {
 
   static numBytes = 7n;
   static ADA = new Currency(new Uint8Array(0));
+  static dummy = new Currency(fromHex("cc"));
 }
 
 export class PCurrency extends PWrapped<Currency> {

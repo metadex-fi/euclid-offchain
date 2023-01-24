@@ -1,10 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { maybeNdef, User } from "../../mod.ts";
-import {
-  Generators,
-  genNonNegative,
-  gMaxLength,
-} from "../../utils/generators.ts";
+import { genNonNegative, genPositive } from "../../utils/generators.ts";
 import {
   Amounts,
   Asset,
@@ -15,7 +10,6 @@ import {
   Param,
   PAsset,
   PConstraint,
-  placeholderCcy,
   PObject,
   PPrices,
   PRecord,
@@ -24,8 +18,8 @@ import {
   Token,
 } from "../mod.ts";
 import { ActiveAssets, PActiveAssets } from "./activeAssets.ts";
-import { Hash, KeyHash, PKeyHash, POwner } from "./hash.ts";
-import { gMaxHashesPerPool, PIdNFT } from "./mod.ts";
+import { KeyHash, PKeyHash, POwner } from "./hash.ts";
+import { PIdNFT } from "./mod.ts";
 
 export class Dirac {
   constructor(
@@ -120,6 +114,7 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
     public readonly paramNFT: Asset,
     public readonly numDiracs: bigint,
   ) {
+    assert(numDiracs > 0n, "PDirac.numDiracs must be positive");
     const pparamNFT = PIdNFT.pparamNFT(paramNFT);
     const pthreadNFT = PIdNFT.pthreadNFT(paramNFT, numDiracs);
     const pprices = param ? PPrices.current(param) : PPrices.initial();
@@ -143,10 +138,10 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
   static genPType(): PConstraint<PObject<Dirac>> {
     const param = Param.generate();
     const paramNFT = new Asset(
-      placeholderCcy,
+      Currency.dummy,
       Token.fromHash(param.owner.hash().hash(genNonNegative())),
     );
-    return new PDirac(param, paramNFT, genNonNegative());
+    return new PDirac(param, paramNFT, genPositive());
   }
 }
 

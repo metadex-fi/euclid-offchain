@@ -4,6 +4,7 @@ import {
   ActiveAssets,
   addValues,
   Amounts,
+  Assets,
   Currency,
   Dirac,
   divValues,
@@ -54,7 +55,7 @@ export class PrePool {
 }
 
 export class Pool {
-  //   private sharedAssets?: Assets;
+  private sharedAssets?: Assets;
   public flippable?: DiracUtxo[];
   public jumpable?: DiracUtxo[];
   constructor(
@@ -110,7 +111,7 @@ export class Pool {
     // );
 
     // generator function for a single dirac based on its' prices
-    const paramNFT = user.nextParamNFT();
+    const paramNFT = PIdNFT.next(user.lastIdNFT);
     function generateDirac(prices: Prices): Dirac {
       return new Dirac(
         param.owner,
@@ -166,19 +167,19 @@ export class Pool {
     return pool;
   };
 
-  // public openForBusiness = (assets: Assets): boolean => {
-  //   const sharedAssets = this.pool.sharedAssets(assets);
-  //   if (sharedAssets.empty()) {
-  //     return false;
-  //   } else {
-  //     this.sharedAssets = sharedAssets;
-  //     this.flippable = this.diracUtxos.filter((diracUtxo) => {
-  //       diracUtxo.openForFlipping(this.sharedAssets!);
-  //     });
-  //     this.jumpable = this.diracUtxos.filter((diracUtxo) => {
-  //       diracUtxo.openForJumping(this.sharedAssets!);
-  //     });
-  //     return true;
-  //   }
-  // };
+  public openForBusiness = (assets: Assets): boolean => {
+    const sharedAssets = this.paramUtxo.sharedAssets(assets);
+    if (sharedAssets.empty()) {
+      return false;
+    } else {
+      this.sharedAssets = sharedAssets;
+      this.flippable = this.diracUtxos.filter((diracUtxo) => {
+        diracUtxo.openForFlipping(this.sharedAssets!);
+      });
+      this.jumpable = this.diracUtxos.filter((diracUtxo) => {
+        diracUtxo.openForJumping(this.sharedAssets!);
+      });
+      return this.flippable.length > 0 || this.jumpable.length > 0;
+    }
+  };
 }

@@ -1,31 +1,23 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { fromText, toHex } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import {
   genNonNegative,
   genPositive,
-  gMaxLength,
   PKeyHash,
   randomChoice,
   Token,
 } from "../../mod.ts";
-import {
-  Asset,
-  Currency,
-  f,
-  Hash,
-  KeyHash,
-  PAsset,
-  PConstraint,
-} from "../mod.ts";
-
-export const gMaxHashesPerPool = 128n;
-export const placeholderCcy = Currency.fromHex("cc");
+import { Asset, f, Hash, PAsset, PConstraint } from "../mod.ts";
+import { Currency } from "../general/derived/asset.ts";
 
 export class PIdNFT extends PConstraint<PAsset> {
   private constructor(
     public readonly paramNFT: Asset,
     public readonly numDiracs?: bigint,
   ) {
+    assert(
+      numDiracs === undefined || numDiracs > 0n,
+      "PIdNFT.numDiracs must be undefined (paramNFT) or positive (diracNFT)",
+    );
     super(
       PAsset.ptype,
       [
@@ -37,7 +29,7 @@ export class PIdNFT extends PConstraint<PAsset> {
         ? PIdNFT.generateThreadNFT(paramNFT, numDiracs)
         : () => paramNFT,
     );
-    this.population = Number(gMaxHashesPerPool + 1n);
+    this.population = Number(numDiracs ?? 1n);
   }
 
   public showData = (data: Asset): string => {
@@ -60,6 +52,7 @@ export class PIdNFT extends PConstraint<PAsset> {
     paramNFT: Asset,
     numDiracs: bigint,
   ): PIdNFT {
+    assert(numDiracs > 0n, "pthreadNFT.numDiracs must be positive");
     return new PIdNFT(
       paramNFT,
       numDiracs,
@@ -121,12 +114,12 @@ export class PIdNFT extends PConstraint<PAsset> {
 
   static genPType = (): PConstraint<PAsset> => {
     const paramNFT = new Asset(
-      placeholderCcy,
+      Currency.dummy,
       Token.fromHash(PKeyHash.ptype.genData().hash().hash(genNonNegative())),
     );
     return randomChoice([
       () => PIdNFT.pparamNFT(paramNFT),
-      () => PIdNFT.pthreadNFT(paramNFT, genNonNegative()),
+      () => PIdNFT.pthreadNFT(paramNFT, genPositive()),
     ])();
   };
 }

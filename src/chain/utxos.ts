@@ -20,6 +20,7 @@ export class ParamUtxo {
   constructor(
     public readonly param: Param,
     public readonly paramNFT: Asset,
+    public readonly utxo?: UTxO,
   ) {}
 
   static parse(
@@ -40,8 +41,11 @@ export class ParamUtxo {
     );
     const paramNFT = balance.firstAsset();
 
-    return new ParamUtxo(param, paramNFT);
+    return new ParamUtxo(param, paramNFT, utxo);
   }
+
+  public sharedAssets = (assets: Assets): Assets =>
+    this.param.sharedAssets(assets);
 
   public openingTx = (user: User): Tx => {
     const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(this.param));
@@ -80,13 +84,14 @@ export class PreDiracUtxo {
 }
 
 export class DiracUtxo {
-  // public readonly balance: Amounts; // might want this later again
   public flippable?: Assets;
   public jumpable?: Assets;
 
   constructor(
     public readonly dirac: Dirac,
     public readonly pdiracDatum: PDiracDatum,
+    public readonly balance?: Amounts,
+    public readonly utxo?: UTxO,
   ) {}
 
   static parse(
@@ -104,7 +109,7 @@ export class DiracUtxo {
     );
     // TODO consider checking amounts for all locations
 
-    return new DiracUtxo(dirac, pdiracDatum);
+    return new DiracUtxo(dirac, pdiracDatum, balance, from.utxo);
   }
 
   public openingTx = (user: User, tx: Tx): Tx => {
@@ -121,15 +126,15 @@ export class DiracUtxo {
     return tx;
   };
 
-  // public openForFlipping = (assets: Assets): boolean => {
-  //   const sharedAssets = this.dirac.assets().intersect(assets);
-  //   if (sharedAssets.empty()) return false;
-  //   this.flippable = sharedAssets;
-  //   return true;
-  // };
+  public openForFlipping = (assets: Assets): boolean => {
+    const sharedAssets = this.dirac.assets().intersect(assets);
+    if (sharedAssets.empty()) return false;
+    this.flippable = sharedAssets;
+    return true;
+  };
 
-  // public openForJumping = (assets: Assets): boolean => {
-  //   throw new Error("not implemented");
-  //   // return this.dirac.isJumpable(assets);
-  // };
+  public openForJumping = (assets: Assets): boolean => {
+    throw new Error("not implemented");
+    // return this.dirac.isJumpable(assets);
+  };
 }

@@ -36,7 +36,7 @@ export class JumpSizes {
     );
   }
 
-  static fromMap(m: AssocMap<PCurrency, PMap<PToken, PInteger>>): JumpSizes {
+  static fromMap(m: AssocMap<PCurrency, AssocMap<PToken, bigint>>): JumpSizes {
     return new JumpSizes(new PositiveValue(new Value(m)));
   }
 }

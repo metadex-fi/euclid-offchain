@@ -73,7 +73,7 @@ export class PositiveValue {
   };
 
   static maybeFromMap = (
-    m?: AssocMap<PCurrency, PMap<PToken, PInteger>>,
+    m?: AssocMap<PCurrency, AssocMap<PToken, bigint>>,
   ): PositiveValue | undefined => {
     if (m === undefined) return undefined;
     else return new PositiveValue(new Value(m));
