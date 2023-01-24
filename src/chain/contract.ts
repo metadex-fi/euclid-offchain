@@ -1,7 +1,7 @@
 import euclidValidator from "../../contract/euclidValidator.json" assert {
   type: "json",
 };
-import euclidMinting from "../../contract/euclidMinting.json" assert {
+import euclidMinting from "../../contract/mintAlways.json" assert { // TODO rename to euclidMinting
   type: "json",
 };
 import { Euclid } from "./euclid.ts";

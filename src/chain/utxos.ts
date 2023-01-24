@@ -55,15 +55,15 @@ export class ParamUtxo {
 
     return user.lucid.newTx()
       .attachMintingPolicy(user.contract.mintingPolicy)
-      .mintAssets(paramNFT)
-      .payToContract(
-        user.contract.address,
-        {
-          inline: Data.to(paramDatum),
-          scriptRef: user.contract.validator, // for now, for simplicities' sake
-        },
-        paramNFT,
-      );
+      .mintAssets(paramNFT, Lucid.Data.void());
+    // .payToContract(
+    //   user.contract.address,
+    //   {
+    //     inline: Data.to(paramDatum),
+    //     scriptRef: user.contract.validator, // for now, for simplicities' sake
+    //   },
+    //   paramNFT,
+    // );
   };
 
   public show = (tabs = ""): string => {
