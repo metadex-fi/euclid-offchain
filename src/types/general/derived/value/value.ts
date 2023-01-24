@@ -1,30 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { fromHex, toHex } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import {
-  AssocMap,
-  genPositive,
-  IdNFT,
-  max,
-  maxInteger,
-} from "../../../../mod.ts";
-import {
-  f,
-  PConstraint,
-  PInteger,
-  PList,
-  PMap,
-  PWrapped,
-  t,
-} from "../../mod.ts";
-import {
-  Asset,
-  Assets,
-  ccysTkns,
-  Currency,
-  PCurrency,
-  PToken,
-  Token,
-} from "../asset.ts";
+import { AssocMap, IdNFT, max, maxInteger } from "../../../../mod.ts";
+import { f, PConstraint, PMap, PWrapped, t } from "../../mod.ts";
+import { Asset, Assets, ccysTkns, PCurrency, PToken } from "../asset.ts";
 import { bothExtreme, PBounded } from "../bounded.ts";
 
 export const ccysTknsAmnts = new AssocMap<PCurrency, AssocMap<PToken, bigint>>(

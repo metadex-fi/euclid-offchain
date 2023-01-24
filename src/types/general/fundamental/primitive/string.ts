@@ -1,10 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  fromHex,
-  fromText,
-  toHex,
-  toText,
-} from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Lucid } from "../../../../../lucid.mod.ts";
 import {
   genName,
   genNonNegative,
@@ -36,7 +31,7 @@ export class PString implements PType<Uint8Array, string> {
       s instanceof Uint8Array,
       `PString.plift: expected Uint8Array, got ${s} (${typeof s})`,
     );
-    const data = toText(toHex(s));
+    const data = Lucid.toText(Lucid.toHex(s));
     assert(
       data.length >= this.minLength,
       `PString.plift: data too short: ${data}`,
@@ -61,7 +56,7 @@ export class PString implements PType<Uint8Array, string> {
       data.length <= this.maxLength,
       `PString.pconstant: data too long: ${data}`,
     );
-    return fromHex(fromText(data.toString()));
+    return Lucid.fromHex(Lucid.fromText(data.toString()));
   };
 
   public genData = (): string => {

@@ -2,9 +2,6 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   AssocMap,
   gMaxLength,
-  Hash,
-  KeyHash,
-  maxInteger,
   minSizedSubset,
   nonEmptySubSet,
   randomChoice,
@@ -13,21 +10,8 @@ import {
 import { f, PConstraint, PObject, PRecord, t } from "../mod.ts";
 import { newGenInRange } from "./bounded.ts";
 import { PNonEmptyList } from "./nonEmptyList.ts";
-import {
-  PByteString,
-  PList,
-  PMap,
-  PString,
-  PType,
-  PWrapped,
-} from "../fundamental/mod.ts";
-import {
-  Assets as LucidAssets,
-  fromHex,
-  fromText,
-  toHex,
-  toText,
-} from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { PByteString, PMap, PString, PWrapped } from "../fundamental/mod.ts";
+import { Lucid } from "../../../../lucid.mod.ts";
 
 export class Currency {
   constructor(public readonly symbol: Uint8Array) {
@@ -38,7 +22,7 @@ export class Currency {
   }
 
   public toString = (): string => {
-    return toHex(this.symbol);
+    return Lucid.toHex(this.symbol);
   };
 
   public show = (): string => {
@@ -48,20 +32,20 @@ export class Currency {
   public valueOf = this.show;
 
   public toLucid = (): string => {
-    return toHex(this.symbol);
+    return Lucid.toHex(this.symbol);
   };
 
   static fromLucid(hexCurrencySymbol: string): Currency {
-    return new Currency(fromHex(hexCurrencySymbol));
+    return new Currency(Lucid.fromHex(hexCurrencySymbol));
   }
 
   static fromHex = (hex: string): Currency => {
-    return new Currency(fromHex(hex));
+    return new Currency(Lucid.fromHex(hex));
   };
 
   static numBytes = 28n;
   static ADA = new Currency(new Uint8Array(0));
-  static dummy = new Currency(fromHex("cc"));
+  static dummy = new Currency(Lucid.fromHex("cc"));
 }
 
 export class PCurrency extends PWrapped<Currency> {
@@ -92,19 +76,19 @@ export class Token {
   public valueOf = this.show;
 
   public toLucid = (): string => {
-    return fromText(this.name);
+    return Lucid.fromText(this.name);
   };
 
   static fromLucid(hexTokenName: string): Token {
     try {
-      return new Token(toText(hexTokenName));
+      return new Token(Lucid.toText(hexTokenName));
     } catch (e) {
       throw new Error(`Token.fromLucid ${hexTokenName}:\n${e}`);
     }
   }
 
   // static fromOwner = (owner: KeyHash) => {
-  //   return new Token(toText_(toHex(owner.keyHash)));
+  //   return new Token(toText_(Lucid.toHex(owner.keyHash)));
   // };
 
   static maxLength = 32n; // empirical maximum (at least with lucid)
@@ -140,27 +124,30 @@ export class Asset {
 
   public toLucid = (): string => {
     if (this.currency.symbol.length === 0) return "lovelace";
-    else return `${this.currency.toLucid()}${this.token.toLucid()}`;
+    else return Lucid.toUnit(this.currency.toLucid(), this.token.toLucid());
   };
 
-  public toLucidWith = (amount: bigint): LucidAssets => {
+  public toLucidWith = (amount: bigint): Lucid.Assets => {
     return { [this.toLucid()]: amount };
   };
 
   static fromLucid(hexAsset: string): Asset {
     try {
       if (hexAsset === "lovelace") return Asset.ADA;
-      else {return new Asset(
-          Currency.fromLucid(hexAsset.slice(0, Number(Currency.numBytes * 2n))),
-          Token.fromLucid(hexAsset.slice(Number(Currency.numBytes * 2n))),
-        );}
+      else {
+        const unit = Lucid.fromUnit(hexAsset);
+        return new Asset(
+          Currency.fromLucid(unit.policyId),
+          Token.fromLucid(unit.assetName ?? ""),
+        );
+      }
     } catch (e) {
       throw new Error(`Asset.fromLucid ${hexAsset}:\n${e}`);
     }
   }
 
   static assertADAlovelace(asset: Asset): void {
-    if (toHex(asset.currency.symbol) === "") {
+    if (Lucid.toHex(asset.currency.symbol) === "") {
       assert(
         asset.token.name === "",
         `ADA must have lovelace, got ${asset.show()}`,
@@ -445,8 +432,8 @@ export class Assets {
     return new Assets(shared);
   };
 
-  public toLucidWith = (amount: bigint): LucidAssets => {
-    const assets: LucidAssets = {};
+  public toLucidWith = (amount: bigint): Lucid.Assets => {
+    const assets: Lucid.Assets = {};
     this.forEach((asset) => assets[asset.toLucid()] = amount);
     return assets;
   };

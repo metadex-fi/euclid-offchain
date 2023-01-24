@@ -1,11 +1,7 @@
 // TODO consider generating wrong cases as well
 
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  Address,
-  fromHex,
-  Lucid,
-} from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Lucid } from "../../lucid.mod.ts";
 import { Amounts, Asset, Assets, PData, User } from "../mod.ts";
 
 export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
@@ -151,7 +147,7 @@ export function genByteString(
   minBytes = 0n,
   maxBytes = gMaxStringBytes,
 ): Uint8Array {
-  return fromHex(genString("abcdef", minBytes, maxBytes, 2n));
+  return Lucid.fromHex(genString("abcdef", minBytes, maxBytes, 2n));
 }
 
 export function genName(minLength = 0n, maxLength = gMaxStringLength): string {
@@ -165,11 +161,11 @@ export async function genUsers(): Promise<User[]> {
   const users = new Array<User>();
   const allAssets = Assets.generate(2n, 10n);
   console.log(allAssets.show());
-  const lucid = await Lucid.new(undefined, "Custom");
+  const lucid = await Lucid.Lucid.new(undefined, "Custom");
 
   const numUsers = 10n; //genPositive(gMaxLength);
   let canOpenPool = 10n; //genPositive(numUsers);
-  const addresses = new Array<Address>();
+  const addresses = new Array<Lucid.Address>();
   while (users.length < numUsers) {
     const user = await User.generateWith(lucid);
     assert(user.address, `user.address is undefined`);

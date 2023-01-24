@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Constr } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Lucid } from "../../../../../lucid.mod.ts";
 import {
   genPositive,
   minSizedSubset,
@@ -11,7 +11,7 @@ import {
 import { Data, f, PType, t } from "../type.ts";
 import { PObject } from "./object.ts";
 
-export class PSum<Os extends Object> implements PType<Constr<Data>, Os> {
+export class PSum<Os extends Object> implements PType<Lucid.Constr<Data>, Os> {
   public readonly population;
   constructor(
     public readonly pconstrs: Array<Os extends Object ? PObject<Os> : never>,
@@ -31,9 +31,9 @@ export class PSum<Os extends Object> implements PType<Constr<Data>, Os> {
   }
 
   public plift = (
-    c: Constr<Data>,
+    c: Lucid.Constr<Data>,
   ): Os => {
-    assert(c instanceof Constr, `plift: expected Constr`);
+    assert(c instanceof Lucid.Constr, `plift: expected Constr`);
     assert(c.index < this.pconstrs.length, `plift: constr index out of bounds`);
     return this.pconstrs[Number(c.index)].plift(c.fields) as Os;
   };
@@ -59,9 +59,9 @@ export class PSum<Os extends Object> implements PType<Constr<Data>, Os> {
 
   public pconstant = (
     data: Os,
-  ): Constr<Data> => {
+  ): Lucid.Constr<Data> => {
     const [index, match] = this.matchData(data);
-    return new Constr(index, match.pconstant(data));
+    return new Lucid.Constr(index, match.pconstant(data));
   };
 
   public genData = (): Os => {

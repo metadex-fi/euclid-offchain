@@ -1,15 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  Address,
-  Assets as LucidAssets,
-  Data,
-  generatePrivateKey,
-  Lucid,
-  Tx,
-  TxHash,
-  Utils,
-  utxoToCore,
-} from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Lucid } from "../../lucid.mod.ts";
+
 import {
   Amounts,
   Asset,
@@ -42,9 +33,9 @@ export class User {
   public pendingConsequences?: consequences;
 
   private constructor(
-    public readonly lucid: Lucid,
+    public readonly lucid: Lucid.Lucid,
     public readonly privateKey: string,
-    public readonly address?: Address,
+    public readonly address?: Lucid.Address,
     paymentKeyHash?: KeyHash,
   ) {
     this.contract = new Contract(lucid);
@@ -79,7 +70,7 @@ export class User {
   };
 
   static async from(
-    lucid: Lucid,
+    lucid: Lucid.Lucid,
     privateKey: string,
   ): Promise<User> {
     const address = await lucid.selectWalletFromPrivateKey(privateKey).wallet
@@ -88,9 +79,9 @@ export class User {
   }
 
   static async generateWith(
-    lucid: Lucid,
+    lucid: Lucid.Lucid,
   ): Promise<User> {
-    const privateKey = generatePrivateKey();
+    const privateKey = Lucid.generatePrivateKey();
     const address = await lucid.selectWalletFromPrivateKey(privateKey).wallet
       .address();
     const user = new User(lucid, privateKey, address);
@@ -99,9 +90,9 @@ export class User {
 
   // for propertytesting
   static generateDummy(): User {
-    const lucid = new Lucid();
-    lucid.utils = new Utils(lucid);
-    const privateKey = generatePrivateKey();
+    const lucid = new Lucid.Lucid();
+    lucid.utils = new Lucid.Utils(lucid);
+    const privateKey = Lucid.generatePrivateKey();
     const paymentKeyHash = PKeyHash.ptype.genData();
     const user = new User(lucid, privateKey, undefined, paymentKeyHash);
     const assets = Assets.generate(2n);
@@ -109,7 +100,7 @@ export class User {
     return user;
   }
 
-  public account = (): { address: Address; assets: LucidAssets } => {
+  public account = (): { address: Lucid.Address; assets: Lucid.Assets } => {
     assert(this.address, "No address");
     assert(this.balance, "No balance");
     return {
@@ -135,14 +126,14 @@ export class User {
       this.lucid.utxosAt(this.address!),
       this.contract.update(),
     ]))[0];
-    const assets: LucidAssets = {};
+    const assets: Lucid.Assets = {};
     utxos.forEach((utxo) => {
       Object.entries(utxo.assets).forEach(([asset, amount]) => {
         assets[asset] = amount + BigInt(assets[asset] ?? 0);
       });
     });
     this.balance = Amounts.fromLucid(assets);
-    console.log(this.balance.concise());
+    console.log(`balance: ${this.balance.concise()}`);
   };
 
   public ownsPools = (): boolean => {

@@ -1,8 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Assets as LucidAssets } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { genPositive, IdNFT } from "../../../../mod.ts";
-import { AssocMap, PInteger, PMap, PObject, PRecord } from "../../mod.ts";
-import { Asset, Assets, Currency, PCurrency, PToken, Token } from "../asset.ts";
+import { AssocMap, PObject, PRecord } from "../../mod.ts";
+import { Asset, Assets, PCurrency, PToken } from "../asset.ts";
 import { PPositive } from "../bounded.ts";
 import { newAmountsCheck, newBoundedWith, PValue, Value } from "./value.ts";
 

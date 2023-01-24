@@ -7,33 +7,26 @@ plift parses, pconstant composes.
 T is the equivalent concrete type.
 */
 
-import {
-  Constr,
-  Data as LucidData,
-  Datum,
-  fromHex,
-  Redeemer,
-  toHex,
-} from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Lucid } from "../../../../lucid.mod.ts";
 
 export type Data =
   | Uint8Array
   | bigint
   | Data[]
   | Map<Data, Data>
-  | Constr<Data>;
+  | Lucid.Constr<Data>;
 
 export const Data = {
-  to: (data: Data): Datum | Redeemer => {
-    return LucidData.to(Data.lucid(data));
+  to: (data: Data): Lucid.Datum | Lucid.Redeemer => {
+    return Lucid.Data.to(Data.lucid(data));
   },
-  from: (raw: Datum | Redeemer): Data => {
-    return Data.plutus(LucidData.from(raw));
+  from: (raw: Lucid.Datum | Lucid.Redeemer): Data => {
+    return Data.plutus(Lucid.Data.from(raw));
   },
 
-  plutus: (data: LucidData): Data => {
+  plutus: (data: Lucid.Data): Data => {
     if (typeof data === "string") {
-      return fromHex(data);
+      return Lucid.fromHex(data);
     } else if (typeof data === "bigint") {
       return data;
     } else if (data instanceof Array) {
@@ -42,16 +35,16 @@ export const Data = {
       return new Map(
         [...data.entries()].map(([k, v]) => [Data.plutus(k), Data.plutus(v)]),
       );
-    } else if (data instanceof Constr) {
-      return new Constr(data.index, data.fields.map(Data.plutus));
+    } else if (data instanceof Lucid.Constr) {
+      return new Lucid.Constr(data.index, data.fields.map(Data.plutus));
     } else {
       throw new Error(`bytey: unknown data type ${data}`);
     }
   },
 
-  lucid: (data: Data): LucidData => {
+  lucid: (data: Data): Lucid.Data => {
     if (data instanceof Uint8Array) {
-      return toHex(data);
+      return Lucid.toHex(data);
     } else if (typeof data === "bigint") {
       return data;
     } else if (data instanceof Array) {
@@ -60,8 +53,8 @@ export const Data = {
       return new Map(
         [...data.entries()].map(([k, v]) => [Data.lucid(k), Data.lucid(v)]),
       );
-    } else if (data instanceof Constr) {
-      return new Constr(data.index, data.fields.map(Data.lucid));
+    } else if (data instanceof Lucid.Constr) {
+      return new Lucid.Constr(data.index, data.fields.map(Data.lucid));
     } else {
       throw new Error(`stringy: unknown data type ${data}`);
     }

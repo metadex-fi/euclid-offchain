@@ -1,17 +1,12 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { genNonNegative, maxInteger } from "../../mod.ts";
 import {
   Asset,
   Assets,
-  AssocMap,
-  Currency,
   IdNFT,
   mulValues_,
   Param,
-  PInteger,
   PObject,
   PRecord,
-  PToken,
   Value,
 } from "../mod.ts";
 import { Prices } from "./prices.ts";
@@ -19,7 +14,7 @@ import {
   PositiveValue,
   PPositiveValue,
 } from "../general/derived/value/positiveValue.ts";
-import { Assets as LucidAssets } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Lucid } from "../../../lucid.mod.ts";
 
 export class Amounts {
   constructor(
@@ -51,15 +46,15 @@ export class Amounts {
     return mulValues_(this.unsigned(), prices.unsigned()).sumAmounts();
   };
 
-  public toLucid = (): LucidAssets => {
-    const assets: LucidAssets = {};
+  public toLucid = (): Lucid.Assets => {
+    const assets: Lucid.Assets = {};
     this.assets().forEach((asset) => {
       assets[asset.toLucid()] = this.amountOf(asset);
     });
     return assets;
   };
 
-  static fromLucid(assets: LucidAssets): Amounts {
+  static fromLucid(assets: Lucid.Assets): Amounts {
     try {
       const value = new Value();
       Object.entries(assets).forEach(([name, amount]) => {

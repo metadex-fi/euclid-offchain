@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Tx, UTxO } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Lucid } from "../../lucid.mod.ts";
 import {
   Amounts,
   Asset,
@@ -23,11 +23,11 @@ export class ParamUtxo {
   constructor(
     public readonly param: Param,
     public readonly paramNFT: IdNFT,
-    public readonly utxo?: UTxO,
+    public readonly utxo?: Lucid.UTxO,
   ) {}
 
   static parse(
-    utxo: UTxO,
+    utxo: Lucid.UTxO,
     fields: Data[],
   ): ParamUtxo {
     const param = PParamDatum.ptype.plift(fields)._0;
@@ -46,14 +46,16 @@ export class ParamUtxo {
   public sharedAssets = (assets: Assets): Assets =>
     this.param.sharedAssets(assets);
 
-  public openingTx = (user: User): Tx => {
+  public openingTx = (user: User): Lucid.Tx => {
     console.log(`paramUTxo: ${this.show()}`);
     const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(this.param));
     const paramNFT = this.paramNFT.toLucidNFT();
 
+    console.log(this.paramNFT.show());
+
     return user.lucid.newTx()
-      .mintAssets(paramNFT)
       .attachMintingPolicy(user.contract.mintingPolicy)
+      .mintAssets(paramNFT)
       .payToContract(
         user.contract.address,
         {
@@ -67,7 +69,7 @@ export class ParamUtxo {
   public show = (tabs = ""): string => {
     const tt = tabs + t;
     const ttf = tt + f;
-    return `DiracUtxo (
+    return `ParamUtxo (
 ${ttf}param: ${this.param.concise(ttf)}
 ${tt})`;
   };
@@ -76,7 +78,7 @@ ${tt})`;
 export class PreDiracUtxo {
   public readonly dirac: Dirac;
   constructor(
-    public readonly utxo: UTxO,
+    public readonly utxo: Lucid.UTxO,
     public readonly fields: Data[],
   ) {
     this.dirac = PDiracDatum.pre.plift(this.fields)._0;
@@ -99,7 +101,7 @@ export class DiracUtxo {
     public readonly dirac: Dirac,
     public readonly pdiracDatum: PDiracDatum,
     public readonly balance?: Amounts,
-    public readonly utxo?: UTxO,
+    public readonly utxo?: Lucid.UTxO,
   ) {}
 
   static parse(
@@ -120,11 +122,11 @@ export class DiracUtxo {
     return new DiracUtxo(dirac, pdiracDatum, balance, from.utxo);
   }
 
-  public openingTx = (user: User, tx: Tx): Tx => {
-    console.log(`diracUTxo: ${this.show()}`);
+  public openingTx = (user: User, tx: Lucid.Tx): Lucid.Tx => {
+    // console.log(`diracUTxo: ${this.show()}`);
     const funds = this.dirac.activeAmnts.toLucid();
-    const nft = this.dirac.threadNFT.toLucid();
-    funds[nft] = 1n;
+    // const nft = this.dirac.threadNFT.toLucid();
+    // funds[nft] = 1n;
     const datum = this.pdiracDatum.pconstant(new DiracDatum(this.dirac));
     tx = tx.payToContract(
       user.contract.address,

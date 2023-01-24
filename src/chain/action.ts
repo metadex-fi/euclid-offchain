@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Tx, TxHash, utxoToCore } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Lucid } from "../../lucid.mod.ts";
 import {
   Data,
   Dirac,
@@ -14,7 +14,7 @@ import { Pool } from "./pool.ts";
 export class Action {
   constructor(public readonly user: User) {}
 
-  public genOpenTx = (): Tx => {
+  public genOpenTx = (): Lucid.Tx => {
     return Pool.generate(this.user).openingTx(this.user);
   };
 
@@ -33,7 +33,7 @@ export class Action {
   //   ])(pool);
   // };
 
-  public genFlipTx = (pool: Pool): Tx => {
+  public genFlipTx = (pool: Pool): Lucid.Tx => {
     const diracUtxo = randomChoice(pool.flippable!);
     const dirac = diracUtxo.dirac;
 
@@ -84,18 +84,18 @@ export class Action {
 
     assert(diracUtxo.utxo, `diracUtxo.utxo is undefined`);
     tx.txBuilder.add_input( // TODO see if this works
-      utxoToCore(diracUtxo.utxo),
+      Lucid.utxoToCore(diracUtxo.utxo),
       undefined, // TODO see if that's required
     );
 
     return tx;
   };
 
-  public genJumpTx = (pool: Pool): Tx => {
+  public genJumpTx = (pool: Pool): Lucid.Tx => {
     throw new Error("Not implemented");
   };
 
-  public genUserTx = (openUtxoPools: Pool[]) => (): Tx => {
+  public genUserTx = (openUtxoPools: Pool[]) => (): Lucid.Tx => {
     const utxoPool = randomChoice(openUtxoPools);
     return randomChoice([
       ...utxoPool.flippable!.length ? [this.genFlipTx] : [],
@@ -103,7 +103,7 @@ export class Action {
     ])(utxoPool);
   };
 
-  public txOptions = async (): Promise<(() => Tx)[]> => {
+  public txOptions = async (): Promise<(() => Lucid.Tx)[]> => {
     await this.user.update();
 
     const openUtxoPools = this.user.contract.state!.openForBusiness(
@@ -116,16 +116,23 @@ export class Action {
     ];
   };
 
-  public genEuclidTx = async (options: (() => Tx)[]): Promise<TxHash> => {
+  public genEuclidTx = async (
+    options: (() => Lucid.Tx)[],
+  ): Promise<Lucid.TxHash> => {
     const genTx = randomChoice(options);
     const tx = genTx();
-    try {
-      const complete = await tx.complete();
-      const signed = await complete.sign().complete();
-      return await signed.submit();
-    } catch (e) {
-      console.log(e);
-      return "";
-    }
+    // try {
+    console.log(`tx`);
+    const complete = await tx.complete();
+    console.log(`complete`);
+    const signed = await complete.sign().complete();
+    console.log(`signed`);
+    const txHash = await signed.submit();
+    console.log(`txHash: ${txHash}`);
+    return txHash;
+    // } catch (e) {
+    //   console.log(e);
+    //   return "";
+    // }
   };
 }

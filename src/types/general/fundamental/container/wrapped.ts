@@ -1,6 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Generators } from "../../../../mod.ts";
-import { Data, f, PData, PLifted, PType, t } from "../type.ts";
+import { Data, f, PData, PType, t } from "../type.ts";
 import { filterFunctions } from "./object.ts";
 
 // like PObject, but only one field in the PRecord.

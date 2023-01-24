@@ -1,40 +1,22 @@
-import {
-  Emulator,
-  fromHex,
-  fromText,
-  generatePrivateKey,
-  getAddressDetails,
-  Lucid,
-  toHex,
-  toUnit,
-  TxHash,
-} from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import {
-  Action,
-  genName,
-  genUsers,
-  maxInteger,
-  randomChoice,
-  User,
-} from "../src/mod.ts";
+import { Lucid } from "../lucid.mod.ts";
+import { Action, genName, genUsers, randomChoice, User } from "../src/mod.ts";
 
 Deno.test("lucid-example", async () => {
-  let l = 0n; // empirical maximum = 32n
-  //   while (true) {
+  const l = 32n; // empirical maximum = 32n
   console.log(l);
-  const privateKey = generatePrivateKey();
+  const privateKey = Lucid.generatePrivateKey();
 
-  const address = await (await Lucid.new(undefined, "Custom"))
+  const address = await (await Lucid.Lucid.new(undefined, "Custom"))
     .selectWalletFromPrivateKey(privateKey).wallet.address();
 
-  const { paymentCredential } = getAddressDetails(address);
+  const { paymentCredential } = Lucid.getAddressDetails(address);
 
-  const emulator = new Emulator([{
+  const emulator = new Lucid.Emulator([{
     address,
     assets: { lovelace: 3000000000n },
   }]);
 
-  const lucid = await Lucid.new(emulator);
+  const lucid = await Lucid.Lucid.new(emulator);
 
   lucid.selectWalletFromPrivateKey(privateKey);
 
@@ -51,12 +33,20 @@ Deno.test("lucid-example", async () => {
 
   const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
 
-  async function mint(l: bigint): Promise<TxHash> {
-    const token = genName(l, l);
+  const token = genName(1n, l);
+  const assets = {
+    [Lucid.toUnit(policyId, Lucid.fromText(token))]: 123n,
+  };
+
+  console.log(mintingPolicy.type);
+  console.log(mintingPolicy.script);
+  console.log(policyId);
+  console.log(token);
+  console.log(assets);
+
+  async function mint(): Promise<Lucid.TxHash> {
     const tx = await lucid.newTx()
-      .mintAssets({
-        [toUnit(policyId, fromText(token))]: 123n,
-      })
+      .mintAssets(assets)
       .validTo(emulator.now() + 30000)
       .attachMintingPolicy(mintingPolicy)
       .complete();
@@ -64,8 +54,7 @@ Deno.test("lucid-example", async () => {
 
     return signedTx.submit();
   }
-  await mint(l++);
-  //   }
+  await mint();
 
   emulator.awaitBlock(4);
 
@@ -74,17 +63,21 @@ Deno.test("lucid-example", async () => {
 
 Deno.test("emulator", async () => {
   const users = await genUsers();
-  const emulator = new Emulator(users.map((u) => u.account()));
+  const accounts = users.map((u) => u.account());
+  console.log(`accounts: ${accounts}`);
+  const emulator = new Lucid.Emulator(accounts);
   const iterations = 10;
   const timeout = 10;
   let timeout_ = timeout;
   const trace = [];
+  const lucid = await Lucid.Lucid.new(emulator);
   while (trace.length < iterations) {
-    const lucid = await Lucid.new(emulator);
+    console.log(`\ni: ${trace.length}`);
     const user = await User.from(lucid, randomChoice(users).privateKey);
     const action = new Action(user);
     const options = await action.txOptions();
     if (options.length) {
+      console.log(`contract: ${user.contract.concise()}`);
       timeout_ = timeout;
       const txHash = await action.genEuclidTx(options);
       trace.push(txHash);

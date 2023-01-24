@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Constr, UTxO } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Lucid } from "../../lucid.mod.ts";
 import {
   Assets,
   AssocMap,
@@ -16,12 +16,14 @@ type PErrorMessage = PString;
 
 export class Euclid {
   // private invalidDiracs = new AssocMap<PErrorMessage, PreDiracUtxo[]>(PString.ptype);
-  private invalidUtxos = new AssocMap<PErrorMessage, UTxO[]>(PString.ptype);
+  private invalidUtxos = new AssocMap<PErrorMessage, Lucid.UTxO[]>(
+    PString.ptype,
+  );
   // public emptyPoolParams!: AssocMap<PKeyHash, AssocMap<PToken, ParamUtxo>>;
   public pools: AssocMap<PKeyHash, AssocMap<PIdNFT, Pool>>;
 
   constructor(
-    utxos: UTxO[],
+    utxos: Lucid.UTxO[],
     contractCurrency: Currency,
   ) {
     const prePools = new AssocMap<PIdNFT, PrePool>(PIdNFT.pdummy);
@@ -30,7 +32,7 @@ export class Euclid {
         // TODO assert scriptref, and all the other fields if it makes sense
         assert(utxo.datum, `datum must be present`);
         const datum = Data.from(utxo.datum);
-        assert(datum instanceof Constr, `datum must be a Constr`);
+        assert(datum instanceof Lucid.Constr, `datum must be a Constr`);
         switch (datum.index) {
           case 0: {
             const paramUtxo = ParamUtxo.parse(

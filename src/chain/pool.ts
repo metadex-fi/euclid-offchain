@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Tx } from "https://deno.land/x/lucid@0.8.6/mod.ts";
+import { Lucid } from "../../lucid.mod.ts";
 import {
   ActiveAssets,
   addValues,
@@ -62,10 +62,10 @@ export class Pool {
     public readonly diracUtxos: DiracUtxo[],
   ) {}
 
-  public openingTx = (user: User): Tx => {
+  public openingTx = (user: User): Lucid.Tx => {
     console.log(`opening pool`);
     let tx = this.paramUtxo.openingTx(user);
-    this.diracUtxos.forEach((diracUtxo) => tx = diracUtxo.openingTx(user, tx));
+    // this.diracUtxos.forEach((diracUtxo) => tx = diracUtxo.openingTx(user, tx));
     return tx;
   };
 

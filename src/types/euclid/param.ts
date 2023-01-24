@@ -43,7 +43,7 @@ export class Param {
     const tt = tabs + t;
     const ttf = tt + f;
     return `Param (
-${ttf}owner: ${this.owner}, 
+${ttf}owner: ${this.owner.toString()}, 
 ${ttf}jumpSizes: ${this.jumpSizes.concise(ttf)}, 
 ${ttf}initialPrices: ${this.initialPrices.concise(ttf)}, 
 ${ttf}lowerPriceBounds: ${this.lowerPriceBounds.concise(ttf)}, 
