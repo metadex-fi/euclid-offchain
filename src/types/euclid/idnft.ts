@@ -7,7 +7,11 @@ import {
 } from "../../mod.ts";
 import { f, Hash, PConstraint, PHash, PObject, PRecord } from "../mod.ts";
 import { Asset, Currency, PCurrency, Token } from "../general/derived/asset.ts";
+import { Assets as LucidAssets } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 
+// NOTE biggest difference to regular Asset is that tokenName is not decoded/encoded
+// when parsing to/from lucid, as this is not symmetric unless starting with text-strings
+// (here we start with hashes, aka hex-strings).
 export class IdNFT {
   constructor(
     public readonly currency: Currency,
@@ -22,12 +26,33 @@ export class IdNFT {
     return new IdNFT(this.currency, this.token.hash());
   };
 
-  public asset = (): Asset => {
-    return new Asset(this.currency, Token.fromHash(this.token));
+  public toLucid = (): string => {
+    if (this.currency.symbol.length === 0) return "lovelace";
+    else return `${this.currency.toLucid()}${this.token.toLucid()}`;
   };
 
-  static from(asset: Asset): IdNFT {
-    return new IdNFT(asset.currency, Hash.from(asset.token.name));
+  public toLucidNFT = (): LucidAssets => {
+    return { [this.toLucid()]: 1n };
+  };
+
+  static fromLucid(hexAsset: string): IdNFT {
+    try {
+      if (hexAsset === "lovelace") throw new Error("lovelace is not an id-NFT");
+      else {return new IdNFT(
+          Currency.fromLucid(hexAsset.slice(0, Number(Currency.numBytes * 2n))),
+          Hash.fromLucid(hexAsset.slice(Number(Currency.numBytes * 2n))),
+        );}
+    } catch (e) {
+      throw new Error(`IdNFT.fromLucid ${hexAsset}:\n${e}`);
+    }
+  }
+
+  static fromAsset(asset: Asset): IdNFT {
+    try {
+      return new IdNFT(asset.currency, Hash.fromString(asset.token.name));
+    } catch (e) {
+      throw new Error(`IdNFT.fromAsset ${asset.show()}:\n${e}`);
+    }
   }
 }
 

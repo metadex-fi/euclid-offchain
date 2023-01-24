@@ -6,7 +6,7 @@ import {
   fromHex,
   Lucid,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
-import { Amounts, Assets, PData, User } from "../mod.ts";
+import { Amounts, Asset, Assets, PData, User } from "../mod.ts";
 
 export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
 export const gMaxStringLength = maxInteger;
@@ -87,7 +87,8 @@ export function minSizedSubset<T>(set: T[], minSize: bigint): T[] {
   assert(minSize <= set.length, `minSizedSubset: ${minSize} > ${set.length}`);
   const subset = [];
   const pickedIndices: number[] = [];
-  while (subset.length < minSize) {
+  const size = minSize + genNonNegative(BigInt(set.length) - minSize);
+  while (subset.length < size) {
     const [elem, index] = randomIndexedChoice(set);
     if (!pickedIndices.includes(index)) {
       subset.push(elem);
@@ -162,7 +163,8 @@ export function genName(minLength = 0n, maxLength = gMaxStringLength): string {
 
 export async function genUsers(): Promise<User[]> {
   const users = new Array<User>();
-  const allAssets = Assets.generate(2n);
+  const allAssets = Assets.generate(2n, 10n);
+  console.log(allAssets.show());
   const lucid = await Lucid.new(undefined, "Custom");
 
   const numUsers = 10n; //genPositive(gMaxLength);
@@ -176,6 +178,7 @@ export async function genUsers(): Promise<User[]> {
       user.balance = Amounts.genOfAssets(
         allAssets.minSizedSubset(canOpenPool-- > 0 ? 2n : 0n),
       );
+      user.balance.addAmountOf(Asset.ADA, 100000000n); // TODO try without
       users.push(user);
     }
   }

@@ -14,7 +14,6 @@ import {
   mulValues,
   Param,
   PDiracDatum,
-  PIdNFT,
   PParam,
   Prices,
   User,
@@ -64,6 +63,7 @@ export class Pool {
   ) {}
 
   public openingTx = (user: User): Tx => {
+    console.log(`opening pool`);
     let tx = this.paramUtxo.openingTx(user);
     this.diracUtxos.forEach((diracUtxo) => tx = diracUtxo.openingTx(user, tx));
     return tx;

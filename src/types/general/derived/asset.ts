@@ -103,13 +103,9 @@ export class Token {
     }
   }
 
-  static fromHash = (hash: Hash): Token => {
-    return new Token(hash.toString());
-  };
-
-  static fromOwner = (owner: KeyHash) => {
-    return new Token(toText(toHex(owner.keyHash)));
-  };
+  // static fromOwner = (owner: KeyHash) => {
+  //   return new Token(toText_(toHex(owner.keyHash)));
+  // };
 
   static maxLength = 32n; // empirical maximum (at least with lucid)
   static lovelace = new Token("");
@@ -135,6 +131,7 @@ export class Asset {
     public readonly token: Token,
   ) {
     Asset.assertADAlovelace(this);
+    // Asset.assertLength(this);
   }
 
   public show = (): string => {
@@ -152,7 +149,7 @@ export class Asset {
 
   static fromLucid(hexAsset: string): Asset {
     try {
-      if (hexAsset === "lovelace") return Asset.ADA();
+      if (hexAsset === "lovelace") return Asset.ADA;
       else {return new Asset(
           Currency.fromLucid(hexAsset.slice(0, Number(Currency.numBytes * 2n))),
           Token.fromLucid(hexAsset.slice(Number(Currency.numBytes * 2n))),
@@ -171,9 +168,19 @@ export class Asset {
     }
   }
 
-  private static ADA = (): Asset => {
-    return new Asset(Currency.ADA, Token.lovelace);
-  };
+  // static maxLength = 64n;
+  // static assertLength(asset: Asset): void {
+  //   const ccy = asset.currency.symbol.length * 2;
+  //   const tkn = asset.token.name.length;
+  //   const ass = ccy + tkn;
+
+  //   assert(
+  //     ass <= Asset.maxLength,
+  //     `Asset too long: ${asset.show()}, ${ass} = ${ccy} + ${tkn}`,
+  //   );
+  // }
+
+  static ADA = new Asset(Currency.ADA, Token.lovelace);
 
   private static generateNonADA = (): Asset => {
     const ccy = PCurrency.ptype.genData();
@@ -182,7 +189,10 @@ export class Asset {
   };
 
   static generate(): Asset {
-    return randomChoice([Asset.ADA, Asset.generateNonADA])();
+    return randomChoice([
+      () => Asset.ADA,
+      Asset.generateNonADA,
+    ])();
   }
 }
 
@@ -198,7 +208,7 @@ export class PAsset extends PConstraint<PObject<Asset>> {
         ),
         Asset,
       ),
-      [Asset.assertADAlovelace],
+      [], // asserts for PConstraint<PObject<O>> belong in Constructor of O
       Asset.generate,
     );
   }
@@ -445,10 +455,10 @@ export class Assets {
     assets.forEach((asset) => Asset.assertADAlovelace(asset));
   }
 
-  static generate = (minLength = 0n): Assets => {
+  static generate = (minLength = 0n, maxLength = gMaxLength): Assets => {
     const assets = PMap.genKeys(
       PAsset.ptype,
-      newGenInRange(minLength, gMaxLength)(),
+      newGenInRange(minLength, maxLength)(),
     );
     assert(assets.length >= minLength, `generated ${assets} too small`);
     const assets_ = Assets.fromList(assets);

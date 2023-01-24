@@ -8,12 +8,14 @@ import {
   Data,
   Dirac,
   DiracDatum,
+  f,
   IdNFT,
   leq,
   Param,
   ParamDatum,
   PDiracDatum,
   PParamDatum,
+  t,
   User,
 } from "../mod.ts";
 
@@ -36,7 +38,7 @@ export class ParamUtxo {
       balance.size() === 1n,
       `expected exactly id-NFT in ${balance.concise()}`,
     );
-    const paramNFT = IdNFT.from(balance.firstAsset());
+    const paramNFT = IdNFT.fromAsset(balance.firstAsset());
 
     return new ParamUtxo(param, paramNFT, utxo);
   }
@@ -45,8 +47,9 @@ export class ParamUtxo {
     this.param.sharedAssets(assets);
 
   public openingTx = (user: User): Tx => {
+    console.log(`paramUTxo: ${this.show()}`);
     const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(this.param));
-    const paramNFT = new Assets().add(this.paramNFT.asset()).toLucidWith(1n);
+    const paramNFT = this.paramNFT.toLucidNFT();
 
     return user.lucid.newTx()
       .mintAssets(paramNFT)
@@ -59,6 +62,14 @@ export class ParamUtxo {
         },
         paramNFT,
       );
+  };
+
+  public show = (tabs = ""): string => {
+    const tt = tabs + t;
+    const ttf = tt + f;
+    return `DiracUtxo (
+${ttf}param: ${this.param.concise(ttf)}
+${tt})`;
   };
 }
 
@@ -110,15 +121,17 @@ export class DiracUtxo {
   }
 
   public openingTx = (user: User, tx: Tx): Tx => {
-    const funds = this.dirac.activeAmnts.clone(); // not strictly required, as the utxo will be obsolete anyways
-    funds.initAmountOf(this.dirac.threadNFT.asset(), 1n);
+    console.log(`diracUTxo: ${this.show()}`);
+    const funds = this.dirac.activeAmnts.toLucid();
+    const nft = this.dirac.threadNFT.toLucid();
+    funds[nft] = 1n;
     const datum = this.pdiracDatum.pconstant(new DiracDatum(this.dirac));
     tx = tx.payToContract(
       user.contract.address,
       {
         inline: Data.to(datum),
       },
-      funds.toLucid(),
+      funds,
     );
     return tx;
   };
@@ -133,5 +146,14 @@ export class DiracUtxo {
   public openForJumping = (assets: Assets): boolean => {
     throw new Error("not implemented");
     // return this.dirac.isJumpable(assets);
+  };
+
+  public show = (tabs = ""): string => {
+    const tt = tabs + t;
+    const ttf = tt + f;
+    return `DiracUtxo (
+${ttf}dirac: ${this.dirac.show(ttf)},
+${ttf}balance: ${this.balance?.concise(ttf) ?? "undefined"}
+${tt})`;
   };
 }

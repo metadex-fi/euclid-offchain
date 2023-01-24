@@ -42,7 +42,7 @@ export class Param {
   public concise = (tabs = ""): string => {
     const tt = tabs + t;
     const ttf = tt + f;
-    return `Param(
+    return `Param (
 ${ttf}owner: ${this.owner}, 
 ${ttf}jumpSizes: ${this.jumpSizes.concise(ttf)}, 
 ${ttf}initialPrices: ${this.initialPrices.concise(ttf)}, 
@@ -190,7 +190,7 @@ export class PParam extends PConstraint<PObject<Param>> {
         }),
         Param,
       ),
-      [Param.assert],
+      [], // asserts for PConstraint<PObject<O>> belong in Constructor of O
       Param.generate,
     );
   }

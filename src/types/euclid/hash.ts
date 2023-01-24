@@ -6,7 +6,7 @@ import {
   toHex,
 } from "https://deno.land/x/lucid@0.8.6/mod.ts";
 import { PByteString } from "../general/fundamental/primitive/bytestring.ts";
-import { PLiteral, PWrapped } from "../mod.ts";
+import { PLiteral, PWrapped, Token } from "../mod.ts";
 
 export class KeyHash {
   constructor(public readonly keyHash: Uint8Array) {
@@ -61,11 +61,23 @@ export class Hash {
     return toHex(this.bytes);
   };
 
-  static from(s: string): Hash {
+  public toLucid = (): string => {
+    return toHex(this.bytes);
+  };
+
+  static fromLucid(hexTokenName: string): Hash {
+    try {
+      return Hash.fromString(hexTokenName);
+    } catch (e) {
+      throw new Error(`Token.fromLucid ${hexTokenName}:\n${e}`);
+    }
+  }
+
+  static fromString(s: string): Hash {
     try {
       return new Hash(fromHex(s));
     } catch (e) {
-      throw new Error(`not a hash: ${s} (${e})`);
+      throw new Error(`Hash.fromString ${s}:\n${e}`);
     }
   }
 

@@ -42,6 +42,7 @@ export class PositiveValue {
   public setAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.setAmountOf(asset, amount);
   public clone = (): PositiveValue => new PositiveValue(this.value.clone());
+  public has = (asset: Asset): boolean => this.value.has(asset);
   public scaledWith = (factor: bigint): PositiveValue =>
     new PositiveValue(this.value.scaledWith(factor));
   public fill = (assets: Assets, amount: bigint): PositiveValue => {
@@ -50,6 +51,11 @@ export class PositiveValue {
   };
 
   public addAmountOf = (asset: Asset, amount: bigint): void => {
+    if (this.has(asset)) this.increaseAmountOf(asset, amount);
+    else this.initAmountOf(asset, amount);
+  };
+
+  public increaseAmountOf = (asset: Asset, amount: bigint): void => {
     const newAmount = this.amountOf(asset) + amount;
     assert(
       newAmount >= 0n,

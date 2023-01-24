@@ -178,8 +178,11 @@ export class Value {
     const tknsAmnts = this.value.get(nft.currency);
     assert(tknsAmnts, `no tokens for currency ${nft.currency}`);
     assert(tknsAmnts.size === 1, `more than one tokenNames for ${nft.show()}`); // this is only because of our specific use case
-    const amnt = tknsAmnts.get(Token.fromHash(nft.token));
-    assert(amnt, `no amount for token ${nft.token}`);
+    const [tkn, amnt] = [...tknsAmnts.entries()][0];
+    assert(
+      tkn.name === nft.token.toString(),
+      `token ${tkn} != ${nft.token} for ${nft.show()}`,
+    );
     assert(amnt === 1n, `amount ${amnt} != 1 for ${nft.show()}`);
     this.value.delete(nft.currency);
   };
@@ -297,8 +300,9 @@ export class Value {
     return size;
   };
 
-  public has = (assets: Assets): boolean => {
-    return this.assets().subsetOf(assets);
+  public has = (asset: Asset): boolean => {
+    const tokens = this.value.get(asset.currency);
+    return tokens ? tokens.has(asset.token) : false;
   };
 
   public clone = (): Value => new Value(this.toMap());

@@ -35,6 +35,8 @@ export class Amounts {
   public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
   public popIdNFT = (nft: IdNFT) => this.value.popIdNFT(nft);
   public smallestAmount = (): bigint => this.value.smallestAmount();
+  public increaseAmountOf = (asset: Asset, amount: bigint): void =>
+    this.value.increaseAmountOf(asset, amount);
   public addAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.addAmountOf(asset, amount);
   public clone = (): Amounts => new Amounts(this.value.clone());
@@ -73,6 +75,8 @@ export class Amounts {
       );
     }
   }
+
+  static empty = (): Amounts => new Amounts(new PositiveValue());
 
   static fresh(param: Param, prices: Prices): Amounts {
     const activeAsset = prices.defaultActiveAsset(param.initialPrices);

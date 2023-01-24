@@ -131,7 +131,7 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
         }),
         Dirac,
       ),
-      [], //param ? [Dirac.assertWith(param)] : [],
+      [], // asserts for PConstraint<PObject<O>> belong in Constructor of O
       Dirac.generateFresh(param, paramNFT, numDiracs),
     );
   }
