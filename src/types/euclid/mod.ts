@@ -1,4 +1,5 @@
 export * from "./boughtSold.ts";
+export * from "./euclidDatum.ts";
 export * from "./dirac.ts";
 export * from "./idnft.ts";
 export * from "./param.ts";

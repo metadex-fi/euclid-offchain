@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Assets, PositiveValue, PPositiveValue } from "../mod.ts";
+import { Assets, PositiveValue, PPositiveValue, Value } from "../mod.ts";
 import { PWrapped } from "../general/fundamental/container/wrapped.ts";
 
 export class EuclidValue {
@@ -10,6 +10,8 @@ export class EuclidValue {
   }
 
   public assets = (): Assets => this.value.assets();
+  public unsigned = (): Value => this.value.unsigned();
+  public unit = (): Value => this.value.unit();
 
   static asserts(euclidValue: EuclidValue): void {
     assert(euclidValue.assets().size >= 2n, "at least two assets are required");
@@ -23,6 +25,10 @@ export class EuclidValue {
 
   static genOfAssets(assets: Assets): EuclidValue {
     return new EuclidValue(PositiveValue.genOfAssets(assets));
+  }
+
+  static fromValue(value: Value): EuclidValue {
+    return new EuclidValue(new PositiveValue(value));
   }
 }
 

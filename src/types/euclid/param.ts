@@ -9,10 +9,14 @@ export class Param {
   constructor(
     public readonly owner: KeyHash,
     public readonly jumpSizes: EuclidValue,
+    public readonly highestPrices: EuclidValue,
     public readonly weights: EuclidValue,
-    public readonly lowestPrices: EuclidValue,
   ) {
     Param.asserts(this);
+  }
+
+  public get assets(): Assets {
+    return this.jumpSizes.assets();
   }
 
   static asserts(param: Param): void {
@@ -22,7 +26,7 @@ export class Param {
       "assets of jumpSizes and weights must match",
     );
     assert(
-      assets.equals(param.lowestPrices.assets()),
+      assets.equals(param.highestPrices.assets()),
       "assets of jumpSizes and lowestPrices must match",
     );
   }
@@ -30,13 +34,13 @@ export class Param {
   static generate(): Param {
     const assets = Assets.generate(2n);
     const jumpSizes = EuclidValue.genOfAssets(assets);
+    const highestPrices = EuclidValue.genOfAssets(assets);
     const weights = EuclidValue.genOfAssets(assets);
-    const lowestPrices = EuclidValue.genOfAssets(assets);
     return new Param(
       PKeyHash.ptype.genData(),
       jumpSizes,
+      highestPrices,
       weights,
-      lowestPrices,
     );
   }
 }
