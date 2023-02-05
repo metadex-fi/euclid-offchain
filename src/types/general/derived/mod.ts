@@ -1,4 +1,4 @@
 export * from "./nonEmptyList.ts";
-export * from "./asset.ts";
-export * from "./bounded.ts";
+export * from "./asset/mod.ts";
+export * from "./bounded/mod.ts";
 export * from "./value/mod.ts";

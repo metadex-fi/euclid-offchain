@@ -1,8 +1,8 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { PConstraint, PInteger } from "../mod.ts";
-import { genNonNegative, maxInteger } from "../../../utils/mod.ts";
+import { maxInteger,genNonNegative } from "../../../../mod.ts";
+import { PConstraint,PInteger } from "../../mod.ts";
 
-export const bothExtreme = (a: Amount, b: Amount) =>
+export const bothExtreme = (a: bigint, b: bigint) =>
   a === b && a === maxInteger || a === -maxInteger;
 
 export class PBounded extends PConstraint<PInteger> {
@@ -30,21 +30,7 @@ export class PBounded extends PConstraint<PInteger> {
   }
 }
 
-export class PPositive extends PBounded {
-  constructor(
-    public lowerBound = 1n,
-    public upperBound = maxInteger,
-  ) {
-    assert(!lowerBound || lowerBound > 0n, `PPositive: ${lowerBound} <= 0`);
-    super(lowerBound, upperBound);
-  }
-
-  static genPType(): PPositive {
-    return genPBounded(1n);
-  }
-}
-
-const genPBounded = (
+export const genPBounded = (
   minLowerBound = -maxInteger,
 ): PBounded => {
   assert(minLowerBound >= -maxInteger, `${minLowerBound} < -maxInteger`);
@@ -74,6 +60,3 @@ const newAssertInRange =
       `too big: ${i} > ${upperBound}`,
     );
   };
-
-export type Amount = bigint;
-export type PAmount = PPositive;
