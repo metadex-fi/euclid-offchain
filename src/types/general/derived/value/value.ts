@@ -21,10 +21,7 @@ export class Value {
   constructor(
     private value = ccysTknsAmnts.anew,
   ) {
-    assert(
-      this.value instanceof AssocMap,
-      `Value must be a AssocMap, not ${this.value}`,
-    );
+    Value.assert(this);
   }
 
   public show = (tabs = ""): string => {
@@ -361,6 +358,10 @@ export class Value {
   };
 
   static assert(value: Value): void {
+    assert(
+      value.value instanceof AssocMap,
+      `Value must be a AssocMap, not ${value.value}`,
+    );
     Assets.assert(value.assets());
   }
 

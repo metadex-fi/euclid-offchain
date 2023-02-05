@@ -16,6 +16,7 @@ import {
   PLiteral,
   PMap,
   PObject,
+  PParam,
   PPositive,
   PRecord,
   proptestPTypes,
@@ -85,5 +86,6 @@ const derivedContainerGenerators = [
 const euclidPrimitiveGenerators = [
   PBoughtSold.genPType,
   PSwap.genPType,
+  PParam.genPType,
   // PIdNFT.genPType,
 ];
