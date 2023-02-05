@@ -18,6 +18,7 @@ import {
   proptestPTypes,
   PString,
   PSum,
+  PSwap,
   PToken,
   PWrapped,
 } from "../src/mod.ts";
@@ -78,4 +79,5 @@ const derivedContainerGenerators = [
 
 const euclidPrimitiveGenerators = [
   PBoughtSold.genPType,
+  PSwap.genPType,
 ];
