@@ -8,7 +8,10 @@ import {
   PConstraint,
   PCurrency,
   PEnum,
+  PHash,
+  PIdNFT,
   PInteger,
+  PKeyHash,
   PList,
   PLiteral,
   PMap,
@@ -65,6 +68,8 @@ const fundamentalContainerGenerators = [
 const derivedPrimitiveGenerators = [
   PBounded.genPType,
   PPositive.genPType,
+  PHash.genPType,
+  PKeyHash.genPType,
   PCurrency.genPType,
   PToken.genPType,
   PAsset.genPType,
@@ -80,4 +85,5 @@ const derivedContainerGenerators = [
 const euclidPrimitiveGenerators = [
   PBoughtSold.genPType,
   PSwap.genPType,
+  // PIdNFT.genPType,
 ];

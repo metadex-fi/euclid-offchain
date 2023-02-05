@@ -1,13 +1,22 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { Lucid } from "../../../lucid.mod.ts";
 import {
   genNonNegative,
   genPositive,
+  Hash,
+  PHash,
   PKeyHash,
   randomChoice,
 } from "../../mod.ts";
-import { f, Hash, PConstraint, PHash, PObject, PRecord } from "../mod.ts";
-import { Asset, Currency, PCurrency } from "../general/derived/asset.ts";
-import { Lucid } from "../../../lucid.mod.ts";
+import {
+  Asset,
+  Currency,
+  f,
+  PConstraint,
+  PCurrency,
+  PObject,
+  PRecord,
+} from "../mod.ts";
 
 // NOTE biggest difference to regular Asset is that tokenName is not decoded/encoded
 // when parsing to/from lucid, as this is not symmetric unless starting with text-strings

@@ -1,7 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
 import { randomChoice } from "../../../../mod.ts";
-import { PConstraint, PObject, PRecord } from "../../mod.ts";
+import { PObject, PRecord } from "../../mod.ts";
 import { Currency, PCurrency } from "./currency.ts";
 import { PToken, Token } from "./token.ts";
 
@@ -79,22 +79,20 @@ export class Asset {
   }
 }
 
-export class PAsset extends PConstraint<PObject<Asset>> {
+export class PAsset extends PObject<Asset> {
   private constructor() {
     super(
-      new PObject(
-        new PRecord(
-          {
-            "currency": PCurrency.ptype,
-            "token": PToken.ptype,
-          },
-        ),
-        Asset,
+      new PRecord(
+        {
+          "currency": PCurrency.ptype,
+          "token": PToken.ptype,
+        },
       ),
-      [], // asserts for PConstraint<PObject<O>> belong in Constructor of O
-      Asset.generate,
+      Asset,
     );
   }
+
+  public genData = Asset.generate;
 
   public showData = (data: Asset): string => {
     assert(
@@ -109,7 +107,7 @@ export class PAsset extends PConstraint<PObject<Asset>> {
   };
 
   static ptype = new PAsset();
-  static genPType(): PConstraint<PObject<Asset>> {
+  static genPType(): PObject<Asset> {
     return PAsset.ptype;
   }
 }

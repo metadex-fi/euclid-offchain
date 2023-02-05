@@ -100,28 +100,17 @@ export class PositiveValue {
 export const boundPositive = newBoundedWith(new PPositive());
 
 export class PPositiveValue extends PObject<PositiveValue> {
-  constructor(
-    public pnum = new PPositive(),
-  ) {
+  constructor() {
     super(
       new PRecord({
-        value: new PValue(pnum),
+        value: new PValue(new PPositive()),
       }),
       PositiveValue,
     );
   }
 
+  static ptype = new PPositiveValue();
   static genPType(): PPositiveValue {
-    const pnum = PPositive.genPType();
-    return new PPositiveValue(pnum);
+    return PPositiveValue.ptype;
   }
-
-  // static pliteral(
-  //   value: PositiveValue,
-  // ): PLiteral<PPositiveValue> {
-  //   return new PLiteral(
-  //     new PPositiveValue(),
-  //     value,
-  //   );
-  // }
 }

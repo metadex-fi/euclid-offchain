@@ -1,40 +1,8 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Lucid } from "../../../lucid.mod.ts";
-import { PByteString } from "../general/fundamental/primitive/bytestring.ts";
-import { PLiteral, PWrapped } from "../mod.ts";
+import { Lucid } from "../../../../../lucid.mod.ts";
+import { PByteString, PLiteral, PWrapped } from "../../mod.ts";
+import { KeyHash, PKeyHash } from "./keyHash.ts";
 
-export class KeyHash {
-  constructor(public readonly keyHash: Uint8Array) {
-    assert(keyHash.length > 0, "paymentKeyHash must be non-empty");
-  }
-  public hash = (): Hash => new Hash(Lucid.sha256(this.keyHash));
-
-  public toString = (): string => {
-    return Lucid.toHex(this.keyHash);
-  };
-
-  public show = (): string => {
-    return `KeyHash: ${this.toString()}`;
-  };
-
-  static fromCredential(credential: Lucid.Credential): KeyHash {
-    return new KeyHash(Lucid.fromHex(credential.hash));
-  }
-}
-
-export class PKeyHash extends PWrapped<KeyHash> {
-  private constructor() {
-    super(
-      new PByteString(1n),
-      KeyHash,
-    );
-  }
-
-  static ptype = new PKeyHash();
-  static genPType(): PWrapped<KeyHash> {
-    return PKeyHash.ptype;
-  }
-}
 // product from hashing-function
 export class Hash {
   constructor(public readonly bytes: Uint8Array) {
@@ -95,22 +63,5 @@ export class PHash extends PWrapped<Hash> {
   static ptype = new PHash();
   static genPType(): PWrapped<Hash> {
     return PHash.ptype;
-  }
-}
-
-export class POwner extends PLiteral<PKeyHash> {
-  private constructor(
-    public paymentKeyHash: KeyHash,
-  ) {
-    super(PKeyHash.ptype, paymentKeyHash);
-  }
-
-  static genPType(): PLiteral<PKeyHash> {
-    const paymentKeyHash = PKeyHash.ptype.genData();
-    return new POwner(paymentKeyHash);
-  }
-
-  static pliteral(paymentKeyHash: KeyHash): POwner {
-    return new POwner(paymentKeyHash);
   }
 }

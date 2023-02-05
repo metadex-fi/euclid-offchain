@@ -1,4 +1,4 @@
-import { Asset, PAsset, PPositive, PRecord } from "../mod.ts";
+import { Asset, PAsset, PRecord } from "../mod.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
 import { BoughtSold, PBoughtSold } from "./boughtSold.ts";
 

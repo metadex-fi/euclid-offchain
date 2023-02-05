@@ -28,9 +28,7 @@ export class Assets {
   constructor(
     private assets = ccysTkns.anew,
   ) {
-    for (const [ccy, tkns] of this.assets) {
-      assert(tkns.length > 0, `empty token list for ${ccy}`);
-    }
+    Assets.assert(this);
   }
 
   public show = (tabs = ""): string => {
@@ -178,13 +176,13 @@ export class Assets {
     return this.assets.size === 0;
   }
 
-  public size = (): number => {
+  public get size(): number {
     let size = 0;
     for (const tkns of this.assets.values()) {
       size += tkns.length;
     }
     return size;
-  };
+  }
 
   public subsetOf = (assets: Assets): boolean => {
     for (const [ccy, tkns] of this.assets) {
@@ -217,7 +215,7 @@ export class Assets {
       assets_.insert(asset);
     }
     assert(
-      assets_.size() === assets.length,
+      assets_.size === assets.length,
       `fromList ${assets} resulted in ${assets_.show()}`,
     );
     return assets_;
@@ -243,6 +241,9 @@ export class Assets {
   };
 
   static assert(assets: Assets): void {
+    for (const [ccy, tkns] of assets.assets) {
+      assert(tkns.length > 0, `empty token list for ${ccy}`);
+    }
     assets.forEach((asset) => Asset.assertADAlovelace(asset));
   }
 
@@ -254,7 +255,7 @@ export class Assets {
     assert(assets.length >= minLength, `generated ${assets} too small`);
     const assets_ = Assets.fromList(assets);
     assert(
-      assets_.size() >= minLength,
+      assets_.size >= minLength,
       `generated ${assets_.show()} too small`,
     );
     return assets_;
@@ -267,20 +268,18 @@ export class Assets {
   };
 }
 
-export class PAssets extends PConstraint<PWrapped<Assets>> {
+export class PAssets extends PWrapped<Assets> {
   private constructor() {
     super(
-      new PWrapped(
-        new PMap(PCurrency.ptype, PNonEmptyTokenList),
-        Assets,
-      ),
-      [Assets.assert],
-      Assets.generate,
+      new PMap(PCurrency.ptype, PNonEmptyTokenList),
+      Assets,
     );
   }
 
+  public genData = Assets.generate;
+
   static ptype = new PAssets();
-  static genPType(): PConstraint<PWrapped<Assets>> {
+  static genPType(): PWrapped<Assets> {
     return PAssets.ptype;
   }
 }

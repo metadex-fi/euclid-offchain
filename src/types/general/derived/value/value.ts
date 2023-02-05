@@ -364,7 +364,7 @@ export class Value {
     Assets.assert(value.assets());
   }
 
-  static generateWith = (bounded: PBounded) => (): Value => {
+  static generateWith = (bounded: PBounded): Value => {
     const assets = Assets.generate();
     const value = new Value();
     assets.forEach((asset) => {
@@ -374,23 +374,24 @@ export class Value {
   };
 }
 
-export class PValue extends PConstraint<PWrapped<Value>> {
+export class PValue extends PWrapped<Value> {
   constructor(
     public pbounded: PBounded,
   ) {
     super(
-      new PWrapped(
-        new PMap(
-          PCurrency.ptype,
-          new PMap(PToken.ptype, pbounded),
-        ),
-        Value,
+      new PMap(
+        PCurrency.ptype,
+        new PMap(PToken.ptype, pbounded),
       ),
-      [Value.assert],
-      Value.generateWith(pbounded),
+      Value,
     );
   }
-  static genPType(): PConstraint<PWrapped<Value>> {
+
+  public genData = (): Value => {
+    return Value.generateWith(this.pbounded);
+  };
+
+  static genPType(): PWrapped<Value> {
     return new PValue(PBounded.genPType() as PBounded);
   }
 }
