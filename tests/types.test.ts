@@ -26,6 +26,7 @@ import {
   PToken,
   PWrapped,
 } from "../src/mod.ts";
+import { PEuclidValue } from "../src/types/euclid/euclidValue.ts";
 import { PNonEmptyList } from "../src/types/general/derived/nonEmptyList.ts";
 import { PPositiveValue } from "../src/types/general/derived/value/positiveValue.ts";
 import { PValue } from "../src/types/general/derived/value/value.ts";
@@ -86,6 +87,7 @@ const derivedContainerGenerators = [
 const euclidPrimitiveGenerators = [
   PBoughtSold.genPType,
   PSwap.genPType,
+  PEuclidValue.genPType,
+  PIdNFT.genPType,
   PParam.genPType,
-  // PIdNFT.genPType,
 ];

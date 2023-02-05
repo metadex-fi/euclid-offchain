@@ -1,25 +1,21 @@
-import {
-  Assets,
-  KeyHash,
-  PKeyHash,
-  PositiveValue,
-  PPositiveValue,
-  PRecord,
-} from "../mod.ts";
+import { Assets, KeyHash, PKeyHash, PRecord } from "../mod.ts";
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
+import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
+
+// TODO somewhere, take care of sortedness where it applies (not only for PParam)
 
 export class Param {
   constructor(
     public readonly owner: KeyHash,
-    public readonly jumpSizes: PositiveValue,
-    public readonly weights: PositiveValue,
-    public readonly lowestPrices: PositiveValue,
+    public readonly jumpSizes: EuclidValue,
+    public readonly weights: EuclidValue,
+    public readonly lowestPrices: EuclidValue,
   ) {
-    Param.assertAssets(this);
+    Param.asserts(this);
   }
 
-  static assertAssets(param: Param): void {
+  static asserts(param: Param): void {
     const assets = param.jumpSizes.assets();
     assert(
       assets.equals(param.weights.assets()),
@@ -29,7 +25,19 @@ export class Param {
       assets.equals(param.lowestPrices.assets()),
       "assets of jumpSizes and lowestPrices must match",
     );
-    assert(assets.size >= 2n, "at least two assets are required");
+  }
+
+  static generate(): Param {
+    const assets = Assets.generate(2n);
+    const jumpSizes = EuclidValue.genOfAssets(assets);
+    const weights = EuclidValue.genOfAssets(assets);
+    const lowestPrices = EuclidValue.genOfAssets(assets);
+    return new Param(
+      PKeyHash.ptype.genData(),
+      jumpSizes,
+      weights,
+      lowestPrices,
+    );
   }
 }
 
@@ -38,26 +46,15 @@ export class PParam extends PObject<Param> {
     super(
       new PRecord({
         owner: PKeyHash.ptype,
-        jumpSizes: PPositiveValue.ptype,
-        highestPrices: PPositiveValue.ptype,
-        weights: PPositiveValue.ptype,
+        jumpSizes: PEuclidValue.ptype,
+        highestPrices: PEuclidValue.ptype,
+        weights: PEuclidValue.ptype,
       }),
       Param,
     );
   }
 
-  public genData = (): Param => {
-    const assets = Assets.generate(2n);
-    const jumpSizes = PositiveValue.genOfAssets(assets);
-    const weights = PositiveValue.genOfAssets(assets);
-    const lowestPrices = PositiveValue.genOfAssets(assets);
-    return new Param(
-      PKeyHash.ptype.genData(),
-      jumpSizes,
-      weights,
-      lowestPrices,
-    );
-  };
+  public genData = Param.generate;
 
   static ptype = new PParam();
   static genPtype(): PParam {
