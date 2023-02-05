@@ -2,6 +2,7 @@ import {
   Generators,
   PAsset,
   PAssets,
+  PBoughtSold,
   PBounded,
   PByteString,
   PConstraint,
@@ -30,7 +31,7 @@ Deno.test("euclid data/types tests", () => {
     [
       ...fundamentalPrimitiveGenerators,
       ...derivedPrimitiveGenerators,
-      //   ...euclidPrimitiveGenerators,
+      ...euclidPrimitiveGenerators,
     ],
     [
       ...fundamentalContainerGenerators,
@@ -75,17 +76,6 @@ const derivedContainerGenerators = [
   PNonEmptyList.genPType,
 ];
 
-// const euclidPrimitiveGenerators = [
-//   PKeyHash.genPType,
-//   PHash.genPType,
-//   POwner.genPType,
-//   PIdNFT.genPType,
-//   PJumpSizes.genPType,
-//   PPrices.genPType,
-//   PParam.genPType,
-//   PParamDatum.genPType,
-//   PAmounts.genPType,
-//   PActiveAssets.genPType,
-//   PDirac.genPType,
-//   PDiracDatum.genPType,
-// ];
+const euclidPrimitiveGenerators = [
+  PBoughtSold.genPType,
+];
