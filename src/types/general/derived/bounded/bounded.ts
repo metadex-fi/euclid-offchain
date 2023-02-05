@@ -1,6 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { maxInteger,genNonNegative } from "../../../../mod.ts";
-import { PConstraint,PInteger } from "../../mod.ts";
+import { genNonNegative, maxInteger } from "../../../../mod.ts";
+import { PInteger } from "../../mod.ts";
+import { PConstraint } from "../../fundamental/container/constraint.ts";
 
 export const bothExtreme = (a: bigint, b: bigint) =>
   a === b && a === maxInteger || a === -maxInteger;

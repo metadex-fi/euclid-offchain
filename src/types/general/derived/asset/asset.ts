@@ -1,9 +1,9 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
 import { randomChoice } from "../../../../mod.ts";
-import { PConstraint,PObject,PRecord } from "../../mod.ts";
-import { Currency,PCurrency } from "./currency.ts";
-import { Token,PToken } from "./token.ts";
+import { PConstraint, PObject, PRecord } from "../../mod.ts";
+import { Currency, PCurrency } from "./currency.ts";
+import { PToken, Token } from "./token.ts";
 
 export class Asset {
   constructor(

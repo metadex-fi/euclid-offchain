@@ -1,12 +1,25 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
-import { randomChoice,randomSubset,nonEmptySubSet,minSizedSubset,gMaxLength } from "../../../../mod.ts";
-import { AssocMap,t,f,PMap,PConstraint,PWrapped } from "../../mod.ts";
-import { newGenInRange } from "../bounded.ts";
+import {
+  gMaxLength,
+  minSizedSubset,
+  nonEmptySubSet,
+  randomChoice,
+  randomSubset,
+} from "../../../../mod.ts";
+import {
+  AssocMap,
+  f,
+  newGenInRange,
+  PConstraint,
+  PMap,
+  PWrapped,
+  t,
+} from "../../mod.ts";
 import { PNonEmptyList } from "../nonEmptyList.ts";
-import { Asset,PAsset } from "./asset.ts";
-import { PCurrency,Currency } from "./currency.ts";
-import { Token,PToken } from "./token.ts";
+import { Asset, PAsset } from "./asset.ts";
+import { Currency, PCurrency } from "./currency.ts";
+import { PToken, Token } from "./token.ts";
 
 export const ccysTkns = new AssocMap<PCurrency, Token[]>(PCurrency.ptype);
 const PNonEmptyTokenList = new PNonEmptyList(PToken.ptype);

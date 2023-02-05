@@ -1,8 +1,16 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { AssocMap, IdNFT, max, maxInteger } from "../../../../mod.ts";
+import { max, maxInteger } from "../../../../mod.ts";
 import { f, PConstraint, PMap, PWrapped, t } from "../../mod.ts";
-import { Asset, Assets, ccysTkns, PCurrency, PToken } from "../asset.ts";
-import { bothExtreme, PBounded } from "../bounded.ts";
+import {
+  Asset,
+  Assets,
+  bothExtreme,
+  ccysTkns,
+  PBounded,
+  PCurrency,
+  PToken,
+} from "../mod.ts";
+import { AssocMap } from "../../fundamental/container/map.ts";
 
 export const ccysTknsAmnts = new AssocMap<PCurrency, AssocMap<PToken, bigint>>(
   PCurrency.ptype,
@@ -151,18 +159,18 @@ export class Value {
     return tail_;
   };
 
-  public popIdNFT = (nft: IdNFT): void => {
-    const tknsAmnts = this.value.get(nft.currency);
-    assert(tknsAmnts, `no tokens for currency ${nft.currency}`);
-    assert(tknsAmnts.size === 1, `more than one tokenNames for ${nft.show()}`); // this is only because of our specific use case
-    const [tkn, amnt] = [...tknsAmnts.entries()][0];
-    assert(
-      tkn.name === nft.token.toString(),
-      `token ${tkn} != ${nft.token} for ${nft.show()}`,
-    );
-    assert(amnt === 1n, `amount ${amnt} != 1 for ${nft.show()}`);
-    this.value.delete(nft.currency);
-  };
+  // public popIdNFT = (nft: IdNFT): void => {
+  //   const tknsAmnts = this.value.get(nft.currency);
+  //   assert(tknsAmnts, `no tokens for currency ${nft.currency}`);
+  //   assert(tknsAmnts.size === 1, `more than one tokenNames for ${nft.show()}`); // this is only because of our specific use case
+  //   const [tkn, amnt] = [...tknsAmnts.entries()][0];
+  //   assert(
+  //     tkn.name === nft.token.toString(),
+  //     `token ${tkn} != ${nft.token} for ${nft.show()}`,
+  //   );
+  //   assert(amnt === 1n, `amount ${amnt} != 1 for ${nft.show()}`);
+  //   this.value.delete(nft.currency);
+  // };
 
   public foldWith =
     (init: bigint, op: (a: bigint, b: bigint) => bigint) => (): bigint => {
@@ -307,7 +315,7 @@ export class Value {
   };
 
   public fill = (assets: Assets, amount: bigint): Value => {
-    const value = this.clone();
+    const value = this.clone;
     assets.forEach((asset) => {
       value.fillAmountOf(asset, amount);
     });

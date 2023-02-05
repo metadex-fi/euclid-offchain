@@ -65,7 +65,9 @@ export class Pool {
   public openingTx = (tx: Lucid.Tx, user: User): Lucid.Tx => {
     console.log(`opening pool`);
     let tx_ = this.paramUtxo.openingTx(tx, user);
-    this.diracUtxos.forEach((diracUtxo) => tx_ = diracUtxo.openingTx(user, tx_));
+    this.diracUtxos.forEach((diracUtxo) =>
+      tx_ = diracUtxo.openingTx(user, tx_)
+    );
     return tx_;
   };
 

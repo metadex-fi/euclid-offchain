@@ -26,7 +26,7 @@ export function tryToAct(
     .try((f) => f(tx, user, state));
 }
 
-// Any 
+// Any
 
 function tryOpenAny(tx: Lucid.Tx, user: User): Lucid.Tx | undefined {
   try {

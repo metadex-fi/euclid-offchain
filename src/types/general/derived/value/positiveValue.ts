@@ -1,8 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { genPositive, IdNFT } from "../../../../mod.ts";
+import { genPositive } from "../../../../mod.ts";
 import { AssocMap, PObject, PRecord } from "../../mod.ts";
-import { Asset, Assets, PCurrency, PToken } from "../asset.ts";
-import { PPositive } from "../bounded.ts";
+import { Asset, Assets, PCurrency, PPositive, PToken } from "../mod.ts";
 import { newAmountsCheck, newBoundedWith, PValue, Value } from "./value.ts";
 
 export const allPositive = newAmountsCheck((a) => a > 0n);
@@ -34,7 +33,7 @@ export class PositiveValue {
   public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
   public firstAsset = (): Asset => this.value.firstAsset();
   public firstAmount = (): bigint => this.value.firstAmount();
-  public popIdNFT = (nft: IdNFT) => this.value.popIdNFT(nft);
+  // public popIdNFT = (nft: IdNFT) => this.value.popIdNFT(nft);
   public drop = (asset: Asset): void => this.value.drop(asset);
   public smallestAmount = (): bigint => this.value.smallestAmount();
   public biggestAmount = (): bigint => this.value.biggestAmount();
