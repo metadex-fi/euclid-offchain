@@ -6,7 +6,6 @@ import {
   Data,
   gMaxHashes,
   IdNFT,
-  maxInteger,
   PIdNFT,
   PKeyHash,
   PPreDiracDatum,
@@ -94,27 +93,27 @@ export class EuclidState {
       );
       let hits = ownerPrePools.size;
       let misses = gMaxHashes;
-      let idNFT = new IdNFT(
-        policy,
+      let paramNFT = new IdNFT(
+        policy, // NOTE this is the only place where we actually constrain the policy, preserve that
         owner.hash(),
       );
       while (hits && misses) {
-        const prePool = ownerPrePools.get(idNFT);
+        const prePool = ownerPrePools.get(paramNFT);
         if (prePool) {
           misses = gMaxHashes;
-          const parsed = prePool.parse(policy, idNFT);
+          const parsed = prePool.parse();
           if (parsed) {
             const [parsedPool, lastIdNFT] = parsed;
-            parsedOwnerPools.set(idNFT, parsedPool);
-            idNFT = lastIdNFT;
+            parsedOwnerPools.set(paramNFT, parsedPool);
+            paramNFT = lastIdNFT;
             hits--;
           } else {
-            invalidOwnerPools.set(idNFT, prePool);
+            invalidOwnerPools.set(paramNFT, prePool);
           }
         } else {
           misses--;
         }
-        idNFT = idNFT.next();
+        paramNFT = paramNFT.next();
       }
       this.pools.set(owner, parsedOwnerPools);
       this.invalidPools.set(owner, invalidOwnerPools);

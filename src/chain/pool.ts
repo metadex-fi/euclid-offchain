@@ -1,19 +1,10 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Lucid } from "../../lucid.mod.ts";
-import {
-  AssocMap,
-  Currency,
-  IdNFT,
-  maxInteger,
-  PDiracDatum,
-  PIdNFT,
-} from "../mod.ts";
-import { User } from "./user.ts";
+import { AssocMap, IdNFT, PIdNFT } from "../mod.ts";
 import { DiracUtxo, ParamUtxo, PreDiracUtxo } from "./utxo.ts";
 
 export class PrePool {
   public paramUtxo?: ParamUtxo;
-  public preDiracUtxos = new AssocMap<PIdNFT, PreDiracUtxo>(PIdNFT.pdummy); // TODO not sure about pdummy here
+  public preDiracUtxos?: AssocMap<PIdNFT, PreDiracUtxo>;
 
   public setParamUtxo = (paramUtxo: ParamUtxo): PrePool => {
     assert(!this.paramUtxo, `duplicate param ${paramUtxo}`);
@@ -23,6 +14,11 @@ export class PrePool {
 
   public addPreDiracUtxo = (preDiracUtxo: PreDiracUtxo): PrePool => {
     const paramNFT = preDiracUtxo.dirac.paramNFT;
+    if (!this.preDiracUtxos) {
+      this.preDiracUtxos = new AssocMap<PIdNFT, PreDiracUtxo>(
+        new PIdNFT(paramNFT.currency),
+      );
+    }
     assert(
       !this.preDiracUtxos.has(paramNFT),
       `CRITICAL: duplicate dirac ${paramNFT}`,
@@ -31,51 +27,29 @@ export class PrePool {
     return this;
   };
 
-  public parse = (
-    policy: Currency,
-    firstIdNFT: IdNFT,
-  ): [Pool, IdNFT] | undefined => {
-    if (!this.paramUtxo || this.preDiracUtxos.size) return undefined; // TODO logging
-
-    const param = this.paramUtxo.param;
-    const paramNFT = this.paramUtxo.paramNFT;
-    if (paramNFT.currency.show() !== policy.show()) return undefined; // TODO logging
-
-    try {
-      paramNFT.assertPrecedes(firstIdNFT);
-    } catch (_e) {
-      return undefined; // TODO logging
+  public parse = (): [Pool, IdNFT] | undefined => {
+    if (!this.paramUtxo || !this.preDiracUtxos) return undefined; // TODO consider if critical, then handle and/or log resp.
+    const subsequents = this.paramUtxo.paramNFT.sortSubsequents([
+      ...this.preDiracUtxos.keys(),
+    ]); // TODO  consider if invalids critical, then handle and/or log resp.
+    const threadNFTs = subsequents.sorted;
+    const parsedDiracUtxos = new Array<DiracUtxo>();
+    const invalidDiracUtxos = new Array<PreDiracUtxo>();
+    for (const threadNFT of threadNFTs) {
+      const preDiracUtxo = this.preDiracUtxos.get(threadNFT)!;
+      const parsedDiracUtxo = preDiracUtxo.parse(
+        this.paramUtxo.param,
+        this.paramUtxo.paramNFT,
+        threadNFT,
+      );
+      if (parsedDiracUtxo) parsedDiracUtxos.push(parsedDiracUtxo);
+      else invalidDiracUtxos.push(preDiracUtxo);
     }
-    let idNFT = paramNFT.next();
-    const parsedDiracUtxos = new AssocMap<PIdNFT, DiracUtxo>(
-      new PIdNFT(policy),
-    );
-    const numDiracs = this.preDiracUtxos.size;
-    while (parsedDiracUtxos.size < numDiracs) {
-      const preDirac = this.preDiracUtxos.get(idNFT);
-      if (preDirac) {
-        const parsedDiracUtxo = preDirac.parse();
-        if (parsedDiracUtxo) {
-          parsedDiracUtxos.set(idNFT, parsedDiracUtxo);
-        } // TODO else?
-      } else {
-        if (misses-- < 0) { // TODO do something about the unparsed
-          this.pools.set(owner, parsedOwnerPools);
-          return;
-        }
-      }
-      idNFT = idNFT.next();
-    }
-
-    // TODO ENTRYPOINT do the same thing as in euclidState, where we iterate the nft and process the matches in the map, if they exist
-
-    // const numDiracs = BigInt(this.preDiracUtxos.size);
-    // const pdiracDatum = PDiracDatum.parse(param, paramNFT, numDiracs);
-    // const diracUtxos = this.preDiracUtxos.map((pdu) => pdu.parse(pdiracDatum))
-    //   .filter((du) => du) as DiracUtxo[];
-
-    // if (!diracUtxos.length) return undefined;
-    // return [new Pool(this.paramUtxo, diracUtxos), ];
+    if (!parsedDiracUtxos.length) return undefined;
+    return [
+      new Pool(this.paramUtxo, parsedDiracUtxos),
+      threadNFTs[threadNFTs.length - 1],
+    ];
   };
 }
 
