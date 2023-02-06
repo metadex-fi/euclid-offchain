@@ -16,6 +16,7 @@ import {
   PPreDiracDatum,
   t,
 } from "../mod.ts";
+import { Contract } from "./mod.ts";
 import { User } from "./user.ts";
 
 export class ParamUtxo {
@@ -42,18 +43,18 @@ export class ParamUtxo {
     return new ParamUtxo(param, paramNFT, utxo);
   }
 
-  public openingTx = (tx: Lucid.Tx, user: User): Lucid.Tx => {
+  public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(this.param));
     const paramNFT = this.paramNFT.toLucidNFT();
 
     return tx
-      .attachMintingPolicy(user.contract.mintingPolicy)
+      .attachMintingPolicy(contract.mintingPolicy)
       .mintAssets(paramNFT, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
       .payToContract(
-        user.contract.address,
+        contract.address,
         {
           inline: Data.to(paramDatum),
-          scriptRef: user.contract.validator, // for now, for simplicities' sake
+          scriptRef: contract.validator, // for now, for simplicities' sake
         },
         paramNFT,
       );
@@ -131,7 +132,7 @@ export class DiracUtxo {
   ${tt})`;
   };
 
-  public openingTx = (tx: Lucid.Tx, user: User): Lucid.Tx => {
+  public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     const diracDatum = this.pdiracDatum.pconstant(new DiracDatum(this.dirac));
     const funds = this.balance.toLucid();
     const threadNFT = this.dirac.threadNFT.toLucidNFT();
@@ -140,7 +141,7 @@ export class DiracUtxo {
     return tx
     .mintAssets(threadNFT, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
     .payToContract(
-      user.contract.address,
+      contract.address,
       {
         inline: Data.to(diracDatum),
       },

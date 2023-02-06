@@ -1,6 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
 import { AssocMap, IdNFT, PIdNFT } from "../mod.ts";
+import { Contract } from "./mod.ts";
 import { User } from "./user.ts";
 import { DiracUtxo, ParamUtxo, PreDiracUtxo } from "./utxo.ts";
 
@@ -61,11 +62,10 @@ export class Pool {
     public readonly diracUtxos: DiracUtxo[],
   ) {}
 
-    public openingTx = (tx: Lucid.Tx, user: User): Lucid.Tx => {
-      console.log(`opening pool`);
-      let tx_ = this.paramUtxo.openingTx(tx, user);
+    public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
+      let tx_ = this.paramUtxo.openingTx(tx, contract);
       this.diracUtxos.forEach((diracUtxo) =>
-        tx_ = diracUtxo.openingTx(tx_, user)
+        tx_ = diracUtxo.openingTx(tx_, contract)
       );
       return tx_;
     };
