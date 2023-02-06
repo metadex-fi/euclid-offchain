@@ -16,6 +16,7 @@ export class EuclidValue {
   public unit = (): Value => this.value.unit();
   public concise = (tabs = ""): string => this.value.concise(tabs);
   public popIdNFT = (nft: IdNFT) => this.value.popIdNFT(nft);
+  public toLucid = (): Lucid.Assets => this.value.toLucid();
 
   static asserts(euclidValue: EuclidValue): void {
     assert(euclidValue.assets().size >= 2n, "at least two assets are required");
