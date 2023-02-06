@@ -11,14 +11,17 @@ import {
   f,
   generateWithin,
   KeyHash,
+  leq,
   Param,
+  PConstraint,
   PKeyHash,
   PObject,
+  PParam,
   PRecord,
   t,
 } from "../mod.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
-import { IdNFT, PIdNFT } from "./idnft.ts";
+import { gMaxHashes, IdNFT, PIdNFT } from "./idnft.ts";
 
 export class Dirac {
   constructor(
@@ -45,81 +48,77 @@ ${ttf}lowestPrices: ${this.lowestPrices.concise(ttf)},
 ${tt})`;
   };
 
-  static generateFrom = (
-    param: Param,
-    paramNFT: IdNFT,
-    numDiracs: bigint,
-  ): Dirac => {
-    const threadNFT = PIdNFT.pthreadNFT(
-      paramNFT,
-      numDiracs,
-    ).genData();
-
-    const lowestPrices = EuclidValue.fromValue(
-      generateWithin(
-        param.highestPrices.unit(),
-        param.highestPrices.unsigned(),
-      ),
-    );
-
-    return new Dirac(
-      param.owner,
-      threadNFT,
-      paramNFT,
-      lowestPrices,
-    );
+  static assertWith = (param: Param) => (dirac: Dirac): void => {
+    // leq asserts assets match as well
+    assert(leq(dirac.lowestPrices.unsigned(), param.highestPrices.unsigned()));
   };
+
+  static generateWith =
+    (param: Param, paramNFT: IdNFT, threadNFT: IdNFT) => (): Dirac => {
+      const lowestPrices = EuclidValue.fromValue(
+        generateWithin(
+          param.highestPrices.unit(),
+          param.highestPrices.unsigned(),
+        ),
+      );
+      return new Dirac(
+        param.owner,
+        threadNFT,
+        paramNFT,
+        lowestPrices,
+      );
+    };
 }
 
 export class PPreDirac extends PObject<Dirac> {
-  constructor() {
+  constructor(
+    policy: Currency,
+  ) {
     super(
       new PRecord({
         owner: PKeyHash.ptype,
-        threadNFT: PAsset.ptype,
-        paramNFT: PAsset.ptype,
+        threadNFT: new PIdNFT(policy),
+        paramNFT: new PIdNFT(policy),
         lowestPrices: PEuclidValue.ptype,
       }),
       Dirac,
     );
   }
 
-  static ptype = new PPreDirac();
-  static genPType(): PObject<Dirac> {
-    return PPreDirac.ptype;
+  static genPType(): PPreDirac {
+    return new PPreDirac(Currency.dummy);
   }
 }
 
-export class PDirac extends PObject<Dirac> {
+export class PDirac extends PConstraint<PObject<Dirac>> {
   constructor(
     public readonly param: Param,
     public readonly paramNFT: IdNFT,
-    public readonly numDiracs: bigint,
+    public readonly threadNFT: IdNFT,
   ) {
-    assert(numDiracs > 0n, "PDirac.numDiracs must be positive");
-    const pparamNFT = PIdNFT.pparamNFT(paramNFT);
-    const pthreadNFT = PIdNFT.pthreadNFT(paramNFT, numDiracs);
+    const pidNFT = new PIdNFT(paramNFT.currency);
     super(
-      new PRecord({
-        owner: new PLiteral<PKeyHash>(PKeyHash.ptype, param.owner),
-        threadNFT: pthreadNFT,
-        paramNFT: pparamNFT,
-        lowestPrices: PEuclidValue.ptype,
-      }),
-      Dirac,
+      new PObject(
+        new PRecord({
+          owner: new PLiteral<PKeyHash>(PKeyHash.ptype, param.owner),
+          threadNFT: new PLiteral(pidNFT, threadNFT),
+          paramNFT: new PLiteral(pidNFT, paramNFT),
+          lowestPrices: PEuclidValue.ptype,
+        }),
+        Dirac,
+      ),
+      [Dirac.assertWith(param)],
+      Dirac.generateWith(param, paramNFT, threadNFT),
     );
   }
 
-  public genData = (): Dirac => {
-    return Dirac.generateFrom(this.param, this.paramNFT, this.numDiracs);
-  };
-
-  static genPType(): PDirac {
-    const param = Param.generate();
+  static genPType(): PConstraint<PObject<Dirac>> {
+    const param = PParam.ptype.genData();
     const paramNFT = new IdNFT(
       Currency.dummy,
-      param.owner.hash().hash(genNonNegative()),
+      param.owner.hash().hash(genNonNegative(gMaxHashes - 1n)),
     );
-    return new PDirac(param, paramNFT, genPositive());
+    const threadNFT = paramNFT.next(genPositive(gMaxHashes));
+    return new PDirac(param, paramNFT, threadNFT);
   }
 }

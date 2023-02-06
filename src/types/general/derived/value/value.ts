@@ -460,15 +460,14 @@ export const newCompareWith = (
 };
 
 // TODO better "infinity" values. Maybe use onchain maximum?
-export const lt = newCompareWith(
-  (a, b) => a < b || bothExtreme(a, b),
-  -BigInt(maxInteger),
-  BigInt(maxInteger),
-);
+// export const lt = newCompareWith(
+//   (a, b) => a < b || bothExtreme(a, b),
+//   -BigInt(maxInteger),
+//   BigInt(maxInteger),
+// );
 export const leq = newCompareWith(
   (a, b) => a <= b,
-  -BigInt(maxInteger),
-  BigInt(maxInteger),
+  // no defaults, as we use it to assert assets match as well
 );
 
 export const newAmountsCheck = (op: (arg: bigint) => boolean) =>

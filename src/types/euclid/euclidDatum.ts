@@ -1,4 +1,4 @@
-import { PObject, PRecord } from "../mod.ts";
+import { Currency, PObject, PRecord } from "../mod.ts";
 import { Dirac, PDirac, PPreDirac } from "./dirac.ts";
 import { IdNFT } from "./idnft.ts";
 import { Param, PParam } from "./param.ts";
@@ -10,7 +10,7 @@ export class ParamDatum {
 }
 export class PParamDatum extends PObject<ParamDatum> {
   private constructor(
-    public readonly pparam: PParam,
+    pparam: PParam,
   ) {
     super(
       new PRecord({
@@ -32,30 +32,39 @@ export class DiracDatum {
   ) {}
 }
 
-export class PDiracDatum extends PObject<DiracDatum> {
-  private constructor(
-    public readonly pdirac: PDirac | PPreDirac,
+export class PPreDiracDatum extends PObject<DiracDatum> {
+  constructor(
+    policy: Currency,
   ) {
     super(
       new PRecord({
-        "dirac": pdirac,
+        "dirac": new PPreDirac(policy),
       }),
       DiracDatum,
     );
   }
 
-  static pre: PDiracDatum = new PDiracDatum(PPreDirac.ptype);
+  static genPType(): PPreDiracDatum {
+    return new PPreDiracDatum(Currency.dummy);
+  }
+}
 
-  static parse(
+export class PDiracDatum extends PObject<DiracDatum> {
+  constructor(
     param: Param,
     paramNFT: IdNFT,
-    numDiracs: bigint,
-  ): PDiracDatum {
-    return new PDiracDatum(new PDirac(param, paramNFT, numDiracs));
+    threadNFT: IdNFT,
+  ) {
+    super(
+      new PRecord({
+        "dirac": new PDirac(param, paramNFT, threadNFT),
+      }),
+      DiracDatum,
+    );
   }
 
-  static genPType(): PObject<DiracDatum> {
+  static genPType(): PDiracDatum {
     const pdirac = PDirac.genPType() as PDirac;
-    return new PDiracDatum(pdirac);
+    return new PDiracDatum(pdirac.param, pdirac.paramNFT, pdirac.threadNFT);
   }
 }

@@ -12,6 +12,7 @@ import {
   PDiracDatum,
   PositiveValue,
   PParamDatum,
+  PPreDiracDatum,
   t,
 } from "../mod.ts";
 import { User } from "./user.ts";
@@ -74,21 +75,26 @@ export class ParamUtxo {
 
 export class PreDiracUtxo {
   public readonly dirac: Dirac;
-  public readonly balance: EuclidValue
+  public readonly balance: EuclidValue;
   constructor(
     public readonly utxo: Lucid.UTxO,
     public readonly fields: Data[],
+    ppreDiracDatum: PPreDiracDatum,
   ) {
-    this.dirac = PDiracDatum.pre.plift(this.fields).dirac;
+    this.dirac = ppreDiracDatum.plift(fields).dirac;
     this.balance = EuclidValue.fromLucid(
       utxo.assets,
     );
     this.balance.popIdNFT(this.dirac.threadNFT);
   }
 
-  public parse = (pdiracDatum: PDiracDatum): DiracUtxo | undefined => {
+  public parse = (
+    param: Param,
+    paramNFT: IdNFT,
+    threadNFT: IdNFT,
+  ): DiracUtxo | undefined => {
     try {
-      return DiracUtxo.parse(this, pdiracDatum);
+      return DiracUtxo.parse(this, param, paramNFT, threadNFT);
     } catch (_e) { // TODO log this somewhere
       return undefined;
     }
@@ -96,17 +102,20 @@ export class PreDiracUtxo {
 }
 
 export class DiracUtxo {
-  constructor(
+  private constructor( // keep private, because how we handle optional utxo arg
     public readonly dirac: Dirac,
     public readonly pdiracDatum: PDiracDatum,
     public readonly balance: EuclidValue,
-    public readonly utxo?: Lucid.UTxO, //exists only when reading, not when creating
+    public readonly utxo?: Lucid.UTxO, //exists when reading, not when creating
   ) {}
 
   static parse(
     from: PreDiracUtxo,
-    pdiracDatum: PDiracDatum,
+    param: Param,
+    paramNFT: IdNFT,
+    threadNFT: IdNFT,
   ): DiracUtxo {
+    const pdiracDatum = new PDiracDatum(param, paramNFT, threadNFT);
     const dirac = pdiracDatum.plift(from.fields).dirac;
     return new DiracUtxo(dirac, pdiracDatum, from.balance, from.utxo);
   }

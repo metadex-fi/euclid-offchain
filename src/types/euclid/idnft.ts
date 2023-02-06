@@ -4,19 +4,25 @@ import {
   genNonNegative,
   genPositive,
   Hash,
+  maxInteger,
   PHash,
   PKeyHash,
   randomChoice,
 } from "../../mod.ts";
 import {
   Asset,
+  AssocMap,
   Currency,
   f,
   PConstraint,
   PCurrency,
+  PLiteral,
   PObject,
   PRecord,
+  PWrapped,
 } from "../mod.ts";
+
+export const gMaxHashes = maxInteger; // maximum distance between two subsequent idNFTs before we stop trying
 
 // NOTE biggest difference to regular Asset is that tokenName is not decoded/encoded
 // when parsing to/from lucid, as this is not symmetric unless starting with text-strings
@@ -31,8 +37,51 @@ export class IdNFT {
     return `IdNFT (${this.currency.show()}, ${this.token.show()})`;
   };
 
-  public next = (): IdNFT => {
-    return new IdNFT(this.currency, this.token.hash());
+  public next = (skip = 1n): IdNFT => {
+    return new IdNFT(this.currency, this.token.hash(skip));
+  };
+
+  public sortSubsequents = (candidates: IdNFT[]): {
+    sorted: IdNFT[];
+    wrongPolicy: IdNFT[];
+    unmatched: IdNFT[];
+  } => {
+    const policy = this.currency.show();
+    const hashes = new AssocMap<PHash, IdNFT>(PHash.ptype);
+    const sorted = new Array<IdNFT>();
+    const wrongPolicy = new Array<IdNFT>();
+    candidates.forEach((c) => {
+      if (c.currency.show() === policy) hashes.set(c.token, c);
+      else wrongPolicy.push(c);
+    });
+    let hits = hashes.size;
+    let misses = gMaxHashes;
+    let current = this.token;
+    while (hits && misses) {
+      current = current.hash();
+      const match = hashes.get(current);
+      if (match) {
+        sorted.push(match);
+        hashes.delete(current);
+        misses = gMaxHashes;
+        hits--;
+      } else {
+        misses--;
+      }
+    }
+    const unmatched = [...hashes.values()];
+    return { sorted, wrongPolicy, unmatched };
+  };
+
+  public assertPrecedes = (other: IdNFT): void => {
+    assert(this.currency.show() === other.currency.show(), "currency mismatch");
+    let current = this.token.hash();
+    const target = other.token.toString();
+    for (let i = 0n; i < gMaxHashes; i++) {
+      if (current.toString() === target) return;
+      current = current.hash();
+    }
+    throw new Error("assertPrecedes failed");
   };
 
   public toLucid = (): string => {
@@ -68,121 +117,20 @@ export class IdNFT {
   }
 }
 
-// this is supposed to hace the same onchain-representation as PAsset
-export class PIdNFT extends PConstraint<PObject<IdNFT>> {
-  private constructor(
-    public readonly paramNFT: IdNFT,
-    public readonly numDiracs?: bigint, // this tells us if we're dealing with a Param- or Dirac-IdNFT ("threadNFT")
+export class PIdNFT extends PObject<IdNFT> {
+  constructor(
+    public readonly policy: Currency,
   ) {
-    assert(
-      numDiracs === undefined || numDiracs > 0n,
-      "PIdNFT.numDiracs must be undefined (paramNFT) or positive (diracNFT)",
-    );
     super(
-      new PObject(
-        new PRecord({
-          currency: PCurrency.ptype,
-          token: PHash.ptype,
-        }),
-        IdNFT,
-      ),
-      [
-        numDiracs
-          ? PIdNFT.assertThreadNFT(paramNFT, numDiracs)
-          : PIdNFT.assertParamNFT(paramNFT),
-      ],
-      numDiracs
-        ? PIdNFT.generateThreadNFT(paramNFT, numDiracs)
-        : () => paramNFT,
-    );
-    this.population = Number(numDiracs ?? 1n);
-  }
-
-  public showData = (data: IdNFT): string => {
-    return `IdNFT ${data.show()}`;
-  };
-
-  public showPType = (): string => {
-    return `PObject: PIdNFT(${this.paramNFT.show()}, ${this.numDiracs})`;
-  };
-
-  static pparamNFT(
-    paramNFT: IdNFT,
-  ): PIdNFT {
-    return new PIdNFT(
-      paramNFT,
+      new PRecord({
+        currency: new PLiteral(PCurrency.ptype, policy),
+        token: PHash.ptype,
+      }),
+      IdNFT,
     );
   }
 
-  static pthreadNFT(
-    paramNFT: IdNFT,
-    numDiracs: bigint,
-  ): PIdNFT {
-    assert(numDiracs > 0n, "pthreadNFT.numDiracs must be positive");
-    return new PIdNFT(
-      paramNFT,
-      numDiracs,
-    );
+  static genPType(): PIdNFT {
+    return new PIdNFT(Currency.dummy);
   }
-
-  private static assertIdNFT = (
-    paramNFT: IdNFT,
-    maxHashes: bigint,
-  ) =>
-  (nft: IdNFT): void => {
-    assert(
-      nft.currency.show() === paramNFT.currency.show(),
-      `currency of ${nft.show()} does not fit ${paramNFT.currency.show()}`,
-    );
-
-    let hash = paramNFT.token;
-    let hashString = hash.toString();
-    const log = [hashString];
-    for (let i = 0n; i <= maxHashes; i++) {
-      if (nft.token.toString() === hashString) {
-        return;
-      }
-      hash = hash.hash();
-      hashString = hash.toString();
-      log.push(hashString);
-    }
-    throw new Error(
-      `ID-Asset verification failure for
-      ${nft.show()}
-      within ${maxHashes} hashes:\n${f}${log.join(`\n${f}`)}`,
-    );
-  };
-
-  static assertParamNFT = (
-    paramNFT: IdNFT,
-  ) => this.assertIdNFT(paramNFT, 0n);
-
-  static assertThreadNFT = (
-    paramNFT: IdNFT,
-    numDiracs: bigint,
-  ) => this.assertIdNFT(paramNFT, numDiracs);
-
-  private static generateThreadNFT = (
-    paramNFT: IdNFT,
-    maxHashes: bigint,
-  ) =>
-  (): IdNFT => {
-    return new IdNFT(
-      paramNFT.currency,
-      paramNFT.token.hash(genPositive(maxHashes)),
-    );
-  };
-
-  static genPType = (): PConstraint<PObject<IdNFT>> => {
-    const paramNFT = new IdNFT(
-      Currency.dummy,
-      PKeyHash.ptype.genData().hash().hash(genNonNegative()),
-    );
-    return randomChoice([
-      () => PIdNFT.pparamNFT(paramNFT),
-      () => PIdNFT.pthreadNFT(paramNFT, genPositive()),
-    ])();
-  };
-
-  static pdummy = PIdNFT.pparamNFT(new IdNFT(Currency.dummy, Hash.dummy));
 }
