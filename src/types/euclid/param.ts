@@ -1,4 +1,4 @@
-import { Assets, KeyHash, PKeyHash, PRecord } from "../mod.ts";
+import { Assets, f, KeyHash, PKeyHash, PRecord, t } from "../mod.ts";
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
@@ -18,6 +18,19 @@ export class Param {
   public get assets(): Assets {
     return this.jumpSizes.assets();
   }
+  public sharedAssets = (assets: Assets): Assets =>
+    this.assets.intersect(assets);
+
+  public concise = (tabs = ""): string => {
+    const tt = tabs + t;
+    const ttf = tt + f;
+    return `Param (
+${ttf}owner: ${this.owner.toString()}, 
+${ttf}jumpSizes: ${this.jumpSizes.concise(ttf)}, 
+${ttf}highestPrices: ${this.highestPrices.concise(ttf)}, 
+${ttf}weights: ${this.weights.concise(ttf)}
+${tt})`;
+  };
 
   static asserts(param: Param): void {
     const assets = param.jumpSizes.assets();
@@ -43,6 +56,33 @@ export class Param {
       weights,
     );
   }
+
+  // static generateForUser(user: User): [Param, PositiveValue] {
+  //   assert(user.balance, `user balance not initialized for ${user.address}`);
+  //   assert(
+  //     user.balance.size() >= 2,
+  //     `balance must be at least 2, got ${user.balance.concise()}`,
+  //   );
+  //   const deposit = user.balance.minSizedSubValue(2n);
+  //   const assets = deposit.assets();
+
+  //   const jumpSizes = EuclidValue.genOfAssets(assets);
+  //   const highestPrices = EuclidValue.genOfAssets(assets);
+  //   const weights = EuclidValue.genOfAssets(assets);
+
+  //   const param = new Param(
+  //     user.paymentKeyHash,
+  //     jumpSizes,
+  //     highestPrices,
+  //     weights,
+  //   );
+  //   let minDiracs = param.locationsPerDirac();
+  //   while (minDiracs > deposit.smallestAmount()) {
+  //     param.jumpSizes.doubleRandomAmount(); // this should decrease diracs
+  //     minDiracs = param.locationsPerDirac();
+  //   }
+  //   return [param, deposit];
+  // }
 }
 
 export class PParam extends PObject<Param> {

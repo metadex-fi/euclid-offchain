@@ -1,21 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
+import { Assets, IdNFT, KeyHash, PKeyHash, PositiveValue } from "../mod.ts";
 
-import {
-  Amounts,
-  Asset,
-  Assets,
-  Dirac,
-  DiracDatum,
-  f,
-  genPositive,
-  IdNFT,
-  KeyHash,
-  min,
-  PKeyHash,
-  randomChoice,
-  Token,
-} from "../mod.ts";
 import { Contract } from "./contract.ts";
 import { Pool } from "./pool.ts";
 
@@ -25,7 +11,7 @@ export class User {
   public readonly contract: Contract;
   public readonly paymentKeyHash: KeyHash;
 
-  public balance?: Amounts;
+  public balance?: PositiveValue;
   public pools?: Pool[]; // own creation recall
   // public utxoPools?: UtxoPool[]; // from onchain
   private lastIdNFT?: IdNFT;
@@ -57,7 +43,7 @@ export class User {
 
   public nextParamNFT = (): IdNFT => {
     if (this.lastIdNFT) return this.lastIdNFT.next();
-    else return new IdNFT(this.contract.currency, this.paymentKeyHash.hash());
+    else return new IdNFT(this.contract.policy, this.paymentKeyHash.hash());
   };
 
   public setLastIdNFT = (idNFT: IdNFT): void => {
@@ -96,7 +82,7 @@ export class User {
     const paymentKeyHash = PKeyHash.ptype.genData();
     const user = new User(lucid, privateKey, undefined, paymentKeyHash);
     const assets = Assets.generate(2n);
-    user.balance = Amounts.genOfAssets(assets);
+    user.balance = PositiveValue.genOfAssets(assets);
     return user;
   }
 
@@ -132,7 +118,7 @@ export class User {
         assets[asset] = amount + BigInt(assets[asset] ?? 0);
       });
     });
-    this.balance = Amounts.fromLucid(assets);
+    this.balance = PositiveValue.fromLucid(assets);
     console.log(`balance: ${this.balance.concise()}`);
   };
 

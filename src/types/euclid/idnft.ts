@@ -72,7 +72,7 @@ export class IdNFT {
 export class PIdNFT extends PConstraint<PObject<IdNFT>> {
   private constructor(
     public readonly paramNFT: IdNFT,
-    public readonly numDiracs?: bigint,
+    public readonly numDiracs?: bigint, // this tells us if we're dealing with a Param- or Dirac-IdNFT ("threadNFT")
   ) {
     assert(
       numDiracs === undefined || numDiracs > 0n,

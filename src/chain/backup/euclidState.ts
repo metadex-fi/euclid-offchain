@@ -1,20 +1,12 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
-import {
-  Assets,
-  AssocMap,
-  Currency,
-  Data,
-  PIdNFT,
-  PKeyHash,
-  PString,
-} from "../mod.ts";
+import { AssocMap, Currency, Data, PIdNFT, PKeyHash, PString } from "../mod.ts";
 import { Pool, PrePool } from "./pool.ts";
-import { ParamUtxo, PreDiracUtxo } from "./utxos.ts";
+import { ParamUtxo, PreDiracUtxo } from "./utxo.ts";
 
 type PErrorMessage = PString;
 
-export class Euclid {
+export class EuclidState {
   // private invalidDiracs = new AssocMap<PErrorMessage, PreDiracUtxo[]>(PString.ptype);
   private invalidUtxos = new AssocMap<PErrorMessage, Lucid.UTxO[]>(
     PString.ptype,
@@ -24,7 +16,7 @@ export class Euclid {
 
   constructor(
     utxos: Lucid.UTxO[],
-    contractCurrency: Currency,
+    policy: Currency,
   ) {
     const prePools = new AssocMap<PIdNFT, PrePool>(PIdNFT.pdummy);
     utxos.forEach((utxo) => {
@@ -64,9 +56,7 @@ export class Euclid {
         this.invalidUtxos.set(e.message, is);
       }
     });
-    const pools = prePools.map((prePool: PrePool) =>
-      prePool.parse(contractCurrency)
-    );
+    const pools = prePools.map((prePool: PrePool) => prePool.parse(policy));
     this.pools = new AssocMap<PKeyHash, AssocMap<PIdNFT, Pool>>(PKeyHash.ptype);
     for (const [paramNFT, pool] of pools) {
       const owner = pool.paramUtxo.param.owner;
@@ -77,8 +67,8 @@ export class Euclid {
     }
   }
 
-  public openForBusiness = (assets: Assets): Pool[] => {
-    return [...this.pools.values()].map((pools) => [...pools.values()]).flat()
-      .filter((pool) => pool.openForBusiness(assets));
-  };
+  // public openForBusiness = (assets: Assets): Pool[] => {
+  //   return [...this.pools.values()].map((pools) => [...pools.values()]).flat()
+  //     .filter((pool) => pool.openForBusiness(assets));
+  // };
 }

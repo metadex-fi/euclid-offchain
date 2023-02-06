@@ -4,7 +4,7 @@ import euclidValidator from "../../contract/euclidValidator.json" assert {
 import euclidMinting from "../../contract/mintAlways.json" assert { // TODO rename to euclidMinting
   type: "json",
 };
-import { Euclid } from "./euclid.ts";
+import { EuclidState } from "./euclidState.ts";
 import { Currency } from "../mod.ts";
 import { Lucid } from "../../lucid.mod.ts";
 
@@ -12,9 +12,8 @@ export class Contract {
   public readonly validator: Lucid.Validator;
   public readonly mintingPolicy: Lucid.MintingPolicy;
   public readonly address: Lucid.Address;
-  public readonly policyId: Lucid.PolicyId;
-  public readonly currency: Currency;
-  public state?: Euclid;
+  public readonly policy: Currency;
+  public euclidState?: EuclidState;
 
   constructor(
     public readonly lucid: Lucid.Lucid,
@@ -30,13 +29,14 @@ export class Contract {
     };
 
     this.address = lucid.utils.validatorToAddress(this.validator);
-    this.policyId = lucid.utils.mintingPolicyToId(this.mintingPolicy);
-    this.currency = Currency.fromHex(this.policyId);
+    this.policy = Currency.fromHex(
+      lucid.utils.mintingPolicyToId(this.mintingPolicy),
+    );
   }
 
   public update = async (): Promise<void> => {
     const utxos = await this.lucid.utxosAt(this.address);
-    this.state = new Euclid(utxos, this.currency);
+    this.euclidState = new EuclidState(utxos, this.policy);
   };
 
   public concise = (): string => {
@@ -44,9 +44,8 @@ export class Contract {
     return `Contract (
       mintingPolicy.script: ${this.mintingPolicy.script};
       address: ${this.address};
-      policyId: ${this.policyId};
-      currency: ${this.currency};
-      state?: ${this.state ? "yes" : "no"};
+      policy: ${this.policy};
+      state?: ${this.euclidState ? "yes" : "no"};
       )`;
   };
 }

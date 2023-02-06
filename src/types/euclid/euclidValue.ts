@@ -1,6 +1,8 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Assets, PositiveValue, PPositiveValue, Value } from "../mod.ts";
 import { PWrapped } from "../general/fundamental/container/wrapped.ts";
+import { Lucid } from "../../../lucid.mod.ts";
+import { IdNFT } from "./idnft.ts";
 
 export class EuclidValue {
   constructor(
@@ -12,6 +14,8 @@ export class EuclidValue {
   public assets = (): Assets => this.value.assets();
   public unsigned = (): Value => this.value.unsigned();
   public unit = (): Value => this.value.unit();
+  public concise = (tabs = ""): string => this.value.concise(tabs);
+  public popIdNFT = (nft: IdNFT) => this.value.popIdNFT(nft);
 
   static asserts(euclidValue: EuclidValue): void {
     assert(euclidValue.assets().size >= 2n, "at least two assets are required");
@@ -27,9 +31,10 @@ export class EuclidValue {
     return new EuclidValue(PositiveValue.genOfAssets(assets));
   }
 
-  static fromValue(value: Value): EuclidValue {
-    return new EuclidValue(new PositiveValue(value));
-  }
+  static fromValue = (value: Value): EuclidValue =>
+    new EuclidValue(new PositiveValue(value));
+  static fromLucid = (assets: Lucid.Assets): EuclidValue =>
+    new EuclidValue(PositiveValue.fromLucid(assets));
 }
 
 export class PEuclidValue extends PWrapped<EuclidValue> {

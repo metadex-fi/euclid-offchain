@@ -1,13 +1,21 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { genNonNegative, genPositive, PAsset, PLiteral } from "../../mod.ts";
+import {
+  Assets,
+  genNonNegative,
+  genPositive,
+  PAsset,
+  PLiteral,
+} from "../../mod.ts";
 import {
   Currency,
+  f,
   generateWithin,
   KeyHash,
   Param,
   PKeyHash,
   PObject,
   PRecord,
+  t,
 } from "../mod.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
 import { IdNFT, PIdNFT } from "./idnft.ts";
@@ -19,6 +27,23 @@ export class Dirac {
     public readonly paramNFT: IdNFT,
     public readonly lowestPrices: EuclidValue,
   ) {}
+
+  public get assets(): Assets {
+    return this.lowestPrices.assets();
+  }
+  public sharedAssets = (assets: Assets): Assets =>
+    this.assets.intersect(assets);
+
+  public concise = (tabs = ""): string => {
+    const tt = tabs + t;
+    const ttf = tt + f;
+    return `Dirac(
+${ttf}owner: ${this.owner},
+${ttf}threadNFT: ${this.threadNFT.show()},
+${ttf}paramNFT: ${this.paramNFT.show()},
+${ttf}lowestPrices: ${this.lowestPrices.concise(ttf)},
+${tt})`;
+  };
 
   static generateFrom = (
     param: Param,

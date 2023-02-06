@@ -1,37 +1,34 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
 import {
-  Amounts,
-  Asset,
   Assets,
-  Currency,
   Data,
   Dirac,
-  DiracDatum,
+  EuclidValue,
   f,
   IdNFT,
-  leq,
   Param,
   ParamDatum,
   PDiracDatum,
+  PositiveValue,
   PParamDatum,
   t,
-  User,
 } from "../mod.ts";
+import { User } from "./user.ts";
 
 export class ParamUtxo {
   constructor(
     public readonly param: Param,
     public readonly paramNFT: IdNFT,
-    public readonly utxo?: Lucid.UTxO,
+    public readonly utxo?: Lucid.UTxO, //exists only when reading, not when creating
   ) {}
 
   static parse(
     utxo: Lucid.UTxO,
     fields: Data[],
   ): ParamUtxo {
-    const param = PParamDatum.ptype.plift(fields)._0;
-    const balance = Amounts.fromLucid(
+    const param = PParamDatum.ptype.plift(fields).param;
+    const balance = PositiveValue.fromLucid(
       utxo.assets,
     );
     assert(
@@ -70,18 +67,23 @@ export class ParamUtxo {
     const tt = tabs + t;
     const ttf = tt + f;
     return `ParamUtxo (
-${ttf}param: ${this.param.concise(ttf)}
-${tt})`;
+  ${ttf}param: ${this.param.concise(ttf)}
+  ${tt})`;
   };
 }
 
 export class PreDiracUtxo {
   public readonly dirac: Dirac;
+  public readonly balance: EuclidValue
   constructor(
     public readonly utxo: Lucid.UTxO,
     public readonly fields: Data[],
   ) {
-    this.dirac = PDiracDatum.pre.plift(this.fields)._0;
+    this.dirac = PDiracDatum.pre.plift(this.fields).dirac;
+    this.balance = EuclidValue.fromLucid(
+      utxo.assets,
+    );
+    this.balance.popIdNFT(this.dirac.threadNFT);
   }
 
   public parse = (pdiracDatum: PDiracDatum): DiracUtxo | undefined => {
@@ -94,51 +96,22 @@ export class PreDiracUtxo {
 }
 
 export class DiracUtxo {
-  public flippable?: Assets;
-  public jumpable?: Assets;
-
   constructor(
     public readonly dirac: Dirac,
     public readonly pdiracDatum: PDiracDatum,
-    public readonly balance?: Amounts,
-    public readonly utxo?: Lucid.UTxO,
+    public readonly balance: EuclidValue,
+    public readonly utxo?: Lucid.UTxO, //exists only when reading, not when creating
   ) {}
 
   static parse(
     from: PreDiracUtxo,
     pdiracDatum: PDiracDatum,
   ): DiracUtxo {
-    const dirac = pdiracDatum.plift(from.fields)._0;
-    const balance = Amounts.fromLucid(
-      from.utxo.assets,
-    );
-    balance.popIdNFT(dirac.threadNFT);
-    assert(
-      leq(dirac.activeAmnts.unsigned(), balance.unsigned()),
-      `dirac activeAmnts ${dirac.activeAmnts.concise()} > balance ${balance.concise()}`,
-    );
-    // TODO consider checking amounts for all locations
-
-    return new DiracUtxo(dirac, pdiracDatum, balance, from.utxo);
+    const dirac = pdiracDatum.plift(from.fields).dirac;
+    return new DiracUtxo(dirac, pdiracDatum, from.balance, from.utxo);
   }
 
-  public openingTx = (user: User, tx: Lucid.Tx): Lucid.Tx => {
-    // console.log(`diracUTxo: ${this.show()}`);
-    const funds = this.dirac.activeAmnts.toLucid();
-    // const nft = this.dirac.threadNFT.toLucid();
-    // funds[nft] = 1n;
-    const datum = this.pdiracDatum.pconstant(new DiracDatum(this.dirac));
-    tx = tx.payToContract(
-      user.contract.address,
-      {
-        inline: Data.to(datum),
-      },
-      funds,
-    );
-    return tx;
-  };
-
-  public assets = (): Assets => this.dirac.assets();
+  public assets = (): Assets => this.dirac.assets;
   public sharedAssets = (assets: Assets): Assets =>
     this.dirac.sharedAssets(assets);
 
@@ -146,8 +119,8 @@ export class DiracUtxo {
     const tt = tabs + t;
     const ttf = tt + f;
     return `DiracUtxo (
-${ttf}dirac: ${this.dirac.show(ttf)},
-${ttf}balance: ${this.balance?.concise(ttf) ?? "undefined"}
-${tt})`;
+  ${ttf}dirac: ${this.dirac.concise(ttf)},
+  ${ttf}balance: ${this.balance?.concise(ttf) ?? "undefined"}
+  ${tt})`;
   };
 }

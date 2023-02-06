@@ -1,5 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { genPositive } from "../../../../mod.ts";
+import { Lucid } from "../../../../../lucid.mod.ts";
+import { genPositive, IdNFT } from "../../../../mod.ts";
 import { AssocMap, PObject, PRecord } from "../../mod.ts";
 import { Asset, Assets, PCurrency, PPositive, PToken } from "../mod.ts";
 import { newAmountsCheck, newBoundedWith, PValue, Value } from "./value.ts";
@@ -33,7 +34,8 @@ export class PositiveValue {
   public amountOf = (asset: Asset): bigint => this.value.amountOf(asset);
   public firstAsset = (): Asset => this.value.firstAsset();
   public firstAmount = (): bigint => this.value.firstAmount();
-  // public popIdNFT = (nft: IdNFT) => this.value.popIdNFT(nft);
+  // TODO this does not really belong here, entangles the non-DEX-stuff with DEX-stuff
+  public popIdNFT = (nft: IdNFT) => this.value.popIdNFT(nft);
   public drop = (asset: Asset): void => this.value.drop(asset);
   public smallestAmount = (): bigint => this.value.smallestAmount();
   public biggestAmount = (): bigint => this.value.biggestAmount();
@@ -77,6 +79,31 @@ export class PositiveValue {
     });
     return value;
   };
+
+  public toLucid = (): Lucid.Assets => {
+    const assets: Lucid.Assets = {};
+    this.assets().forEach((asset) => {
+      assets[asset.toLucid()] = this.amountOf(asset);
+    });
+    return assets;
+  };
+
+  static fromLucid(assets: Lucid.Assets): PositiveValue {
+    try {
+      const value = new Value();
+      Object.entries(assets).forEach(([name, amount]) => {
+        const asset = Asset.fromLucid(name);
+        value.initAmountOf(asset, amount);
+      });
+      return new PositiveValue(value);
+    } catch (e) {
+      throw new Error(
+        `Amounts.fromLucid ${
+          Object.entries(assets).map(([ass, amnt]) => `${ass}: ${amnt}\n`)
+        }:${e}`,
+      );
+    }
+  }
 
   static maybeFromMap = (
     m?: AssocMap<PCurrency, AssocMap<PToken, bigint>>,
