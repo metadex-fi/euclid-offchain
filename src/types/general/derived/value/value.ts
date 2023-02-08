@@ -1,10 +1,9 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { IdNFT, max, maxInteger } from "../../../../mod.ts";
+import { IdNFT } from "../../../../mod.ts";
 import { f, PMap, PWrapped, t } from "../../mod.ts";
 import {
   Asset,
   Assets,
-  bothExtreme,
   ccysTkns,
   PBounded,
   PCurrency,
@@ -60,101 +59,37 @@ export class Value {
     else return `[\n${amounts.join(`,\n`)}\n${tabs}]`;
   };
 
-  public zeroed = (): Value => {
-    return newSetAmounts(0n)(this);
-  };
+  public get zeroed(): Value {
+    return Value.newSetAmounts(0n)(this);
+  }
 
-  public unit = (): Value => {
-    return newSetAmounts(1n)(this);
-  };
+  public get unit(): Value {
+    return Value.newSetAmounts(1n)(this);
+  }
 
-  public maxxed = (): Value => {
-    return newSetAmounts(maxInteger)(this);
-  };
+  public divideByScalar = (scalar: bigint): Value => {
+    return Value.newMapAmounts((a) => a / scalar)(this);
+  }
 
-  // public minned = (): Value => {
-  //   return newSetAmounts(-maxInteger)(this);
-  // };
-
-  public scaledWith = (factor: bigint): Value => {
-    return newMapAmounts((a) => a * factor)(this);
-  };
-
-  public increment = (): Value => {
-    return newMapAmounts((a) => a + 1n)(this);
-  };
-
-  public flatDecrement = (): Value => {
-    return newMapAmounts((a) => max(0n, a - 1n))(this);
-  };
-
-  public numAssets = (): number => {
-    let n = 0;
-    for (const tkns of this.value.values()) {
-      n += tkns.size;
-    }
-    return n;
-  };
-
-  public assets = (): Assets => {
+  public get assets(): Assets {
     const assets = ccysTkns.anew;
     for (const [currencySymbol, tokens] of this.value) {
       assets.set(currencySymbol, [...tokens.keys()]);
     }
     return new Assets(assets);
-  };
+  }
 
-  public firstAsset = (): Asset => {
-    assert(this.value.size > 0, `no currencies in value: ${this.show()}`);
-    const ccy = [...this.value.keys()].sort()[0];
-    const tkns = this.value.get(ccy);
-    assert(tkns, `no tokens for currency ${ccy}`);
-    assert(tkns.size > 0, `no tokens for currency ${ccy}`);
-    const tkn = [...tkns.keys()].sort()[0];
-    return new Asset(ccy, tkn);
-  };
-
-  public firstAmount = (): bigint => {
-    assert(this.value.size > 0, `no currencies in value: ${this.show()}`);
-    const ccy = [...this.value.keys()].sort()[0];
-    const tkns = this.value.get(ccy);
-    assert(tkns, `no tokens for currency ${ccy}`);
-    assert(tkns.size > 0, `no tokens for currency ${ccy}`);
-    const tkn = [...tkns.keys()].sort()[0];
-    const amnt = tkns.get(tkn);
-    assert(amnt, `no amount for token ${tkn}`);
-    return amnt;
-  };
-
-  public tail = (): Value => {
-    const size = this.size();
-    assert(size > 0, "empty values tell no tails");
-    const tail = this.value.anew;
-    let first = true;
-    for (const ccy of [...this.value.keys()].sort()) {
-      const tkns = this.value.get(ccy);
-      assert(tkns, `no tokens for currency ${ccy}`);
-      if (first) {
-        assert(tkns.size > 0, "empty token map");
-        if (tkns.size > 1) {
-          const tail_ = tknsAmnts.anew;
-          for (const tkn of [...tkns.keys()].sort().slice(1)) {
-            const amnt = tkns.get(tkn);
-            assert(amnt, `no amount for token ${tkn}`);
-            tail_.set(tkn, amnt);
-          }
-          tail.set(ccy, tail_);
-        }
-        first = false;
-      } else tail.set(ccy, tkns);
+  public get normed(): Value {
+    const value = ccysTknsAmnts.anew;
+    for (const [currency, tokens] of this.value) {
+      const tokens_ = tknsAmnts.anew;
+      for (const [token, amount] of tokens) {
+        if (amount) tokens_.set(token, amount);
+      }
+      if (tokens_.size) value.set(currency, tokens_);
     }
-    const tail_ = new Value(tail);
-    assert(
-      tail_.size() === size - 1n,
-      `tail size ${tail_.size()} != ${size} - 1`,
-    );
-    return tail_;
-  };
+    return new Value(value);
+  }
 
   // TODO this does not really belong here, entangles the non-DEX-stuff with DEX-stuff
   public popIdNFT = (nft: IdNFT): void => {
@@ -185,7 +120,7 @@ export class Value {
   public mulAmounts = this.foldWith(1n, (a, b) => a * b);
 
   public exactAssets = (assets: Assets): boolean => {
-    return this.assets().equals(assets);
+    return this.assets.equals(assets);
   };
 
   public maybeAmountOf = (asset: Asset): bigint | undefined => {
@@ -263,7 +198,7 @@ export class Value {
     return value;
   };
 
-  public toMap = (): AssocMap<PCurrency, AssocMap<PToken, bigint>> => {
+  public get toMap(): AssocMap<PCurrency, AssocMap<PToken, bigint>> {
     const map = this.value.anew;
     for (const [currencySymbol, tokens] of this.value) {
       const tokens_ = tknsAmnts.anew;
@@ -273,24 +208,34 @@ export class Value {
       map.set(currencySymbol, tokens_);
     }
     return map;
-  };
+  }
 
-  public size = (): bigint => {
+  public get size(): bigint {
     let size = 0n;
     for (const [_, tokens] of this.value) {
       size += BigInt(tokens.size);
     }
     return size;
-  };
+  }
+
+  public get headAsset(): Asset {
+    assert(this.value.size > 0, `no currencies in value: ${this.show()}`);
+    const ccy = [...this.value.keys()].sort()[0];
+    const tkns = this.value.get(ccy);
+    assert(tkns, `no tokens for currency ${ccy}`);
+    assert(tkns.size > 0, `no tokens for currency ${ccy}`);
+    const tkn = [...tkns.keys()].sort()[0];
+    return new Asset(ccy, tkn);
+  }
+
+  public get clone(): Value {
+    return new Value(this.toMap);
+  }
 
   public has = (asset: Asset): boolean => {
     const tokens = this.value.get(asset.currency);
     return tokens ? tokens.has(asset.token) : false;
   };
-
-  public get clone(): Value {
-    return new Value(this.toMap());
-  }
 
   public drop = (asset: Asset): void => {
     const tokens = this.value.get(asset.currency);
@@ -363,7 +308,7 @@ export class Value {
       value.value instanceof AssocMap,
       `Value must be a AssocMap, not ${value.value}`,
     );
-    Assets.assert(value.assets());
+    Assets.assert(value.assets);
   }
 
   static generateWith = (bounded: PBounded): Value => {
@@ -374,6 +319,171 @@ export class Value {
     });
     return value;
   };
+
+  private static newUnionWith = (
+    op: (arg: bigint, ...args: Array<bigint>) => bigint,
+    defaultOut?: bigint,
+    ...defaultIns: Array<bigint | undefined>
+  ) => {
+    // assert( // TODO FIXME
+    //   defaultIns.length <= op.arguments.length,
+    //   "more defaultIns than op arguments",
+    // );
+    return (
+      arg: Value = new Value(),
+      ...args: Array<Value | undefined>
+    ): Value => {
+      // assert( TODO FIXME
+      //   1 + args.length === op.arguments.length,
+      //   "args length must match op arguments length",
+      // );
+      const args_ = args.map((v) => v ?? new Value());
+      const assets = Value.assetsOf(arg, ...args_);
+      const value = new Value();
+      for (const [currencySymbol, tokens] of assets.toMap()) {
+        for (const tokenName of tokens) {
+          const asset = new Asset(currencySymbol, tokenName);
+          const amountsIn = new Array<bigint>();
+          [arg, ...args_].forEach((v, i) => {
+            const defaultIn = defaultIns[i];
+            amountsIn.push(v.amountOf(asset, defaultIn));
+          });
+          const amountOut = op(amountsIn[0], ...amountsIn.slice(1));
+          if (amountOut !== defaultOut) {
+            value.initAmountOf(asset, amountOut);
+          }
+        }
+      }
+      return value;
+    };
+  };
+
+  static add = Value.newUnionWith((a, b) => a + b);
+  static normedAdd = Value.newUnionWith((a, b) => a + b, 0n, 0n, 0n);
+  static subtract = Value.newUnionWith((a, b) => a - b);
+  static normedSubtract = Value.newUnionWith((a, b) => a - b, 0n, 0n, 0n);
+  static hadamard = Value.newUnionWith((a, b) => a * b);
+  static hadamard_ = Value.newUnionWith((a, b) => a * b, undefined, 0n);
+  static divide = Value.newUnionWith((a, b) => a / b); // reverse hadamard-product
+
+  // upper bound is strict
+  static genBetween = (lower: Value, upper: Value) =>
+    Value.newUnionWith(
+      (a, b) => new PBounded(a, b - 1n).genData(),
+    )(lower, upper);
+
+  private static assetsOf(
+    ...values: Value[]
+  ): Assets {
+    const assets = ccysTkns.anew;
+    for (const value of values) {
+      for (const [currencySymbol, tokenMap] of value.toMap) {
+        if (!assets.has(currencySymbol)) {
+          assets.set(currencySymbol, []);
+        }
+        for (const tokenName of tokenMap.keys()) {
+          const tokens = assets.get(currencySymbol)!;
+          if (!tokens.includes(tokenName)) {
+            tokens.push(tokenName);
+          }
+        }
+      }
+    }
+    return new Assets(assets);
+  }
+
+  static singleton(asset: Asset, amount: bigint): Value {
+    const value = ccysTknsAmnts.anew;
+    const tokens = tknsAmnts.anew;
+    tokens.set(asset.token, amount);
+    value.set(asset.currency, tokens);
+    return new Value(value);
+  }
+
+  private static newCompareWith = (
+    op: (arg: bigint, ...args: Array<bigint>) => boolean,
+    ...defaultIns: Array<bigint | undefined>
+  ) => {
+    // assert( // TODO FIXME
+    //   defaultIns.length <= op.arguments.length,
+    //   "more defaultIns than op arguments",
+    // );
+    return (arg = new Value(), ...args: Array<Value | undefined>): boolean => {
+      // assert( // TODO FIXME
+      //   1 + args.length === op.arguments.length,
+      //   "args length must match op arguments length",
+      // );
+      const args_ = args.map((v) => v ?? new Value());
+      const assets = Value.assetsOf(arg, ...args_);
+      for (const [currencySymbol, tokens] of assets.toMap()) {
+        for (const tokenName of tokens) {
+          const asset = new Asset(currencySymbol, tokenName);
+          const amountsIn = new Array<bigint>();
+          [arg, ...args_].forEach((v, i) => {
+            const defaultIn = defaultIns[i];
+            const amountIn = v.amountOf(asset, defaultIn);
+            amountsIn.push(amountIn);
+          });
+          if (!op(amountsIn[0], ...amountsIn.slice(1))) {
+            return false;
+          }
+        }
+      }
+      return true;
+    };
+  };
+
+  // TODO better "infinity" values. Maybe use onchain maximum?
+  // export const lt = newCompareWith(
+  //   (a, b) => a < b || bothExtreme(a, b),
+  //   -BigInt(maxInteger),
+  //   BigInt(maxInteger),
+  // );
+  static leq = Value.newCompareWith(
+    (a, b) => a <= b,
+    // no defaults, as we use it to assert assets match as well
+  );
+
+  static leq_ = Value.newCompareWith(
+    (a, b) => a <= b,
+    undefined,
+    0n,
+  );
+  static lt_ = Value.newCompareWith(
+    (a, b) => a < b,
+    0n,
+  );
+
+  static newAmountsCheck = (op: (arg: bigint) => boolean) =>
+    Value.newCompareWith(
+      (a) => op(a),
+    );
+
+  static newBoundedWith = (bounds: PBounded) => (value: Value): Value => {
+    const bounded = new Value();
+    for (const [currencySymbol, tokens] of value.toMap) {
+      for (const [tokenName, amount] of tokens) {
+        bounded.initAmountOf(
+          new Asset(currencySymbol, tokenName),
+          amount < bounds.lowerBound
+            ? bounds.lowerBound
+            : amount > bounds.upperBound
+            ? bounds.upperBound
+            : amount,
+        );
+      }
+    }
+    return bounded;
+  };
+
+  private static newMapAmounts = (op: (arg: bigint) => bigint) =>
+    Value.newUnionWith(
+      (a) => op(a),
+    );
+
+  private static newSetAmounts(amount: bigint): (value: Value) => Value {
+    return Value.newMapAmounts(() => amount);
+  }
 }
 
 export class PValue extends PWrapped<Value> {
@@ -396,162 +506,4 @@ export class PValue extends PWrapped<Value> {
   static genPType(): PWrapped<Value> {
     return new PValue(PBounded.genPType() as PBounded);
   }
-}
-
-export function assetsOf(
-  ...values: Value[]
-): Assets {
-  const assets = ccysTkns.anew;
-  for (const value of values) {
-    for (const [currencySymbol, tokenMap] of value.toMap()) {
-      if (!assets.has(currencySymbol)) {
-        assets.set(currencySymbol, []);
-      }
-      for (const tokenName of tokenMap.keys()) {
-        const tokens = assets.get(currencySymbol)!;
-        if (!tokens.includes(tokenName)) {
-          tokens.push(tokenName);
-        }
-      }
-    }
-  }
-  return new Assets(assets);
-}
-
-export function singleton(asset: Asset, amount: bigint): Value {
-  const value = ccysTknsAmnts.anew;
-  const tokens = tknsAmnts.anew;
-  tokens.set(asset.token, amount);
-  value.set(asset.currency, tokens);
-  return new Value(value);
-}
-
-export const newCompareWith = (
-  op: (arg: bigint, ...args: Array<bigint>) => boolean,
-  ...defaultIns: Array<bigint | undefined>
-) => {
-  // assert( // TODO FIXME
-  //   defaultIns.length <= op.arguments.length,
-  //   "more defaultIns than op arguments",
-  // );
-  return (arg = new Value(), ...args: Array<Value | undefined>): boolean => {
-    // assert( // TODO FIXME
-    //   1 + args.length === op.arguments.length,
-    //   "args length must match op arguments length",
-    // );
-    const args_ = args.map((v) => v ?? new Value());
-    const assets = assetsOf(arg, ...args_);
-    for (const [currencySymbol, tokens] of assets.toMap()) {
-      for (const tokenName of tokens) {
-        const asset = new Asset(currencySymbol, tokenName);
-        const amountsIn = new Array<bigint>();
-        [arg, ...args_].forEach((v, i) => {
-          const defaultIn = defaultIns[i];
-          const amountIn = v.amountOf(asset, defaultIn);
-          amountsIn.push(amountIn);
-        });
-        if (!op(amountsIn[0], ...amountsIn.slice(1))) {
-          return false;
-        }
-      }
-    }
-    return true;
-  };
-};
-
-// TODO better "infinity" values. Maybe use onchain maximum?
-// export const lt = newCompareWith(
-//   (a, b) => a < b || bothExtreme(a, b),
-//   -BigInt(maxInteger),
-//   BigInt(maxInteger),
-// );
-export const leq = newCompareWith(
-  (a, b) => a <= b,
-  // no defaults, as we use it to assert assets match as well
-);
-
-export const newAmountsCheck = (op: (arg: bigint) => boolean) =>
-  newCompareWith(
-    (a) => op(a),
-  );
-
-export const newUnionWith = (
-  op: (arg: bigint, ...args: Array<bigint>) => bigint,
-  defaultOut?: bigint,
-  ...defaultIns: Array<bigint | undefined>
-) => {
-  // assert( // TODO FIXME
-  //   defaultIns.length <= op.arguments.length,
-  //   "more defaultIns than op arguments",
-  // );
-  return (
-    arg: Value = new Value(),
-    ...args: Array<Value | undefined>
-  ): Value => {
-    // assert( TODO FIXME
-    //   1 + args.length === op.arguments.length,
-    //   "args length must match op arguments length",
-    // );
-    const args_ = args.map((v) => v ?? new Value());
-    const assets = assetsOf(arg, ...args_);
-    const value = new Value();
-    for (const [currencySymbol, tokens] of assets.toMap()) {
-      for (const tokenName of tokens) {
-        const asset = new Asset(currencySymbol, tokenName);
-        const amountsIn = new Array<bigint>();
-        [arg, ...args_].forEach((v, i) => {
-          const defaultIn = defaultIns[i];
-          amountsIn.push(v.amountOf(asset, defaultIn));
-        });
-        const amountOut = op(amountsIn[0], ...amountsIn.slice(1));
-        if (amountOut !== defaultOut) {
-          value.initAmountOf(asset, amountOut);
-        }
-      }
-    }
-    return value;
-  };
-};
-
-export const addValues = newUnionWith((a, b) => a + b);
-export const mulValues = newUnionWith((a, b) => a * b);
-export const mulValues_ = newUnionWith((a, b) => a * b, undefined, 0n);
-export const divValues = newUnionWith((a, b) => a / b);
-
-export const lSubValues = newUnionWith((a, b) => a > b ? a - b : 0n, 0n);
-export const lSubValues_ = newUnionWith(
-  (a, b) => a > b ? a - b : 0n,
-  undefined,
-  undefined,
-  0n,
-);
-
-export const generateWithin = newUnionWith(
-  (a, b) => new PBounded(a, b).genData(),
-);
-
-export const newBoundedWith = (bounds: PBounded) => (value: Value): Value => {
-  const bounded = new Value();
-  for (const [currencySymbol, tokens] of value.toMap()) {
-    for (const [tokenName, amount] of tokens) {
-      bounded.initAmountOf(
-        new Asset(currencySymbol, tokenName),
-        amount < bounds.lowerBound
-          ? bounds.lowerBound
-          : amount > bounds.upperBound
-          ? bounds.upperBound
-          : amount,
-      );
-    }
-  }
-  return bounded;
-};
-
-export const newMapAmounts = (op: (arg: bigint) => bigint) =>
-  newUnionWith(
-    (a) => op(a),
-  );
-
-export function newSetAmounts(amount: bigint): (value: Value) => Value {
-  return newMapAmounts(() => amount);
 }

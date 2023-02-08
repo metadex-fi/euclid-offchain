@@ -1,8 +1,11 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
-import { AssocMap, IdNFT, PIdNFT } from "../mod.ts";
+import {
+  AssocMap,
+  IdNFT,
+  PIdNFT,
+} from "../mod.ts";
 import { Contract } from "./mod.ts";
-import { User } from "./user.ts";
 import { DiracUtxo, ParamUtxo, PreDiracUtxo } from "./utxo.ts";
 
 export class PrePool {
@@ -42,31 +45,37 @@ export class PrePool {
       const preDiracUtxo = this.preDiracUtxos.get(threadNFT)!;
       const parsedDiracUtxo = preDiracUtxo.parse(
         this.paramUtxo.param,
-        this.paramUtxo.paramNFT,
-        threadNFT,
       );
       if (parsedDiracUtxo) parsedDiracUtxos.push(parsedDiracUtxo);
       else invalidDiracUtxos.push(preDiracUtxo);
     }
     if (!parsedDiracUtxos.length) return undefined;
     return [
-      new Pool(this.paramUtxo, parsedDiracUtxos),
+      Pool.parse(this.paramUtxo, parsedDiracUtxos),
       threadNFTs[threadNFTs.length - 1],
     ];
   };
 }
 
 export class Pool {
-  constructor(
+  private constructor(
     public readonly paramUtxo: ParamUtxo,
     public readonly diracUtxos: DiracUtxo[],
   ) {}
 
-    public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
-      let tx_ = this.paramUtxo.openingTx(tx, contract);
-      this.diracUtxos.forEach((diracUtxo) =>
-        tx_ = diracUtxo.openingTx(tx_, contract)
-      );
-      return tx_;
-    };
+  public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
+    let tx_ = this.paramUtxo.openingTx(tx, contract);
+    this.diracUtxos.forEach((diracUtxo) =>
+      tx_ = diracUtxo.openingTx(tx_, contract)
+    );
+    return tx_;
+  };
+
+  static parse(paramUtxo: ParamUtxo, diracUtxos: DiracUtxo[]): Pool {
+    return new Pool(paramUtxo, diracUtxos);
+  }
+
+  static open(paramUtxo: ParamUtxo, diracUtxos: DiracUtxo[]): Pool {
+    return new Pool(paramUtxo, diracUtxos);
+  }
 }

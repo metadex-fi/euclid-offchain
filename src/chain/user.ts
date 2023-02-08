@@ -41,10 +41,10 @@ export class User {
     }
   }
 
-  public nextParamNFT = (): IdNFT => {
+  public get nextParamNFT(): IdNFT {
     if (this.lastIdNFT) return this.lastIdNFT.next();
     else return new IdNFT(this.contract.policy, this.paymentKeyHash.hash());
-  };
+  }
 
   public setLastIdNFT = (idNFT: IdNFT): void => {
     this.lastIdNFT = idNFT;
@@ -91,7 +91,7 @@ export class User {
     assert(this.balance, "No balance");
     return {
       address: this.address,
-      assets: this.balance.toLucid(),
+      assets: this.balance.toLucid,
     };
   };
 

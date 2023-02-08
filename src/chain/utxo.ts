@@ -5,7 +5,6 @@ import {
   Data,
   Dirac,
   DiracDatum,
-  EuclidValue,
   f,
   IdNFT,
   Param,
@@ -17,10 +16,9 @@ import {
   t,
 } from "../mod.ts";
 import { Contract } from "./mod.ts";
-import { User } from "./user.ts";
 
 export class ParamUtxo {
-  constructor(
+  private constructor(
     public readonly param: Param,
     public readonly paramNFT: IdNFT,
     public readonly utxo?: Lucid.UTxO, //exists only when reading, not when creating
@@ -35,12 +33,19 @@ export class ParamUtxo {
       utxo.assets,
     );
     assert(
-      balance.size() === 1n,
+      balance.size === 1n,
       `expected exactly id-NFT in ${balance.concise()}`,
     );
-    const paramNFT = IdNFT.fromAsset(balance.firstAsset());
+    const paramNFT = IdNFT.fromAsset(balance.headAsset);
 
     return new ParamUtxo(param, paramNFT, utxo);
+  }
+
+  static open(
+    param: Param,
+    paramNFT: IdNFT,
+  ): ParamUtxo {
+    return new ParamUtxo(param, paramNFT);
   }
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
@@ -74,14 +79,14 @@ export class ParamUtxo {
 
 export class PreDiracUtxo {
   public readonly dirac: Dirac;
-  public readonly balance: EuclidValue;
+  public readonly balance: PositiveValue;
   constructor(
     public readonly utxo: Lucid.UTxO,
     public readonly fields: Data[],
     ppreDiracDatum: PPreDiracDatum,
   ) {
     this.dirac = ppreDiracDatum.plift(fields).dirac;
-    this.balance = EuclidValue.fromLucid(
+    this.balance = PositiveValue.fromLucid(
       utxo.assets,
     );
     this.balance.popIdNFT(this.dirac.threadNFT);
@@ -89,11 +94,9 @@ export class PreDiracUtxo {
 
   public parse = (
     param: Param,
-    paramNFT: IdNFT,
-    threadNFT: IdNFT,
   ): DiracUtxo | undefined => {
     try {
-      return DiracUtxo.parse(this, param, paramNFT, threadNFT);
+      return DiracUtxo.parse(this, param);
     } catch (_e) { // TODO log this somewhere
       return undefined;
     }
@@ -104,24 +107,31 @@ export class DiracUtxo {
   private constructor( // keep private, because how we handle optional utxo arg
     public readonly dirac: Dirac,
     public readonly pdiracDatum: PDiracDatum,
-    public readonly balance: EuclidValue,
+    public readonly balance: PositiveValue,
     public readonly utxo?: Lucid.UTxO, //exists when reading, not when creating
   ) {}
 
   static parse(
     from: PreDiracUtxo,
     param: Param,
-    paramNFT: IdNFT,
-    threadNFT: IdNFT,
   ): DiracUtxo {
-    const pdiracDatum = new PDiracDatum(param, paramNFT, threadNFT);
+    const pdiracDatum = new PDiracDatum(param, from.dirac.paramNFT, from.dirac.threadNFT);
     const dirac = pdiracDatum.plift(from.fields).dirac;
     return new DiracUtxo(dirac, pdiracDatum, from.balance, from.utxo);
   }
 
-  public assets = (): Assets => this.dirac.assets;
-  public sharedAssets = (assets: Assets): Assets =>
-    this.dirac.sharedAssets(assets);
+  static open(
+    param: Param,
+    dirac: Dirac,
+    balance: PositiveValue,
+  ): DiracUtxo {
+    const pdiracDatum = new PDiracDatum(param, dirac.paramNFT, dirac.threadNFT);
+    return new DiracUtxo(dirac, pdiracDatum, balance);
+  }
+
+  // public assets = (): Assets => this.dirac.assets;
+  // public sharedAssets = (assets: Assets): Assets =>
+  //   this.dirac.sharedAssets(assets);
 
   public show = (tabs = ""): string => {
     const tt = tabs + t;
@@ -134,18 +144,18 @@ export class DiracUtxo {
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     const diracDatum = this.pdiracDatum.pconstant(new DiracDatum(this.dirac));
-    const funds = this.balance.toLucid();
+    const funds = this.balance.toLucid;
     const threadNFT = this.dirac.threadNFT.toLucidNFT();
-    funds[Object.keys(threadNFT)[0]] = 1n
+    funds[Object.keys(threadNFT)[0]] = 1n;
 
     return tx
-    .mintAssets(threadNFT, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
-    .payToContract(
-      contract.address,
-      {
-        inline: Data.to(diracDatum),
-      },
-      funds
-    );
-  }
+      .mintAssets(threadNFT, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+      .payToContract(
+        contract.address,
+        {
+          inline: Data.to(diracDatum),
+        },
+        funds,
+      );
+  };
 }

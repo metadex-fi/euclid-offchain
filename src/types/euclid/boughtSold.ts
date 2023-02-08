@@ -10,7 +10,7 @@ export class BoughtSold {
 
 export class PBoughtSold extends PObject<BoughtSold> {
   constructor() {
-    const ppositive = new PPositive();
+    const ppositive = new PPositive(); // leaving this as ppositive, because onchain rep should be positive
     super(
       new PRecord({
         bought: ppositive,

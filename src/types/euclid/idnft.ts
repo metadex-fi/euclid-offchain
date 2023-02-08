@@ -1,25 +1,14 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../lucid.mod.ts";
-import {
-  genNonNegative,
-  genPositive,
-  Hash,
-  maxInteger,
-  PHash,
-  PKeyHash,
-  randomChoice,
-} from "../../mod.ts";
+import { Hash, maxInteger, PHash } from "../../mod.ts";
 import {
   Asset,
   AssocMap,
   Currency,
-  f,
-  PConstraint,
   PCurrency,
   PLiteral,
   PObject,
   PRecord,
-  PWrapped,
 } from "../mod.ts";
 
 export const gMaxHashes = maxInteger; // maximum distance between two subsequent idNFTs before we stop trying

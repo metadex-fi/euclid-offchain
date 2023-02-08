@@ -176,17 +176,17 @@ export class Assets {
     return this.assets.size === 0;
   }
 
-  public get size(): number {
-    let size = 0;
+  public get size(): bigint {
+    let size = 0n;
     for (const tkns of this.assets.values()) {
-      size += tkns.length;
+      size += BigInt(tkns.length);
     }
     return size;
   }
 
-  public subsetOf = (assets: Assets): boolean => {
+  public subsetOf = (superSet: Assets): boolean => {
     for (const [ccy, tkns] of this.assets) {
-      const tkns_ = assets.toMap().get(ccy);
+      const tkns_ = superSet.toMap().get(ccy);
       if (tkns_ === undefined) return false;
       for (const tkn of tkns) {
         if (!tkns_.includes(tkn)) return false;
@@ -214,10 +214,6 @@ export class Assets {
     for (const asset of assets) {
       assets_.insert(asset);
     }
-    assert(
-      assets_.size === assets.length,
-      `fromList ${assets} resulted in ${assets_.show()}`,
-    );
     return assets_;
   }
 

@@ -1,26 +1,20 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  Assets,
-  genNonNegative,
-  genPositive,
-  PAsset,
-  PLiteral,
-} from "../../mod.ts";
+import { genNonNegative, genPositive, PLiteral } from "../../mod.ts";
 import {
   Currency,
   f,
-  generateWithin,
   KeyHash,
-  leq,
   Param,
   PConstraint,
   PKeyHash,
   PObject,
+  PositiveValue,
   PParam,
+  PPositiveValue,
   PRecord,
   t,
+  Value,
 } from "../mod.ts";
-import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
 import { gMaxHashes, IdNFT, PIdNFT } from "./idnft.ts";
 
 export class Dirac {
@@ -28,14 +22,8 @@ export class Dirac {
     public readonly owner: KeyHash,
     public readonly threadNFT: IdNFT,
     public readonly paramNFT: IdNFT,
-    public readonly lowestPrices: EuclidValue,
+    public readonly lowestPrices: PositiveValue,
   ) {}
-
-  public get assets(): Assets {
-    return this.lowestPrices.assets();
-  }
-  public sharedAssets = (assets: Assets): Assets =>
-    this.assets.intersect(assets);
 
   public concise = (tabs = ""): string => {
     const tt = tabs + t;
@@ -49,17 +37,26 @@ ${tt})`;
   };
 
   static assertWith = (param: Param) => (dirac: Dirac): void => {
-    // leq asserts assets match as well
-    assert(leq(dirac.lowestPrices.unsigned(), param.highestPrices.unsigned()));
+    const lowestPrices = dirac.lowestPrices.unsigned;
+    const minLowestPrices = param.minLowestPrices;
+    const maxLowestPrices = Value.add(
+      minLowestPrices,
+      param.jumpSizes.unsigned,
+    );
+    // leq_/lt_ assert assets are subsets too (in one (different) direction, resp.)
+    assert(Value.leq_(minLowestPrices, lowestPrices));
+    assert(Value.lt_(lowestPrices, maxLowestPrices));
   };
 
   static generateWith =
     (param: Param, paramNFT: IdNFT, threadNFT: IdNFT) => (): Dirac => {
-      const lowestPrices = EuclidValue.fromValue(
-        generateWithin(
-          param.highestPrices.unit(),
-          param.highestPrices.unsigned(),
-        ),
+      const minLowestPrices = param.minLowestPrices;
+      const maxLowestPrices = Value.add(
+        minLowestPrices,
+        param.jumpSizes.unsigned,
+      );
+      const lowestPrices = PositiveValue.normed(
+        Value.genBetween(minLowestPrices, maxLowestPrices),
       );
       return new Dirac(
         param.owner,
@@ -79,7 +76,7 @@ export class PPreDirac extends PObject<Dirac> {
         owner: PKeyHash.ptype,
         threadNFT: new PIdNFT(policy),
         paramNFT: new PIdNFT(policy),
-        lowestPrices: PEuclidValue.ptype,
+        lowestPrices: PPositiveValue.ptype,
       }),
       Dirac,
     );
@@ -103,7 +100,7 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
           owner: new PLiteral<PKeyHash>(PKeyHash.ptype, param.owner),
           threadNFT: new PLiteral(pidNFT, threadNFT),
           paramNFT: new PLiteral(pidNFT, paramNFT),
-          lowestPrices: PEuclidValue.ptype,
+          lowestPrices: PPositiveValue.ptype,
         }),
         Dirac,
       ),

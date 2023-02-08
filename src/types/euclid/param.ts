@@ -1,4 +1,14 @@
-import { Assets, f, KeyHash, PKeyHash, PRecord, t } from "../mod.ts";
+import {
+  Assets,
+  f,
+  KeyHash,
+  PKeyHash,
+  PositiveValue,
+  PPositiveValue,
+  PRecord,
+  t,
+  Value,
+} from "../mod.ts";
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
@@ -8,15 +18,20 @@ import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
 export class Param {
   constructor(
     public readonly owner: KeyHash,
+    public readonly virtual: PositiveValue,
+    public readonly weights: EuclidValue, // NOTE those are actually inverted
     public readonly jumpSizes: EuclidValue,
-    public readonly highestPrices: EuclidValue,
-    public readonly weights: EuclidValue,
   ) {
     Param.asserts(this);
   }
 
+  // filled with zeroes for assets without virtual liquidity
+  public get minLowestPrices(): Value {
+    return Value.hadamard_(this.virtual.unsigned, this.weights.unsigned);
+  }
+
   public get assets(): Assets {
-    return this.jumpSizes.assets();
+    return this.weights.assets;
   }
   public sharedAssets = (assets: Assets): Assets =>
     this.assets.intersect(assets);
@@ -26,63 +41,36 @@ export class Param {
     const ttf = tt + f;
     return `Param (
 ${ttf}owner: ${this.owner.toString()}, 
-${ttf}jumpSizes: ${this.jumpSizes.concise(ttf)}, 
-${ttf}highestPrices: ${this.highestPrices.concise(ttf)}, 
+${ttf}virtual: ${this.virtual.concise(ttf)}, 
 ${ttf}weights: ${this.weights.concise(ttf)}
+${ttf}jumpSizes: ${this.jumpSizes.concise(ttf)}, 
 ${tt})`;
   };
 
   static asserts(param: Param): void {
-    const assets = param.jumpSizes.assets();
+    const assets = param.jumpSizes.assets;
     assert(
-      assets.equals(param.weights.assets()),
+      assets.equals(param.weights.assets),
       "assets of jumpSizes and weights must match",
     );
     assert(
-      assets.equals(param.highestPrices.assets()),
-      "assets of jumpSizes and lowestPrices must match",
+      param.virtual.assets.subsetOf(assets),
+      "assets of virtual must be a subset of assets of jumpSizes and weights",
     );
   }
 
   static generate(): Param {
     const assets = Assets.generate(2n);
-    const jumpSizes = EuclidValue.genOfAssets(assets);
-    const highestPrices = EuclidValue.genOfAssets(assets);
+    const virtual = PositiveValue.genOfAssets(assets.randomSubset());
     const weights = EuclidValue.genOfAssets(assets);
+    const jumpSizes = EuclidValue.genOfAssets(assets);
     return new Param(
       PKeyHash.ptype.genData(),
-      jumpSizes,
-      highestPrices,
+      virtual,
       weights,
+      jumpSizes,
     );
   }
-
-  // static generateForUser(user: User): [Param, PositiveValue] {
-  //   assert(user.balance, `user balance not initialized for ${user.address}`);
-  //   assert(
-  //     user.balance.size() >= 2,
-  //     `balance must be at least 2, got ${user.balance.concise()}`,
-  //   );
-  //   const deposit = user.balance.minSizedSubValue(2n);
-  //   const assets = deposit.assets();
-
-  //   const jumpSizes = EuclidValue.genOfAssets(assets);
-  //   const highestPrices = EuclidValue.genOfAssets(assets);
-  //   const weights = EuclidValue.genOfAssets(assets);
-
-  //   const param = new Param(
-  //     user.paymentKeyHash,
-  //     jumpSizes,
-  //     highestPrices,
-  //     weights,
-  //   );
-  //   let minDiracs = param.locationsPerDirac();
-  //   while (minDiracs > deposit.smallestAmount()) {
-  //     param.jumpSizes.doubleRandomAmount(); // this should decrease diracs
-  //     minDiracs = param.locationsPerDirac();
-  //   }
-  //   return [param, deposit];
-  // }
 }
 
 export class PParam extends PObject<Param> {
@@ -90,9 +78,9 @@ export class PParam extends PObject<Param> {
     super(
       new PRecord({
         owner: PKeyHash.ptype,
-        jumpSizes: PEuclidValue.ptype,
-        highestPrices: PEuclidValue.ptype,
+        virtual: PPositiveValue.ptype,
         weights: PEuclidValue.ptype,
+        jumpSizes: PEuclidValue.ptype,
       }),
       Param,
     );
