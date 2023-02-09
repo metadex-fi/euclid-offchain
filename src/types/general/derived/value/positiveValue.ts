@@ -1,6 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
-import { genPositive, IdNFT } from "../../../../mod.ts";
+import { genPositive, IdNFT, max } from "../../../../mod.ts";
 import { AssocMap, PObject, PRecord } from "../../mod.ts";
 import { Asset, Assets, PCurrency, PPositive, PToken } from "../mod.ts";
 import { PValue, Value } from "./value.ts";
@@ -9,7 +9,7 @@ export class PositiveValue {
   constructor(
     private value = new Value(),
   ) {
-    assert(PositiveValue.allPositive(value), "value must be positive");
+    assert(value.positive, "value must be positive");
   }
 
   public initAmountOf = (asset: Asset, amount: bigint): void => {
@@ -103,9 +103,9 @@ export class PositiveValue {
       Value.normedSubtract(this.unsigned, other.unsigned),
     );
   };
-  public hadamard = (other: PositiveValue): PositiveValue => {
-    return new PositiveValue(Value.hadamard(this.unsigned, other.unsigned));
-  };
+  // public hadamard = (other: PositiveValue): PositiveValue => {
+  //   return new PositiveValue(Value.hadamard(this.unsigned, other.unsigned));
+  // };
   // reverse hadamard product
   public divideBy = (other: PositiveValue): PositiveValue => {
     return new PositiveValue(Value.divide(this.unsigned, other.unsigned));
@@ -113,6 +113,14 @@ export class PositiveValue {
 
   public leq = (other: PositiveValue): boolean => {
     return Value.leq(this.unsigned, other.unsigned);
+  };
+
+  public halfRandomAmount = (): void => {
+    const asset = this.assets.randomChoice();
+    this.value.setAmountOf(
+      asset,
+      max(1n, this.value.amountOf(asset) / 2n),
+    );
   };
 
   // public divideByScalar = (scalar: bigint): PositiveValue => {
@@ -165,8 +173,6 @@ export class PositiveValue {
   static normed(value: Value): PositiveValue {
     return new PositiveValue(value.normed);
   }
-
-  private static allPositive = Value.newAmountsCheck((a) => a > 0n);
 }
 
 export const boundPositive = Value.newBoundedWith(new PPositive());

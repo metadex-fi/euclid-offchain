@@ -39,9 +39,9 @@ export class EuclidValue {
       Value.normedSubtract(this.unsigned, other.unsigned),
     );
   };
-  public hadamard = (other: EuclidValue): EuclidValue => {
-    return EuclidValue.fromValue(Value.hadamard(this.unsigned, other.unsigned));
-  };
+  // public hadamard = (other: EuclidValue): EuclidValue => {
+  //   return EuclidValue.fromValue(Value.hadamard(this.unsigned, other.unsigned));
+  // };
   // reverse hadamard product
   public divideBy = (other: EuclidValue): EuclidValue => {
     return EuclidValue.fromValue(Value.divide(this.unsigned, other.unsigned));
@@ -50,6 +50,8 @@ export class EuclidValue {
   public leq = (other: EuclidValue): boolean => {
     return Value.leq(this.unsigned, other.unsigned);
   };
+
+  public halfRandomAmount = (): void => this.value.halfRandomAmount();
 
   static asserts(euclidValue: EuclidValue): void {
     assert(euclidValue.assets.size >= 2n, "at least two assets are required");

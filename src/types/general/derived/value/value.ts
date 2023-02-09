@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { IdNFT } from "../../../../mod.ts";
+import { abs, IdNFT, max, maxInteger } from "../../../../mod.ts";
 import { f, PMap, PWrapped, t } from "../../mod.ts";
 import {
   Asset,
@@ -71,6 +71,12 @@ export class Value {
     return Value.newMapAmounts((a) => a / scalar)(this);
   };
 
+  public divideByScalar_ = (scalar: number): Value => {
+    return Value.newMapAmounts((a) => BigInt(Math.floor(Number(a) / scalar)))(
+      this,
+    );
+  };
+
   public get assets(): Assets {
     const assets = ccysTkns.anew;
     for (const [currencySymbol, tokens] of this.value) {
@@ -105,7 +111,7 @@ export class Value {
     this.value.delete(nft.currency);
   };
 
-  public foldWith =
+  private newFoldWith =
     (init: bigint, op: (a: bigint, b: bigint) => bigint) => (): bigint => {
       let agg = init;
       for (const [_, tokens] of this.value) {
@@ -116,8 +122,45 @@ export class Value {
       return agg;
     };
 
-  public sumAmounts = this.foldWith(0n, (a, b) => a + b);
-  public mulAmounts = this.foldWith(1n, (a, b) => a * b);
+  public sumAmounts = this.newFoldWith(0n, (a, b) => a + b);
+  public mulAmounts = this.newFoldWith(1n, (a, b) => a * b);
+  private euclidean(a: bigint, b: bigint) {
+    a = abs(a);
+    b = abs(b);
+    if (b > a) {
+      const temp = a;
+      a = b;
+      b = temp;
+    }
+    while (true) {
+      if (b === 0n) return a;
+      a %= b;
+      if (a === 0n) return b;
+      b %= a;
+    }
+  }
+  public gcd = (init = 0n) =>
+    this.newFoldWith(init, (a, b) => this.euclidean(a, b))();
+
+  public get maxAmount(): bigint {
+    return this.newFoldWith(this.unsortedHeadAmount, max)();
+  }
+
+  public cleanReduce(...values: Value[]): Value[] {
+    const gcd = values.reduce((a, b) => b.gcd(a), this.gcd());
+    return [this, ...values].map((v) => v.divideByScalar(gcd));
+  }
+
+  public dirtyReduce(...values: Value[]): Value[] {
+    const maxAmnt = values.reduce(
+      (a, b) => max(a, b.maxAmount),
+      this.maxAmount,
+    );
+    const values_ = [this, ...values];
+    if (maxAmnt <= maxInteger) return values_;
+    const divisor = Number(maxAmnt) / Number(maxInteger);
+    return values_.map((v) => v.divideByScalar_(divisor));
+  }
 
   public exactAssets = (assets: Assets): boolean => {
     return this.assets.equals(assets);
@@ -226,6 +269,15 @@ export class Value {
     assert(tkns.size > 0, `no tokens for currency ${ccy}`);
     const tkn = [...tkns.keys()].sort()[0];
     return new Asset(ccy, tkn);
+  }
+
+  public get unsortedHeadAmount(): bigint {
+    for (const [_, tokens] of this.value) {
+      for (const [_, amount] of tokens) {
+        return amount;
+      }
+    }
+    throw new Error(`no amounts in value: ${this.show()}`);
   }
 
   public get clone(): Value {
@@ -339,22 +391,19 @@ export class Value {
       // );
       const args_ = args.map((v) => v ?? new Value());
       const assets = Value.assetsOf(arg, ...args_);
-      const value = new Value();
-      for (const [currencySymbol, tokens] of assets.toMap) {
-        for (const tokenName of tokens) {
-          const asset = new Asset(currencySymbol, tokenName);
-          const amountsIn = new Array<bigint>();
-          [arg, ...args_].forEach((v, i) => {
-            const defaultIn = defaultIns[i];
-            amountsIn.push(v.amountOf(asset, defaultIn));
-          });
-          const amountOut = op(amountsIn[0], ...amountsIn.slice(1));
-          if (amountOut !== defaultOut) {
-            value.initAmountOf(asset, amountOut);
-          }
+      const result = new Value();
+      assets.forEach((asset) => {
+        const amountsIn = new Array<bigint>();
+        [arg, ...args_].forEach((v, i) => {
+          const defaultIn = defaultIns[i];
+          amountsIn.push(v.amountOf(asset, defaultIn));
+        });
+        const amountOut = op(amountsIn[0], ...amountsIn.slice(1));
+        if (amountOut !== defaultOut) {
+          result.initAmountOf(asset, amountOut);
         }
-      }
-      return value;
+      });
+      return result;
     };
   };
 
@@ -362,7 +411,7 @@ export class Value {
   static normedAdd = Value.newUnionWith((a, b) => a + b, 0n, 0n, 0n);
   static subtract = Value.newUnionWith((a, b) => a - b);
   static normedSubtract = Value.newUnionWith((a, b) => a - b, 0n, 0n, 0n);
-  static hadamard = Value.newUnionWith((a, b) => a * b);
+  // static hadamard = Value.newUnionWith((a, b) => a * b);
   static hadamard_ = Value.newUnionWith((a, b) => a * b, undefined, 0n);
   static divide = Value.newUnionWith((a, b) => a / b); // reverse hadamard-product
 
@@ -378,15 +427,13 @@ export class Value {
     const assets = ccysTkns.anew;
     for (const value of values) {
       for (const [currencySymbol, tokenMap] of value.toMap) {
-        if (!assets.has(currencySymbol)) {
-          assets.set(currencySymbol, []);
-        }
-        for (const tokenName of tokenMap.keys()) {
-          const tokens = assets.get(currencySymbol)!;
-          if (!tokens.includes(tokenName)) {
-            tokens.push(tokenName);
+        const tokens = assets.get(currencySymbol) ?? [];
+        for (const token of tokenMap.keys()) {
+          if (!tokens.some((t) => t.name === token.name)) {
+            tokens.push(token);
           }
         }
+        assets.set(currencySymbol, tokens);
       }
     }
     return new Assets(assets);
@@ -454,10 +501,17 @@ export class Value {
     0n,
   );
 
-  static newAmountsCheck = (op: (arg: bigint) => boolean) =>
+  private newAmountsCheck = (op: (arg: bigint) => boolean) =>
     Value.newCompareWith(
       (a) => op(a),
-    );
+    )(this);
+
+  public get positive() {
+    return this.newAmountsCheck((a) => a > 0n);
+  }
+  public get leqMaxInteger() {
+    return this.newAmountsCheck((a) => a <= maxInteger);
+  }
 
   static newBoundedWith = (bounds: PBounded) => (value: Value): Value => {
     const bounded = new Value();

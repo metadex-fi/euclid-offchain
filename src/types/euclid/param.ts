@@ -12,6 +12,7 @@ import {
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
+import { randomChoice } from "../../mod.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
 
@@ -57,13 +58,40 @@ ${tt})`;
       param.virtual.assets.subsetOf(assets),
       `assets of virtual must be a subset of assets of jumpSizes and weights, but ${param.virtual.assets.show()}\nis not a subset of ${assets.show()}`,
     );
+    const minLowestPrices = param.minLowestPrices;
+    const maxLowestPrices = Value.add(
+      minLowestPrices,
+      param.jumpSizes.unsigned,
+    );
+    assert(
+      maxLowestPrices.leqMaxInteger,
+      `max lowest price must be leq max integer, but is ${maxLowestPrices.concise()}`,
+    );
   }
 
   static generate(): Param {
     const assets = Assets.generate(2n);
+
     const virtual = PositiveValue.genOfAssets(assets.randomSubset());
     const weights = EuclidValue.genOfAssets(assets);
     const jumpSizes = EuclidValue.genOfAssets(assets);
+
+    let minLowestPrices = Value.hadamard_(virtual.unsigned, weights.unsigned);
+    let maxLowestPrices = Value.add(
+      minLowestPrices,
+      jumpSizes.unsigned,
+    );
+    while (!maxLowestPrices.leqMaxInteger) {
+      // this is a bit sloppy vs. clean and/or dirty reduce, but sloppy feels correct here
+      randomChoice([virtual, weights, jumpSizes]).halfRandomAmount();
+
+      minLowestPrices = Value.hadamard_(virtual.unsigned, weights.unsigned);
+      maxLowestPrices = Value.add(
+        minLowestPrices,
+        jumpSizes.unsigned,
+      );
+    }
+
     return new Param(
       PKeyHash.ptype.genData(),
       virtual,
@@ -89,7 +117,7 @@ export class PParam extends PObject<Param> {
   public genData = Param.generate;
 
   static ptype = new PParam();
-  static genPtype(): PParam {
+  static genPType(): PParam {
     return PParam.ptype;
   }
 }

@@ -1,5 +1,10 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { genNonNegative, genPositive, PLiteral } from "../../mod.ts";
+import {
+  genNonNegative,
+  genPositive,
+  maxInteger,
+  PLiteral,
+} from "../../mod.ts";
 import {
   Currency,
   f,
@@ -44,8 +49,14 @@ ${tt})`;
       param.jumpSizes.unsigned,
     );
     // leq_/lt_ assert assets are subsets too (in one (different) direction, resp.)
-    assert(Value.leq_(minLowestPrices, lowestPrices));
-    assert(Value.lt_(lowestPrices, maxLowestPrices));
+    assert(
+      Value.leq_(minLowestPrices, lowestPrices),
+      `lowestPrices must be at least minLowestPrices, but ${lowestPrices.show()}\nis not at least ${minLowestPrices.show()}`,
+    );
+    assert(
+      Value.lt_(lowestPrices, maxLowestPrices),
+      `lowestPrices must be strictly less than maxLowestPrices, but ${lowestPrices.show()}\nis not strictly less than ${maxLowestPrices.show()}`,
+    );
   };
 
   static generateWith =
