@@ -95,7 +95,7 @@ const euclidPrimitiveGenerators = [
   PIdNFT.genPType,
   PParam.genPType,
   PPreDirac.genPType,
-  PDirac.genPType,
+  // PDirac.genPType,
   PParamDatum.genPType,
-  PDiracDatum.genPType,
+  // PDiracDatum.genPType,
 ];

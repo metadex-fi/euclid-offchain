@@ -1,10 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
-import {
-  AssocMap,
-  IdNFT,
-  PIdNFT,
-} from "../mod.ts";
+import { AssocMap, IdNFT, PIdNFT } from "../mod.ts";
 import { Contract } from "./mod.ts";
 import { DiracUtxo, ParamUtxo, PreDiracUtxo } from "./utxo.ts";
 

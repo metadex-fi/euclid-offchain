@@ -69,7 +69,7 @@ export class Value {
 
   public divideByScalar = (scalar: bigint): Value => {
     return Value.newMapAmounts((a) => a / scalar)(this);
-  }
+  };
 
   public get assets(): Assets {
     const assets = ccysTkns.anew;
@@ -184,7 +184,7 @@ export class Value {
   public ofAssets = (assets: Assets): Value => {
     const value = new Value();
     for (const [currencySymbol, tokens] of this.value) {
-      const assets_ = assets.toMap();
+      const assets_ = assets.toMap;
       if (assets_.has(currencySymbol)) {
         const tokens_ = tknsAmnts.anew;
         for (const tokenName of tokens.keys()) {
@@ -293,7 +293,7 @@ export class Value {
 
   static nullOfAssets = (assets: Assets): Value => {
     const value = ccysTknsAmnts.anew;
-    for (const [currencySymbol, tokens] of assets.toMap()) {
+    for (const [currencySymbol, tokens] of assets.toMap) {
       const tokens_ = tknsAmnts.anew;
       for (const tokenName of tokens) {
         tokens_.set(tokenName, 0n);
@@ -340,7 +340,7 @@ export class Value {
       const args_ = args.map((v) => v ?? new Value());
       const assets = Value.assetsOf(arg, ...args_);
       const value = new Value();
-      for (const [currencySymbol, tokens] of assets.toMap()) {
+      for (const [currencySymbol, tokens] of assets.toMap) {
         for (const tokenName of tokens) {
           const asset = new Asset(currencySymbol, tokenName);
           const amountsIn = new Array<bigint>();
@@ -415,7 +415,7 @@ export class Value {
       // );
       const args_ = args.map((v) => v ?? new Value());
       const assets = Value.assetsOf(arg, ...args_);
-      for (const [currencySymbol, tokens] of assets.toMap()) {
+      for (const [currencySymbol, tokens] of assets.toMap) {
         for (const tokenName of tokens) {
           const asset = new Asset(currencySymbol, tokenName);
           const amountsIn = new Array<bigint>();

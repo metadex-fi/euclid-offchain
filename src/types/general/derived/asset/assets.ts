@@ -7,18 +7,10 @@ import {
   randomChoice,
   randomSubset,
 } from "../../../../mod.ts";
-import {
-  AssocMap,
-  f,
-  newGenInRange,
-  PConstraint,
-  PMap,
-  PWrapped,
-  t,
-} from "../../mod.ts";
+import { AssocMap, f, newGenInRange, PMap, PWrapped, t } from "../../mod.ts";
 import { PNonEmptyList } from "../nonEmptyList.ts";
 import { Asset, PAsset } from "./asset.ts";
-import { Currency, PCurrency } from "./currency.ts";
+import { PCurrency } from "./currency.ts";
 import { PToken, Token } from "./token.ts";
 
 export const ccysTkns = new AssocMap<PCurrency, Token[]>(PCurrency.ptype);
@@ -164,13 +156,13 @@ export class Assets {
     return tkns !== undefined && tkns.includes(token);
   };
 
-  public toMap = (): Map<Currency, Token[]> => {
-    const assets = new Map<Currency, Token[]>();
+  public get toMap(): AssocMap<PCurrency, Token[]> {
+    const assets = ccysTkns.anew;
     for (const [ccy, tkns] of this.assets) {
       assets.set(ccy, tkns.slice());
     }
     return assets;
-  };
+  }
 
   public get empty(): boolean {
     return this.assets.size === 0;
@@ -186,10 +178,11 @@ export class Assets {
 
   public subsetOf = (superSet: Assets): boolean => {
     for (const [ccy, tkns] of this.assets) {
-      const tkns_ = superSet.toMap().get(ccy);
+      const tkns_ = superSet.toMap.get(ccy);
       if (tkns_ === undefined) return false;
       for (const tkn of tkns) {
-        if (!tkns_.includes(tkn)) return false;
+        const target = tkn.show();
+        if (!tkns_.some((tkn_) => tkn_.show() === target)) return false;
       }
     }
     return true;
@@ -219,7 +212,7 @@ export class Assets {
 
   public intersect = (assets: Assets): Assets => {
     const shared = this.assets.anew;
-    const other = assets.toMap();
+    const other = assets.toMap;
     for (const [ccy, ownTkns] of this.assets) {
       const otherTkns = other.get(ccy);
       if (otherTkns) {

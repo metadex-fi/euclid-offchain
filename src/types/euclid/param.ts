@@ -55,7 +55,7 @@ ${tt})`;
     );
     assert(
       param.virtual.assets.subsetOf(assets),
-      "assets of virtual must be a subset of assets of jumpSizes and weights",
+      `assets of virtual must be a subset of assets of jumpSizes and weights, but ${param.virtual.assets.show()}\nis not a subset of ${assets.show()}`,
     );
   }
 

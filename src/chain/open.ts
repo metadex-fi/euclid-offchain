@@ -82,15 +82,17 @@ export class Open {
     });
 
     // TODO consider checking if balance has assets left over
-    const balance = PositiveValue.normed(this.deposit.unsigned.divideByScalar(BigInt(diracs.length)));
+    const balance = PositiveValue.normed(
+      this.deposit.unsigned.divideByScalar(BigInt(diracs.length)),
+    );
     const diracUtxos = diracs.map((dirac) => {
       return DiracUtxo.open(param, dirac, balance);
-    })
+    });
 
     return Pool.open(
       paramUtxo,
       diracUtxos,
-    )
+    );
   };
 
   // splitting it up this way to later use the same class to process actual user input

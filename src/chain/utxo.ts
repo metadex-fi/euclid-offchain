@@ -115,7 +115,11 @@ export class DiracUtxo {
     from: PreDiracUtxo,
     param: Param,
   ): DiracUtxo {
-    const pdiracDatum = new PDiracDatum(param, from.dirac.paramNFT, from.dirac.threadNFT);
+    const pdiracDatum = new PDiracDatum(
+      param,
+      from.dirac.paramNFT,
+      from.dirac.threadNFT,
+    );
     const dirac = pdiracDatum.plift(from.fields).dirac;
     return new DiracUtxo(dirac, pdiracDatum, from.balance, from.utxo);
   }
