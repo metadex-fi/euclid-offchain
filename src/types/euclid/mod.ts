@@ -1,4 +1,5 @@
 export * from "./boughtSold.ts";
+export * from "./euclidAction.ts";
 export * from "./euclidDatum.ts";
 export * from "./euclidValue.ts";
 export * from "./dirac.ts";

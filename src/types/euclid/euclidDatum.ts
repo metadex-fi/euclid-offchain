@@ -21,7 +21,7 @@ export class PParamDatum extends PObject<ParamDatum> {
   }
 
   static ptype = new PParamDatum(PParam.ptype);
-  static genPType(): PObject<ParamDatum> {
+  static genPType(): PParamDatum {
     return PParamDatum.ptype;
   }
 }

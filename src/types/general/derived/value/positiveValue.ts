@@ -76,7 +76,7 @@ export class PositiveValue {
     const newAmount = this.amountOf(asset) + amount;
     assert(
       newAmount >= 0n,
-      `addAmountOf: newAmount must be positive, got ${newAmount}`,
+      `addAmountOf: newAmount must be nonnegative, got ${newAmount}`,
     );
     if (newAmount === 0n) {
       this.value.drop(asset);
@@ -178,6 +178,10 @@ export class PositiveValue {
 
   static normed(value: Value): PositiveValue {
     return new PositiveValue(value.normed);
+  }
+
+  static singleton(asset: Asset, amount: bigint): PositiveValue {
+    return new PositiveValue(Value.singleton(asset, amount));
   }
 }
 

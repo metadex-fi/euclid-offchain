@@ -10,6 +10,7 @@ import {
   min,
   Param,
   ParamDatum,
+  PConstanted,
   PDiracDatum,
   PositiveValue,
   PParamDatum,
@@ -109,8 +110,8 @@ export class PreDiracUtxo {
 export class DiracUtxo {
   private constructor( // keep private, because how we handle optional utxo arg
     public readonly dirac: Dirac,
-    public readonly pdiracDatum: PDiracDatum,
     public readonly balance: PositiveValue,
+    public readonly datum: PConstanted<PDiracDatum>,
     public readonly utxo?: Lucid.UTxO, //exists when reading, not when creating
   ) {}
 
@@ -124,7 +125,7 @@ export class DiracUtxo {
       from.dirac.threadNFT,
     );
     const dirac = pdiracDatum.plift(from.fields).dirac;
-    return new DiracUtxo(dirac, pdiracDatum, from.balance, from.utxo);
+    return new DiracUtxo(dirac, from.balance, from.fields, from.utxo);
   }
 
   static open(
@@ -133,7 +134,8 @@ export class DiracUtxo {
     balance: PositiveValue,
   ): DiracUtxo {
     const pdiracDatum = new PDiracDatum(param, dirac.paramNFT, dirac.threadNFT);
-    return new DiracUtxo(dirac, pdiracDatum, balance);
+    const datum = pdiracDatum.pconstant(new DiracDatum(dirac));
+    return new DiracUtxo(dirac, balance, datum);
   }
 
   // public assets = (): Assets => this.dirac.assets;
@@ -253,7 +255,7 @@ export class DiracUtxo {
         const buyingOffer = offer.amountOf(buyingAsset);
         const swapping = Swapping.limit(
           user,
-          pool,
+          this,
           buyingAsset,
           sellingAsset,
           buyingOffer,
@@ -269,7 +271,10 @@ export class DiracUtxo {
   };
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
-    const diracDatum = this.pdiracDatum.pconstant(new DiracDatum(this.dirac));
+    assert(
+      this.datum !== undefined,
+      "DiracUtxo.openingTx: datum must be defined",
+    );
     const funds = this.balance.toLucid;
     const threadNFT = this.dirac.threadNFT.toLucidNFT();
     funds[Object.keys(threadNFT)[0]] = 1n;
@@ -279,7 +284,7 @@ export class DiracUtxo {
       .payToContract(
         contract.address,
         {
-          inline: Data.to(diracDatum),
+          inline: Data.to(this.datum),
         },
         funds,
       );

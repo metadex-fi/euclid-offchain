@@ -1,13 +1,19 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../lucid.mod.ts";
-import { Asset, genPositive, randomChoice } from "../../mod.ts";
-import { Pool } from "../pool.ts";
+import {
+  Asset,
+  Data,
+  genPositive,
+  PositiveValue,
+  randomChoice,
+} from "../../mod.ts";
+import { DiracUtxo } from "../mod.ts";
 import { User } from "../user.ts";
 
 export class Swapping {
   private constructor(
     private readonly user: User,
-    private readonly pool: Pool,
+    private readonly diracUtxo: DiracUtxo,
     private readonly boughtAsset: Asset,
     private readonly soldAsset: Asset,
     private readonly boughtAmount: bigint,
@@ -17,6 +23,25 @@ export class Swapping {
   ) {}
 
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
+    assert(
+      this.diracUtxo.utxo,
+      `Swapping.tx: this.diracUtxo.utxo is undefined`,
+    );
+    const funds = this.diracUtxo.balance.clone; // TODO cloning probably not required here
+    funds.addAmountOf(this.boughtAsset, this.boughtAmount);
+    funds.addAmountOf(this.soldAsset, -this.soldAmount);
+    return tx
+      .collectFrom(
+        [this.diracUtxo.utxo],
+        Data.to(swapRedeemer),
+      )
+      .payToContract(
+        this.user.contract.address,
+        {
+          inline: Data.to(this.diracUtxo.datum),
+        },
+        funds.toLucid,
+      );
   };
 
   public randomSubSwap = (): Swapping => {
@@ -25,24 +50,24 @@ export class Swapping {
     let soldAmount = Number(genPositive(this.soldAmount));
     let boughtAmount = soldAmount * soldSpot / boughtSpot;
     if (boughtAmount > this.boughtAmount) {
-        boughtAmount = Number(this.boughtAmount);
-        soldAmount = boughtAmount * boughtSpot / soldSpot;
+      boughtAmount = Number(this.boughtAmount);
+      soldAmount = boughtAmount * boughtSpot / soldSpot;
     }
     return new Swapping(
-        this.user,
-        this.pool,
-        this.boughtAsset,
-        this.soldAsset,
-        BigInt(Math.floor(boughtAmount)),
-        BigInt(Math.ceil(soldAmount)),
-        this.boughtSpot,
-        this.soldSpot,
+      this.user,
+      this.diracUtxo,
+      this.boughtAsset,
+      this.soldAsset,
+      BigInt(Math.floor(boughtAmount)),
+      BigInt(Math.ceil(soldAmount)),
+      this.boughtSpot,
+      this.soldSpot,
     );
   };
 
   static limit(
     user: User,
-    pool: Pool,
+    diracUtxo: DiracUtxo,
     boughtAsset: Asset,
     soldAsset: Asset,
     boughtAmount: bigint,
@@ -52,7 +77,7 @@ export class Swapping {
   ): Swapping {
     return new Swapping(
       user,
-      pool,
+      diracUtxo,
       boughtAsset,
       soldAsset,
       boughtAmount,

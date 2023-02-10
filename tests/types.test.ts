@@ -27,6 +27,7 @@
 //   PString,
 //   PSum,
 //   PSwap,
+//   PSwapRedeemer,
 //   PToken,
 //   PWrapped,
 // } from "../src/mod.ts";
@@ -91,6 +92,7 @@
 // const euclidPrimitiveGenerators = [
 //   PBoughtSold.genPType,
 //   PSwap.genPType,
+//   PSwapRedeemer.genPType,
 //   PEuclidValue.genPType,
 //   PIdNFT.genPType,
 //   PParam.genPType,
