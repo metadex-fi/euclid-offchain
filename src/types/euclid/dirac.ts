@@ -1,9 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  genNonNegative,
-  genPositive,
-  PLiteral,
-} from "../../mod.ts";
+import { genNonNegative, genPositive, PLiteral } from "../../mod.ts";
 import {
   Currency,
   f,

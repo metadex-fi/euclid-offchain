@@ -68,11 +68,13 @@ export class Pool {
     return tx_;
   };
 
-  public eligibleFor(user: User): Swapping[] {
-    assert(user.balance, `Pool.eligibleFor: user.balance is undefined`)
-    const eligibleSells = this.paramUtxo.sharedAssets(user.balance.assets);
-    if (!eligibleSells.size) return [];
-    return this.diracUtxos.flatMap(d => d.eligibleFor(user, this, eligibleSells));
+  public swappingsFor(user: User): Swapping[] {
+    assert(user.balance, `Pool.eligibleFor: user.balance is undefined`);
+    const sellableBalance = user.balance.ofAssets(this.paramUtxo.param.assets);
+    if (!sellableBalance.size) return [];
+    return this.diracUtxos.flatMap((d) =>
+      d.swappingsFor(user, this, sellableBalance.unsigned)
+    );
   }
 
   static parse(paramUtxo: ParamUtxo, diracUtxos: DiracUtxo[]): Pool {

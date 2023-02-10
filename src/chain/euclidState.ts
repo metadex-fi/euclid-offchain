@@ -123,9 +123,9 @@ export class EuclidState {
     });
   }
 
-  public eligibleFor(user: User): Swapping[] {
+  public swappingsFor(user: User): Swapping[] {
     // TODO consider removing the user's own pools beforehand
-    const pools = [...this.pools.values()].flatMap(p => [...p.values()]);
-    return pools.flatMap(pool => pool.eligibleFor(user));
+    const pools = [...this.pools.values()].flatMap((p) => [...p.values()]);
+    return pools.flatMap((pool) => pool.swappingsFor(user));
   }
 }

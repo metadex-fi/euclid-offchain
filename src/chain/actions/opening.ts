@@ -1,9 +1,18 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { PositiveValue,EuclidValue,Param,Dirac,Assets,max,genNonNegative,gMaxLength,Asset } from "../../mod.ts";
+import {
+  Asset,
+  Assets,
+  Dirac,
+  EuclidValue,
+  genNonNegative,
+  gMaxLength,
+  max,
+  Param,
+  PositiveValue,
+} from "../../mod.ts";
 import { Pool } from "../pool.ts";
 import { User } from "../user.ts";
-import { ParamUtxo,DiracUtxo } from "../utxo.ts";
-
+import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 
 // complete settings for opening a pool
 export class Opening {

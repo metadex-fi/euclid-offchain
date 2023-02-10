@@ -5,8 +5,10 @@ import {
   Data,
   Dirac,
   DiracDatum,
+  EuclidValue,
   f,
   IdNFT,
+  min,
   Param,
   ParamDatum,
   PDiracDatum,
@@ -14,6 +16,7 @@ import {
   PParamDatum,
   PPreDiracDatum,
   t,
+  Value,
 } from "../mod.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { Contract, Pool, User } from "./mod.ts";
@@ -147,17 +150,124 @@ export class DiracUtxo {
   ${tt})`;
   };
 
-  public eligibleFor = (user: User, pool: Pool, eligibleSells: Assets): Swapping[] => {
+  public swappingsFor = (
+    user: User,
+    pool: Pool,
+    sellable: Value,
+  ): Swapping[] => {
     const swappings = new Array<Swapping>();
-    eligibleSells.forEach((soldAsset) => {
-      const eligibleBuys = this.balance.assets.drop(soldAsset);
-      eligibleBuys.forEach((boughtAsset) => {
-        
-      })
-    })
+    const param = pool.paramUtxo.param;
+    const buyable = this.balance.unsigned;
+    const virtual = param.virtual.unsigned;
+    const weights = param.weights.unsigned;
+    const jumpSizes = param.jumpSizes.unsigned;
+    const lowestPrices = this.dirac.lowestPrices.unsigned;
 
-    return swappings
-  }
+    const amm = Value.newUnionWith(
+      (
+        buyable: bigint,
+        virtual: bigint,
+        weight: bigint,
+      ): bigint => (buyable + virtual) * weight,
+      0n,
+      0n,
+      0n,
+    )( // TODO consider what happens if 0n
+      buyable,
+      virtual,
+      weights,
+    );
+    const spotBuying = Value.newUnionWith((
+      amm: bigint,
+      lowest: bigint,
+      jumpSize: bigint,
+    ): bigint => (((amm - lowest) / jumpSize) + 1n) * jumpSize + lowest)(
+      amm,
+      lowestPrices,
+      jumpSizes,
+    );
+    const spotSelling = Value.newUnionWith((
+      amm: bigint,
+      lowest: bigint,
+      jumpSize: bigint,
+    ): bigint => ((amm - lowest) / jumpSize) * jumpSize + lowest)(
+      amm,
+      lowestPrices,
+      jumpSizes,
+    );
+
+    // TODO those two are rather inefficient, but so is all our value-arithmetic. Consider fixing that first.
+    const demand = Value.newUnionWith(
+      (
+        sellable: bigint,
+        buyable: bigint,
+        virtual: bigint,
+        weight: bigint,
+        spot: bigint,
+        amm: bigint,
+      ): bigint => {
+        const liquidity = buyable + virtual;
+        const demand = liquidity * (((amm / spot) ** weight) - 1n); // amm --> spot
+        return min(demand, sellable);
+      },
+      0n,
+      0n,
+      0n,
+      0n,
+    )(
+      sellable,
+      buyable,
+      virtual,
+      weights,
+      spotSelling,
+      amm,
+    );
+
+    const offer = Value.newUnionWith(
+      (
+        buyable: bigint,
+        virtual: bigint,
+        weight: bigint,
+        spot: bigint,
+        amm: bigint,
+      ): bigint => {
+        const liquidity = buyable + virtual;
+        const offer = liquidity * (1n - ((amm / spot) ** weight)); // amm --> spot
+        return min(offer, buyable);
+      },
+      0n,
+      0n,
+      0n,
+    )(
+      buyable,
+      virtual,
+      weights,
+      spotBuying,
+      amm,
+    );
+
+    sellable.assets.forEach((sellingAsset) => {
+      const sellingDemand = demand.amountOf(sellingAsset);
+      const sellingSpot = spotSelling.amountOf(sellingAsset);
+      this.balance.assets.drop(sellingAsset).forEach((buyingAsset) => {
+        const buyingSpot = spotBuying.amountOf(buyingAsset);
+        const buyingOffer = offer.amountOf(buyingAsset);
+        const swapping = Swapping.limit(
+          user,
+          pool,
+          buyingAsset,
+          sellingAsset,
+          buyingOffer,
+          sellingDemand,
+          buyingSpot,
+          sellingSpot,
+        );
+        swappings.push(swapping);
+      });
+    });
+
+    return swappings;
+  };
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     const diracDatum = this.pdiracDatum.pconstant(new DiracDatum(this.dirac));

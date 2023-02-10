@@ -226,10 +226,10 @@ export class Value {
 
   public ofAssets = (assets: Assets): Value => {
     const value = new Value();
-    assets.forEach(asset => {
+    assets.forEach((asset) => {
       const amount = this.amountOf(asset);
       value.initAmountOf(asset, amount);
-    })
+    });
     return value;
   };
 
@@ -241,13 +241,16 @@ export class Value {
         for (const [token, amount] of tknAmnts) {
           const amount_ = tknAmnts_.get(token);
           if (amount_) {
-            value.initAmountOf(new Asset(currency, token), min(amount, amount_));
+            value.initAmountOf(
+              new Asset(currency, token),
+              min(amount, amount_),
+            );
           }
         }
       }
     }
     return value;
-  }
+  };
 
   public get toMap(): AssocMap<PCurrency, AssocMap<PToken, bigint>> {
     const map = this.value.anew;
@@ -380,7 +383,7 @@ export class Value {
     return value;
   };
 
-  private static newUnionWith = (
+  static newUnionWith = (
     op: (arg: bigint, ...args: Array<bigint>) => bigint,
     defaultOut?: bigint,
     ...defaultIns: Array<bigint | undefined>
@@ -419,7 +422,7 @@ export class Value {
   static normedAdd = Value.newUnionWith((a, b) => a + b, 0n, 0n, 0n);
   static subtract = Value.newUnionWith((a, b) => a - b);
   static normedSubtract = Value.newUnionWith((a, b) => a - b, 0n, 0n, 0n);
-  // static hadamard = Value.newUnionWith((a, b) => a * b);
+  static hadamard = Value.newUnionWith((a, b) => a * b);
   static hadamard_ = Value.newUnionWith((a, b) => a * b, undefined, 0n);
   static divide = Value.newUnionWith((a, b) => a / b); // reverse hadamard-product
 

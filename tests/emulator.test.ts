@@ -1,7 +1,7 @@
 import { Lucid } from "../lucid.mod.ts";
 import { Action } from "../src/chain/backup/action.backup.ts";
 import { User } from "../src/chain/user.ts";
-import { genName,randomSubset } from "../src/mod.ts";
+import { genName, randomSubset } from "../src/mod.ts";
 
 Deno.test("lucid-example", async () => {
   const l = 32n; // empirical maximum = 32n
