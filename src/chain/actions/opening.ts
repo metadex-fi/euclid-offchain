@@ -1,4 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { Lucid } from "../../../lucid.mod.ts";
 import {
   Asset,
   Assets,
@@ -27,7 +28,11 @@ export class Opening {
     // TODO asserts?
   }
 
-  public pool = (): Pool => {
+  public tx = (tx: Lucid.Tx): Lucid.Tx => {
+    return this.pool().openingTx(tx, this.user.contract);
+  };
+
+  private pool = (): Pool => {
     const param = new Param(
       this.user.paymentKeyHash,
       this.virtual,

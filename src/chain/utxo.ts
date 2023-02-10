@@ -5,7 +5,6 @@ import {
   Data,
   Dirac,
   DiracDatum,
-  EuclidValue,
   f,
   IdNFT,
   min,

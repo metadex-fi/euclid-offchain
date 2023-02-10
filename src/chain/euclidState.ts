@@ -11,7 +11,6 @@ import {
   PPreDiracDatum,
   PString,
 } from "../mod.ts";
-import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { User } from "./mod.ts";
 import { Pool, PrePool } from "./pool.ts";
