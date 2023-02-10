@@ -2,7 +2,6 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   genNonNegative,
   genPositive,
-  maxInteger,
   PLiteral,
 } from "../../mod.ts";
 import {

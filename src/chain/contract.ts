@@ -13,7 +13,7 @@ export class Contract {
   public readonly mintingPolicy: Lucid.MintingPolicy;
   public readonly address: Lucid.Address;
   public readonly policy: Currency;
-  public euclidState?: EuclidState;
+  public state?: EuclidState;
 
   constructor(
     public readonly lucid: Lucid.Lucid,
@@ -36,7 +36,7 @@ export class Contract {
 
   public update = async (): Promise<void> => {
     const utxos = await this.lucid.utxosAt(this.address);
-    this.euclidState = new EuclidState(utxos, this.policy);
+    this.state = new EuclidState(utxos, this.policy);
   };
 
   public concise = (): string => {
@@ -45,7 +45,7 @@ export class Contract {
       mintingPolicy.script: ${this.mintingPolicy.script};
       address: ${this.address};
       policy: ${this.policy};
-      state?: ${this.euclidState ? "yes" : "no"};
+      state?: ${this.state ? "yes" : "no"};
       )`;
   };
 }

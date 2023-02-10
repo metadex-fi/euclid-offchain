@@ -16,7 +16,7 @@ export class User {
   // public utxoPools?: UtxoPool[]; // from onchain
   private lastIdNFT?: IdNFT;
 
-  public pendingConsequences?: consequences;
+  public pendingConsequences?: consequences; // TODO not filled rn
 
   private constructor(
     public readonly lucid: Lucid.Lucid,

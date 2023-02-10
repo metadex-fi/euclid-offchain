@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { abs, IdNFT, max, maxInteger } from "../../../../mod.ts";
+import { abs, IdNFT, max, maxInteger, min } from "../../../../mod.ts";
 import { f, PMap, PWrapped, t } from "../../mod.ts";
 import {
   Asset,
@@ -226,20 +226,28 @@ export class Value {
 
   public ofAssets = (assets: Assets): Value => {
     const value = new Value();
-    for (const [currencySymbol, tokens] of this.value) {
-      const assets_ = assets.toMap;
-      if (assets_.has(currencySymbol)) {
-        const tokens_ = tknsAmnts.anew;
-        for (const tokenName of tokens.keys()) {
-          if (assets_.get(currencySymbol)?.includes(tokenName)) {
-            tokens_.set(tokenName, tokens.get(tokenName)!);
+    assets.forEach(asset => {
+      const amount = this.amountOf(asset);
+      value.initAmountOf(asset, amount);
+    })
+    return value;
+  };
+
+  public intersect = (other: Value): Value => {
+    const value = new Value();
+    for (const [currency, tknAmnts] of this.value) {
+      const tknAmnts_ = other.value.get(currency);
+      if (tknAmnts_) {
+        for (const [token, amount] of tknAmnts) {
+          const amount_ = tknAmnts_.get(token);
+          if (amount_) {
+            value.initAmountOf(new Asset(currency, token), min(amount, amount_));
           }
         }
-        value.value.set(currencySymbol, tokens_);
       }
     }
     return value;
-  };
+  }
 
   public get toMap(): AssocMap<PCurrency, AssocMap<PToken, bigint>> {
     const map = this.value.anew;

@@ -49,6 +49,12 @@ export class PositiveValue {
   // TODO this does not really belong here, entangles the non-DEX-stuff with DEX-stuff
   public popIdNFT = (nft: IdNFT) => this.value.popIdNFT(nft);
   public drop = (asset: Asset): void => this.value.drop(asset);
+  public ofAssets = (assets: Assets): PositiveValue => {
+    return new PositiveValue(this.value.ofAssets(assets));
+  };
+  public intersect = (other: PositiveValue): PositiveValue => {
+    return new PositiveValue(this.value.intersect(other.value));
+  };
   public setAmountOf = (asset: Asset, amount: bigint): void =>
     this.value.setAmountOf(asset, amount);
   public get clone(): PositiveValue {

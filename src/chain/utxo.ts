@@ -15,7 +15,8 @@ import {
   PPreDiracDatum,
   t,
 } from "../mod.ts";
-import { Contract } from "./mod.ts";
+import { Swapping } from "./actions/swapping.ts";
+import { Contract, Pool, User } from "./mod.ts";
 
 export class ParamUtxo {
   private constructor(
@@ -145,6 +146,18 @@ export class DiracUtxo {
   ${ttf}balance: ${this.balance?.concise(ttf) ?? "undefined"}
   ${tt})`;
   };
+
+  public eligibleFor = (user: User, pool: Pool, eligibleSells: Assets): Swapping[] => {
+    const swappings = new Array<Swapping>();
+    eligibleSells.forEach((soldAsset) => {
+      const eligibleBuys = this.balance.assets.drop(soldAsset);
+      eligibleBuys.forEach((boughtAsset) => {
+        
+      })
+    })
+
+    return swappings
+  }
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     const diracDatum = this.pdiracDatum.pconstant(new DiracDatum(this.dirac));

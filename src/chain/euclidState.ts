@@ -11,6 +11,9 @@ import {
   PPreDiracDatum,
   PString,
 } from "../mod.ts";
+import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
+import { Swapping } from "./actions/swapping.ts";
+import { User } from "./mod.ts";
 import { Pool, PrePool } from "./pool.ts";
 import { ParamUtxo, PreDiracUtxo } from "./utxo.ts";
 
@@ -120,8 +123,9 @@ export class EuclidState {
     });
   }
 
-  // public openForBusiness = (assets: Assets): Pool[] => {
-  //   return [...this.pools.values()].map((pools) => [...pools.values()]).flat()
-  //     .filter((pool) => pool.openForBusiness(assets));
-  // };
+  public eligibleFor(user: User): Swapping[] {
+    // TODO consider removing the user's own pools beforehand
+    const pools = [...this.pools.values()].flatMap(p => [...p.values()]);
+    return pools.flatMap(pool => pool.eligibleFor(user));
+  }
 }

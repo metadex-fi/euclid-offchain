@@ -1,22 +1,13 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  Asset,
-  Assets,
-  Dirac,
-  EuclidValue,
-  genNonNegative,
-  gMaxLength,
-  max,
-  Param,
-  PositiveValue,
-} from "../mod.ts";
-import { DiracUtxo, ParamUtxo } from "./mod.ts";
-import { Pool } from "./pool.ts";
-import { User } from "./user.ts";
+import { PositiveValue,EuclidValue,Param,Dirac,Assets,max,genNonNegative,gMaxLength,Asset } from "../../mod.ts";
+import { Pool } from "../pool.ts";
+import { User } from "../user.ts";
+import { ParamUtxo,DiracUtxo } from "../utxo.ts";
+
 
 // complete settings for opening a pool
-export class Open {
-  constructor(
+export class Opening {
+  private constructor(
     private readonly user: User,
     private readonly virtual: PositiveValue,
     private readonly weights: EuclidValue,
@@ -96,7 +87,7 @@ export class Open {
   };
 
   // splitting it up this way to later use the same class to process actual user input
-  static genOfUser = (user: User): Open => {
+  static genOfUser = (user: User): Opening => {
     assert(user.balance, `user balance not initialized for ${user.address}`);
     assert(user.balance.size, `no assets for ${user.address}`);
     const deposit = user.balance.minSizedSubValue(1n);
@@ -120,7 +111,7 @@ export class Open {
     const jumpSizes = EuclidValue.genOfAssets(assets);
     const numTicks = EuclidValue.genOfAssets(assets);
 
-    return new Open(
+    return new Opening(
       user,
       virtual,
       weights,

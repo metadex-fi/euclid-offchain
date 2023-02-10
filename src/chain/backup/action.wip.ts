@@ -5,14 +5,14 @@ import {
   Data,
   Dirac,
   DiracDatum,
-  DiracUtxo,
   genPositive,
   min,
-  Pool,
   randomIndexedChoice,
 } from "../mod.ts";
-import { Euclid } from "./euclid.ts";
+import { EuclidState } from "./euclidState.ts";
+import { Pool } from "./pool.ts";
 import { User } from "./user.ts";
+import { DiracUtxo } from "./utxo.ts";
 
 const showErrors = true;
 
@@ -20,7 +20,7 @@ const showErrors = true;
 export function tryToAct(
   tx: Lucid.Tx,
   user: User,
-  state: Euclid,
+  state: EuclidState,
 ): Lucid.Tx | undefined {
   return new Permutation([tryOpenAny, tryAdminAny, trySwapAny])
     .try((f) => f(tx, user, state));
@@ -40,7 +40,7 @@ function tryOpenAny(tx: Lucid.Tx, user: User): Lucid.Tx | undefined {
 function tryAdminAny(
   tx: Lucid.Tx,
   user: User,
-  state: Euclid,
+  state: EuclidState,
 ): Lucid.Tx | undefined {
   const p = state.pools.get(user.paymentKeyHash);
   const pools = p ? [...p.values()] : [];
@@ -50,7 +50,7 @@ function tryAdminAny(
 function trySwapAny(
   tx: Lucid.Tx,
   user: User,
-  state: Euclid,
+  state: EuclidState,
 ): Lucid.Tx | undefined {
   const pools = ([...state.pools.values()].map((p) => [...p.values()])).flat();
   return new Permutation(pools).try((pool) => trySwapPool(tx, user, pool));

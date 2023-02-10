@@ -1,7 +1,8 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
 import { AssocMap, IdNFT, PIdNFT } from "../mod.ts";
-import { Contract } from "./mod.ts";
+import { Swapping } from "./actions/swapping.ts";
+import { Contract, User } from "./mod.ts";
 import { DiracUtxo, ParamUtxo, PreDiracUtxo } from "./utxo.ts";
 
 export class PrePool {
@@ -66,6 +67,13 @@ export class Pool {
     );
     return tx_;
   };
+
+  public eligibleFor(user: User): Swapping[] {
+    assert(user.balance, `Pool.eligibleFor: user.balance is undefined`)
+    const eligibleSells = this.paramUtxo.sharedAssets(user.balance.assets);
+    if (!eligibleSells.size) return [];
+    return this.diracUtxos.flatMap(d => d.eligibleFor(user, this, eligibleSells));
+  }
 
   static parse(paramUtxo: ParamUtxo, diracUtxos: DiracUtxo[]): Pool {
     return new Pool(paramUtxo, diracUtxos);
