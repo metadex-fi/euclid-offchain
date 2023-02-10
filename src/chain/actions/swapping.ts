@@ -2,10 +2,13 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../lucid.mod.ts";
 import {
   Asset,
+  BoughtSold,
   Data,
   genPositive,
-  PositiveValue,
+  PSwapRedeemer,
   randomChoice,
+  Swap,
+  SwapRedeemer,
 } from "../../mod.ts";
 import { DiracUtxo } from "../mod.ts";
 import { User } from "../user.ts";
@@ -27,9 +30,24 @@ export class Swapping {
       this.diracUtxo.utxo,
       `Swapping.tx: this.diracUtxo.utxo is undefined`,
     );
+
     const funds = this.diracUtxo.balance.clone; // TODO cloning probably not required here
     funds.addAmountOf(this.boughtAsset, this.boughtAmount);
     funds.addAmountOf(this.soldAsset, -this.soldAmount);
+
+    const swapRedeemer = PSwapRedeemer.ptype.pconstant(
+      new SwapRedeemer(
+        new Swap(
+          this.boughtAsset,
+          this.soldAsset,
+          new BoughtSold(
+            this.boughtAmount,
+            this.soldAmount,
+          ),
+        ),
+      ),
+    );
+
     return tx
       .collectFrom(
         [this.diracUtxo.utxo],
@@ -44,7 +62,7 @@ export class Swapping {
       );
   };
 
-  public randomSubSwap = (): Swapping => {
+  private randomSubSwap = (): Swapping => {
     const soldSpot = Number(this.soldSpot);
     const boughtSpot = Number(this.boughtSpot);
     let soldAmount = Number(genPositive(this.soldAmount));
