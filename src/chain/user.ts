@@ -105,9 +105,18 @@ export class User {
     if (paramNFTs) {
       const subsequents =
         (new IdNFT(this.contract.policy, this.paymentKeyHash.hash()))
-          .sortSubsequents([...paramNFTs]).sorted;
-      // TODO handle error cases of sortSubsequents
-      if (subsequents) this.setLastIdNFT(subsequents[subsequents.length - 1]);
+          .sortSubsequents([...paramNFTs]);
+      assert(subsequents.wrongPolicy.length === 0, `wrong policy`); // TODO not for prod
+      if (subsequents.unmatched) { // TODO not for prod
+        assert(subsequents.unmatched.length < 2, `too many unmatched`);
+        assert(
+          subsequents.unmatched[0].token.show() ===
+            this.paymentKeyHash.hash().show(),
+          `wrong token`,
+        );
+      }
+      const sorted = subsequents.sorted;
+      if (subsequents) this.setLastIdNFT(sorted[sorted.length - 1]);
     }
   };
 
