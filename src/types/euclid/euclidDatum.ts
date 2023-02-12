@@ -1,6 +1,7 @@
 import { Currency } from "../general/derived/asset/currency.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
 import { PRecord } from "../general/fundamental/container/record.ts";
+import { PSum } from "../general/fundamental/container/sum.ts";
 import { Dirac, PDirac, PPreDirac } from "./dirac.ts";
 import { IdNFT } from "./idnft.ts";
 import { Param, PParam } from "./param.ts";
@@ -68,5 +69,17 @@ export class PDiracDatum extends PObject<DiracDatum> {
   static genPType(): PDiracDatum {
     const pdirac = PDirac.genPType() as PDirac;
     return new PDiracDatum(pdirac.param, pdirac.paramNFT, pdirac.threadNFT);
+  }
+}
+
+export class PPreEuclidDatum extends PSum<DiracDatum | ParamDatum> {
+  constructor(
+    policy: Currency,
+  ) {
+    super([new PPreDiracDatum(policy), PParamDatum.ptype]);
+  }
+
+  static genPType(): PPreEuclidDatum {
+    return new PPreEuclidDatum(Currency.dummy);
   }
 }

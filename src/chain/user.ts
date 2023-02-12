@@ -62,7 +62,10 @@ export class User {
     if (this.balance.amountOf(Asset.ADA, 0n) < feesEtcLovelace) {
       return new PositiveValue();
     }
-    return this.balance.normedMinus(feesEtc);
+    const available = this.balance.clone;
+    available.drop(Asset.ADA); // TODO don't drop ADA completely
+    return available;
+    // return this.balance.normedMinus(feesEtc);
   }
 
   public get nextParamNFT(): IdNFT {
@@ -80,7 +83,10 @@ export class User {
     spentContractUtxos: Lucid.UTxO[],
   ): Promise<Action[]> => {
     await this.update(spentContractUtxos);
-    if (this.balance!.amountOf(Asset.ADA) < feesEtcLovelace) return [];
+    if (this.balance!.amountOf(Asset.ADA) < feesEtcLovelace) {
+      console.log(`not enough ada to pay fees etc.`);
+      return [];
+    }
     const action = new UserAction(this).generate();
     if (action) return [action];
     else return [];
@@ -155,13 +161,15 @@ export class User {
     return user;
   }
 
-  static async genSeveral(): Promise<User[]> {
+  static async genSeveral(
+    numUsers = 10n,
+    numAssets = gMaxLength,
+  ): Promise<User[]> {
     const users = new Array<User>();
-    const allAssets = Assets.generate(2n, 10n);
-    console.log(allAssets.show());
+    const allAssets = Assets.generate(numAssets, numAssets);
+    // console.log(allAssets.show());
     const lucid = await Lucid.Lucid.new(undefined, "Custom");
 
-    const numUsers = genPositive(gMaxLength);
     const addresses = new Array<Lucid.Address>();
     while (users.length < numUsers) {
       const user = await User.generateWith(lucid, allAssets);

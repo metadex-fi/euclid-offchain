@@ -62,6 +62,10 @@ export class Pool {
     public readonly diracUtxos: DiracUtxo[],
   ) {}
 
+  public get utxos(): Lucid.UTxO[] {
+    return [this.paramUtxo.utxo!, ...this.diracUtxos.map((d) => d.utxo!)];
+  }
+
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     let tx_ = this.paramUtxo.openingTx(tx, contract);
     // let remaining = this.diracUtxos.slice(0, 100);
@@ -71,11 +75,11 @@ export class Pool {
     return tx_;
   };
 
-  // public closingTx = (tx: Lucid.Tx): Lucid.Tx => {
-  //   let tx_ = this.paramUtxo.closingTx(tx);
-  //   this.diracUtxos.forEach((diracUtxo) => tx_ = diracUtxo.closingTx(tx_));
-  //   return tx_;
-  // };
+  public closingTx = (tx: Lucid.Tx): Lucid.Tx => {
+    let tx_ = this.paramUtxo.closingTx(tx);
+    this.diracUtxos.forEach((diracUtxo) => tx_ = diracUtxo.closingTx(tx_));
+    return tx_;
+  };
 
   public swappingsFor(user: User): Swapping[] {
     const balance = user.availableBalance;

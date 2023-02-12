@@ -1,10 +1,16 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
-import { PPreDiracDatum } from "../types/euclid/euclidDatum.ts";
+import {
+  DiracDatum,
+  ParamDatum,
+  PParamDatum,
+  PPreDiracDatum,
+} from "../types/euclid/euclidDatum.ts";
 import { gMaxHashes, IdNFT } from "../types/euclid/idnft.ts";
 import { Currency } from "../types/general/derived/asset/currency.ts";
 import { KeyHash } from "../types/general/derived/hash/keyHash.ts";
 import { AssocMap } from "../types/general/fundamental/container/map.ts";
+import { PSum } from "../types/general/fundamental/container/sum.ts";
 import { Data } from "../types/general/fundamental/type.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { Pool, PrePool } from "./pool.ts";
@@ -32,13 +38,20 @@ export class EuclidState {
     const prePools = new AssocMap<KeyHash, AssocMap<IdNFT, PrePool>>(
       (kh) => kh.show(),
     );
-    const ppreDiracDatum = new PPreDiracDatum(policy);
+    // const ppreDiracDatum = new PPreDiracDatum(policy);
+    const peuclidDatum = new PSum<DiracDatum | ParamDatum>([
+      new PPreDiracDatum(policy),
+      PParamDatum.ptype,
+    ]);
     utxos.forEach((utxo) => {
       try {
         // TODO assert scriptref, and all the other fields if it makes sense
         assert(utxo.datum, `datum must be present`);
         const datum = Data.from(utxo.datum);
-        assert(datum instanceof Lucid.Constr, `datum must be a Constr`);
+        assert(
+          datum instanceof Lucid.Constr,
+          `datum must be a Constr, got ${datum}`,
+        );
         switch (datum.index) {
           case 0: {
             const paramUtxo = ParamUtxo.parse(
@@ -75,9 +88,10 @@ export class EuclidState {
             throw new Error(`invalid datum index: ${datum.index}`);
         }
       } catch (e) {
-        const is = this.invalidUtxos.get(e.message) ?? [];
-        is.push(utxo);
-        this.invalidUtxos.set(e.message, is);
+        throw e; // TODO revert in prod
+        // const is = this.invalidUtxos.get(e.message) ?? [];
+        // is.push(utxo);
+        // this.invalidUtxos.set(e.message, is);
       }
     });
 
@@ -105,7 +119,8 @@ export class EuclidState {
             paramNFT = lastIdNFT;
             hits--;
           } else {
-            invalidOwnerPools.set(paramNFT, prePool);
+            throw new Error(`invalid prePool: ${prePool}`); // TODO revert in prod
+            // invalidOwnerPools.set(paramNFT, prePool);
           }
         } else {
           misses--;
@@ -120,6 +135,9 @@ export class EuclidState {
   public swappingsFor(user: User): Swapping[] {
     // TODO consider removing the user's own pools beforehand
     const pools = [...this.pools.values()].flatMap((p) => [...p.values()]);
+    if (pools.length) {
+      console.log(`pools: ${pools.length}`);
+    }
     return pools.flatMap((pool) => pool.swappingsFor(user));
   }
 }

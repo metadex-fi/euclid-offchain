@@ -1,7 +1,15 @@
 import { PBoughtSold } from "../src/types/euclid/boughtSold.ts";
 import { PDirac, PPreDirac } from "../src/types/euclid/dirac.ts";
-import { PSwapRedeemer } from "../src/types/euclid/euclidAction.ts";
-import { PDiracDatum, PParamDatum } from "../src/types/euclid/euclidDatum.ts";
+import {
+  PAdminRedeemer,
+  PSwapRedeemer,
+} from "../src/types/euclid/euclidAction.ts";
+import {
+  PDiracDatum,
+  PParamDatum,
+  PPreDiracDatum,
+  PPreEuclidDatum,
+} from "../src/types/euclid/euclidDatum.ts";
 import { PEuclidValue } from "../src/types/euclid/euclidValue.ts";
 import { PIdNFT } from "../src/types/euclid/idnft.ts";
 import { PParam } from "../src/types/euclid/param.ts";
@@ -89,7 +97,7 @@ const euclidPrimitiveGenerators = [
   PBoughtSold.genPType,
   PSwap.genPType,
   PSwapRedeemer.genPType,
-  //   PAdminRedeemer.genPType,
+  PAdminRedeemer.genPType,
   PEuclidValue.genPType,
   PIdNFT.genPType,
   PParam.genPType,
@@ -97,4 +105,6 @@ const euclidPrimitiveGenerators = [
   PDirac.genPType,
   PParamDatum.genPType,
   PDiracDatum.genPType,
+  PPreDiracDatum.genPType,
+  PPreEuclidDatum.genPType,
 ];

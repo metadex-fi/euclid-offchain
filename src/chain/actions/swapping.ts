@@ -1,5 +1,4 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Data } from "../../../../lucid/mod.ts";
 import { Lucid } from "../../../lucid.mod.ts";
 import { BoughtSold } from "../../types/euclid/boughtSold.ts";
 import {
@@ -8,6 +7,7 @@ import {
 } from "../../types/euclid/euclidAction.ts";
 import { Swap } from "../../types/euclid/swap.ts";
 import { Asset } from "../../types/general/derived/asset/asset.ts";
+import { Data } from "../../types/general/fundamental/type.ts";
 import { genPositive, randomChoice } from "../../utils/generators.ts";
 import { User } from "../user.ts";
 import { DiracUtxo } from "../utxo.ts";
@@ -110,8 +110,11 @@ export class Swapping {
 
   // TODO don't forget to update (poll) chain state somewhere beforehand
   static genOfUser(user: User): Swapping | undefined {
+    console.log(`attempting to swap`);
     const swappings = user.contract!.state!.swappingsFor(user);
+    console.log(`swappings: ${swappings}`);
     if (swappings.length < 1) return undefined;
-    else return randomChoice(swappings).randomSubSwap();
+    console.log(`Swapping`);
+    return randomChoice(swappings).randomSubSwap();
   }
 }

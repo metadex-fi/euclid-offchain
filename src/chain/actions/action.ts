@@ -1,9 +1,10 @@
 import { randomIndexedChoice } from "../../utils/generators.ts";
 import { User } from "../user.ts";
+import { Closing } from "./closing.ts";
 import { Opening } from "./opening.ts";
 import { Swapping } from "./swapping.ts";
 
-export type Action = Opening | Swapping;
+export type Action = Closing | Opening | Swapping;
 
 export class UserAction {
   constructor(
@@ -11,7 +12,7 @@ export class UserAction {
   ) {}
 
   public generate = (): Action | undefined => {
-    const actions = new Permutation([Opening, Swapping]);
+    const actions = new Permutation([Closing, Opening, Swapping]);
     return actions.try((a) => {
       return a.genOfUser(this.user);
     });

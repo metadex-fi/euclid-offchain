@@ -44,8 +44,8 @@ export const genPBounded = (
 export const newGenInRange = (lowerBound: bigint, upperBound: bigint) => {
   if (lowerBound === upperBound) return () => lowerBound;
   assert(
-    lowerBound < upperBound,
-    `newGenInRange: ${lowerBound} >= ${lowerBound}`,
+    lowerBound <= upperBound,
+    `newGenInRange: ${lowerBound} > ${upperBound}`,
   );
   return () => lowerBound + genNonNegative(upperBound - lowerBound);
 };

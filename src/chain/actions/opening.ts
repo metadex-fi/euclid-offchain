@@ -92,6 +92,7 @@ export class Opening {
 
   // splitting it up this way to later use the same class to process actual user input
   static genOfUser = (user: User): Opening | undefined => {
+    console.log(`attempting to open`);
     const balance = user.availableBalance;
     if (balance.size < 1) return undefined;
     const maxAssets = 5n;
@@ -120,6 +121,7 @@ export class Opening {
     console.log(numTicks.concise());
     // NOTE 27 diracs slightly exceeds the max tx size (17444 vs. 16384)
     // TODO consider splitting up the tx
+    console.log(`Opening`);
     return new Opening(
       user,
       param,

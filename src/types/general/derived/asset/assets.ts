@@ -3,6 +3,7 @@ import { Lucid } from "../../../../../lucid.mod.ts";
 import {
   boundedSubset,
   gMaxLength,
+  max,
   nonEmptySubSet,
   randomChoice,
   randomSubset,
@@ -229,10 +230,10 @@ export class Assets {
     assets.forEach((asset) => Asset.assertADAlovelace(asset));
   }
 
-  static generate = (minLength = 0n, maxLength = gMaxLength): Assets => {
+  static generate = (minLength = 0n, maxLength?: bigint): Assets => {
     const assets = PMap.genKeys(
       PAsset.ptype,
-      newGenInRange(minLength, maxLength)(),
+      newGenInRange(minLength, maxLength ?? max(minLength, gMaxLength))(),
     );
     assert(assets.length >= minLength, `generated ${assets} too small`);
     const assets_ = Assets.fromList(assets);

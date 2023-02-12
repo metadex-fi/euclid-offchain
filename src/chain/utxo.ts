@@ -1,6 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
 import { Dirac } from "../types/euclid/dirac.ts";
+import { AdminRedeemer, PAdminRedeemer } from "../types/euclid/euclidAction.ts";
 import {
   DiracDatum,
   ParamDatum,
@@ -68,8 +69,19 @@ export class ParamUtxo {
       );
   };
 
-  // public closingTx = (tx: Lucid.Tx): Lucid.Tx => {
-  // };
+  public closingTx = (tx: Lucid.Tx): Lucid.Tx => {
+    const adminRedeemer = PAdminRedeemer.ptype.pconstant(
+      new AdminRedeemer(),
+    );
+    const paramNFTburning = this.paramNFT.toLucidNFTburning();
+
+    return tx
+      .mintAssets(paramNFTburning, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+      .collectFrom(
+        [this.utxo!],
+        Data.to(adminRedeemer),
+      );
+  };
 
   public sharedAssets = (assets: Assets): Assets =>
     this.param.sharedAssets(assets);
@@ -292,24 +304,17 @@ export class DiracUtxo {
       );
   };
 
-  // public closingTx = (tx: Lucid.Tx): Lucid.Tx => {
-  //   const swapRedeemer = PSwapRedeemer.ptype.pconstant(
-  //     new SwapRedeemer(
-  //       new Swap(
-  //         this.boughtAsset,
-  //         this.soldAsset,
-  //         new BoughtSold(
-  //           this.boughtAmount,
-  //           this.soldAmount,
-  //         ),
-  //       ),
-  //     ),
-  //   );
+  public closingTx = (tx: Lucid.Tx): Lucid.Tx => {
+    const adminRedeemer = PAdminRedeemer.ptype.pconstant(
+      new AdminRedeemer(),
+    );
+    const threadNFTburning = this.dirac.threadNFT.toLucidNFTburning();
 
-  //   return tx
-  //     .collectFrom(
-  //       [this.utxo!],
-  //       Data.to(swapRedeemer),
-  //     );
-  // };
+    return tx
+      .mintAssets(threadNFTburning, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+      .collectFrom(
+        [this.utxo!],
+        Data.to(adminRedeemer),
+      );
+  };
 }
