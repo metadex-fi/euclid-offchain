@@ -10,6 +10,7 @@ import {
 } from "../types/euclid/euclidDatum.ts";
 import { IdNFT } from "../types/euclid/idnft.ts";
 import { Param } from "../types/euclid/param.ts";
+import { Asset } from "../types/general/derived/asset/asset.ts";
 import { Assets } from "../types/general/derived/asset/assets.ts";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { Value } from "../types/general/derived/value/value.ts";
@@ -34,6 +35,7 @@ export class ParamUtxo {
     const balance = PositiveValue.fromLucid(
       utxo.assets,
     );
+    balance.drop(Asset.ADA) // TODO reconsider this
     assert(
       balance.size === 1n,
       `expected exactly id-NFT in ${balance.concise()}`,
