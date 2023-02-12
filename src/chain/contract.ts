@@ -34,8 +34,14 @@ export class Contract {
     );
   }
 
-  public update = async (): Promise<void> => {
-    const utxos = await this.lucid.utxosAt(this.address);
+  public update = async (
+    spentContractUtxos: Lucid.UTxO[] = [],
+  ): Promise<void> => {
+    const utxos = (await this.lucid.utxosAt(this.address)).filter((utxo) =>
+      !spentContractUtxos.some((spent) =>
+        spent.txHash === utxo.txHash && spent.outputIndex === utxo.outputIndex
+      )
+    );
     this.state = new EuclidState(utxos, this.policy);
   };
 

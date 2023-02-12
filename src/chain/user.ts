@@ -1,11 +1,18 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
+// import { feesEtc, feesEtcLovelace, forFeesEtc } from "../mod.ts";
+import { Asset, feesEtcLovelace } from "../mod.ts";
 import { Assets, IdNFT, KeyHash, PKeyHash, PositiveValue } from "../mod.ts";
-import { Swapping } from "./actions/swapping.ts";
 
 import { Contract } from "./contract.ts";
 import { Action, UserAction } from "./mod.ts";
 import { Pool } from "./pool.ts";
+
+const forFeesEtc = PositiveValue.singleton(
+  Asset.ADA,
+  10n * feesEtcLovelace,
+); // costs in lovelace for fees etc. TODO excessive
+const feesEtc = PositiveValue.singleton(Asset.ADA, feesEtcLovelace);
 
 type consequences = (u: User) => void;
 
@@ -13,7 +20,7 @@ export class User {
   public readonly contract: Contract;
   public readonly paymentKeyHash: KeyHash;
 
-  public balance?: PositiveValue;
+  private balance?: PositiveValue;
   public pools?: Pool[]; // own creation recall
   // public utxoPools?: UtxoPool[]; // from onchain
   private lastIdNFT?: IdNFT;
@@ -43,6 +50,14 @@ export class User {
     }
   }
 
+  public get availableBalance(): PositiveValue {
+    assert(this.balance, "No balance");
+    if (this.balance.amountOf(Asset.ADA, 0n) < feesEtcLovelace) {
+      return new PositiveValue();
+    }
+    return this.balance.normedMinus(feesEtc);
+  }
+
   public get nextParamNFT(): IdNFT {
     if (this.lastIdNFT) return this.lastIdNFT.next();
     else return new IdNFT(this.contract.policy, this.paymentKeyHash.hash());
@@ -53,18 +68,12 @@ export class User {
     this.lastIdNFT = idNFT;
   };
 
-  public get swappings(): Swapping[] {
-    if (
-      this.contract.state === undefined ||
-      this.balance === undefined ||
-      this.balance.size < 1
-    ) return [];
-    else return this.contract.state.swappingsFor(this);
-  }
-
   // TODO consider generating several
-  public generateActions = async (): Promise<Action[]> => {
-    await this.update();
+  public generateActions = async (
+    spentContractUtxos: Lucid.UTxO[],
+  ): Promise<Action[]> => {
+    await this.update(spentContractUtxos);
+    if (this.balance!.amountOf(Asset.ADA) < feesEtcLovelace) return [];
     const action = new UserAction(this).generate();
     if (action) return [action];
     else return [];
@@ -92,13 +101,15 @@ export class User {
   //   this.pools.push(pool);
   // };
 
-  public update = async (): Promise<void> => {
+  public update = async (
+    spentContractUtxos: Lucid.UTxO[] = [],
+  ): Promise<void> => {
     const utxos = (await Promise.all([
       this.lucid.utxosAt(this.address!),
-      this.contract.update(),
+      this.contract.update(spentContractUtxos),
     ]))[0];
     this.balance = utxos.map((utxo) => PositiveValue.fromLucid(utxo.assets))
-      .reduce((a, b) => a.normedPlus(b));
+      .reduce((a, b) => a.normedPlus(b), new PositiveValue());
     console.log(`balance: ${this.balance.concise()}`);
   };
 
@@ -113,11 +124,15 @@ export class User {
 
   static async generateWith(
     lucid: Lucid.Lucid,
+    allAssets: Assets,
   ): Promise<User> {
     const privateKey = Lucid.generatePrivateKey();
     const address = await lucid.selectWalletFromPrivateKey(privateKey).wallet
       .address();
     const user = new User(lucid, privateKey, address);
+    user.balance = PositiveValue.genOfAssets(
+      allAssets.minSizedSubset(1n),
+    ).normedPlus(forFeesEtc);
     return user;
   }
 

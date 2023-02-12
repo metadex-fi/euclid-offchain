@@ -1,4 +1,3 @@
-import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../lucid.mod.ts";
 import {
   Asset,
@@ -26,6 +25,10 @@ export class Opening {
     // TODO asserts?
   }
 
+  public get spendsContractUtxos(): Lucid.UTxO[] {
+    return [];
+  }
+
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
     return this.pool().openingTx(tx, this.user.contract);
   };
@@ -38,8 +41,6 @@ export class Opening {
     const paramNFT = this.user.nextParamNFT;
     const paramUtxo = ParamUtxo.open(this.param, paramNFT);
 
-    console.log(minLowestPrices.concise());
-    console.log(PositiveValue.normed(minLowestPrices).concise());
     let threadNFT = paramNFT.next();
     let diracs = [
       new Dirac(
@@ -61,13 +62,10 @@ export class Opening {
       diracs.forEach((dirac) => {
         for (let i = 1n; i < ticks; i++) {
           const lowestPrices = dirac.lowestPrices.clone;
-          console.log(lowestPrices.concise());
-          console.log(i * tickSize);
           lowestPrices.addAmountOf(
             asset,
             i * tickSize,
           );
-          console.log(lowestPrices.concise());
           threadNFT = threadNFT.next();
           diracs_.push(
             new Dirac(
@@ -77,7 +75,6 @@ export class Opening {
               lowestPrices,
             ),
           );
-          console.log("--------");
         }
       });
       diracs = diracs.concat(diracs_);
@@ -99,8 +96,10 @@ export class Opening {
 
   // splitting it up this way to later use the same class to process actual user input
   static genOfUser = (user: User): Opening | undefined => {
-    if (user.balance === undefined || user.balance.size < 1) return undefined;
-    const deposit = user.balance.minSizedSubValue(1n);
+    const balance = user.availableBalance;
+    if (balance.size < 1) return undefined;
+    const deposit = balance.minSizedSubValue(1n);
+    console.log("deposit", deposit.concise());
     const providedAssets = deposit.assets;
     const emptyAssets = new Assets();
     const assets = providedAssets.clone;

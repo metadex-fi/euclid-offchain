@@ -25,6 +25,10 @@ export class Swapping {
     private readonly soldSpot: bigint,
   ) {}
 
+  public get spendsContractUtxos(): Lucid.UTxO[] {
+    return [this.diracUtxo.utxo!];
+  }
+
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
     assert(
       this.diracUtxo.utxo,
@@ -83,7 +87,7 @@ export class Swapping {
     );
   };
 
-  static limit(
+  static boundary(
     user: User,
     diracUtxo: DiracUtxo,
     boughtAsset: Asset,
@@ -107,7 +111,7 @@ export class Swapping {
 
   // TODO don't forget to update (poll) chain state somewhere beforehand
   static genOfUser(user: User): Swapping | undefined {
-    const swappings = user.swappings;
+    const swappings = user.contract!.state!.swappingsFor(user);
     if (swappings.length < 1) return undefined;
     else return randomChoice(swappings).randomSubSwap();
   }

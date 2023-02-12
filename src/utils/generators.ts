@@ -3,13 +3,14 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
 import { User } from "../chain/user.ts";
-import { Asset, Assets, PData, PositiveValue } from "../mod.ts";
+import { Assets, PData } from "../mod.ts";
 
 export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
 export const gMaxStringLength = maxInteger;
 export const gMaxStringBytes = gMaxStringLength / 2n;
 export const gMaxLength = 3n;
 export const gMaxDepth = 4n;
+export const feesEtcLovelace = 100000000n; // costs in lovelace for fees etc. TODO excessive
 const letters = `abcdefghijklmnopqrstuvwxyz`;
 const symbols = "!@#$%^&*()_-+={[}]|\\;:'\",<.>/?`~";
 const dropChance = 0.5;
@@ -167,14 +168,10 @@ export async function genUsers(): Promise<User[]> {
   const numUsers = genPositive(gMaxLength);
   const addresses = new Array<Lucid.Address>();
   while (users.length < numUsers) {
-    const user = await User.generateWith(lucid);
+    const user = await User.generateWith(lucid, allAssets);
     assert(user.address, `user.address is undefined`);
     if (!addresses.includes(user.address)) {
       addresses.push(user.address);
-      user.balance = PositiveValue.genOfAssets(
-        allAssets.minSizedSubset(1n),
-      );
-      user.balance.addAmountOf(Asset.ADA, 100000000n); // TODO try without
       users.push(user);
     }
   }

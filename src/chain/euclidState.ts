@@ -78,7 +78,7 @@ export class EuclidState {
             throw new Error(`invalid datum index: ${datum.index}`);
         }
       } catch (e) {
-        const is = e.invalidUtxos.get(e.message) ?? [];
+        const is = this.invalidUtxos.get(e.message) ?? [];
         is.push(utxo);
         this.invalidUtxos.set(e.message, is);
       }

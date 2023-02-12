@@ -1,6 +1,6 @@
 import { Lucid } from "../lucid.mod.ts";
 import { User } from "../src/chain/user.ts";
-import { genName, genUsers, randomSubset } from "../src/mod.ts";
+import { genName, genPositive, genUsers, randomSubset } from "../src/mod.ts";
 
 Deno.test("lucid-example", async () => {
   const l = 32n; // empirical maximum = 32n
@@ -67,38 +67,38 @@ Deno.test("emulator", async () => {
   const accounts = allUsers.map((u) => u.account);
   console.log(`accounts: ${accounts}`);
   const emulator = new Lucid.Emulator(accounts);
-  const iterations = 10;
   const traces: string[][] = [];
-  while (traces.length < iterations) {
-    console.log(`\ni: ${traces.length}`);
+  for (let i = 0; i < 10; i++) {
+    console.log(`\ni: ${i}`);
     const users = await Promise.all(
       randomSubset(allUsers).map(async (user) => {
         const lucid = await Lucid.Lucid.new(emulator);
         return User.from(lucid, user.privateKey);
       }),
     );
-    const hashes = await Promise.all(
-      users.map((user) =>
-        user
-          .generateActions()
-          .then((actions) =>
-            Promise.all(
-              actions.map((action) =>
-                action
-                  .tx(user.lucid.newTx())
-                  .complete()
-                  .then((tx) =>
-                    tx
-                      .sign()
-                      .complete()
-                      .then((signed) => signed.submit())
-                  )
-              ),
-            )
+    const spentContractUtxos = new Array<Lucid.UTxO>();
+    for (const user of users) {
+      const hashes = await user
+        .generateActions(spentContractUtxos)
+        .then((actions) =>
+          Promise.all(
+            actions.map(async (action) => {
+              spentContractUtxos.push(...action.spendsContractUtxos);
+              return await action
+                .tx(user.lucid.newTx())
+                .complete()
+                .then((tx) =>
+                  tx
+                    .sign()
+                    .complete()
+                    .then((signed) => signed.submit())
+                );
+            }),
           )
-      ),
-    );
-    traces.push(hashes.flat());
+        );
+      console.log(hashes);
+      traces.push(hashes);
+    }
+    emulator.awaitBlock(4); //Number(genPositive()));
   }
-  console.log(traces);
 });

@@ -69,8 +69,8 @@ export class Pool {
   };
 
   public swappingsFor(user: User): Swapping[] {
-    assert(user.balance, `Pool.eligibleFor: user.balance is undefined`);
-    const sellableBalance = user.balance.ofAssets(this.paramUtxo.param.assets);
+    const balance = user.availableBalance;
+    const sellableBalance = balance.ofAssets(this.paramUtxo.param.assets);
     if (!sellableBalance.size) return [];
     return this.diracUtxos.flatMap((d) =>
       d.swappingsFor(user, this, sellableBalance.unsigned)

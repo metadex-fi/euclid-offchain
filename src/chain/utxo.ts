@@ -253,7 +253,7 @@ export class DiracUtxo {
       this.balance.assets.drop(sellingAsset).forEach((buyingAsset) => {
         const buyingSpot = spotBuying.amountOf(buyingAsset);
         const buyingOffer = offer.amountOf(buyingAsset);
-        const swapping = Swapping.limit(
+        const swapping = Swapping.boundary(
           user,
           this,
           buyingAsset,
