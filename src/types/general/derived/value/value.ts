@@ -211,7 +211,7 @@ export class Value {
 
   public ofAssets = (assets: Assets): Value => {
     const value = new Value();
-    assets.forEach((asset) => {
+    assets.intersect(this.assets).forEach((asset) => {
       const amount = this.amountOf(asset);
       value.initAmountOf(asset, amount);
     });
