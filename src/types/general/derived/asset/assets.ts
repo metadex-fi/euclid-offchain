@@ -6,8 +6,11 @@ import {
   nonEmptySubSet,
   randomChoice,
   randomSubset,
-} from "../../../../mod.ts";
-import { AssocMap, f, newGenInRange, PMap, PWrapped, t } from "../../mod.ts";
+} from "../../../../utils/generators.ts";
+import { AssocMap, PMap } from "../../fundamental/container/map.ts";
+import { PWrapped } from "../../fundamental/container/wrapped.ts";
+import { f, t } from "../../fundamental/type.ts";
+import { newGenInRange } from "../bounded/bounded.ts";
 import { PNonEmptyList } from "../nonEmptyList.ts";
 import { Asset, PAsset } from "./asset.ts";
 import { Currency, PCurrency } from "./currency.ts";

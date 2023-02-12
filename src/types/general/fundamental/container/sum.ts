@@ -3,13 +3,13 @@ import { Lucid } from "../../../../../lucid.mod.ts";
 import {
   boundedSubset,
   genPositive,
-  PByteString,
-  PInteger,
-  PRecord,
   randomChoice,
-} from "../../../../mod.ts";
+} from "../../../../utils/generators.ts";
 import { Data, f, PType, t } from "../type.ts";
 import { PObject } from "./object.ts";
+import { PRecord } from "./record.ts";
+import { PInteger } from "../primitive/integer.ts";
+import { PByteString } from "../primitive/bytestring.ts";
 
 export class PSum<Os extends Object> implements PType<Lucid.Constr<Data>, Os> {
   public readonly population;
@@ -68,7 +68,7 @@ export class PSum<Os extends Object> implements PType<Lucid.Constr<Data>, Os> {
     return randomChoice(this.pconstrs).genData() as Os;
   };
 
-  public showData(data: Os, tabs = "", maxDepth?: bigint): string {
+  public showData = (data: Os, tabs = "", maxDepth?: bigint): string => {
     if (maxDepth !== undefined && maxDepth <= 0n) return "Sum ( … )";
     const tt = tabs + t;
     const ttf = tt + f;
@@ -78,7 +78,7 @@ export class PSum<Os extends Object> implements PType<Lucid.Constr<Data>, Os> {
 ${ttf}index: ${index}, 
 ${ttf}object: ${match.showData(data, ttf, maxDepth ? maxDepth - 1n : maxDepth)}
 ${tt})`;
-  }
+  };
 
   public showPType(tabs = "", maxDepth?: bigint): string {
     if (maxDepth !== undefined && maxDepth <= 0n) return "PSum ( … )";

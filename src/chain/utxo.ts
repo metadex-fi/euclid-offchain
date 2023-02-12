@@ -1,25 +1,24 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
+import { Dirac } from "../types/euclid/dirac.ts";
 import {
-  Assets,
-  Data,
-  Dirac,
   DiracDatum,
-  f,
-  IdNFT,
-  min,
-  Param,
   ParamDatum,
-  PConstanted,
   PDiracDatum,
-  PositiveValue,
   PParamDatum,
   PPreDiracDatum,
-  t,
-  Value,
-} from "../mod.ts";
+} from "../types/euclid/euclidDatum.ts";
+import { IdNFT } from "../types/euclid/idnft.ts";
+import { Param } from "../types/euclid/param.ts";
+import { Assets } from "../types/general/derived/asset/assets.ts";
+import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
+import { Value } from "../types/general/derived/value/value.ts";
+import { Data, f, PConstanted, t } from "../types/general/fundamental/type.ts";
+import { min } from "../utils/generators.ts";
 import { Swapping } from "./actions/swapping.ts";
-import { Contract, Pool, User } from "./mod.ts";
+import { Contract } from "./contract.ts";
+import { Pool } from "./pool.ts";
+import { User } from "./user.ts";
 
 export class ParamUtxo {
   private constructor(
@@ -68,6 +67,9 @@ export class ParamUtxo {
         paramNFT,
       );
   };
+
+  // public closingTx = (tx: Lucid.Tx): Lucid.Tx => {
+  // };
 
   public sharedAssets = (assets: Assets): Assets =>
     this.param.sharedAssets(assets);
@@ -289,4 +291,25 @@ export class DiracUtxo {
         funds,
       );
   };
+
+  // public closingTx = (tx: Lucid.Tx): Lucid.Tx => {
+  //   const swapRedeemer = PSwapRedeemer.ptype.pconstant(
+  //     new SwapRedeemer(
+  //       new Swap(
+  //         this.boughtAsset,
+  //         this.soldAsset,
+  //         new BoughtSold(
+  //           this.boughtAmount,
+  //           this.soldAmount,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+
+  //   return tx
+  //     .collectFrom(
+  //       [this.utxo!],
+  //       Data.to(swapRedeemer),
+  //     );
+  // };
 }

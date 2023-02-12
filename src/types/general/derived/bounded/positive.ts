@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { maxInteger } from "../../../../mod.ts";
+import { maxInteger } from "../../../../utils/generators.ts";
 import { genPBounded, PBounded } from "./bounded.ts";
 
 export class PPositive extends PBounded {

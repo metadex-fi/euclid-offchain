@@ -1,6 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
-import { PString, PWrapped } from "../../mod.ts";
+import { PWrapped } from "../../fundamental/container/wrapped.ts";
+import { PString } from "../../fundamental/primitive/string.ts";
 
 export class Token {
   constructor(public readonly name: string) {

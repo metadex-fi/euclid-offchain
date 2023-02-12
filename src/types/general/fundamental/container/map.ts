@@ -3,9 +3,9 @@ import {
   Generators,
   genNonNegative,
   gMaxLength,
-  maxShowDepth,
   maybeNdef,
-} from "../../../../mod.ts";
+} from "../../../../utils/generators.ts";
+import { maxShowDepth } from "../../../../utils/proptests.ts";
 import { Data, f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
 import { PList } from "./list.ts";
 

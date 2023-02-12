@@ -1,5 +1,6 @@
-import { Asset, PAsset, PRecord } from "../mod.ts";
+import { Asset, PAsset } from "../general/derived/asset/asset.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
+import { PRecord } from "../general/fundamental/container/record.ts";
 import { BoughtSold, PBoughtSold } from "./boughtSold.ts";
 
 export class Swap {

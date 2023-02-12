@@ -1,7 +1,8 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
-import { randomChoice } from "../../../../mod.ts";
-import { PObject, PRecord } from "../../mod.ts";
+import { randomChoice } from "../../../../utils/generators.ts";
+import { PObject } from "../../fundamental/container/object.ts";
+import { PRecord } from "../../fundamental/container/record.ts";
 import { Currency, PCurrency } from "./currency.ts";
 import { PToken, Token } from "./token.ts";
 

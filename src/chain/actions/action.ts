@@ -1,4 +1,4 @@
-import { randomIndexedChoice } from "../../mod.ts";
+import { randomIndexedChoice } from "../../utils/generators.ts";
 import { User } from "../user.ts";
 import { Opening } from "./opening.ts";
 import { Swapping } from "./swapping.ts";

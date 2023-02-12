@@ -1,8 +1,10 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
-import { AssocMap, IdNFT } from "../mod.ts";
+import { IdNFT } from "../types/euclid/idnft.ts";
+import { AssocMap } from "../types/general/fundamental/container/map.ts";
 import { Swapping } from "./actions/swapping.ts";
-import { Contract, User } from "./mod.ts";
+import { Contract } from "./contract.ts";
+import { User } from "./user.ts";
 import { DiracUtxo, ParamUtxo, PreDiracUtxo } from "./utxo.ts";
 
 export class PrePool {
@@ -68,6 +70,12 @@ export class Pool {
     );
     return tx_;
   };
+
+  // public closingTx = (tx: Lucid.Tx): Lucid.Tx => {
+  //   let tx_ = this.paramUtxo.closingTx(tx);
+  //   this.diracUtxos.forEach((diracUtxo) => tx_ = diracUtxo.closingTx(tx_));
+  //   return tx_;
+  // };
 
   public swappingsFor(user: User): Swapping[] {
     const balance = user.availableBalance;

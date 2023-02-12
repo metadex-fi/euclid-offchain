@@ -5,8 +5,8 @@ import euclidMinting from "../../contract/mintAlways.json" assert { // TODO rena
   type: "json",
 };
 import { EuclidState } from "./euclidState.ts";
-import { Currency } from "../mod.ts";
 import { Lucid } from "../../lucid.mod.ts";
+import { Currency } from "../types/general/derived/asset/currency.ts";
 
 export class Contract {
   public readonly validator: Lucid.Validator;

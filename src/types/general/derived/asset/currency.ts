@@ -1,5 +1,6 @@
 import { Lucid } from "../../../../../lucid.mod.ts";
-import { PByteString, PWrapped } from "../../mod.ts";
+import { PWrapped } from "../../fundamental/container/wrapped.ts";
+import { PByteString } from "../../fundamental/primitive/bytestring.ts";
 
 export class Currency {
   constructor(public readonly symbol: Uint8Array) {

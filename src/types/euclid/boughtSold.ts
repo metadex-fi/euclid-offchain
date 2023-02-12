@@ -1,5 +1,6 @@
-import { PPositive, PRecord } from "../mod.ts";
+import { PPositive } from "../general/derived/bounded/positive.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
+import { PRecord } from "../general/fundamental/container/record.ts";
 
 export class BoughtSold {
   constructor(

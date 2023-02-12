@@ -1,18 +1,15 @@
+import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { Assets } from "../general/derived/asset/assets.ts";
+import { KeyHash, PKeyHash } from "../general/derived/hash/keyHash.ts";
 import {
-  Assets,
-  f,
-  KeyHash,
-  PKeyHash,
   PositiveValue,
   PPositiveValue,
-  PRecord,
-  t,
-  Value,
-} from "../mod.ts";
-import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+} from "../general/derived/value/positiveValue.ts";
+import { Value } from "../general/derived/value/value.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
+import { PRecord } from "../general/fundamental/container/record.ts";
+import { f, t } from "../general/fundamental/type.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
-import { randomChoice } from "../../mod.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
 

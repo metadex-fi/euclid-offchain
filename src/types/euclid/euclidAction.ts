@@ -1,4 +1,5 @@
-import { PObject, PRecord } from "../mod.ts";
+import { PObject } from "../general/fundamental/container/object.ts";
+import { PRecord } from "../general/fundamental/container/record.ts";
 import { PSwap, Swap } from "./swap.ts";
 
 export class SwapRedeemer {
@@ -6,7 +7,7 @@ export class SwapRedeemer {
     public readonly swap: Swap,
   ) {}
 }
-"";
+
 export class PSwapRedeemer extends PObject<SwapRedeemer> {
   private constructor(
     pswap: PSwap,
@@ -25,21 +26,20 @@ export class PSwapRedeemer extends PObject<SwapRedeemer> {
   }
 }
 
-// TODO
-// export class PAdminRedeemer extends PObject<SwapRedeemer> {
-//     private constructor(
-//       pswap: PSwap,
-//     ) {
-//       super(
-//         new PRecord({
-//           "swap": pswap,
-//         }),
-//         SwapRedeemer,
-//       );
-//     }
+export class AdminRedeemer {
+  constructor() {}
+}
 
-//     static ptype = new PSwapRedeemer(PSwap.ptype);
-//     static genPType(): PSwapRedeemer {
-//       return PSwapRedeemer.ptype;
-//     }
-//   }
+export class PAdminRedeemer extends PObject<AdminRedeemer> {
+  private constructor() {
+    super(
+      new PRecord({}),
+      AdminRedeemer,
+    );
+  }
+
+  static ptype = new PAdminRedeemer();
+  static genPType(): PAdminRedeemer {
+    return PAdminRedeemer.ptype;
+  }
+}

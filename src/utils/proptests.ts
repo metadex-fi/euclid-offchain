@@ -2,7 +2,8 @@ import {
   assert,
   assertEquals,
 } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Data, Generators, gMaxDepth, PData } from "../mod.ts";
+import { Data, PData } from "../types/general/fundamental/type.ts";
+import { Generators, gMaxDepth } from "./generators.ts";
 
 export const maxShowDepth = 5n;
 

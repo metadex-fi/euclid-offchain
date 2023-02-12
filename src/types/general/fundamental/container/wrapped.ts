@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Generators } from "../../../../mod.ts";
+import { Generators } from "../../../../utils/generators.ts";
 import { Data, f, PData, PType, t } from "../type.ts";
 import { filterFunctions } from "./object.ts";
 

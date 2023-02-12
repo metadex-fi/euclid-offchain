@@ -1,11 +1,14 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
-// import { feesEtc, feesEtcLovelace, forFeesEtc } from "../mod.ts";
-import { Asset, feesEtcLovelace } from "../mod.ts";
-import { Assets, IdNFT, KeyHash, PKeyHash, PositiveValue } from "../mod.ts";
+import { IdNFT } from "../types/euclid/idnft.ts";
+import { Asset } from "../types/general/derived/asset/asset.ts";
+import { Assets } from "../types/general/derived/asset/assets.ts";
+import { KeyHash, PKeyHash } from "../types/general/derived/hash/keyHash.ts";
+import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
+import { feesEtcLovelace } from "../utils/generators.ts";
+import { Action, UserAction } from "./actions/action.ts";
 
 import { Contract } from "./contract.ts";
-import { Action, UserAction } from "./mod.ts";
 import { Pool } from "./pool.ts";
 
 const forFeesEtc = PositiveValue.singleton(

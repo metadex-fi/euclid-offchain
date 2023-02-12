@@ -4,7 +4,7 @@ import {
   genNonNegative,
   gMaxLength,
   maybeNdef,
-} from "../../../../mod.ts";
+} from "../../../../utils/generators.ts";
 import { f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
 
 export class PList<PElem extends PData>

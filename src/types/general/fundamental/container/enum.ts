@@ -4,7 +4,7 @@ import {
   genPositive,
   gMaxLength,
   randomChoice,
-} from "../../../../mod.ts";
+} from "../../../../utils/generators.ts";
 import { f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
 
 export class PEnum<PT extends PData>

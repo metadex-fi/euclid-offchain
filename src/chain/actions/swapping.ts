@@ -1,17 +1,16 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { Data } from "../../../../lucid/mod.ts";
 import { Lucid } from "../../../lucid.mod.ts";
+import { BoughtSold } from "../../types/euclid/boughtSold.ts";
 import {
-  Asset,
-  BoughtSold,
-  Data,
-  genPositive,
   PSwapRedeemer,
-  randomChoice,
-  Swap,
   SwapRedeemer,
-} from "../../mod.ts";
-import { DiracUtxo } from "../mod.ts";
+} from "../../types/euclid/euclidAction.ts";
+import { Swap } from "../../types/euclid/swap.ts";
+import { Asset } from "../../types/general/derived/asset/asset.ts";
+import { genPositive, randomChoice } from "../../utils/generators.ts";
 import { User } from "../user.ts";
+import { DiracUtxo } from "../utxo.ts";
 
 export class Swapping {
   private constructor(

@@ -1,17 +1,14 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
-import {
-  AssocMap,
-  Currency,
-  Data,
-  gMaxHashes,
-  IdNFT,
-  KeyHash,
-  PPreDiracDatum,
-} from "../mod.ts";
+import { PPreDiracDatum } from "../types/euclid/euclidDatum.ts";
+import { gMaxHashes, IdNFT } from "../types/euclid/idnft.ts";
+import { Currency } from "../types/general/derived/asset/currency.ts";
+import { KeyHash } from "../types/general/derived/hash/keyHash.ts";
+import { AssocMap } from "../types/general/fundamental/container/map.ts";
+import { Data } from "../types/general/fundamental/type.ts";
 import { Swapping } from "./actions/swapping.ts";
-import { User } from "./mod.ts";
 import { Pool, PrePool } from "./pool.ts";
+import { User } from "./user.ts";
 import { ParamUtxo, PreDiracUtxo } from "./utxo.ts";
 
 type ErrorMessage = string;

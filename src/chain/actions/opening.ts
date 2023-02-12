@@ -1,15 +1,11 @@
 import { Lucid } from "../../../lucid.mod.ts";
-import {
-  Asset,
-  Assets,
-  Dirac,
-  EuclidValue,
-  genNonNegative,
-  gMaxLength,
-  max,
-  Param,
-  PositiveValue,
-} from "../../mod.ts";
+import { Dirac } from "../../types/euclid/dirac.ts";
+import { EuclidValue } from "../../types/euclid/euclidValue.ts";
+import { Param } from "../../types/euclid/param.ts";
+import { Asset } from "../../types/general/derived/asset/asset.ts";
+import { Assets } from "../../types/general/derived/asset/assets.ts";
+import { PositiveValue } from "../../types/general/derived/value/positiveValue.ts";
+import { genNonNegative, gMaxLength, max } from "../../utils/generators.ts";
 import { Pool } from "../pool.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";

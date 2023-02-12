@@ -1,8 +1,9 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Generators } from "../../../../mod.ts";
-import { PByteString, PInteger } from "../mod.ts";
+import { Generators } from "../../../../utils/generators.ts";
 import { Data, f, PData, PType, t } from "../type.ts";
 import { PRecord } from "./record.ts";
+import { PInteger } from "../primitive/integer.ts";
+import { PByteString } from "../primitive/bytestring.ts";
 
 export const filterFunctions = <O extends Object>(o: O) =>
   Object.fromEntries(

@@ -1,8 +1,15 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
-import { genPositive, IdNFT } from "../../../../mod.ts";
-import { AssocMap, PObject, PRecord } from "../../mod.ts";
-import { Asset, Assets, Currency, PPositive, Token } from "../mod.ts";
+import { genPositive } from "../../../../utils/generators.ts";
+import { IdNFT } from "../../../euclid/idnft.ts";
+import { AssocMap } from "../../fundamental/container/map.ts";
+import { PObject } from "../../fundamental/container/object.ts";
+import { PRecord } from "../../fundamental/container/record.ts";
+import { Asset } from "../asset/asset.ts";
+import { Assets } from "../asset/assets.ts";
+import { Currency } from "../asset/currency.ts";
+import { Token } from "../asset/token.ts";
+import { PPositive } from "../bounded/positive.ts";
 import { PValue, Value } from "./value.ts";
 
 export class PositiveValue {

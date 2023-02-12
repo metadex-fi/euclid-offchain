@@ -1,16 +1,16 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import {
-  Asset,
-  Assets,
-  PBounded,
-  PositiveValue,
-  PPositiveValue,
-  Value,
-} from "../mod.ts";
 import { PWrapped } from "../general/fundamental/container/wrapped.ts";
 import { Lucid } from "../../../lucid.mod.ts";
 import { IdNFT } from "./idnft.ts";
-import { maxInteger } from "../../mod.ts";
+import { maxInteger } from "../../utils/generators.ts";
+import { Asset } from "../general/derived/asset/asset.ts";
+import { Assets } from "../general/derived/asset/assets.ts";
+import { PBounded } from "../general/derived/bounded/bounded.ts";
+import {
+  PositiveValue,
+  PPositiveValue,
+} from "../general/derived/value/positiveValue.ts";
+import { Value } from "../general/derived/value/value.ts";
 
 export class EuclidValue {
   constructor(

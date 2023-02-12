@@ -1,4 +1,6 @@
-import { Currency, PObject, PRecord } from "../mod.ts";
+import { Currency } from "../general/derived/asset/currency.ts";
+import { PObject } from "../general/fundamental/container/object.ts";
+import { PRecord } from "../general/fundamental/container/record.ts";
 import { Dirac, PDirac, PPreDirac } from "./dirac.ts";
 import { IdNFT } from "./idnft.ts";
 import { Param, PParam } from "./param.ts";

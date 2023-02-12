@@ -5,7 +5,7 @@ import {
   genNonNegative,
   gMaxStringLength,
   maybeNdef,
-} from "../../../../mod.ts";
+} from "../../../../utils/generators.ts";
 import { PType } from "../type.ts";
 
 export class PString implements PType<Uint8Array, string> {

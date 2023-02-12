@@ -1,7 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
-import { PByteString, PLiteral, PWrapped } from "../../mod.ts";
-import { KeyHash, PKeyHash } from "./keyHash.ts";
+import { PWrapped } from "../../fundamental/container/wrapped.ts";
+import { PByteString } from "../../fundamental/primitive/bytestring.ts";
 
 // product from hashing-function
 export class Hash {

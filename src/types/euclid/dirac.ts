@@ -1,21 +1,19 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { genNonNegative, genPositive, PLiteral } from "../../mod.ts";
+import { genNonNegative, genPositive } from "../../utils/generators.ts";
+import { Currency } from "../general/derived/asset/currency.ts";
+import { KeyHash, PKeyHash } from "../general/derived/hash/keyHash.ts";
 import {
-  Currency,
-  f,
-  KeyHash,
-  Param,
-  PConstraint,
-  PKeyHash,
-  PObject,
   PositiveValue,
-  PParam,
   PPositiveValue,
-  PRecord,
-  t,
-  Value,
-} from "../mod.ts";
+} from "../general/derived/value/positiveValue.ts";
+import { Value } from "../general/derived/value/value.ts";
+import { PConstraint } from "../general/fundamental/container/constraint.ts";
+import { PLiteral } from "../general/fundamental/container/literal.ts";
+import { PObject } from "../general/fundamental/container/object.ts";
+import { PRecord } from "../general/fundamental/container/record.ts";
+import { f, t } from "../general/fundamental/type.ts";
 import { gMaxHashes, IdNFT, PIdNFT } from "./idnft.ts";
+import { Param, PParam } from "./param.ts";
 
 export class Dirac {
   constructor(
