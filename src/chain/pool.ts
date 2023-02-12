@@ -18,7 +18,7 @@ export class PrePool {
   };
 
   public addPreDiracUtxo = (preDiracUtxo: PreDiracUtxo): PrePool => {
-    const paramNFT = preDiracUtxo.dirac.paramNFT;
+    const paramNFT = preDiracUtxo.preDirac.paramNFT;
     if (!this.preDiracUtxos) {
       this.preDiracUtxos = new AssocMap<IdNFT, PreDiracUtxo>(
         (kh) => kh.show(),
@@ -68,7 +68,7 @@ export class Pool {
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     let tx_ = this.paramUtxo.openingTx(tx, contract);
-    // let remaining = this.diracUtxos.slice(0, 100);
+    // let remaining = this.diracUtxos.slice(0, 100); TODO this is for splitting larger txes
     this.diracUtxos.forEach((diracUtxo) =>
       tx_ = diracUtxo.openingTx(tx_, contract)
     );

@@ -11,7 +11,7 @@ export class ParamDatum {
     public readonly param: Param,
   ) {}
 }
-export class PParamDatum extends PObject<ParamDatum> {
+class PParamDatum extends PObject<ParamDatum> {
   private constructor(
     pparam: PParam,
   ) {
@@ -35,7 +35,7 @@ export class DiracDatum {
   ) {}
 }
 
-export class PPreDiracDatum extends PObject<DiracDatum> {
+class PPreDiracDatum extends PObject<DiracDatum> {
   constructor(
     policy: Currency,
   ) {
@@ -52,7 +52,7 @@ export class PPreDiracDatum extends PObject<DiracDatum> {
   }
 }
 
-export class PDiracDatum extends PObject<DiracDatum> {
+class PDiracDatum extends PObject<DiracDatum> {
   constructor(
     param: Param,
     paramNFT: IdNFT,
@@ -72,7 +72,9 @@ export class PDiracDatum extends PObject<DiracDatum> {
   }
 }
 
-export class PPreEuclidDatum extends PSum<DiracDatum | ParamDatum> {
+export type EuclidDatum = ParamDatum | DiracDatum;
+
+export class PPreEuclidDatum extends PSum<EuclidDatum> {
   constructor(
     policy: Currency,
   ) {
@@ -81,5 +83,20 @@ export class PPreEuclidDatum extends PSum<DiracDatum | ParamDatum> {
 
   static genPType(): PPreEuclidDatum {
     return new PPreEuclidDatum(Currency.dummy);
+  }
+}
+
+export class PEuclidDatum extends PSum<EuclidDatum> {
+  constructor(
+    param: Param,
+    paramNFT: IdNFT,
+    threadNFT: IdNFT,
+  ) {
+    super([new PDiracDatum(param, paramNFT, threadNFT), PParamDatum.ptype]);
+  }
+
+  static genPType(): PEuclidDatum {
+    const pdirac = PDirac.genPType() as PDirac;
+    return new PEuclidDatum(pdirac.param, pdirac.paramNFT, pdirac.threadNFT);
   }
 }

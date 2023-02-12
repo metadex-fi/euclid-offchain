@@ -5,9 +5,8 @@ import { AdminRedeemer, PAdminRedeemer } from "../types/euclid/euclidAction.ts";
 import {
   DiracDatum,
   ParamDatum,
-  PDiracDatum,
-  PParamDatum,
-  PPreDiracDatum,
+  PEuclidDatum,
+  PPreEuclidDatum,
 } from "../types/euclid/euclidDatum.ts";
 import { IdNFT } from "../types/euclid/idnft.ts";
 import { Param } from "../types/euclid/param.ts";
@@ -30,9 +29,8 @@ export class ParamUtxo {
 
   static parse(
     utxo: Lucid.UTxO,
-    fields: Data[],
+    param: Param,
   ): ParamUtxo {
-    const param = PParamDatum.ptype.plift(fields).param;
     const balance = PositiveValue.fromLucid(
       utxo.assets,
     );
@@ -53,7 +51,8 @@ export class ParamUtxo {
   }
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
-    const paramDatum = PParamDatum.ptype.pconstant(new ParamDatum(this.param));
+    const peuclidDatum = PPreEuclidDatum.genPType(); //only need this for ParamDatum, so this is fine
+    const paramDatum = peuclidDatum.pconstant(new ParamDatum(this.param));
     const paramNFT = this.paramNFT.toLucidNFT();
 
     return tx
@@ -96,18 +95,16 @@ export class ParamUtxo {
 }
 
 export class PreDiracUtxo {
-  public readonly dirac: Dirac;
   public readonly balance: PositiveValue;
   constructor(
     public readonly utxo: Lucid.UTxO,
-    public readonly fields: Data[],
-    ppreDiracDatum: PPreDiracDatum,
+    public readonly datum: PConstanted<PEuclidDatum>,
+    public readonly preDirac: Dirac,
   ) {
-    this.dirac = ppreDiracDatum.plift(fields).dirac;
     this.balance = PositiveValue.fromLucid(
       utxo.assets,
     );
-    this.balance.popIdNFT(this.dirac.threadNFT);
+    this.balance.popIdNFT(this.preDirac.threadNFT);
   }
 
   public parse = (
@@ -123,9 +120,9 @@ export class PreDiracUtxo {
 
 export class DiracUtxo {
   private constructor( // keep private, because how we handle optional utxo arg
+    public readonly peuclidDatum: PEuclidDatum,
     public readonly dirac: Dirac,
     public readonly balance: PositiveValue,
-    public readonly datum: PConstanted<PDiracDatum>,
     public readonly utxo?: Lucid.UTxO, //exists when reading, not when creating
   ) {}
 
@@ -133,13 +130,20 @@ export class DiracUtxo {
     from: PreDiracUtxo,
     param: Param,
   ): DiracUtxo {
-    const pdiracDatum = new PDiracDatum(
+    // lifting it again, to utilize the tighter constraints in PEuclidDatum
+    const peuclidDatum = new PEuclidDatum(
       param,
-      from.dirac.paramNFT,
-      from.dirac.threadNFT,
+      from.preDirac.paramNFT,
+      from.preDirac.threadNFT,
     );
-    const dirac = pdiracDatum.plift(from.fields).dirac;
-    return new DiracUtxo(dirac, from.balance, from.fields, from.utxo);
+    const diracDatum = peuclidDatum.plift(from.datum);
+    assert(diracDatum instanceof DiracDatum, `expected DiracDatum`);
+    return new DiracUtxo(
+      peuclidDatum,
+      diracDatum.dirac,
+      from.balance,
+      from.utxo,
+    );
   }
 
   static open(
@@ -147,9 +151,12 @@ export class DiracUtxo {
     dirac: Dirac,
     balance: PositiveValue,
   ): DiracUtxo {
-    const pdiracDatum = new PDiracDatum(param, dirac.paramNFT, dirac.threadNFT);
-    const datum = pdiracDatum.pconstant(new DiracDatum(dirac));
-    return new DiracUtxo(dirac, balance, datum);
+    const peuclidDatum = new PEuclidDatum(
+      param,
+      dirac.paramNFT,
+      dirac.threadNFT,
+    );
+    return new DiracUtxo(peuclidDatum, dirac, balance);
   }
 
   // public assets = (): Assets => this.dirac.assets;
@@ -163,6 +170,37 @@ export class DiracUtxo {
   ${ttf}dirac: ${this.dirac.concise(ttf)},
   ${ttf}balance: ${this.balance?.concise(ttf) ?? "undefined"}
   ${tt})`;
+  };
+
+  public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
+    const diracDatum = this.peuclidDatum.pconstant(new DiracDatum(this.dirac));
+    const funds = this.balance.toLucid;
+    const threadNFT = this.dirac.threadNFT.toLucidNFT();
+    funds[Object.keys(threadNFT)[0]] = 1n;
+
+    return tx
+      .mintAssets(threadNFT, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+      .payToContract(
+        contract.address,
+        {
+          inline: Data.to(diracDatum),
+        },
+        funds,
+      );
+  };
+
+  public closingTx = (tx: Lucid.Tx): Lucid.Tx => {
+    const adminRedeemer = PAdminRedeemer.ptype.pconstant(
+      new AdminRedeemer(),
+    );
+    const threadNFTburning = this.dirac.threadNFT.toLucidNFTburning();
+
+    return tx
+      .mintAssets(threadNFTburning, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+      .collectFrom(
+        [this.utxo!],
+        Data.to(adminRedeemer),
+      );
   };
 
   public swappingsFor = (
@@ -282,39 +320,5 @@ export class DiracUtxo {
     });
 
     return swappings;
-  };
-
-  public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
-    assert(
-      this.datum !== undefined,
-      "DiracUtxo.openingTx: datum must be defined",
-    );
-    const funds = this.balance.toLucid;
-    const threadNFT = this.dirac.threadNFT.toLucidNFT();
-    funds[Object.keys(threadNFT)[0]] = 1n;
-
-    return tx
-      .mintAssets(threadNFT, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
-      .payToContract(
-        contract.address,
-        {
-          inline: Data.to(this.datum),
-        },
-        funds,
-      );
-  };
-
-  public closingTx = (tx: Lucid.Tx): Lucid.Tx => {
-    const adminRedeemer = PAdminRedeemer.ptype.pconstant(
-      new AdminRedeemer(),
-    );
-    const threadNFTburning = this.dirac.threadNFT.toLucidNFTburning();
-
-    return tx
-      .mintAssets(threadNFTburning, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
-      .collectFrom(
-        [this.utxo!],
-        Data.to(adminRedeemer),
-      );
   };
 }

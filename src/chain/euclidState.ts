@@ -3,14 +3,12 @@ import { Lucid } from "../../lucid.mod.ts";
 import {
   DiracDatum,
   ParamDatum,
-  PParamDatum,
-  PPreDiracDatum,
+  PPreEuclidDatum,
 } from "../types/euclid/euclidDatum.ts";
 import { gMaxHashes, IdNFT } from "../types/euclid/idnft.ts";
 import { Currency } from "../types/general/derived/asset/currency.ts";
 import { KeyHash } from "../types/general/derived/hash/keyHash.ts";
 import { AssocMap } from "../types/general/fundamental/container/map.ts";
-import { PSum } from "../types/general/fundamental/container/sum.ts";
 import { Data } from "../types/general/fundamental/type.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { Pool, PrePool } from "./pool.ts";
@@ -39,10 +37,8 @@ export class EuclidState {
       (kh) => kh.show(),
     );
     // const ppreDiracDatum = new PPreDiracDatum(policy);
-    const peuclidDatum = new PSum<DiracDatum | ParamDatum>([
-      new PPreDiracDatum(policy),
-      PParamDatum.ptype,
-    ]);
+    const ppreEuclidDatum = new PPreEuclidDatum(policy);
+
     utxos.forEach((utxo) => {
       try {
         // TODO assert scriptref, and all the other fields if it makes sense
@@ -52,40 +48,36 @@ export class EuclidState {
           datum instanceof Lucid.Constr,
           `datum must be a Constr, got ${datum}`,
         );
-        switch (datum.index) {
-          case 0: {
-            const paramUtxo = ParamUtxo.parse(
-              utxo,
-              datum.fields,
-            );
-            const owner = paramUtxo.param.owner;
-            const paramNFT = paramUtxo.paramNFT;
-            const ownerPrePools = prePools.get(owner) ??
-              new AssocMap<IdNFT, PrePool>((nft) => nft.show());
-            const prePool = (ownerPrePools.get(paramNFT) ?? new PrePool())
-              .setParamUtxo(paramUtxo);
-            ownerPrePools.set(paramNFT, prePool);
-            prePools.set(owner, ownerPrePools);
-            break;
-          }
-          case 1: {
-            const preDiracUtxo = new PreDiracUtxo(
-              utxo,
-              datum.fields,
-              ppreDiracDatum,
-            );
-            const owner = preDiracUtxo.dirac.owner;
-            const paramNFT = preDiracUtxo.dirac.paramNFT;
-            const ownerPrePools = prePools.get(owner) ??
-              new AssocMap<IdNFT, PrePool>((kh) => kh.show());
-            const prePool = (ownerPrePools.get(paramNFT) ?? new PrePool())
-              .addPreDiracUtxo(preDiracUtxo);
-            ownerPrePools.set(paramNFT, prePool);
-            prePools.set(owner, ownerPrePools);
-            break;
-          }
-          default:
-            throw new Error(`invalid datum index: ${datum.index}`);
+        const preEuclidDatum = ppreEuclidDatum.plift(datum);
+        if (preEuclidDatum instanceof ParamDatum) {
+          const paramUtxo = ParamUtxo.parse(
+            utxo,
+            preEuclidDatum.param,
+          );
+          const owner = paramUtxo.param.owner;
+          const paramNFT = paramUtxo.paramNFT;
+          const ownerPrePools = prePools.get(owner) ??
+            new AssocMap<IdNFT, PrePool>((nft) => nft.show());
+          const prePool = (ownerPrePools.get(paramNFT) ?? new PrePool())
+            .setParamUtxo(paramUtxo);
+          ownerPrePools.set(paramNFT, prePool);
+          prePools.set(owner, ownerPrePools);
+        } else if (preEuclidDatum instanceof DiracDatum) {
+          const preDiracUtxo = new PreDiracUtxo(
+            utxo,
+            datum,
+            preEuclidDatum.dirac,
+          );
+          const owner = preDiracUtxo.preDirac.owner;
+          const paramNFT = preDiracUtxo.preDirac.paramNFT;
+          const ownerPrePools = prePools.get(owner) ??
+            new AssocMap<IdNFT, PrePool>((kh) => kh.show());
+          const prePool = (ownerPrePools.get(paramNFT) ?? new PrePool())
+            .addPreDiracUtxo(preDiracUtxo);
+          ownerPrePools.set(paramNFT, prePool);
+          prePools.set(owner, ownerPrePools);
+        } else {
+          throw new Error(`unknown preEuclidDatum`);
         }
       } catch (e) {
         throw e; // TODO revert in prod

@@ -5,6 +5,7 @@ import {
   PSwapRedeemer,
   SwapRedeemer,
 } from "../../types/euclid/euclidAction.ts";
+import { DiracDatum } from "../../types/euclid/euclidDatum.ts";
 import { Swap } from "../../types/euclid/swap.ts";
 import { Asset } from "../../types/general/derived/asset/asset.ts";
 import { Data } from "../../types/general/fundamental/type.ts";
@@ -51,6 +52,10 @@ export class Swapping {
       ),
     );
 
+    const datum = this.diracUtxo.peuclidDatum.pconstant(
+      new DiracDatum(this.diracUtxo.dirac),
+    );
+
     return tx
       .collectFrom(
         [this.diracUtxo.utxo],
@@ -59,7 +64,7 @@ export class Swapping {
       .payToContract(
         this.user.contract.address,
         {
-          inline: Data.to(this.diracUtxo.datum),
+          inline: Data.to(datum),
         },
         funds.toLucid,
       );
