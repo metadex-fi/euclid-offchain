@@ -62,6 +62,7 @@ export class Pool {
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     let tx_ = this.paramUtxo.openingTx(tx, contract);
+    // let remaining = this.diracUtxos.slice(0, 100);
     this.diracUtxos.forEach((diracUtxo) =>
       tx_ = diracUtxo.openingTx(tx_, contract)
     );

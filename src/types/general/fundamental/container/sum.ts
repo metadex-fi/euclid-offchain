@@ -1,8 +1,8 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
 import {
+  boundedSubset,
   genPositive,
-  minSizedSubset,
   PByteString,
   PInteger,
   PRecord,
@@ -98,7 +98,7 @@ ${tt})`;
     //minSizedSubset also serves as shuffle
     const pconstrs = [PConstr0, PConstr1, PConstr2, PConstr3];
     const len = genPositive(BigInt(pconstrs.length));
-    const pconstrs_ = minSizedSubset(pconstrs, len);
+    const pconstrs_ = boundedSubset(pconstrs, len);
 
     return new PSum<Constr0 | Constr1 | Constr2 | Constr3>(pconstrs_);
   }

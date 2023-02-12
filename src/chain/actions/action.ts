@@ -11,7 +11,7 @@ export class UserAction {
   ) {}
 
   public generate = (): Action | undefined => {
-    const actions = new Permutation([Opening]); // TODO add Swapping
+    const actions = new Permutation([Opening, Swapping]);
     return actions.try((a) => {
       return a.genOfUser(this.user);
     });

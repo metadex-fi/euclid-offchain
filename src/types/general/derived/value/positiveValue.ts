@@ -85,8 +85,11 @@ export class PositiveValue {
     }
   };
 
-  public minSizedSubValue = (minSize: bigint): PositiveValue => {
-    const assets = this.assets.minSizedSubset(minSize);
+  public boundedSubValue = (
+    minSize?: bigint,
+    maxSize?: bigint,
+  ): PositiveValue => {
+    const assets = this.assets.boundedSubset(minSize, maxSize);
     const value = new PositiveValue();
     assets.forEach((asset) => {
       const amount = this.amountOf(asset);

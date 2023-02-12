@@ -1,8 +1,8 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
 import {
+  boundedSubset,
   gMaxLength,
-  minSizedSubset,
   nonEmptySubSet,
   randomChoice,
   randomSubset,
@@ -136,18 +136,8 @@ export class Assets {
     return assets_;
   };
 
-  public nonEmptySubset = (): Assets => {
-    const assets_ = new Assets();
-    const ccys = nonEmptySubSet([...this.assets.keys()]);
-    for (const ccy of ccys) {
-      const tkns = nonEmptySubSet(this.assets.get(ccy)!);
-      assets_.assets.set(ccy, tkns);
-    }
-    return assets_;
-  };
-
-  public minSizedSubset = (minSize: bigint): Assets => {
-    return Assets.fromList(minSizedSubset(this.toList(), minSize));
+  public boundedSubset = (minSize?: bigint, maxSize?: bigint): Assets => {
+    return Assets.fromList(boundedSubset(this.toList(), minSize, maxSize));
   };
 
   public has = (asset: Asset): boolean => {

@@ -81,11 +81,18 @@ export function nonEmptySubSet<T>(set: T[]): T[] {
   return subset;
 }
 
-export function minSizedSubset<T>(set: T[], minSize: bigint): T[] {
+export function boundedSubset<T>(
+  set: T[],
+  minSize = 0n,
+  maxSize?: bigint,
+): T[] {
   assert(minSize <= set.length, `minSizedSubset: ${minSize} > ${set.length}`);
   const subset = [];
   const pickedIndices: number[] = [];
-  const size = minSize + genNonNegative(BigInt(set.length) - minSize);
+  const maxSize_ = maxSize
+    ? min(maxSize, BigInt(set.length))
+    : BigInt(set.length);
+  const size = minSize + genNonNegative(maxSize_ - minSize);
   while (subset.length < size) {
     const [elem, index] = randomIndexedChoice(set);
     if (!pickedIndices.includes(index)) {

@@ -98,27 +98,32 @@ export class Opening {
   static genOfUser = (user: User): Opening | undefined => {
     const balance = user.availableBalance;
     if (balance.size < 1) return undefined;
-    const deposit = balance.minSizedSubValue(1n);
+    const maxAssets = 5n;
+    const deposit = balance.boundedSubValue(1n, maxAssets);
     console.log("deposit", deposit.concise());
     const providedAssets = deposit.assets;
     const emptyAssets = new Assets();
     const assets = providedAssets.clone;
-    let numAssets = max(genNonNegative(gMaxLength), 2n) - providedAssets.size;
-    while (numAssets > 0n) {
+    let addAssets = max(genNonNegative(maxAssets), 2n) - providedAssets.size;
+    while (addAssets > 0n) {
       const asset = Asset.generate();
       if (assets.has(asset)) continue;
       assets.insert(asset);
       emptyAssets.insert(asset);
-      numAssets--;
+      addAssets--;
     }
 
     const param = Param.genOf(user.paymentKeyHash, assets);
     const minTicks = 1n;
-    const maxTicks = 5n;
+    const maxTicks = gMaxLength;
     const numTicks = EuclidValue.genBelow(
       param.jumpSizes.bounded(minTicks + 1n, maxTicks + 1n),
     );
 
+    console.log(`numDiracs: ${numTicks.unsigned.mulAmounts()}`);
+    console.log(numTicks.concise());
+    // NOTE 27 diracs slightly exceeds the max tx size (17444 vs. 16384)
+    // TODO consider splitting up the tx
     return new Opening(
       user,
       param,

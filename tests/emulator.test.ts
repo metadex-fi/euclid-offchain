@@ -68,7 +68,8 @@ Deno.test("emulator", async () => {
   console.log(`accounts: ${accounts}`);
   const emulator = new Lucid.Emulator(accounts);
   const traces: string[][] = [];
-  for (let i = 0; i < 10; i++) {
+  const iterations = 1000;
+  for (let i = 0; i < iterations; i++) {
     console.log(`\ni: ${i}`);
     const users = await Promise.all(
       randomSubset(allUsers).map(async (user) => {
@@ -99,6 +100,7 @@ Deno.test("emulator", async () => {
       console.log(hashes);
       traces.push(hashes);
     }
-    emulator.awaitBlock(4); //Number(genPositive()));
+    emulator.awaitBlock(Number(genPositive()));
   }
+  console.log(traces.length);
 });

@@ -110,7 +110,7 @@ export class User {
     ]))[0];
     this.balance = utxos.map((utxo) => PositiveValue.fromLucid(utxo.assets))
       .reduce((a, b) => a.normedPlus(b), new PositiveValue());
-    console.log(`balance: ${this.balance.concise()}`);
+    // console.log(`balance: ${this.balance.concise()}`);
   };
 
   static async from(
@@ -131,7 +131,7 @@ export class User {
       .address();
     const user = new User(lucid, privateKey, address);
     user.balance = PositiveValue.genOfAssets(
-      allAssets.minSizedSubset(1n),
+      allAssets.boundedSubset(1n),
     ).normedPlus(forFeesEtc);
     return user;
   }
