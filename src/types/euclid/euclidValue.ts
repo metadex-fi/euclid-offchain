@@ -1,7 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { PWrapped } from "../general/fundamental/container/wrapped.ts";
 import { Lucid } from "../../../lucid.mod.ts";
-import { IdNFT } from "./idnft.ts";
 import { maxInteger } from "../../utils/generators.ts";
 import { Asset } from "../general/derived/asset/asset.ts";
 import { Assets } from "../general/derived/asset/assets.ts";
@@ -34,7 +33,6 @@ export class EuclidValue {
   public concise = (tabs = ""): string => this.value.concise(tabs);
   public amountOf = (asset: Asset, defaultAmnt?: bigint): bigint =>
     this.value.amountOf(asset, defaultAmnt);
-  public popIdNFT = (nft: IdNFT) => this.value.popIdNFT(nft);
   public get toLucid(): Lucid.Assets {
     return this.value.toLucid;
   }
@@ -96,8 +94,6 @@ export class EuclidValue {
 
   static fromValue = (value: Value): EuclidValue =>
     new EuclidValue(new PositiveValue(value));
-  static fromLucid = (assets: Lucid.Assets): EuclidValue =>
-    new EuclidValue(PositiveValue.fromLucid(assets));
 
   static filled = (
     value: PositiveValue,

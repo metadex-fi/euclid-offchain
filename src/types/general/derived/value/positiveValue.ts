@@ -53,8 +53,6 @@ export class PositiveValue {
   }
   public amountOf = (asset: Asset, defaultAmnt?: bigint): bigint =>
     this.value.amountOf(asset, defaultAmnt);
-  // TODO this does not really belong here, entangles the non-DEX-stuff with DEX-stuff
-  public popIdNFT = (nft: IdNFT) => this.value.popIdNFT(nft);
   public drop = (asset: Asset): void => this.value.drop(asset);
   public ofAssets = (assets: Assets): PositiveValue => {
     return new PositiveValue(this.value.ofAssets(assets));
@@ -155,12 +153,14 @@ export class PositiveValue {
     return assets;
   }
 
-  static fromLucid(assets: Lucid.Assets): PositiveValue {
+  static fromLucid(assets: Lucid.Assets, idNFT?: string): PositiveValue {
     try {
       const value = new Value();
       Object.entries(assets).forEach(([name, amount]) => {
-        const asset = Asset.fromLucid(name);
-        value.initAmountOf(asset, amount);
+        if (name !== idNFT) {
+          const asset = Asset.fromLucid(name);
+          value.initAmountOf(asset, amount);
+        }
       });
       return new PositiveValue(value);
     } catch (e) {

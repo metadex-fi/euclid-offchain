@@ -96,20 +96,6 @@ export class Value {
     return new Value(value);
   }
 
-  // TODO this does not really belong here, entangles the non-DEX-stuff with DEX-stuff
-  public popIdNFT = (nft: IdNFT): void => {
-    const tknsAmnts = this.value.get(nft.currency);
-    assert(tknsAmnts, `no tokens for currency ${nft.currency}`);
-    assert(tknsAmnts.size === 1, `more than one tokenNames for ${nft.show()}`); // this is only because of our specific use case
-    const [tkn, amnt] = [...tknsAmnts.entries()][0];
-    assert(
-      tkn.name === nft.token.toString(),
-      `token ${tkn} != ${nft.token} for ${nft.show()}`,
-    );
-    assert(amnt === 1n, `amount ${amnt} != 1 for ${nft.show()}`);
-    this.value.delete(nft.currency);
-  };
-
   private newFoldWith =
     (init: bigint, op: (a: bigint, b: bigint) => bigint) => (): bigint => {
       let agg = init;

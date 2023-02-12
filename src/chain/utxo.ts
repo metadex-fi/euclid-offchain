@@ -32,15 +32,14 @@ export class ParamUtxo {
     utxo: Lucid.UTxO,
     param: Param,
   ): ParamUtxo {
-    const balance = PositiveValue.fromLucid(
-      utxo.assets,
-    );
-    balance.drop(Asset.ADA) // TODO reconsider this
+    const lovelace = Asset.ADA.toLucid()
+    const assets = Object.keys(utxo.assets).filter((a) => a !== lovelace)
     assert(
-      balance.size === 1n,
-      `expected exactly id-NFT in ${balance.concise()}`,
+      assets.length === 1,
+      `expected exactly id-NFT in ${assets.toString()}`,
     );
-    const paramNFT = IdNFT.fromAsset(balance.headAsset);
+    assert(utxo.assets[assets[0]] === 1n, `expected exactly 1 id-NFT`)
+    const paramNFT = IdNFT.fromLucid(assets[0]);
 
     return new ParamUtxo(param, paramNFT, utxo);
   }
@@ -103,10 +102,12 @@ export class PreDiracUtxo {
     public readonly datum: PConstanted<PEuclidDatum>,
     public readonly preDirac: Dirac,
   ) {
+    const threadNFT = this.preDirac.threadNFT.toLucid();
+    assert(utxo.assets[threadNFT] === 1n, `expected exactly 1 thread-NFT`)
     this.balance = PositiveValue.fromLucid(
       utxo.assets,
+      threadNFT,
     );
-    this.balance.popIdNFT(this.preDirac.threadNFT);
   }
 
   public parse = (
