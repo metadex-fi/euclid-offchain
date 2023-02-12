@@ -9,7 +9,7 @@ export class PositiveValue {
   constructor(
     private value = new Value(),
   ) {
-    assert(value.positive, "value must be positive");
+    assert(value.positive, `value must be positive: ${value.show()}`);
   }
 
   public initAmountOf = (asset: Asset, amount: bigint): void => {
@@ -115,6 +115,10 @@ export class PositiveValue {
   // reverse hadamard product
   public divideBy = (other: PositiveValue): PositiveValue => {
     return new PositiveValue(Value.divide(this.unsigned, other.unsigned));
+  };
+
+  public normedDivideBy = (other: PositiveValue): PositiveValue => {
+    return new PositiveValue(Value.normedDivide(this.unsigned, other.unsigned));
   };
 
   public leq = (other: PositiveValue): boolean => {

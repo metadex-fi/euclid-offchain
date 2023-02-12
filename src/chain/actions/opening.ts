@@ -101,9 +101,8 @@ export class Opening {
   };
 
   // splitting it up this way to later use the same class to process actual user input
-  static genOfUser = (user: User): Opening => {
-    assert(user.balance, `user balance not initialized for ${user.address}`);
-    assert(user.balance.size, `no assets for ${user.address}`);
+  static genOfUser = (user: User): Opening | undefined => {
+    if (user.balance === undefined || user.balance.size < 1) return undefined;
     const deposit = user.balance.minSizedSubValue(1n);
     const providedAssets = deposit.assets;
     const emptyAssets = new Assets();

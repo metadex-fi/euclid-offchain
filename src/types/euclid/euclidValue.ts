@@ -17,6 +17,9 @@ export class EuclidValue {
   public get unsigned(): Value {
     return this.value.unsigned;
   }
+  public get unsized(): PositiveValue {
+    return this.value.clone;
+  }
   public get unit(): Value {
     return this.value.unit;
   }
@@ -47,6 +50,10 @@ export class EuclidValue {
     return EuclidValue.fromValue(Value.divide(this.unsigned, other.unsigned));
   };
 
+  // public normedDivideBy = (other: EuclidValue): PositiveValue => {
+  //   return new PositiveValue(Value.normedDivide(this.unsigned, other.unsigned));
+  // };
+
   public leq = (other: EuclidValue): boolean => {
     return Value.leq(this.unsigned, other.unsigned);
   };
@@ -65,6 +72,12 @@ export class EuclidValue {
 
   static genOfAssets(assets: Assets): EuclidValue {
     return new EuclidValue(PositiveValue.genOfAssets(assets));
+  }
+
+  static genBelow(upper: EuclidValue): EuclidValue {
+    return EuclidValue.fromValue(
+      Value.genBetween(upper.unit, upper.unsigned, false),
+    );
   }
 
   static fromValue = (value: Value): EuclidValue =>

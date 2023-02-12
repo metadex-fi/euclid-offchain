@@ -425,11 +425,11 @@ export class Value {
   static hadamard = Value.newUnionWith((a, b) => a * b);
   static hadamard_ = Value.newUnionWith((a, b) => a * b, undefined, 0n);
   static divide = Value.newUnionWith((a, b) => a / b); // reverse hadamard-product
+  static normedDivide = Value.newUnionWith((a, b) => a / b, 0n, 0n, 0n);
 
-  // upper bound is strict
-  static genBetween = (lower: Value, upper: Value) =>
+  static genBetween = (lower: Value, upper: Value, strict: boolean) =>
     Value.newUnionWith(
-      (a, b) => new PBounded(a, b - 1n).genData(),
+      (a, b) => new PBounded(a, b - (strict ? 1n : 0n)).genData(),
     )(lower, upper);
 
   private static assetsOf(

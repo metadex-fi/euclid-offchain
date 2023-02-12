@@ -1,8 +1,10 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
 import { Assets, IdNFT, KeyHash, PKeyHash, PositiveValue } from "../mod.ts";
+import { Swapping } from "./actions/swapping.ts";
 
 import { Contract } from "./contract.ts";
+import { Action, UserAction } from "./mod.ts";
 import { Pool } from "./pool.ts";
 
 type consequences = (u: User) => void;
@@ -46,13 +48,58 @@ export class User {
     else return new IdNFT(this.contract.policy, this.paymentKeyHash.hash());
   }
 
+  // TODO use this
   public setLastIdNFT = (idNFT: IdNFT): void => {
     this.lastIdNFT = idNFT;
   };
 
-  public numPools = (): bigint => {
-    assert(this.pools, "no pools");
-    return BigInt(this.pools.length);
+  public get swappings(): Swapping[] {
+    if (
+      this.contract.state === undefined ||
+      this.balance === undefined ||
+      this.balance.size < 1
+    ) return [];
+    else return this.contract.state.swappingsFor(this);
+  }
+
+  // TODO consider generating several
+  public generateActions = async (): Promise<Action[]> => {
+    await this.update();
+    const action = new UserAction(this).generate();
+    if (action) return [action];
+    else return [];
+  };
+
+  public get account(): { address: Lucid.Address; assets: Lucid.Assets } {
+    assert(this.address, "No address");
+    assert(this.balance, "No balance");
+    return {
+      address: this.address,
+      assets: this.balance.toLucid,
+    };
+  }
+
+  // TODO use this
+  public dealWithConsequences = (): void => {
+    if (this.pendingConsequences) {
+      this.pendingConsequences(this);
+      this.pendingConsequences = undefined;
+    }
+  };
+
+  // public addPool = (pool: Pool): void => {
+  //   if (!this.pools) this.pools = [];
+  //   this.pools.push(pool);
+  // };
+
+  public update = async (): Promise<void> => {
+    const utxos = (await Promise.all([
+      this.lucid.utxosAt(this.address!),
+      this.contract.update(),
+    ]))[0];
+    this.balance = utxos.map((utxo) => PositiveValue.fromLucid(utxo.assets))
+      .reduce((a, b) => a.normedPlus(b));
+    console.log(`balance: ${this.balance.concise()}`);
   };
 
   static async from(
@@ -85,46 +132,6 @@ export class User {
     user.balance = PositiveValue.genOfAssets(assets);
     return user;
   }
-
-  public account = (): { address: Lucid.Address; assets: Lucid.Assets } => {
-    assert(this.address, "No address");
-    assert(this.balance, "No balance");
-    return {
-      address: this.address,
-      assets: this.balance.toLucid,
-    };
-  };
-
-  public dealWithConsequences = (): void => {
-    if (this.pendingConsequences) {
-      this.pendingConsequences(this);
-      this.pendingConsequences = undefined;
-    }
-  };
-
-  public addPool = (pool: Pool): void => {
-    if (!this.pools) this.pools = [];
-    this.pools.push(pool);
-  };
-
-  public update = async (): Promise<void> => {
-    const utxos = (await Promise.all([
-      this.lucid.utxosAt(this.address!),
-      this.contract.update(),
-    ]))[0];
-    const assets: Lucid.Assets = {};
-    utxos.forEach((utxo) => {
-      Object.entries(utxo.assets).forEach(([asset, amount]) => {
-        assets[asset] = amount + BigInt(assets[asset] ?? 0);
-      });
-    });
-    this.balance = PositiveValue.fromLucid(assets);
-    console.log(`balance: ${this.balance.concise()}`);
-  };
-
-  public ownsPools = (): boolean => {
-    return this.pools ? this.pools.length > 0 : false;
-  };
 }
 
 // function addLucidAssetsTo(a: LucidAssets, b: LucidAssets): void {

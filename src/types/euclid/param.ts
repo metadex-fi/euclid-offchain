@@ -71,26 +71,11 @@ ${tt})`;
 
   static generate(): Param {
     const assets = Assets.generate(2n);
-
-    const virtual = PositiveValue.genOfAssets(assets.randomSubset());
     const weights = EuclidValue.genOfAssets(assets);
-    const jumpSizes = EuclidValue.genOfAssets(assets);
-
-    let minLowestPrices = Value.hadamard_(virtual.unsigned, weights.unsigned);
-    let maxLowestPrices = Value.add(
-      minLowestPrices,
-      jumpSizes.unsigned,
-    );
-    while (!maxLowestPrices.leqMaxInteger) {
-      // this is a bit sloppy vs. clean and/or dirty reduce, but sloppy feels correct here
-      randomChoice([virtual, weights, jumpSizes]).halfRandomAmount();
-
-      minLowestPrices = Value.hadamard_(virtual.unsigned, weights.unsigned);
-      maxLowestPrices = Value.add(
-        minLowestPrices,
-        jumpSizes.unsigned,
-      );
-    }
+    const maxLowestPrices = EuclidValue.genOfAssets(assets);
+    const jumpSizes = EuclidValue.genBelow(maxLowestPrices);
+    const minLowestPrices = maxLowestPrices.normedMinus(jumpSizes);
+    const virtual = minLowestPrices.normedDivideBy(weights.unsized);
 
     return new Param(
       PKeyHash.ptype.genData(),

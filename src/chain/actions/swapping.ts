@@ -106,14 +106,9 @@ export class Swapping {
   }
 
   // TODO don't forget to update (poll) chain state somewhere beforehand
-  static genOfUser(user: User): Swapping {
-    assert(
-      user.contract.state,
-      `Swapping.genOfUser: user.contract.state is undefined`,
-    );
-    assert(user.balance, `Swapping.genOfUser: user.balance is undefined`);
-    assert(user.balance.size, `no assets for ${user.address}`);
-    const swappings = user.contract.state.swappingsFor(user);
-    return randomChoice(swappings).randomSubSwap();
+  static genOfUser(user: User): Swapping | undefined {
+    const swappings = user.swappings;
+    if (swappings.length < 1) return undefined;
+    else return randomChoice(swappings).randomSubSwap();
   }
 }
