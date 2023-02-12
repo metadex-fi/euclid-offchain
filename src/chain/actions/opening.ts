@@ -19,9 +19,7 @@ import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 export class Opening {
   private constructor(
     private readonly user: User,
-    private readonly virtual: PositiveValue,
-    private readonly weights: EuclidValue,
-    private readonly jumpSizes: EuclidValue,
+    private readonly param: Param,
     private readonly deposit: PositiveValue, // total of all Diracs
     private readonly numTicks: EuclidValue,
   ) {
@@ -33,20 +31,15 @@ export class Opening {
   };
 
   private pool = (): Pool => {
-    const param = new Param(
-      this.user.paymentKeyHash,
-      this.virtual,
-      this.weights,
-      this.jumpSizes,
-    );
-
-    const assets = this.weights.assets;
-    const minLowestPrices = param.minLowestPrices;
-    const tickSizes = this.jumpSizes.divideBy(this.numTicks);
+    const assets = this.param.weights.assets;
+    const minLowestPrices = this.param.minLowestPrices;
+    const tickSizes = this.param.jumpSizes.divideBy(this.numTicks);
 
     const paramNFT = this.user.nextParamNFT;
-    const paramUtxo = ParamUtxo.open(param, paramNFT);
+    const paramUtxo = ParamUtxo.open(this.param, paramNFT);
 
+    console.log(minLowestPrices.concise());
+    console.log(PositiveValue.normed(minLowestPrices).concise());
     let threadNFT = paramNFT.next();
     let diracs = [
       new Dirac(
@@ -68,10 +61,13 @@ export class Opening {
       diracs.forEach((dirac) => {
         for (let i = 1n; i < ticks; i++) {
           const lowestPrices = dirac.lowestPrices.clone;
+          console.log(lowestPrices.concise());
+          console.log(i * tickSize);
           lowestPrices.addAmountOf(
             asset,
             i * tickSize,
           );
+          console.log(lowestPrices.concise());
           threadNFT = threadNFT.next();
           diracs_.push(
             new Dirac(
@@ -81,6 +77,7 @@ export class Opening {
               lowestPrices,
             ),
           );
+          console.log("--------");
         }
       });
       diracs = diracs.concat(diracs_);
@@ -91,7 +88,7 @@ export class Opening {
       this.deposit.unsigned.divideByScalar(BigInt(diracs.length)),
     );
     const diracUtxos = diracs.map((dirac) => {
-      return DiracUtxo.open(param, dirac, balance);
+      return DiracUtxo.open(this.param, dirac, balance);
     });
 
     return Pool.open(
@@ -106,7 +103,7 @@ export class Opening {
     const deposit = user.balance.minSizedSubValue(1n);
     const providedAssets = deposit.assets;
     const emptyAssets = new Assets();
-    const assets = providedAssets.clone();
+    const assets = providedAssets.clone;
     let numAssets = max(genNonNegative(gMaxLength), 2n) - providedAssets.size;
     while (numAssets > 0n) {
       const asset = Asset.generate();
@@ -115,20 +112,17 @@ export class Opening {
       emptyAssets.insert(asset);
       numAssets--;
     }
-    const emptyVirtual = PositiveValue.genOfAssets(emptyAssets);
-    const providedVirtual = PositiveValue.genOfAssets(
-      providedAssets.randomSubset(),
+
+    const param = Param.genOf(user.paymentKeyHash, assets);
+    const minTicks = 1n;
+    const maxTicks = 5n;
+    const numTicks = EuclidValue.genBelow(
+      param.jumpSizes.bounded(minTicks + 1n, maxTicks + 1n),
     );
-    const virtual = emptyVirtual.normedPlus(providedVirtual);
-    const weights = EuclidValue.genOfAssets(assets);
-    const jumpSizes = EuclidValue.genOfAssets(assets);
-    const numTicks = EuclidValue.genOfAssets(assets);
 
     return new Opening(
       user,
-      virtual,
-      weights,
-      jumpSizes,
+      param,
       deposit,
       numTicks,
     );

@@ -1,13 +1,13 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
-import { AssocMap, IdNFT, PIdNFT } from "../mod.ts";
+import { AssocMap, IdNFT } from "../mod.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { Contract, User } from "./mod.ts";
 import { DiracUtxo, ParamUtxo, PreDiracUtxo } from "./utxo.ts";
 
 export class PrePool {
   public paramUtxo?: ParamUtxo;
-  public preDiracUtxos?: AssocMap<PIdNFT, PreDiracUtxo>;
+  public preDiracUtxos?: AssocMap<IdNFT, PreDiracUtxo>;
 
   public setParamUtxo = (paramUtxo: ParamUtxo): PrePool => {
     assert(!this.paramUtxo, `duplicate param ${paramUtxo}`);
@@ -18,8 +18,8 @@ export class PrePool {
   public addPreDiracUtxo = (preDiracUtxo: PreDiracUtxo): PrePool => {
     const paramNFT = preDiracUtxo.dirac.paramNFT;
     if (!this.preDiracUtxos) {
-      this.preDiracUtxos = new AssocMap<PIdNFT, PreDiracUtxo>(
-        new PIdNFT(paramNFT.currency),
+      this.preDiracUtxos = new AssocMap<IdNFT, PreDiracUtxo>(
+        (kh) => kh.show(),
       );
     }
     assert(

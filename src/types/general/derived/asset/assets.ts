@@ -10,10 +10,10 @@ import {
 import { AssocMap, f, newGenInRange, PMap, PWrapped, t } from "../../mod.ts";
 import { PNonEmptyList } from "../nonEmptyList.ts";
 import { Asset, PAsset } from "./asset.ts";
-import { PCurrency } from "./currency.ts";
+import { Currency, PCurrency } from "./currency.ts";
 import { PToken, Token } from "./token.ts";
 
-export const ccysTkns = new AssocMap<PCurrency, Token[]>(PCurrency.ptype);
+export const ccysTkns = new AssocMap<Currency, Token[]>((ccy) => ccy.show());
 const PNonEmptyTokenList = new PNonEmptyList(PToken.ptype);
 
 export class Assets {
@@ -58,13 +58,13 @@ export class Assets {
     return true;
   };
 
-  public clone = (): Assets => {
+  public get clone(): Assets {
     const assets = new Assets();
     for (const [ccy, tkns] of this.assets) {
       assets.assets.set(ccy, tkns.slice());
     }
     return assets;
-  };
+  }
 
   public insert = (asset: Asset): void => {
     const { currency, token } = asset;
@@ -75,7 +75,7 @@ export class Assets {
   };
 
   public add = (asset: Asset): Assets => {
-    const assets = this.clone();
+    const assets = this.clone;
     assets.insert(asset);
     return assets;
   };
@@ -156,7 +156,7 @@ export class Assets {
     return tkns !== undefined && tkns.includes(token);
   };
 
-  public get toMap(): AssocMap<PCurrency, Token[]> {
+  public get toMap(): AssocMap<Currency, Token[]> {
     const assets = ccysTkns.anew;
     for (const [ccy, tkns] of this.assets) {
       assets.set(ccy, tkns.slice());

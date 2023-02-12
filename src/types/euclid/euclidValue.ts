@@ -1,8 +1,16 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { Asset, Assets, PositiveValue, PPositiveValue, Value } from "../mod.ts";
+import {
+  Asset,
+  Assets,
+  PBounded,
+  PositiveValue,
+  PPositiveValue,
+  Value,
+} from "../mod.ts";
 import { PWrapped } from "../general/fundamental/container/wrapped.ts";
 import { Lucid } from "../../../lucid.mod.ts";
 import { IdNFT } from "./idnft.ts";
+import { maxInteger } from "../../mod.ts";
 
 export class EuclidValue {
   constructor(
@@ -58,7 +66,13 @@ export class EuclidValue {
     return Value.leq(this.unsigned, other.unsigned);
   };
 
-  public halfRandomAmount = (): void => this.value.halfRandomAmount();
+  public bounded = (lower = 1n, upper = maxInteger): EuclidValue => {
+    return EuclidValue.fromValue(
+      Value.newBoundedWith(new PBounded(lower, upper))(this.unsigned),
+    );
+  };
+
+  // public halfRandomAmount = (): void => this.value.halfRandomAmount();
 
   static asserts(euclidValue: EuclidValue): void {
     assert(euclidValue.assets.size >= 2n, "at least two assets are required");
@@ -76,7 +90,7 @@ export class EuclidValue {
 
   static genBelow(upper: EuclidValue): EuclidValue {
     return EuclidValue.fromValue(
-      Value.genBetween(upper.unit, upper.unsigned, false),
+      Value.genBetween(upper.unit, upper.unsigned),
     );
   }
 

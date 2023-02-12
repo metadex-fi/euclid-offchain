@@ -5,16 +5,18 @@ import {
   Asset,
   Assets,
   ccysTkns,
+  Currency,
   PBounded,
   PCurrency,
   PToken,
+  Token,
 } from "../mod.ts";
 import { AssocMap } from "../../fundamental/container/map.ts";
 
-export const ccysTknsAmnts = new AssocMap<PCurrency, AssocMap<PToken, bigint>>(
-  PCurrency.ptype,
+export const ccysTknsAmnts = new AssocMap<Currency, AssocMap<Token, bigint>>(
+  (currency) => currency.show(),
 );
-export const tknsAmnts = new AssocMap<PToken, bigint>(PToken.ptype);
+export const tknsAmnts = new AssocMap<Token, bigint>((tkn) => tkn.show());
 
 export class Value {
   constructor(
@@ -252,7 +254,7 @@ export class Value {
     return value;
   };
 
-  public get toMap(): AssocMap<PCurrency, AssocMap<PToken, bigint>> {
+  public get toMap(): AssocMap<Currency, AssocMap<Token, bigint>> {
     const map = this.value.anew;
     for (const [currencySymbol, tokens] of this.value) {
       const tokens_ = tknsAmnts.anew;
@@ -427,9 +429,10 @@ export class Value {
   static divide = Value.newUnionWith((a, b) => a / b); // reverse hadamard-product
   static normedDivide = Value.newUnionWith((a, b) => a / b, 0n, 0n, 0n);
 
-  static genBetween = (lower: Value, upper: Value, strict: boolean) =>
+  // upper bound is strict
+  static genBetween = (lower: Value, upper: Value) =>
     Value.newUnionWith(
-      (a, b) => new PBounded(a, b - (strict ? 1n : 0n)).genData(),
+      (a, b) => new PBounded(a, b - 1n).genData(),
     )(lower, upper);
 
   private static assetsOf(

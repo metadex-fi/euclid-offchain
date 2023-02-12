@@ -6,27 +6,25 @@ import {
   Data,
   gMaxHashes,
   IdNFT,
-  PIdNFT,
-  PKeyHash,
+  KeyHash,
   PPreDiracDatum,
-  PString,
 } from "../mod.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { User } from "./mod.ts";
 import { Pool, PrePool } from "./pool.ts";
 import { ParamUtxo, PreDiracUtxo } from "./utxo.ts";
 
-type PErrorMessage = PString;
+type ErrorMessage = string;
 
 export class EuclidState {
   // private invalidDiracs = new AssocMap<PErrorMessage, PreDiracUtxo[]>(PString.ptype);
-  private invalidUtxos = new AssocMap<PErrorMessage, Lucid.UTxO[]>(
-    PString.ptype,
-  );
+  private invalidUtxos = new AssocMap<ErrorMessage, Lucid.UTxO[]>((str) => str);
   // public emptyPoolParams!: AssocMap<PKeyHash, AssocMap<PToken, ParamUtxo>>;
-  public pools = new AssocMap<PKeyHash, AssocMap<PIdNFT, Pool>>(PKeyHash.ptype);
-  public invalidPools = new AssocMap<PKeyHash, AssocMap<PIdNFT, PrePool>>(
-    PKeyHash.ptype,
+  public pools = new AssocMap<KeyHash, AssocMap<IdNFT, Pool>>((kh) =>
+    kh.show()
+  );
+  public invalidPools = new AssocMap<KeyHash, AssocMap<IdNFT, PrePool>>(
+    (kh) => kh.show(),
   );
 
   constructor(
@@ -34,8 +32,8 @@ export class EuclidState {
     policy: Currency,
   ) {
     // 1. sort utxos into prePools
-    const prePools = new AssocMap<PKeyHash, AssocMap<PIdNFT, PrePool>>(
-      PKeyHash.ptype,
+    const prePools = new AssocMap<KeyHash, AssocMap<IdNFT, PrePool>>(
+      (kh) => kh.show(),
     );
     const ppreDiracDatum = new PPreDiracDatum(policy);
     utxos.forEach((utxo) => {
@@ -53,7 +51,7 @@ export class EuclidState {
             const owner = paramUtxo.param.owner;
             const paramNFT = paramUtxo.paramNFT;
             const ownerPrePools = prePools.get(owner) ??
-              new AssocMap<PIdNFT, PrePool>(new PIdNFT(policy));
+              new AssocMap<IdNFT, PrePool>((nft) => nft.show());
             const prePool = (ownerPrePools.get(paramNFT) ?? new PrePool())
               .setParamUtxo(paramUtxo);
             ownerPrePools.set(paramNFT, prePool);
@@ -69,7 +67,7 @@ export class EuclidState {
             const owner = preDiracUtxo.dirac.owner;
             const paramNFT = preDiracUtxo.dirac.paramNFT;
             const ownerPrePools = prePools.get(owner) ??
-              new AssocMap<PIdNFT, PrePool>(new PIdNFT(policy));
+              new AssocMap<IdNFT, PrePool>((kh) => kh.show());
             const prePool = (ownerPrePools.get(paramNFT) ?? new PrePool())
               .addPreDiracUtxo(preDiracUtxo);
             ownerPrePools.set(paramNFT, prePool);
@@ -87,12 +85,12 @@ export class EuclidState {
     });
 
     // 2. parse prePools into pools
-    this.pools = new AssocMap<PKeyHash, AssocMap<PIdNFT, Pool>>(PKeyHash.ptype);
+    this.pools = new AssocMap<KeyHash, AssocMap<IdNFT, Pool>>((kh) =>
+      kh.show()
+    );
     prePools.forEach((ownerPrePools, owner) => { // TODO this could be parallelized
-      const parsedOwnerPools = new AssocMap<PIdNFT, Pool>(new PIdNFT(policy));
-      const invalidOwnerPools = new AssocMap<PIdNFT, PrePool>(
-        new PIdNFT(policy),
-      );
+      const parsedOwnerPools = new AssocMap<IdNFT, Pool>((kh) => kh.show());
+      const invalidOwnerPools = new AssocMap<IdNFT, PrePool>((kh) => kh.show());
       let hits = ownerPrePools.size;
       let misses = gMaxHashes;
       let paramNFT = new IdNFT(

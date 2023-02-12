@@ -1,8 +1,8 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
-import { genPositive, IdNFT, max } from "../../../../mod.ts";
+import { genPositive, IdNFT } from "../../../../mod.ts";
 import { AssocMap, PObject, PRecord } from "../../mod.ts";
-import { Asset, Assets, PCurrency, PPositive, PToken } from "../mod.ts";
+import { Asset, Assets, Currency, PPositive, Token } from "../mod.ts";
 import { PValue, Value } from "./value.ts";
 
 export class PositiveValue {
@@ -125,13 +125,13 @@ export class PositiveValue {
     return Value.leq(this.unsigned, other.unsigned);
   };
 
-  public halfRandomAmount = (): void => {
-    const asset = this.assets.randomChoice();
-    this.value.setAmountOf(
-      asset,
-      max(1n, this.value.amountOf(asset) / 2n),
-    );
-  };
+  // public halfRandomAmount = (): void => {
+  //   const asset = this.assets.randomChoice();
+  //   this.value.setAmountOf(
+  //     asset,
+  //     max(1n, this.value.amountOf(asset) / 2n),
+  //   );
+  // };
 
   // public divideByScalar = (scalar: bigint): PositiveValue => {
   //   return new PositiveValue(this.value.divideByScalar(scalar));
@@ -163,7 +163,7 @@ export class PositiveValue {
   }
 
   static maybeFromMap = (
-    m?: AssocMap<PCurrency, AssocMap<PToken, bigint>>,
+    m?: AssocMap<Currency, AssocMap<Token, bigint>>,
   ): PositiveValue | undefined => {
     if (m === undefined) return undefined;
     else return new PositiveValue(new Value(m));

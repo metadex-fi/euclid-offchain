@@ -36,7 +36,7 @@ export class IdNFT {
     unmatched: IdNFT[];
   } => {
     const policy = this.currency.show();
-    const hashes = new AssocMap<PHash, IdNFT>(PHash.ptype);
+    const hashes = new AssocMap<Hash, IdNFT>((h) => h.show());
     const sorted = new Array<IdNFT>();
     const wrongPolicy = new Array<IdNFT>();
     candidates.forEach((c) => {

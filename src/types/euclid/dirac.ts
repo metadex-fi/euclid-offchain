@@ -62,7 +62,7 @@ ${tt})`;
         param.jumpSizes.unsigned,
       );
       const lowestPrices = PositiveValue.normed(
-        Value.genBetween(minLowestPrices, maxLowestPrices, true),
+        Value.genBetween(minLowestPrices, maxLowestPrices),
       );
       return new Dirac(
         param.owner,

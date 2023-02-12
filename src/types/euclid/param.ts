@@ -71,14 +71,19 @@ ${tt})`;
 
   static generate(): Param {
     const assets = Assets.generate(2n);
+    const owner = PKeyHash.ptype.genData();
+    return Param.genOf(owner, assets);
+  }
+
+  static genOf(owner: KeyHash, assets: Assets): Param {
     const weights = EuclidValue.genOfAssets(assets);
     const maxLowestPrices = EuclidValue.genOfAssets(assets);
-    const jumpSizes = EuclidValue.genBelow(maxLowestPrices);
+    const jumpSizes = EuclidValue.genBelow(maxLowestPrices.bounded(2n));
     const minLowestPrices = maxLowestPrices.normedMinus(jumpSizes);
     const virtual = minLowestPrices.normedDivideBy(weights.unsized);
 
     return new Param(
-      PKeyHash.ptype.genData(),
+      owner,
       virtual,
       weights,
       jumpSizes,
