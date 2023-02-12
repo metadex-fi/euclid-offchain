@@ -62,6 +62,7 @@ export class User {
     else return new IdNFT(this.contract.policy, this.paymentKeyHash.hash());
   }
 
+  // only needed for multiple actions within same iteration
   public setLastIdNFT = (idNFT: IdNFT): void => {
     this.lastIdNFT = idNFT;
   };
@@ -99,6 +100,15 @@ export class User {
     this.balance = utxos.map((utxo) => PositiveValue.fromLucid(utxo.assets))
       .reduce((a, b) => a.normedPlus(b), new PositiveValue());
     // console.log(`balance: ${this.balance.concise()}`);
+    const paramNFTs = this.contract.state!.pools.get(this.paymentKeyHash)
+      ?.keys();
+    if (paramNFTs) {
+      const subsequents =
+        (new IdNFT(this.contract.policy, this.paymentKeyHash.hash()))
+          .sortSubsequents([...paramNFTs]).sorted;
+      // TODO handle error cases of sortSubsequents
+      if (subsequents) this.setLastIdNFT(subsequents[subsequents.length - 1]);
+    }
   };
 
   static async from(
