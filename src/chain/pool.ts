@@ -18,17 +18,17 @@ export class PrePool {
   };
 
   public addPreDiracUtxo = (preDiracUtxo: PreDiracUtxo): PrePool => {
-    const paramNFT = preDiracUtxo.preDirac.paramNFT;
+    const threadNFT = preDiracUtxo.preDirac.threadNFT;
     if (!this.preDiracUtxos) {
       this.preDiracUtxos = new AssocMap<IdNFT, PreDiracUtxo>(
         (kh) => kh.show(),
       );
     }
     assert(
-      !this.preDiracUtxos.has(paramNFT),
-      `CRITICAL: duplicate dirac ${paramNFT}`,
+      !this.preDiracUtxos.has(threadNFT),
+      `CRITICAL: duplicate dirac ${threadNFT}`,
     );
-    this.preDiracUtxos.set(paramNFT, preDiracUtxo);
+    this.preDiracUtxos.set(threadNFT, preDiracUtxo);
     return this;
   };
 
