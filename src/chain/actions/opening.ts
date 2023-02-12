@@ -84,6 +84,7 @@ export class Opening {
       return DiracUtxo.open(this.param, dirac, balance);
     });
 
+    this.user.setLastIdNFT(threadNFT);
     return Pool.open(
       paramUtxo,
       diracUtxos,

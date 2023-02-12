@@ -4,35 +4,24 @@ import { IdNFT } from "../types/euclid/idnft.ts";
 import { Asset } from "../types/general/derived/asset/asset.ts";
 import { Assets } from "../types/general/derived/asset/assets.ts";
 import { KeyHash, PKeyHash } from "../types/general/derived/hash/keyHash.ts";
-import {
-  feesEtcLovelace,
-  genPositive,
-  gMaxLength,
-} from "../utils/generators.ts";
+import { feesEtcLovelace, gMaxLength } from "../utils/generators.ts";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { Action, UserAction } from "./actions/action.ts";
 
 import { Contract } from "./contract.ts";
-import { Pool } from "./pool.ts";
 
 const forFeesEtc = PositiveValue.singleton(
   Asset.ADA,
   10n * feesEtcLovelace,
 ); // costs in lovelace for fees etc. TODO excessive
-const feesEtc = PositiveValue.singleton(Asset.ADA, feesEtcLovelace);
-
-type consequences = (u: User) => void;
+// const feesEtc = PositiveValue.singleton(Asset.ADA, feesEtcLovelace);
 
 export class User {
   public readonly contract: Contract;
   public readonly paymentKeyHash: KeyHash;
 
   private balance?: PositiveValue;
-  public pools?: Pool[]; // own creation recall
-  // public utxoPools?: UtxoPool[]; // from onchain
   private lastIdNFT?: IdNFT;
-
-  public pendingConsequences?: consequences; // TODO not filled rn
 
   private constructor(
     public readonly lucid: Lucid.Lucid,
@@ -73,7 +62,6 @@ export class User {
     else return new IdNFT(this.contract.policy, this.paymentKeyHash.hash());
   }
 
-  // TODO use this
   public setLastIdNFT = (idNFT: IdNFT): void => {
     this.lastIdNFT = idNFT;
   };
@@ -100,19 +88,6 @@ export class User {
       assets: this.balance.toLucid,
     };
   }
-
-  // TODO use this
-  public dealWithConsequences = (): void => {
-    if (this.pendingConsequences) {
-      this.pendingConsequences(this);
-      this.pendingConsequences = undefined;
-    }
-  };
-
-  // public addPool = (pool: Pool): void => {
-  //   if (!this.pools) this.pools = [];
-  //   this.pools.push(pool);
-  // };
 
   public update = async (
     spentContractUtxos: Lucid.UTxO[] = [],

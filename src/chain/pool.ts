@@ -12,7 +12,10 @@ export class PrePool {
   public preDiracUtxos?: AssocMap<IdNFT, PreDiracUtxo>;
 
   public setParamUtxo = (paramUtxo: ParamUtxo): PrePool => {
-    assert(!this.paramUtxo, `duplicate param ${paramUtxo}`);
+    assert(
+      !this.paramUtxo,
+      `duplicate paramNFT for ${this.paramUtxo?.paramNFT.show()}`,
+    );
     this.paramUtxo = paramUtxo;
     return this;
   };
