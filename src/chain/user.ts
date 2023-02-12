@@ -4,8 +4,12 @@ import { IdNFT } from "../types/euclid/idnft.ts";
 import { Asset } from "../types/general/derived/asset/asset.ts";
 import { Assets } from "../types/general/derived/asset/assets.ts";
 import { KeyHash, PKeyHash } from "../types/general/derived/hash/keyHash.ts";
+import {
+  feesEtcLovelace,
+  genPositive,
+  gMaxLength,
+} from "../utils/generators.ts";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
-import { feesEtcLovelace } from "../utils/generators.ts";
 import { Action, UserAction } from "./actions/action.ts";
 
 import { Contract } from "./contract.ts";
@@ -149,6 +153,25 @@ export class User {
     const assets = Assets.generate(2n);
     user.balance = PositiveValue.genOfAssets(assets);
     return user;
+  }
+
+  static async genSeveral(): Promise<User[]> {
+    const users = new Array<User>();
+    const allAssets = Assets.generate(2n, 10n);
+    console.log(allAssets.show());
+    const lucid = await Lucid.Lucid.new(undefined, "Custom");
+
+    const numUsers = genPositive(gMaxLength);
+    const addresses = new Array<Lucid.Address>();
+    while (users.length < numUsers) {
+      const user = await User.generateWith(lucid, allAssets);
+      assert(user.address, `user.address is undefined`);
+      if (!addresses.includes(user.address)) {
+        addresses.push(user.address);
+        users.push(user);
+      }
+    }
+    return users;
   }
 }
 

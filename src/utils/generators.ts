@@ -2,8 +2,6 @@
 
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
-// import { User } from "../chain/user.ts";
-// import { Assets } from "../types/general/derived/asset/assets.ts";
 import { PData } from "../types/general/fundamental/type.ts";
 
 export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
@@ -166,22 +164,3 @@ export function genName(minLength = 0n, maxLength = gMaxStringLength): string {
   const alph = lower + upper + symbols;
   return genString(alph, minLength, maxLength, 1n);
 }
-
-// export async function genUsers(): Promise<User[]> {
-//   const users = new Array<User>();
-//   const allAssets = Assets.generate(2n, 10n);
-//   console.log(allAssets.show());
-//   const lucid = await Lucid.Lucid.new(undefined, "Custom");
-
-//   const numUsers = genPositive(gMaxLength);
-//   const addresses = new Array<Lucid.Address>();
-//   while (users.length < numUsers) {
-//     const user = await User.generateWith(lucid, allAssets);
-//     assert(user.address, `user.address is undefined`);
-//     if (!addresses.includes(user.address)) {
-//       addresses.push(user.address);
-//       users.push(user);
-//     }
-//   }
-//   return users;
-// }
