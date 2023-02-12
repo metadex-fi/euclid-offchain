@@ -81,7 +81,7 @@ export class PositiveValue {
     if (newAmount === 0n) {
       this.value.drop(asset);
     } else {
-      this.value.setAmountOf(asset, amount);
+      this.value.setAmountOf(asset, newAmount);
     }
   };
 
