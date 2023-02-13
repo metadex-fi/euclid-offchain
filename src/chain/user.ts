@@ -57,6 +57,10 @@ export class User {
     // return this.balance.normedMinus(feesEtc);
   }
 
+  public get hasPools(): boolean {
+    return this.lastIdNFT !== undefined;
+  }
+
   public get nextParamNFT(): IdNFT {
     if (this.lastIdNFT) return this.lastIdNFT.next();
     else return new IdNFT(this.contract.policy, this.paymentKeyHash.hash());

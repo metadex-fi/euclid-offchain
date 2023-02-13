@@ -5,12 +5,12 @@ import { Data } from "../src/types/general/fundamental/type.ts";
 import { genPositive, randomSubset } from "../src/utils/generators.ts";
 
 Deno.test("emulator", async () => {
-  const allUsers = await User.genSeveral();
+  const allUsers = await User.genSeveral(); // TODO more
   const accounts = allUsers.map((u) => u.account);
   console.log(`accounts: ${accounts}`);
   const emulator = new Lucid.Emulator(accounts);
   const traces: string[] = [];
-  const iterations = 100;
+  const iterations = 100; // TODO more
   for (let i = 0; i < iterations; i++) {
     console.log(`\niteration: ${i} - block: ${emulator.blockHeight}`);
     const users = await Promise.all(
@@ -29,19 +29,24 @@ Deno.test("emulator", async () => {
           Promise.all(
             actions.map(async (action) => {
               spentContractUtxos.push(...action.spendsContractUtxos);
-              return await action
-                .tx(user.lucid.newTx())
+              const tx = action.tx(user.lucid.newTx());
+              // console.log(tx);
+              return await tx
                 .complete()
-                .then((tx) =>
-                  tx
+                .then((completed) => {
+                  // console.log(completed.txComplete.to_js_value());
+                  return completed
                     .sign()
                     .complete()
-                    .then((signed) => signed.submit())
-                );
+                    .then((signed) => {
+                      // console.log(signed.txSigned.to_js_value());
+                      return signed.submit();
+                    });
+                });
             }),
           )
         );
-      console.log(hashes);
+      // console.log(hashes);
       traces.push(...hashes);
     }
     // } catch (e) {
@@ -50,6 +55,11 @@ Deno.test("emulator", async () => {
     emulator.awaitBlock(Number(genPositive()));
   }
   console.log(`traces.length: ${traces.length}`);
+  // for (const user of allUsers) {
+  //   const lucid = await Lucid.Lucid.new(emulator);
+  //   const user_ = await User.from(lucid, user.privateKey);
+  //   console.log(await user_.lucid.wallet.getUtxos());
+  // }
 });
 
 // Deno.test("constr", async () => {

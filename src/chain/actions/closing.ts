@@ -14,7 +14,9 @@ export class Closing {
   }
 
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
-    return this.pool.closingTx(tx, this.user.contract);
+    return this.pool.closingTx(tx, this.user.contract).addSigner(
+      this.user.address!,
+    );
   };
 
   static genOfUser = (user: User): Closing | undefined => {

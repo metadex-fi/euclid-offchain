@@ -54,6 +54,7 @@ export class ParamUtxo {
     const peuclidDatum = PPreEuclidDatum.genPType(); //only need this for ParamDatum, so this is fine
     const paramDatum = peuclidDatum.pconstant(new ParamDatum(this.param));
     const paramNFT = this.paramNFT.toLucidNFT;
+    // console.log(paramNFT);
 
     return tx
       .attachMintingPolicy(contract.mintingPolicy)
@@ -88,7 +89,10 @@ export class PreDiracUtxo {
     public readonly preDirac: Dirac,
   ) {
     const threadNFT = this.preDirac.threadNFT.toLucid;
-    assert(utxo.assets[threadNFT] === 1n, `expected exactly 1 thread-NFT`);
+    assert(
+      utxo.assets[threadNFT] === 1n,
+      `expected exactly 1 thread-NFT, got ${utxo.assets[threadNFT]}`,
+    );
     this.balance = PositiveValue.fromLucid(
       utxo.assets,
       threadNFT,

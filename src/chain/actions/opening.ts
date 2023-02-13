@@ -26,7 +26,9 @@ export class Opening {
   }
 
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
-    return this.pool().openingTx(tx, this.user.contract);
+    return this.pool().openingTx(tx, this.user.contract).addSigner(
+      this.user.address!,
+    );
   };
 
   private pool = (): Pool => {
@@ -34,7 +36,7 @@ export class Opening {
     const minLowestPrices = this.param.minLowestPrices;
     const tickSizes = this.param.jumpSizes.divideBy(this.numTicks);
 
-    const paramNFT = this.user.nextParamNFT;
+    const paramNFT = this.user.nextParamNFT.next(); // TODO remove next()
     const paramUtxo = ParamUtxo.open(this.param, paramNFT);
 
     let threadNFT = paramNFT.next();
