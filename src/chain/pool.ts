@@ -69,6 +69,12 @@ export class Pool {
     return [this.paramUtxo.utxo!, ...this.diracUtxos.map((d) => d.utxo!)];
   }
 
+  public get lastIdNFT(): IdNFT {
+    if (this.diracUtxos) {
+      return this.diracUtxos[this.diracUtxos.length - 1].dirac.threadNFT;
+    } else return this.paramUtxo.paramNFT;
+  }
+
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     let tx_ = this.paramUtxo.openingTx(tx, contract);
     // let remaining = this.diracUtxos.slice(0, 100); TODO this is for splitting larger txes

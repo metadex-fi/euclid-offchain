@@ -100,24 +100,8 @@ export class User {
     this.balance = utxos.map((utxo) => PositiveValue.fromLucid(utxo.assets))
       .reduce((a, b) => a.normedPlus(b), new PositiveValue());
     // console.log(`balance: ${this.balance.concise()}`);
-    const paramNFTs = this.contract.state!.pools.get(this.paymentKeyHash)
-      ?.keys();
-    if (paramNFTs) {
-      const subsequents =
-        (new IdNFT(this.contract.policy, this.paymentKeyHash.hash()))
-          .sortSubsequents([...paramNFTs]);
-      assert(subsequents.wrongPolicy.length === 0, `wrong policy`); // TODO not for prod
-      if (subsequents.unmatched) { // TODO not for prod
-        assert(subsequents.unmatched.length < 2, `too many unmatched`);
-        assert(
-          subsequents.unmatched[0].token.show() ===
-            this.paymentKeyHash.hash().show(),
-          `wrong token`,
-        );
-      }
-      const sorted = subsequents.sorted;
-      if (subsequents) this.setLastIdNFT(sorted[sorted.length - 1]);
-    }
+    this.lastIdNFT = this.contract.state!.pools.get(this.paymentKeyHash)?.last
+      ?.lastIdNFT;
   };
 
   static async from(

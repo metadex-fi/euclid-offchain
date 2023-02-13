@@ -36,6 +36,12 @@ export class AssocMap<K, V> {
     return new AssocMap(this.showKey);
   }
 
+  public get last(): V | undefined {
+    const ks = [...this.keys()];
+    if (ks) return this.get(ks[ks.length - 1]);
+    else return undefined;
+  }
+
   public set = (k: K, v: V): void => {
     this.inner.set(this.showKey(k), [k, v]);
   };
