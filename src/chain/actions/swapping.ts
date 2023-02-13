@@ -1,8 +1,7 @@
-import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../lucid.mod.ts";
 import { BoughtSold } from "../../types/euclid/boughtSold.ts";
 import {
-  PSwapRedeemer,
+  PEuclidAction,
   SwapRedeemer,
 } from "../../types/euclid/euclidAction.ts";
 import { DiracDatum } from "../../types/euclid/euclidDatum.ts";
@@ -11,11 +10,12 @@ import { Asset } from "../../types/general/derived/asset/asset.ts";
 import { Data } from "../../types/general/fundamental/type.ts";
 import { genPositive, randomChoice } from "../../utils/generators.ts";
 import { User } from "../user.ts";
-import { DiracUtxo } from "../utxo.ts";
+import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 
 export class Swapping {
   private constructor(
     private readonly user: User,
+    private readonly paramUtxo: ParamUtxo,
     private readonly diracUtxo: DiracUtxo,
     private readonly boughtAsset: Asset,
     private readonly soldAsset: Asset,
@@ -30,16 +30,11 @@ export class Swapping {
   }
 
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
-    assert(
-      this.diracUtxo.utxo,
-      `Swapping.tx: this.diracUtxo.utxo is undefined`,
-    );
-
     const funds = this.diracUtxo.balance.clone; // TODO cloning probably not required here
     funds.addAmountOf(this.boughtAsset, this.boughtAmount);
     funds.addAmountOf(this.soldAsset, -this.soldAmount);
 
-    const swapRedeemer = PSwapRedeemer.ptype.pconstant(
+    const swapRedeemer = PEuclidAction.ptype.pconstant(
       new SwapRedeemer(
         new Swap(
           this.boughtAsset,
@@ -57,8 +52,9 @@ export class Swapping {
     );
 
     return tx
+      .readFrom([this.paramUtxo.utxo!])
       .collectFrom(
-        [this.diracUtxo.utxo],
+        [this.diracUtxo.utxo!],
         Data.to(swapRedeemer),
       )
       .payToContract(
@@ -81,6 +77,7 @@ export class Swapping {
     }
     return new Swapping(
       this.user,
+      this.paramUtxo,
       this.diracUtxo,
       this.boughtAsset,
       this.soldAsset,
@@ -93,6 +90,7 @@ export class Swapping {
 
   static boundary(
     user: User,
+    paramUtxo: ParamUtxo,
     diracUtxo: DiracUtxo,
     boughtAsset: Asset,
     soldAsset: Asset,
@@ -103,6 +101,7 @@ export class Swapping {
   ): Swapping {
     return new Swapping(
       user,
+      paramUtxo,
       diracUtxo,
       boughtAsset,
       soldAsset,

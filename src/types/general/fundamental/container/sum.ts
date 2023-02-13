@@ -33,6 +33,7 @@ export class PSum<Os extends Object> implements PType<Lucid.Constr<Data>, Os> {
   public plift = (
     c: Lucid.Constr<Data>,
   ): Os => {
+    // return {} as Os;
     assert(c instanceof Lucid.Constr, `plift: expected Constr`);
     assert(c.index < this.pconstrs.length, `plift: constr index out of bounds`);
     return this.pconstrs[Number(c.index)].plift(c.fields) as Os;
@@ -60,6 +61,7 @@ export class PSum<Os extends Object> implements PType<Lucid.Constr<Data>, Os> {
   public pconstant = (
     data: Os,
   ): Lucid.Constr<Data> => {
+    // return new Lucid.Constr(0, []);
     const [index, match] = this.matchData(data);
     return new Lucid.Constr(index, match.pconstant(data));
   };

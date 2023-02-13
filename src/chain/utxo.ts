@@ -1,7 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
 import { Dirac } from "../types/euclid/dirac.ts";
-import { AdminRedeemer, PAdminRedeemer } from "../types/euclid/euclidAction.ts";
 import {
   DiracDatum,
   ParamDatum,
@@ -54,7 +53,7 @@ export class ParamUtxo {
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     const peuclidDatum = PPreEuclidDatum.genPType(); //only need this for ParamDatum, so this is fine
     const paramDatum = peuclidDatum.pconstant(new ParamDatum(this.param));
-    const paramNFT = this.paramNFT.toLucidNFT();
+    const paramNFT = this.paramNFT.toLucidNFT;
 
     return tx
       .attachMintingPolicy(contract.mintingPolicy)
@@ -66,20 +65,6 @@ export class ParamUtxo {
           scriptRef: contract.validator, // for now, for simplicities' sake
         },
         paramNFT,
-      );
-  };
-
-  public closingTx = (tx: Lucid.Tx): Lucid.Tx => {
-    const adminRedeemer = PAdminRedeemer.ptype.pconstant(
-      new AdminRedeemer(),
-    );
-    const paramNFTburning = this.paramNFT.toLucidNFTburning();
-
-    return tx
-      .mintAssets(paramNFTburning, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
-      .collectFrom(
-        [this.utxo!],
-        Data.to(adminRedeemer),
       );
   };
 
@@ -102,7 +87,7 @@ export class PreDiracUtxo {
     public readonly datum: PConstanted<PEuclidDatum>,
     public readonly preDirac: Dirac,
   ) {
-    const threadNFT = this.preDirac.threadNFT.toLucid();
+    const threadNFT = this.preDirac.threadNFT.toLucid;
     assert(utxo.assets[threadNFT] === 1n, `expected exactly 1 thread-NFT`);
     this.balance = PositiveValue.fromLucid(
       utxo.assets,
@@ -178,7 +163,7 @@ export class DiracUtxo {
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     const diracDatum = this.peuclidDatum.pconstant(new DiracDatum(this.dirac));
     const funds = this.balance.toLucid;
-    const threadNFT = this.dirac.threadNFT.toLucidNFT();
+    const threadNFT = this.dirac.threadNFT.toLucidNFT;
     funds[Object.keys(threadNFT)[0]] = 1n;
 
     return tx
@@ -189,20 +174,6 @@ export class DiracUtxo {
           inline: Data.to(diracDatum),
         },
         funds,
-      );
-  };
-
-  public closingTx = (tx: Lucid.Tx): Lucid.Tx => {
-    const adminRedeemer = PAdminRedeemer.ptype.pconstant(
-      new AdminRedeemer(),
-    );
-    const threadNFTburning = this.dirac.threadNFT.toLucidNFTburning();
-
-    return tx
-      .mintAssets(threadNFTburning, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
-      .collectFrom(
-        [this.utxo!],
-        Data.to(adminRedeemer),
       );
   };
 
@@ -310,6 +281,7 @@ export class DiracUtxo {
         const buyingOffer = offer.amountOf(buyingAsset);
         const swapping = Swapping.boundary(
           user,
+          pool.paramUtxo,
           this,
           buyingAsset,
           sellingAsset,

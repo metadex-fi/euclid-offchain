@@ -71,18 +71,14 @@ export class IdNFT {
     throw new Error("assertPrecedes failed");
   };
 
-  public toLucid = (): string => {
+  public get toLucid(): string {
     if (this.currency.symbol.length === 0) return "lovelace";
     else return Lucid.toUnit(this.currency.toLucid(), this.token.toLucid());
-  };
+  }
 
-  public toLucidNFT = (): Lucid.Assets => {
-    return { [this.toLucid()]: 1n };
-  };
-
-  public toLucidNFTburning = (): Lucid.Assets => {
-    return { [this.toLucid()]: -1n };
-  };
+  public get toLucidNFT(): Lucid.Assets {
+    return { [this.toLucid]: 1n };
+  }
 
   static fromLucid(hexAsset: string): IdNFT {
     try {

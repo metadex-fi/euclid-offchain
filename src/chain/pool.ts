@@ -1,7 +1,9 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
+import { AdminRedeemer, PEuclidAction } from "../types/euclid/euclidAction.ts";
 import { IdNFT } from "../types/euclid/idnft.ts";
 import { AssocMap } from "../types/general/fundamental/container/map.ts";
+import { Data } from "../types/general/fundamental/type.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { Contract } from "./contract.ts";
 import { User } from "./user.ts";
@@ -84,14 +86,33 @@ export class Pool {
     return tx_;
   };
 
-  public closingTx = (tx: Lucid.Tx): Lucid.Tx => {
-    let tx_ = this.paramUtxo.closingTx(tx);
-    this.diracUtxos.forEach((diracUtxo) => tx_ = diracUtxo.closingTx(tx_));
-    return tx_;
+  public closingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
+    const adminRedeemer = PEuclidAction.ptype.pconstant(
+      new AdminRedeemer(),
+    );
+
+    const burningNFTs: Lucid.Assets = {};
+    for (
+      const nft of [
+        this.paramUtxo.paramNFT,
+        ...this.diracUtxos.map((d) => d.dirac.threadNFT),
+      ]
+    ) {
+      burningNFTs[nft.toLucid] = -1n;
+    }
+
+    return tx // TODO read script?
+      .attachMintingPolicy(contract.mintingPolicy)
+      .mintAssets(burningNFTs, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+      .collectFrom(
+        this.utxos,
+        Data.to(adminRedeemer),
+      );
   };
 
   public swappingsFor(user: User): Swapping[] {
     const balance = user.availableBalance;
+    if (!balance) return [];
     const sellableBalance = balance.ofAssets(this.paramUtxo.param.assets);
     if (!sellableBalance.size) return [];
     return this.diracUtxos.flatMap((d) =>

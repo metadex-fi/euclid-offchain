@@ -5,6 +5,7 @@ import { User } from "../user.ts";
 
 export class Closing {
   private constructor(
+    private readonly user: User,
     private readonly pool: Pool,
   ) {}
 
@@ -13,16 +14,18 @@ export class Closing {
   }
 
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
-    return this.pool.closingTx(tx);
+    return this.pool.closingTx(tx, this.user.contract);
   };
 
   static genOfUser = (user: User): Closing | undefined => {
     console.log(`attempting to close`);
+    const enoughForFees = user.availableBalance;
+    if (!enoughForFees) return undefined;
     const pools = user.contract.state?.pools.get(user.paymentKeyHash);
-    console.log(`pools: ${pools}`);
+    console.log(`pools: ${pools?.size}`);
     if (!pools) return undefined;
     const pool = randomChoice([...pools.values()]);
     console.log(`Closing`);
-    return new Closing(pool);
+    return new Closing(user, pool);
   };
 }

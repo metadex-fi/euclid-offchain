@@ -1,5 +1,6 @@
 import { PObject } from "../general/fundamental/container/object.ts";
 import { PRecord } from "../general/fundamental/container/record.ts";
+import { PSum } from "../general/fundamental/container/sum.ts";
 import { PSwap, Swap } from "./swap.ts";
 
 export class SwapRedeemer {
@@ -8,19 +9,17 @@ export class SwapRedeemer {
   ) {}
 }
 
-export class PSwapRedeemer extends PObject<SwapRedeemer> {
-  private constructor(
-    pswap: PSwap,
-  ) {
+class PSwapRedeemer extends PObject<SwapRedeemer> {
+  private constructor() {
     super(
       new PRecord({
-        "swap": pswap,
+        "swap": PSwap.ptype,
       }),
       SwapRedeemer,
     );
   }
 
-  static ptype = new PSwapRedeemer(PSwap.ptype);
+  static ptype = new PSwapRedeemer();
   static genPType(): PSwapRedeemer {
     return PSwapRedeemer.ptype;
   }
@@ -30,7 +29,7 @@ export class AdminRedeemer {
   constructor() {}
 }
 
-export class PAdminRedeemer extends PObject<AdminRedeemer> {
+class PAdminRedeemer extends PObject<AdminRedeemer> {
   private constructor() {
     super(
       new PRecord({}),
@@ -41,5 +40,18 @@ export class PAdminRedeemer extends PObject<AdminRedeemer> {
   static ptype = new PAdminRedeemer();
   static genPType(): PAdminRedeemer {
     return PAdminRedeemer.ptype;
+  }
+}
+
+export type EuclidAction = SwapRedeemer | AdminRedeemer;
+
+export class PEuclidAction extends PSum<EuclidAction> {
+  private constructor() {
+    super([PSwapRedeemer.ptype, PAdminRedeemer.ptype]);
+  }
+
+  static ptype = new PEuclidAction();
+  static genPType(): PEuclidAction {
+    return PEuclidAction.ptype;
   }
 }

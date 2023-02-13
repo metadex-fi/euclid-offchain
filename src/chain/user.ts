@@ -46,10 +46,10 @@ export class User {
     }
   }
 
-  public get availableBalance(): PositiveValue {
+  public get availableBalance(): PositiveValue | undefined {
     assert(this.balance, "No balance");
     if (this.balance.amountOf(Asset.ADA, 0n) < feesEtcLovelace) {
-      return new PositiveValue();
+      return undefined;
     }
     const available = this.balance.clone;
     available.drop(Asset.ADA); // TODO don't drop ADA completely

@@ -95,10 +95,9 @@ export class Opening {
   static genOfUser = (user: User): Opening | undefined => {
     console.log(`attempting to open`);
     const balance = user.availableBalance;
-    if (balance.size < 1) return undefined;
-    const maxAssets = 5n;
+    if (!balance || balance.size < 1) return undefined;
+    const maxAssets = gMaxLength;
     const deposit = balance.boundedSubValue(1n, maxAssets);
-    console.log("deposit", deposit.concise());
     const providedAssets = deposit.assets;
     const emptyAssets = new Assets();
     const assets = providedAssets.clone;
@@ -119,7 +118,6 @@ export class Opening {
     );
 
     console.log(`numDiracs: ${numTicks.unsigned.mulAmounts()}`);
-    console.log(numTicks.concise());
     // NOTE 27 diracs slightly exceeds the max tx size (17444 vs. 16384)
     // TODO consider splitting up the tx
     console.log(`Opening`);

@@ -36,7 +36,6 @@ export class EuclidState {
     const prePools = new AssocMap<KeyHash, AssocMap<IdNFT, PrePool>>(
       (kh) => kh.show(),
     );
-    // const ppreDiracDatum = new PPreDiracDatum(policy);
     const ppreEuclidDatum = new PPreEuclidDatum(policy);
 
     utxos.forEach((utxo) => {
