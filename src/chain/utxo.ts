@@ -184,118 +184,119 @@ export class DiracUtxo {
   public swappingsFor = (
     user: User,
     pool: Pool,
-    sellable: Value,
+    sellable: Value, // subset of pool-assets
   ): Swapping[] => {
     const swappings = new Array<Swapping>();
     const param = pool.paramUtxo.param;
-    const buyable = this.balance.unsigned;
-    const virtual = param.virtual.unsigned;
-    const weights = param.weights.unsigned;
-    const jumpSizes = param.jumpSizes.unsigned;
-    const lowestPrices = this.dirac.lowestPrices.unsigned;
 
-    const amm = Value.newUnionWith(
+    const virtual = param.virtual.unsigned; // subset of pool-assets
+    const weights = param.weights.unsigned; // exact pool-assets
+    const jumpSizes = param.jumpSizes.unsigned; // exact pool-assets
+
+    const lowestPrices = this.dirac.lowestPrices.unsigned; // subset of pool-assets
+    const buyable = this.balance.unsigned; // ADA + subset of pool-assets
+
+    if (!weights.has(Asset.ADA)) {
+      buyable.drop(Asset.ADA);
+    }
+
+    // exact pool-assets (at least buyable or virtual should be nonzero for each pool-asset)
+    const liquidity = Value.normedAdd(virtual, buyable);
+
+    console.log(buyable.concise());
+    console.log(virtual.concise());
+    console.log(liquidity.concise());
+
+    // exact pool-assets
+    const amm = Value.hadamard(liquidity, weights);
+
+    // exact pool-assets
+    const spotSelling = Value.newUnionWith(
       (
-        buyable: bigint,
-        virtual: bigint,
-        weight: bigint,
-      ): bigint => (buyable + virtual) * weight,
-      0n,
-      0n,
-      0n,
-    )( // TODO consider what happens if 0n
-      buyable,
-      virtual,
-      weights,
+        lowest: bigint, // subset of pool-assets
+        jumpSize: bigint, // exact pool-assets
+        amm: bigint, // exact pool-assets
+      ): bigint => ((amm - lowest) / jumpSize) * jumpSize + lowest,
+      0n, // --> should never happen, removing 0n to cause errors downstream if it does
+      0n, // subset of pool-assets
+    )(
+      lowestPrices, // subset of pool-assets
+      jumpSizes, // exact pool-assets
+      amm, // exact pool-assets
     );
-    const spotBuying = Value.newUnionWith((
-      amm: bigint,
-      lowest: bigint,
-      jumpSize: bigint,
-    ): bigint => (((amm - lowest) / jumpSize) + 1n) * jumpSize + lowest)(
-      amm,
-      lowestPrices,
-      jumpSizes,
-    );
-    const spotSelling = Value.newUnionWith((
-      amm: bigint,
-      lowest: bigint,
-      jumpSize: bigint,
-    ): bigint => ((amm - lowest) / jumpSize) * jumpSize + lowest)(
-      amm,
-      lowestPrices,
-      jumpSizes,
-    );
+
+    // exact pool-assets
+    const spotBuying = Value.add(spotSelling, jumpSizes);
 
     // TODO those two are rather inefficient, but so is all our value-arithmetic. Consider fixing that first.
+    // subset of pool-assets
     const demand = Value.newUnionWith(
       (
-        sellable: bigint,
-        buyable: bigint,
-        virtual: bigint,
-        weight: bigint,
-        spot: bigint,
-        amm: bigint,
+        sellable: bigint, // subset of pool-assets
+        liquidity: bigint, // subset of pool-assets
+        weight: bigint, // exact pool-assets
+        spot: bigint, // exact pool-assets
+        amm: bigint, // exact pool-assets
       ): bigint => {
-        const liquidity = buyable + virtual;
         const demand = liquidity * (((amm / spot) ** weight) - 1n); // amm --> spot
         return min(demand, sellable);
       },
-      0n,
-      0n,
-      0n,
-      0n,
+      undefined, // --> leaving non-demanded/sellable pool-assets as 0n
+      0n, // subset of pool-assets
+      0n, // subset of pool-assets
     )(
-      sellable,
-      buyable,
-      virtual,
-      weights,
-      spotSelling,
-      amm,
+      sellable, // subset of pool-assets
+      liquidity, // subset of pool-assets
+      weights, // exact pool-assets
+      spotSelling, // exact pool-assets
+      amm, // exact pool-assets
     );
 
+    // subset of pool-assets
     const offer = Value.newUnionWith(
       (
-        buyable: bigint,
-        virtual: bigint,
-        weight: bigint,
-        spot: bigint,
-        amm: bigint,
+        buyable: bigint, // subset of pool-assets
+        liquidity: bigint, // exact pool-assets
+        weight: bigint, // exact pool-assets
+        spot: bigint, // exact pool-assets
+        amm: bigint, // exact pool-assets
       ): bigint => {
-        const liquidity = buyable + virtual;
         const offer = liquidity * (1n - ((amm / spot) ** weight)); // amm --> spot
         return min(offer, buyable);
       },
-      0n,
-      0n,
-      0n,
+      undefined, // --> leaving non-demanded/sellable pool-assets as 0n
+      0n, // subset of pool-assets
     )(
-      buyable,
-      virtual,
-      weights,
-      spotBuying,
-      amm,
+      buyable, // subset of pool-assets
+      liquidity, // exact pool-assets
+      weights, // exact pool-assets
+      spotBuying, // exact pool-assets
+      amm, // exact pool-assets
     );
 
     sellable.assets.forEach((sellingAsset) => {
       const sellingDemand = demand.amountOf(sellingAsset);
-      const sellingSpot = spotSelling.amountOf(sellingAsset);
-      this.balance.assets.drop(sellingAsset).forEach((buyingAsset) => {
-        const buyingSpot = spotBuying.amountOf(buyingAsset);
-        const buyingOffer = offer.amountOf(buyingAsset);
-        const swapping = Swapping.boundary(
-          user,
-          pool.paramUtxo,
-          this,
-          buyingAsset,
-          sellingAsset,
-          buyingOffer,
-          sellingDemand,
-          buyingSpot,
-          sellingSpot,
-        );
-        swappings.push(swapping);
-      });
+      if (sellingDemand) {
+        const sellingSpot = spotSelling.amountOf(sellingAsset);
+        this.balance.assets.drop(sellingAsset).forEach((buyingAsset) => {
+          const buyingOffer = offer.amountOf(buyingAsset);
+          if (buyingOffer) {
+            const buyingSpot = spotBuying.amountOf(buyingAsset);
+            const swapping = Swapping.boundary(
+              user,
+              pool.paramUtxo,
+              this,
+              buyingAsset,
+              sellingAsset,
+              buyingOffer,
+              sellingDemand,
+              buyingSpot,
+              sellingSpot,
+            );
+            swappings.push(swapping);
+          }
+        });
+      }
     });
 
     return swappings;

@@ -313,7 +313,7 @@ export class Value {
     return value;
   };
 
-  public smallestAmount = (): bigint => {
+  public get smallestAmount(): bigint {
     let smallest: bigint | undefined = undefined;
     for (const amounts of this.value.values()) {
       for (const amount of amounts.values()) {
@@ -324,7 +324,7 @@ export class Value {
     }
     assert(smallest, `smallestAmount: no smallest found in ${this.concise()}`);
     return smallest;
-  };
+  }
 
   public biggestAmount = (): bigint => {
     let biggest: bigint | undefined = undefined;
@@ -385,21 +385,31 @@ export class Value {
       //   1 + args.length === op.arguments.length,
       //   "args length must match op arguments length",
       // );
-      const args_ = args.map((v) => v ?? new Value());
-      const assets = Value.assetsOf(arg, ...args_);
-      const result = new Value();
-      assets.forEach((asset) => {
-        const amountsIn = new Array<bigint>();
-        [arg, ...args_].forEach((v, i) => {
-          const defaultIn = defaultIns[i];
-          amountsIn.push(v.amountOf(asset, defaultIn));
+      try {
+        const args_ = args.map((v) => v ?? new Value());
+        const assets = Value.assetsOf(arg, ...args_);
+        const result = new Value();
+        assets.forEach((asset) => {
+          const amountsIn = new Array<bigint>();
+          [arg, ...args_].forEach((v, i) => {
+            const defaultIn = defaultIns[i];
+            amountsIn.push(v.amountOf(asset, defaultIn));
+          });
+          const amountOut = op(amountsIn[0], ...amountsIn.slice(1));
+          if (amountOut !== defaultOut) {
+            result.initAmountOf(asset, amountOut);
+          }
         });
-        const amountOut = op(amountsIn[0], ...amountsIn.slice(1));
-        if (amountOut !== defaultOut) {
-          result.initAmountOf(asset, amountOut);
-        }
-      });
-      return result;
+        return result;
+      } catch (e) {
+        throw new Error(
+          `newUnionWith:\n${op}\n${
+            [arg, ...args]
+              .map((v) => v?.concise())
+              .join(",\n")
+          }\nfailed: ${e}`,
+        );
+      }
     };
   };
 

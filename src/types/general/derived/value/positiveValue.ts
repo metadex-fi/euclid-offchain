@@ -51,6 +51,9 @@ export class PositiveValue {
   public get headAsset(): Asset {
     return this.value.headAsset;
   }
+  public get smallestAmount(): bigint {
+    return this.value.smallestAmount;
+  }
   public amountOf = (asset: Asset, defaultAmnt?: bigint): bigint =>
     this.value.amountOf(asset, defaultAmnt);
   public drop = (asset: Asset): void => this.value.drop(asset);

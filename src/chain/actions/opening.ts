@@ -1,11 +1,20 @@
+import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../lucid.mod.ts";
 import { Dirac } from "../../types/euclid/dirac.ts";
 import { EuclidValue } from "../../types/euclid/euclidValue.ts";
 import { Param } from "../../types/euclid/param.ts";
 import { Asset } from "../../types/general/derived/asset/asset.ts";
 import { Assets } from "../../types/general/derived/asset/assets.ts";
+import { PBounded } from "../../types/general/derived/bounded/bounded.ts";
+import { PPositive } from "../../types/general/derived/bounded/positive.ts";
 import { PositiveValue } from "../../types/general/derived/value/positiveValue.ts";
-import { genNonNegative, gMaxLength, max } from "../../utils/generators.ts";
+import { Value } from "../../types/general/derived/value/value.ts";
+import {
+  genNonNegative,
+  gMaxLength,
+  max,
+  min,
+} from "../../utils/generators.ts";
 import { Pool } from "../pool.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
@@ -19,6 +28,8 @@ export class Opening {
     private readonly numTicks: EuclidValue,
   ) {
     // TODO asserts?
+    // 1. assets fit
+    // 2. numDiracs resulting from numTicks <= lowest deposit
   }
 
   public get spendsContractUtxos(): Lucid.UTxO[] {
@@ -82,6 +93,10 @@ export class Opening {
     const balance = PositiveValue.normed(
       this.deposit.unsigned.divideByScalar(BigInt(diracs.length)),
     );
+    assert(
+      balance.size === this.deposit.size,
+      "balance size should match deposit size",
+    );
     const diracUtxos = diracs.map((dirac) => {
       return DiracUtxo.open(this.param, dirac, balance);
     });
@@ -113,11 +128,17 @@ export class Opening {
     }
 
     const param = Param.genOf(user.paymentKeyHash, assets);
-    const minTicks = 1n;
-    const maxTicks = gMaxLength;
-    const numTicks = EuclidValue.genBelow(
-      param.jumpSizes.bounded(minTicks + 1n, maxTicks + 1n),
-    );
+
+    let maxTicks = deposit.smallestAmount; // === maxNumDiracs
+    const numTicks = new PositiveValue();
+    assets.forEach((asset) => {
+      const ticks = new PPositive(
+        1n,
+        min(min(gMaxLength, param.jumpSizes.amountOf(asset)), maxTicks),
+      ).genData();
+      maxTicks /= ticks;
+      numTicks.initAmountOf(asset, ticks);
+    });
 
     console.log(`numDiracs: ${numTicks.unsigned.mulAmounts()}`);
     // NOTE 27 diracs slightly exceeds the max tx size (17444 vs. 16384)
@@ -127,7 +148,7 @@ export class Opening {
       user,
       param,
       deposit,
-      numTicks,
+      new EuclidValue(numTicks),
     );
   };
 }

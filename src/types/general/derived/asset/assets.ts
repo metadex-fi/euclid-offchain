@@ -82,7 +82,7 @@ export class Assets {
     const { currency, token } = asset;
     const tkns = this.assets.get(currency);
     assert(tkns !== undefined, `${asset.show()} not in ${this.show()}`);
-    const i = tkns.indexOf(token);
+    const i = tkns.findIndex((tkn) => tkn.name === token.name);
     assert(i >= 0, `${asset.show()} not in ${this.show()}`);
     tkns.splice(i, 1);
     if (tkns.length === 0) {
