@@ -123,21 +123,20 @@ export class AssocMap<K, V> {
     return result;
   };
 
-  public show = (showValue: (v: V, tabs?: string) => string, tabs = ""): string => {
+  public show = (
+    showValue: (v: V, tabs?: string) => string,
+    tabs = "",
+  ): string => {
     const tt = t + tabs;
     const ttf = tt + f;
     return `AssocMap {
       ${
-            [...this.inner.values()].map(([key, value]) =>
-              `${ttf}${
-                this.showKey(key, ttf)
-              } => ${
-                showValue(value, ttf)
-              }`
-            ).join(",\n")
-          }
+      [...this.inner.values()].map(([key, value]) =>
+        `${ttf}${this.showKey(key, ttf)} => ${showValue(value, ttf)}`
+      ).join(",\n")
+    }
       ${tt}}`;
-        }
+  };
 }
 
 export class PMap<PKey extends PData, PValue extends PData> implements

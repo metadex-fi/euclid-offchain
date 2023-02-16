@@ -66,9 +66,8 @@ export class PrePool {
     return `PrePool {
 ${ttf}paramUtxo: ${this.paramUtxo?.show(ttf)}
 ${ttf}preDiracUtxos: ${this.preDiracUtxos?.show((pdu, ts) => pdu.show(ts), ttf)}
-${tt}}`
+${tt}}`;
   };
-
 }
 
 export class Pool {
