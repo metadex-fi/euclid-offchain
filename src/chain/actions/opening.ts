@@ -5,10 +5,8 @@ import { EuclidValue } from "../../types/euclid/euclidValue.ts";
 import { Param } from "../../types/euclid/param.ts";
 import { Asset } from "../../types/general/derived/asset/asset.ts";
 import { Assets } from "../../types/general/derived/asset/assets.ts";
-import { PBounded } from "../../types/general/derived/bounded/bounded.ts";
 import { PPositive } from "../../types/general/derived/bounded/positive.ts";
 import { PositiveValue } from "../../types/general/derived/value/positiveValue.ts";
-import { Value } from "../../types/general/derived/value/value.ts";
 import {
   genNonNegative,
   gMaxLength,
@@ -27,9 +25,13 @@ export class Opening {
     private readonly deposit: PositiveValue, // total of all Diracs
     private readonly numTicks: EuclidValue,
   ) {
-    // TODO asserts?
-    // 1. assets fit
-    // 2. numDiracs resulting from numTicks <= lowest deposit
+    console.log(deposit.assets.union(this.param.virtual.assets).show());
+    assert(
+      deposit.assets.union(this.param.virtual.assets).equals(this.param.assets),
+      `deposit and virtual must cover all assets, but got\ndeposit: ${deposit.concise()}\nparam: ${this.param.concise()}`,
+    );
+
+    // TODO assert 2. numDiracs resulting from numTicks <= lowest deposit
   }
 
   public get spendsContractUtxos(): Lucid.UTxO[] {

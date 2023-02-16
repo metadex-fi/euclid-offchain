@@ -213,6 +213,24 @@ export class Assets {
     return new Assets(shared);
   };
 
+  public union = (assets: Assets): Assets => {
+    const union = this.assets.anew;
+    const other = assets.toMap;
+    for (const [ccy, ownTkns] of this.assets) {
+      const otherTkns = other.get(ccy);
+      if (otherTkns) {
+        const unionTkns = ownTkns.concat(otherTkns.filter((other) => {
+          return !ownTkns.some((own) => own.name === other.name);
+        }));
+        union.set(ccy, unionTkns);
+      } else union.set(ccy, ownTkns);
+    }
+    for (const [ccy, otherTkns] of other) {
+      if (!this.assets.has(ccy)) union.set(ccy, otherTkns);
+    }
+    return new Assets(union);
+  };
+
   public toLucidWith = (amount: bigint): Lucid.Assets => {
     const assets: Lucid.Assets = {};
     this.forEach((asset) => assets[asset.toLucid()] = amount);
