@@ -1,5 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { maxInteger, randomChoice } from "../../utils/generators.ts";
 import { Assets } from "../general/derived/asset/assets.ts";
+import { PPositive } from "../general/derived/bounded/positive.ts";
 import { KeyHash, PKeyHash } from "../general/derived/hash/keyHash.ts";
 import {
   PositiveValue,
@@ -67,25 +69,72 @@ ${tt})`;
   }
 
   static generate(): Param {
-    const assets = Assets.generate(2n);
     const owner = PKeyHash.ptype.genData();
-    return Param.genOf(owner, assets);
+    const allAssets = Assets.generate(2n);
+    const virtualAssets = allAssets.randomSubset();
+    return Param.genOf(owner, allAssets, virtualAssets);
   }
 
-  static genOf(owner: KeyHash, assets: Assets): Param {
-    const weights = EuclidValue.genOfAssets(assets);
-    const maxLowestPrices = EuclidValue.genOfAssets(assets);
-    const jumpSizes = EuclidValue.genBelow(maxLowestPrices.bounded(2n));
-    const minLowestPrices = maxLowestPrices.normedMinus(jumpSizes);
-    const virtual = minLowestPrices.normedDivideBy(weights.unsized);
+  static genOf(
+    owner: KeyHash,
+    allAssets: Assets,
+    virtualAssets: Assets,
+  ): Param {
+    assert(
+      virtualAssets.subsetOf(allAssets),
+      `Param.genOf: virtual assets must be a subset of all assets, but ${virtualAssets.show()} is not a subset of ${allAssets.show()}`,
+    );
+    const jumpSizes = new PositiveValue();
+    const weights = new PositiveValue();
+    const virtual = new PositiveValue();
+
+    const ppositive = new PPositive();
+    allAssets.forEach((asset) => {
+      if (virtualAssets.has(asset)) {
+        const maxLowestPrice = new PPositive(2n).genData();
+        const jumpSize = new PPositive(1n, maxLowestPrice - 1n).genData();
+        const minLowestPrice = maxLowestPrice - jumpSize;
+        const weight = new PPositive(1n, minLowestPrice).genData();
+
+        virtual.initAmountOf(asset, minLowestPrice / weight);
+        jumpSizes.initAmountOf(asset, jumpSize);
+        weights.initAmountOf(asset, weight);
+      } else {
+        const weight = ppositive.genData();
+        const maxLowestPrice = ppositive.genData();
+        const jumpSize = new PPositive(1n, maxLowestPrice).genData();
+        const minLowestPrice = maxLowestPrice - jumpSize;
+
+        if (weight <= minLowestPrice) {
+          virtual.initAmountOf(asset, minLowestPrice / weight);
+        }
+        jumpSizes.initAmountOf(asset, jumpSize);
+        weights.initAmountOf(asset, weight);
+      }
+    });
 
     return new Param(
       owner,
       virtual,
-      weights,
-      jumpSizes,
+      new EuclidValue(weights),
+      new EuclidValue(jumpSizes),
     );
   }
+
+  // static genOf(owner: KeyHash, assets: Assets): Param {
+  //   const weights = EuclidValue.genOfAssets(assets);
+  //   const maxLowestPrices = EuclidValue.genOfAssets(assets);
+  //   const jumpSizes = EuclidValue.genBelow(maxLowestPrices.bounded(2n));
+  //   const minLowestPrices = maxLowestPrices.normedMinus(jumpSizes);
+  //   const virtual = minLowestPrices.normedDivideBy(weights.unsized);
+
+  //   return new Param(
+  //     owner,
+  //     virtual,
+  //     weights,
+  //     jumpSizes,
+  //   );
+  // }
 }
 
 export class PParam extends PObject<Param> {

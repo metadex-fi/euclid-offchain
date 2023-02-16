@@ -117,23 +117,22 @@ export class Opening {
     if (!balance || balance.size < 1) return undefined;
     const maxAssets = gMaxLength;
     const deposit = balance.boundedSubValue(1n, maxAssets);
-    const providedAssets = deposit.assets;
-    const emptyAssets = new Assets();
-    const assets = providedAssets.clone;
-    let addAssets = max(genNonNegative(maxAssets), 2n) - providedAssets.size;
-    while (addAssets > 0n) {
+    const allAssets = deposit.assets;
+    const virtualAssets = new Assets();
+    let addVirtualAssets = max(genNonNegative(maxAssets), 2n) - allAssets.size;
+    while (addVirtualAssets > 0n) {
       const asset = Asset.generate();
-      if (assets.has(asset)) continue;
-      assets.insert(asset);
-      emptyAssets.insert(asset);
-      addAssets--;
+      if (allAssets.has(asset)) continue;
+      allAssets.insert(asset);
+      virtualAssets.insert(asset);
+      addVirtualAssets--;
     }
-
-    const param = Param.genOf(user.paymentKeyHash, assets);
+    // console.log(allAssets.show());
+    const param = Param.genOf(user.paymentKeyHash, allAssets, virtualAssets);
 
     let maxTicks = deposit.smallestAmount; // === maxNumDiracs
     const numTicks = new PositiveValue();
-    assets.forEach((asset) => {
+    allAssets.forEach((asset) => {
       const ticks = new PPositive(
         1n,
         min(min(gMaxLength, param.jumpSizes.amountOf(asset)), maxTicks),
