@@ -24,7 +24,7 @@ export class AssocMap<K, V> {
     [K, V]
   >();
 
-  constructor(private readonly showKey: (k: K) => string) {}
+  constructor(private readonly showKey: (k: K, tabs?: string) => string) {}
 
   // TODO check this notation works
   public get size(): number {
@@ -37,6 +37,7 @@ export class AssocMap<K, V> {
   }
 
   public get last(): V | undefined {
+    if (this.size === 0) return undefined;
     const ks = [...this.keys()];
     if (ks) return this.get(ks[ks.length - 1]);
     else return undefined;
@@ -121,6 +122,22 @@ export class AssocMap<K, V> {
     }
     return result;
   };
+
+  public show = (showValue: (v: V, tabs?: string) => string, tabs = ""): string => {
+    const tt = t + tabs;
+    const ttf = tt + f;
+    return `AssocMap {
+      ${
+            [...this.inner.values()].map(([key, value]) =>
+              `${ttf}${
+                this.showKey(key, ttf)
+              } => ${
+                showValue(value, ttf)
+              }`
+            ).join(",\n")
+          }
+      ${tt}}`;
+        }
 }
 
 export class PMap<PKey extends PData, PValue extends PData> implements
@@ -312,7 +329,7 @@ ${t}pkey: ${pkey.showPType(t)}`,
     tabs = "",
     maxDepth?: bigint,
   ): string => {
-    if (maxDepth !== undefined && maxDepth <= 0n) return "Map { … }";
+    if (maxDepth !== undefined && maxDepth <= 0n) return "AssocMap { … }";
     assert(
       data instanceof AssocMap,
       `PMap.showData: expected AssocMap, got ${data}`,
@@ -320,7 +337,7 @@ ${t}pkey: ${pkey.showPType(t)}`,
     const tt = tabs + t;
     const ttf = tt + f;
 
-    return `Map {
+    return `AssocMap {
 ${
       [...data.entries()].map(([key, value]) =>
         `${ttf}${

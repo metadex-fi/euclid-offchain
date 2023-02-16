@@ -3,7 +3,7 @@ import { Lucid } from "../../lucid.mod.ts";
 import { AdminRedeemer, PEuclidAction } from "../types/euclid/euclidAction.ts";
 import { IdNFT } from "../types/euclid/idnft.ts";
 import { AssocMap } from "../types/general/fundamental/container/map.ts";
-import { Data } from "../types/general/fundamental/type.ts";
+import { Data, f, t } from "../types/general/fundamental/type.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { Contract } from "./contract.ts";
 import { User } from "./user.ts";
@@ -59,6 +59,16 @@ export class PrePool {
       threadNFTs[threadNFTs.length - 1],
     ];
   };
+
+  public show = (tabs = "") => {
+    const tt = tabs + t;
+    const ttf = tt + f;
+    return `PrePool {
+${ttf}paramUtxo: ${this.paramUtxo?.show(ttf)}
+${ttf}preDiracUtxos: ${this.preDiracUtxos?.show((pdu, ts) => pdu.show(ts), ttf)}
+${tt}}`
+  };
+
 }
 
 export class Pool {

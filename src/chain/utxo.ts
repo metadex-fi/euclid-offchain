@@ -108,6 +108,16 @@ export class PreDiracUtxo {
       return undefined;
     }
   };
+
+  public show = (tabs = ""): string => {
+    const tt = tabs + t;
+    const ttf = tt + f;
+    return `PreDiracUtxo (
+  ${ttf}utxo: {this.utxo.concise(ttf)}
+  ${ttf}datum: {this.datum.concise(ttf)}
+  ${ttf}preDirac: ${this.preDirac.concise(ttf)}
+  ${tt})`;
+  };
 }
 
 export class DiracUtxo {
@@ -240,7 +250,9 @@ export class DiracUtxo {
       const demand = demand_.amountOf(sellingAsset);
       const spotSelling = spotSelling_.amountOf(sellingAsset);
       const demandA0 = demand * spotSelling;
-      offer_.assets.drop(sellingAsset).forEach((buyingAsset) => {
+      const offeredAssets = offer_.assets;
+      if (offeredAssets.has(sellingAsset)) offeredAssets.drop(sellingAsset);
+      offeredAssets.forEach((buyingAsset) => {
         const offer = offer_.amountOf(buyingAsset);
         const spotBuying = spotBuying_.amountOf(buyingAsset);
         const offerA0 = offer * spotBuying;

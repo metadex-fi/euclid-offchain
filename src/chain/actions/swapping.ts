@@ -48,6 +48,8 @@ export class Swapping {
     const funds = this.diracUtxo.balance.clone; // TODO cloning probably not required here
     funds.addAmountOf(this.boughtAsset, -this.boughtAmount);
     funds.addAmountOf(this.soldAsset, this.soldAmount);
+    const retour = funds.toLucid;
+    retour[this.diracUtxo.dirac.threadNFT.toLucid] = 1n;
 
     const swapRedeemer = PEuclidAction.ptype.pconstant(
       new SwapRedeemer(
@@ -77,7 +79,7 @@ export class Swapping {
         {
           inline: Data.to(datum),
         },
-        funds.toLucid,
+        retour,
       );
   };
 

@@ -25,6 +25,7 @@ export class Closing {
     if (!enoughForFees) return undefined;
     const pools = user.contract.state?.pools.get(user.paymentKeyHash);
     if (!pools) return undefined;
+    if (!pools.size) return undefined;
     const pool = randomChoice([...pools.values()]);
     console.log(`Closing`);
     return new Closing(user, pool);
