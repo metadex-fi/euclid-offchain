@@ -84,7 +84,9 @@ export class PositiveValue {
     const newAmount = this.amountOf(asset) + amount;
     assert(
       newAmount >= 0n,
-      `addAmountOf: newAmount must be nonnegative, got ${newAmount}`,
+      `addAmountOf: newAmount must be nonnegative, got ${
+        this.amountOf(asset)
+      } - ${amount} = ${newAmount}`,
     );
     if (newAmount === 0n) {
       this.value.drop(asset);
