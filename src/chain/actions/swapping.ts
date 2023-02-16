@@ -116,7 +116,7 @@ export class Swapping {
   static genOfUser(user: User): Swapping | undefined {
     console.log(`attempting to swap`);
     const swappings = user.contract!.state!.swappingsFor(user);
-    console.log(`swappings: ${swappings}`);
+    console.log(`\tswappings: ${swappings}`);
     if (swappings.length < 1) return undefined;
     console.log(`Swapping`);
     return randomChoice(swappings).randomSubSwap();

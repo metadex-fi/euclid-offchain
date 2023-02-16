@@ -20,11 +20,10 @@ export class Closing {
   };
 
   static genOfUser = (user: User): Closing | undefined => {
-    console.log(`attempting to close`);
+    // console.log(`attempting to close`);
     const enoughForFees = user.availableBalance;
     if (!enoughForFees) return undefined;
     const pools = user.contract.state?.pools.get(user.paymentKeyHash);
-    console.log(`pools: ${pools?.size}`);
     if (!pools) return undefined;
     const pool = randomChoice([...pools.values()]);
     console.log(`Closing`);

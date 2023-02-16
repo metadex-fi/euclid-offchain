@@ -95,7 +95,7 @@ export class Opening {
 
   // splitting it up this way to later use the same class to process actual user input
   static genOfUser = (user: User): Opening | undefined => {
-    console.log(`attempting to open`);
+    // console.log(`attempting to open`);
     const balance = user.availableBalance;
     if (!balance || balance.size < 1) return undefined;
     const maxAssets = gMaxLength;

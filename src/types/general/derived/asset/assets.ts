@@ -50,16 +50,7 @@ export class Assets {
   };
 
   public equals = (other: Assets): boolean => {
-    if (this.assets.size !== other.assets.size) return false;
-    for (const [ccy, tkns] of this.assets) {
-      const tkns_ = other.assets.get(ccy);
-      if (tkns_ === undefined) return false;
-      if (tkns.length !== tkns_.length) return false;
-      for (const tkn of tkns) {
-        if (!tkns_.map((t) => t.name).includes(tkn.name)) return false;
-      }
-    }
-    return true;
+    return this.subsetOf(other) && other.subsetOf(this);
   };
 
   public get clone(): Assets {
@@ -72,10 +63,13 @@ export class Assets {
 
   public insert = (asset: Asset): void => {
     const { currency, token } = asset;
-    const tkns = this.assets.get(currency) ?? [];
-    assert(!tkns.includes(token), `${asset} already in ${this.show()}`);
-    tkns.push(token);
-    this.assets.set(currency, tkns);
+    const ownTkns = this.assets.get(currency) ?? [];
+    assert(
+      !ownTkns.some((own) => own.name === token.name),
+      `${asset} already in ${this.show()}`,
+    );
+    ownTkns.push(token);
+    this.assets.set(currency, ownTkns);
   };
 
   public add = (asset: Asset): Assets => {
@@ -146,8 +140,9 @@ export class Assets {
 
   public has = (asset: Asset): boolean => {
     const { currency, token } = asset;
-    const tkns = this.assets.get(currency);
-    return tkns !== undefined && tkns.includes(token);
+    const ownTkns = this.assets.get(currency);
+    return ownTkns !== undefined &&
+      ownTkns.some((own) => own.name === token.name);
   };
 
   public get toMap(): AssocMap<Currency, Token[]> {
@@ -170,13 +165,12 @@ export class Assets {
     return size;
   }
 
-  public subsetOf = (superSet: Assets): boolean => {
-    for (const [ccy, tkns] of this.assets) {
-      const tkns_ = superSet.toMap.get(ccy);
-      if (tkns_ === undefined) return false;
-      for (const tkn of tkns) {
-        const target = tkn.show();
-        if (!tkns_.some((tkn_) => tkn_.show() === target)) return false;
+  public subsetOf = (other: Assets): boolean => {
+    for (const [ccy, ownTkns] of this.assets) {
+      const otherTkns = other.toMap.get(ccy);
+      if (otherTkns === undefined) return false;
+      for (const own of ownTkns) {
+        if (!otherTkns.some((other) => own.name === other.name)) return false;
       }
     }
     return true;
@@ -210,7 +204,9 @@ export class Assets {
     for (const [ccy, ownTkns] of this.assets) {
       const otherTkns = other.get(ccy);
       if (otherTkns) {
-        const sharedTkns = ownTkns.filter((tkn) => otherTkns.includes(tkn));
+        const sharedTkns = ownTkns.filter((own) =>
+          otherTkns.some((other) => other.name === own.name)
+        );
         if (sharedTkns.length > 0) shared.set(ccy, sharedTkns);
       }
     }
