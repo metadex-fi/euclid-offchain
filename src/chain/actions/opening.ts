@@ -25,7 +25,7 @@ export class Opening {
     private readonly deposit: PositiveValue, // total of all Diracs
     private readonly numTicks: EuclidValue,
   ) {
-    console.log(deposit.assets.union(this.param.virtual.assets).show());
+    // console.log(deposit.assets.union(this.param.virtual.assets).show());
     assert(
       deposit.assets.union(this.param.virtual.assets).equals(this.param.assets),
       `deposit and virtual must cover all assets, but got\ndeposit: ${deposit.concise()}\nparam: ${this.param.concise()}`,
@@ -130,7 +130,9 @@ export class Opening {
     // console.log(allAssets.show());
     const param = Param.genOf(user.paymentKeyHash, allAssets, virtualAssets);
 
-    let maxTicks = deposit.smallestAmount; // === maxNumDiracs
+    const gMaxDiracs = 26n; // because tx size
+    const maxDiracs = deposit.smallestAmount; // because minimum deposit
+    let maxTicks = min(gMaxDiracs, maxDiracs);
     const numTicks = new PositiveValue();
     allAssets.forEach((asset) => {
       const ticks = new PPositive(
@@ -141,7 +143,7 @@ export class Opening {
       numTicks.initAmountOf(asset, ticks);
     });
 
-    console.log(`numDiracs: ${numTicks.unsigned.mulAmounts()}`);
+    // console.log(`numDiracs: ${numTicks.unsigned.mulAmounts()}`);
     // NOTE 27 diracs slightly exceeds the max tx size (17444 vs. 16384)
     // TODO consider splitting up the tx
     console.log(`Opening`);

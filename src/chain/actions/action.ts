@@ -5,6 +5,7 @@ import { Opening } from "./opening.ts";
 import { Swapping } from "./swapping.ts";
 
 export type Action = Closing | Opening | Swapping;
+export const allActions = [Closing, Opening, Swapping];
 
 export class UserAction {
   constructor(
@@ -12,7 +13,7 @@ export class UserAction {
   ) {}
 
   public generate = (): Action | undefined => {
-    const actions = new Permutation([Closing, Opening, Swapping]); // TODO Closing, Swapping
+    const actions = new Permutation(allActions);
     return actions.try((a) => {
       return a.genOfUser(this.user);
     });

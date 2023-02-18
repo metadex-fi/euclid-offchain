@@ -140,8 +140,8 @@ export class User {
   }
 
   static async genSeveral(
-    numUsers = 10n,
-    numAssets = gMaxLength,
+    numUsers: bigint,
+    numAssets: bigint,
   ): Promise<User[]> {
     const users = new Array<User>();
     const allAssets = Assets.generate(numAssets, numAssets);

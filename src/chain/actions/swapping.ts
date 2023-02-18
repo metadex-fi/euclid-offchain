@@ -42,16 +42,19 @@ export class Swapping {
 
   public show = (): string => {
     return `Swapping (
-boughtAsset: ${this.boughtAsset.show()}
-soldAsset: ${this.soldAsset.show()}
-boughtAmount: ${this.boughtAmount}
-soldAmount: ${this.soldAmount}
-boughtSpot: ${this.boughtSpot}
-soldSpot: ${this.soldSpot}
+  paramUtxo: ${this.paramUtxo.show()}
+  diracUtxo: ${this.diracUtxo.show()}
+  boughtAsset: ${this.boughtAsset.show()}
+  soldAsset: ${this.soldAsset.show()}
+  boughtAmount: ${this.boughtAmount}
+  soldAmount: ${this.soldAmount}
+  boughtSpot: ${this.boughtSpot}
+  soldSpot: ${this.soldSpot}
 )`;
   };
 
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
+    console.log(this.show());
     const funds = this.diracUtxo.balance.clone; // TODO cloning probably not required here
     funds.addAmountOf(this.boughtAsset, -this.boughtAmount);
     funds.addAmountOf(this.soldAsset, this.soldAmount);
@@ -69,40 +72,6 @@ soldSpot: ${this.soldSpot}
           ),
         ),
       ),
-    );
-
-    console.log(this.show());
-    console.log(this.diracUtxo.dirac.lowestPrices.concise());
-    console.log(this.paramUtxo.param.jumpSizes.concise());
-    const boughtLowest = this.diracUtxo.dirac.lowestPrices.amountOf(
-      this.boughtAsset,
-      0n,
-    );
-    const soldLowest = this.diracUtxo.dirac.lowestPrices.amountOf(
-      this.soldAsset,
-      0n,
-    );
-    const boughtJump = this.paramUtxo.param.jumpSizes.amountOf(
-      this.boughtAsset,
-    );
-    const soldJump = this.paramUtxo.param.jumpSizes.amountOf(this.soldAsset);
-    console.log(
-      `${this.boughtSpot} - ${boughtLowest} = ${
-        this.boughtSpot - boughtLowest
-      }`,
-    );
-    console.log(
-      `${this.soldSpot} - ${soldLowest} = ${this.soldSpot - soldLowest}`,
-    );
-    console.log(
-      `${this.boughtSpot - boughtLowest} % ${boughtJump} = ${
-        (this.boughtSpot - boughtLowest) % boughtJump
-      }`,
-    );
-    console.log(
-      `${this.soldSpot - soldLowest} % ${soldJump} = ${
-        (this.soldSpot - soldLowest) % soldJump
-      }`,
     );
 
     const datum = this.diracUtxo.peuclidDatum.pconstant(
@@ -131,7 +100,7 @@ soldSpot: ${this.soldSpot}
     const maxBought = maxSwapA0 / this.boughtSpot;
     assert(
       maxBought > 0n,
-      `Swapping.randomSubSwap: maxBought must be positive, but is ${maxBought}`,
+      `Swapping.randomSubSwap: maxBought must be positive, but is ${maxBought} for ${this.show()}`,
     );
 
     const boughtAmount = genPositive(maxBought);
@@ -177,11 +146,104 @@ soldSpot: ${this.soldSpot}
 
   // TODO don't forget to update (poll) chain state somewhere beforehand
   static genOfUser(user: User): Swapping | undefined {
-    console.log(`attempting to swap`);
+    // console.log(`attempting to swap`);
     const swappings = user.contract!.state!.swappingsFor(user);
-    console.log(`\tswappings: ${swappings}`);
+    // console.log(`\tswappings: ${swappings}`);
     if (swappings.length < 1) return undefined;
     console.log(`Swapping`);
     return randomChoice(swappings).randomSubSwap();
+  }
+
+  private static pricesFitDirac(
+    spotBuying: bigint,
+    spotSelling: bigint,
+    buyingLowest: bigint,
+    sellingLowest: bigint,
+    buyingJumpSize: bigint,
+    sellingJumpSize: bigint,
+  ): boolean {
+    const fitBuying = (spotBuying - buyingLowest) % buyingJumpSize === 0n;
+    const fitSelling = (spotSelling - sellingLowest) % sellingJumpSize === 0n;
+    return fitBuying && fitSelling;
+  }
+
+  private static boughtAssetForSale(
+    spotBuying: bigint,
+    spotSelling: bigint,
+    buyingAmm: bigint,
+    sellingAmm: bigint,
+  ): boolean {
+    const fitsBuying = buyingAmm <= spotBuying;
+    const fitsSelling = sellingAmm >= spotSelling;
+    return fitsBuying && fitsSelling;
+  }
+
+  private static valueEquation(
+    spotBuying: bigint,
+    spotSelling: bigint,
+    oldBuyingLiquidity: bigint,
+    oldSellingLiquidity: bigint,
+    newBuyingLiquidity: bigint,
+    newSellingLiquidity: bigint,
+  ): boolean {
+    const addedBuyingLiquidity = newBuyingLiquidity - oldBuyingLiquidity;
+    const addedSellingLiquidity = newSellingLiquidity - oldSellingLiquidity;
+    const addedBuyingA0 = addedBuyingLiquidity * spotBuying;
+    const addedSellingA0 = addedSellingLiquidity * spotSelling;
+    return addedBuyingA0 <= addedSellingA0;
+  }
+
+  static validates(
+    spotBuying: bigint,
+    spotSelling: bigint,
+    buyingLowest: bigint,
+    sellingLowest: bigint,
+    buyingJumpSize: bigint,
+    sellingJumpSize: bigint,
+    buyingWeight: bigint,
+    sellingWeight: bigint,
+    oldBuyingLiquidity: bigint,
+    oldSellingLiquidity: bigint,
+    buyingAmount: bigint,
+    sellingAmount: bigint,
+  ): boolean {
+    const newBuyingLiquidity = oldBuyingLiquidity + buyingAmount;
+    const newSellingLiquidity = oldSellingLiquidity + sellingAmount;
+
+    const oldBuyingAmm = buyingWeight * oldBuyingLiquidity;
+    const oldSellingAmm = sellingWeight * oldSellingLiquidity;
+
+    const newBuyingAmm = buyingWeight * newBuyingLiquidity;
+    const newSellingAmm = sellingWeight * newSellingLiquidity;
+
+    return Swapping.pricesFitDirac(
+      spotBuying,
+      spotSelling,
+      buyingLowest,
+      sellingLowest,
+      buyingJumpSize,
+      sellingJumpSize,
+    ) &&
+      Swapping.boughtAssetForSale(
+        spotBuying,
+        spotSelling,
+        oldBuyingAmm,
+        oldSellingAmm,
+      ) &&
+      Swapping.boughtAssetForSale(
+        spotBuying,
+        spotSelling,
+        newBuyingAmm,
+        newSellingAmm,
+      ) &&
+      Swapping.valueEquation(
+        spotBuying,
+        spotSelling,
+        oldBuyingLiquidity,
+        oldSellingLiquidity,
+        newBuyingLiquidity,
+        newSellingLiquidity,
+      );
+    // TODO othersUnchanged
   }
 }

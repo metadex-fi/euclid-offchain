@@ -1,4 +1,5 @@
 import { Lucid } from "../lucid.mod.ts";
+import { allActions } from "../src/chain/actions/action.ts";
 import { Contract } from "../src/chain/contract.ts";
 import { User } from "../src/chain/user.ts";
 import {
@@ -15,13 +16,13 @@ Deno.test("emulator", async () => {
   let trials = 10;
   const actionCounts_ = new Map<string, number>();
   while (trials > 0) {
-    const allUsers = await User.genSeveral(10n, 2n); // TODO more
+    const allUsers = await User.genSeveral(genPositive(10n), genPositive(10n)); // TODO more
     const accounts = allUsers.map((u) => u.account);
     console.log(`accounts: ${accounts}`);
     const emulator = new Lucid.Emulator(accounts);
     const traces: string[] = [];
     const actionCounts = new Map<string, number>();
-    const iterations = 50;
+    const iterations = 100;
     for (let i = 0; i < iterations; i++) {
       console.log(
         `\ntrials: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`,
@@ -72,13 +73,11 @@ Deno.test("emulator", async () => {
       emulator.awaitBlock(Number(genPositive()));
     }
     console.log(`traces.length: ${traces.length}`);
-    let valid = true;
     for (const [type, count] of actionCounts) {
       console.log(`${type}: ${count}`);
-      if (count === 0) valid = false;
       actionCounts_.set(type, (actionCounts_.get(type) ?? 0) + count);
     }
-    if (valid) trials--;
+    if (actionCounts.size === allActions.length) trials--;
     // for (const user of allUsers) {
     //   const lucid = await Lucid.Lucid.new(emulator);
     //   const user_ = await User.from(lucid, user.privateKey);
