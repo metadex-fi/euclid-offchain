@@ -4,13 +4,14 @@ import { Data, f, PData, PType, t } from "../type.ts";
 import { PRecord } from "./record.ts";
 import { PInteger } from "../primitive/integer.ts";
 import { PByteString } from "../primitive/bytestring.ts";
+import { Lucid } from "../../../../../lucid.mod.ts";
 
 export const filterFunctions = <O extends Object>(o: O) =>
   Object.fromEntries(
     Object.entries(o).filter(([_, v]) => typeof v !== "function"),
   );
 
-export class PObject<O extends Object> implements PType<Array<Data>, O> {
+export class PObject<O extends Object> implements PType<Lucid.Constr<Data>, O> {
   public readonly population: number;
   constructor(
     public readonly precord: PRecord<PData>,
@@ -23,10 +24,12 @@ export class PObject<O extends Object> implements PType<Array<Data>, O> {
     );
   }
 
+  public setIndex = (index: number) => this.precord.setIndex(index);
+
   public plift = (
-    l: Array<Data>,
+    l: Lucid.Constr<Data>,
   ): O => {
-    assert(l instanceof Array, `plift: expected Array`);
+    assert(l instanceof Lucid.Constr, `plift: expected Constr`);
     const record = this.precord.plift(l);
     const args = Object.values(record);
     return new (this.O)(...args);
@@ -34,7 +37,7 @@ export class PObject<O extends Object> implements PType<Array<Data>, O> {
 
   public pconstant = (
     data: O,
-  ): Array<Data> => {
+  ): Lucid.Constr<Data> => {
     const record = filterFunctions(data);
     return this.precord.pconstant(record);
   };

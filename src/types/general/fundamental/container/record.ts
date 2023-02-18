@@ -1,4 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { Lucid } from "../../../../../lucid.mod.ts";
 import {
   Generators,
   genName,
@@ -17,8 +18,10 @@ import {
 } from "../type.ts";
 
 export class PRecord<PFields extends PData>
-  implements PType<PConstanted<PFields>[], RecordOfMaybe<PLifted<PFields>>> {
+  implements
+    PType<Lucid.Constr<PConstanted<PFields>>, RecordOfMaybe<PLifted<PFields>>> {
   public readonly population: number;
+  private index = 0; // for sum types
 
   constructor(
     public readonly pfields: RecordOfMaybe<PFields>,
@@ -34,35 +37,41 @@ export class PRecord<PFields extends PData>
     );
   }
 
+  public setIndex = (index: number) => this.index = index;
+
   public plift = (
-    l: PConstanted<PFields>[],
+    c: Lucid.Constr<PConstanted<PFields>>,
   ): RecordOfMaybe<PLifted<PFields>> => {
     assert(
-      l instanceof Array,
-      `Record.plift: expected Array, got ${l} (${typeof l})\nfor ${this.showPType()})`,
+      c instanceof Lucid.Constr,
+      `Record.plift: expected Constr, got ${c} (${typeof c})\nfor ${this.showPType()})`,
+    );
+    assert(
+      c.index === this.index,
+      `Record.plift: wrong index ${c.index} for ${this.showPType()}`,
     );
     const r: RecordOfMaybe<PLifted<PFields>> = {};
     let i = 0;
     Object.entries(this.pfields).forEach(([key, pfield]) => {
       if (pfield !== undefined) {
         assert(
-          i < l.length,
+          i < c.fields.length,
           `Record.plift: too few elements at
 key = ${key}
 i = ${i}
 pfield = ${pfield.showPType()}
-in [${l}] of length ${l.length}
+in [${c}] of length ${c.fields.length}
 for ${this.showPType()};
 status: ${Object.keys(r).join(`,\n${f}`)}`,
         );
-        const value = l[i++];
+        const value = c.fields[i++];
         assert(
           value !== undefined,
           `Record.plift: undefined value <${value}> at
 key = ${key}
 i = ${i}
 pfield = ${pfield.showPType()}
-in [${l}] of length ${l.length}
+in [${c}] of length ${c.fields.length}
 for ${this.showPType()};
 status: ${Object.keys(r).join(`,\n${f}`)}`,
         );
@@ -72,8 +81,8 @@ status: ${Object.keys(r).join(`,\n${f}`)}`,
       }
     });
     assert(
-      i === l.length,
-      `Record.plift: too many elements (${l.length}) for ${this.showPType()}`,
+      i === c.fields.length,
+      `Record.plift: too many elements (${c.fields.length}) for ${this.showPType()}`,
     );
     return r;
   };
@@ -93,7 +102,7 @@ status: ${Object.keys(r).join(`,\n${f}`)}`,
 
   public pconstant = (
     data: RecordOfMaybe<PLifted<PFields>>,
-  ): PConstanted<PFields>[] => {
+  ): Lucid.Constr<PConstanted<PFields>> => {
     this.checkFields(data);
 
     const l = new Array<PConstanted<PFields>>();
@@ -112,7 +121,7 @@ status: ${Object.keys(r).join(`,\n${f}`)}`,
         );
       }
     });
-    return l;
+    return new Lucid.Constr(this.index, l);
   };
 
   public genData = (): RecordOfMaybe<PLifted<PFields>> => {
@@ -142,19 +151,20 @@ status: ${Object.keys(r).join(`,\n${f}`)}`,
           value === undefined,
           `PRecord.showData: value ${value} for undefined pfield at key ${key}`,
         );
-        return `${ttf}${key.length === 0 ? "_" : key}: undefined`;
+        return `${key.length === 0 ? "_" : key}: undefined`;
       } else {
         assert(
           value !== undefined,
           `PRecord.showData: value undefined for pfield ${pfield.showPType()} at key ${key}`,
         );
-        return `${ttf}${key.length === 0 ? "_" : key}: ${
+        return `${key.length === 0 ? "_" : key}: ${
           pfield.showData(value, ttft, maxDepth ? maxDepth - 1n : maxDepth)
         }`;
       }
-    }).join(",\n");
+    }).join(`,\n${ttf}`);
     return `Record {
-${fields}
+${ttf}index: ${this.index},
+${ttf}fields: ${fields}
 ${tt}}`;
   };
 

@@ -28,6 +28,9 @@ export class PSum<Os extends Object> implements PType<Lucid.Constr<Data>, Os> {
       (acc, pconstr) => acc + pconstr.population,
       0,
     );
+    pconstrs.forEach((pconstr, i) => {
+      pconstr.setIndex(i);
+    });
   }
 
   public plift = (
@@ -36,17 +39,15 @@ export class PSum<Os extends Object> implements PType<Lucid.Constr<Data>, Os> {
     // return {} as Os;
     assert(c instanceof Lucid.Constr, `plift: expected Constr`);
     assert(c.index < this.pconstrs.length, `plift: constr index out of bounds`);
-    return this.pconstrs[Number(c.index)].plift(c.fields) as Os;
+    return this.pconstrs[Number(c.index)].plift(c) as Os;
   };
 
-  private matchData = (data: Os): [number, PObject<Os>] => {
+  private matchData = (data: Os): PObject<Os> => {
     assert(data instanceof Object, `PSum.matchData: expected Object`);
     const matches = new Array<PObject<Os>>();
-    let index = -1;
     this.pconstrs.forEach((pconstr, i) => {
       if (data instanceof pconstr.O) {
         matches.push(pconstr);
-        index = i;
       }
     });
     assert(
@@ -55,15 +56,13 @@ export class PSum<Os extends Object> implements PType<Lucid.Constr<Data>, Os> {
         matches.map((pconstr) => pconstr.O.name)
       }`,
     );
-    return [index, matches[0]];
+    return matches[0];
   };
 
   public pconstant = (
     data: Os,
   ): Lucid.Constr<Data> => {
-    // return new Lucid.Constr(0, []);
-    const [index, match] = this.matchData(data);
-    return new Lucid.Constr(index, match.pconstant(data));
+    return this.matchData(data).pconstant(data);
   };
 
   public genData = (): Os => {
@@ -75,10 +74,14 @@ export class PSum<Os extends Object> implements PType<Lucid.Constr<Data>, Os> {
     const tt = tabs + t;
     const ttf = tt + f;
 
-    const [index, match] = this.matchData(data);
     return `Sum (
-${ttf}index: ${index}, 
-${ttf}object: ${match.showData(data, ttf, maxDepth ? maxDepth - 1n : maxDepth)}
+${ttf}${
+      this.matchData(data).showData(
+        data,
+        ttf,
+        maxDepth ? maxDepth - 1n : maxDepth,
+      )
+    }
 ${tt})`;
   };
 
