@@ -94,6 +94,7 @@ export class Swapping {
   };
 
   private randomSubSwap = (): Swapping => {
+    return this; //TODO
     const offerA0 = this.boughtAmount * this.boughtSpot;
     const demandA0 = this.soldAmount * this.soldSpot;
     const maxSwapA0 = min(offerA0, demandA0); // those should be equal if freshly generatee
@@ -185,7 +186,7 @@ export class Swapping {
     oldNew: string,
   ): boolean {
     const fitsBuying = buyingAmm <= spotBuying;
-    const fitsSelling = sellingAmm >= spotSelling;
+    const fitsSelling = spotSelling <= sellingAmm;
     if (!fitsBuying) {
       console.log(
         `boughtAssetForSale (${oldNew}): buyingAmm ${buyingAmm} > spotBuying ${spotBuying}`,
@@ -202,15 +203,11 @@ export class Swapping {
   private static valueEquation(
     spotBuying: bigint,
     spotSelling: bigint,
-    oldBuyingLiquidity: bigint,
-    oldSellingLiquidity: bigint,
-    newBuyingLiquidity: bigint,
-    newSellingLiquidity: bigint,
+    buyingAmount: bigint,
+    sellingAmount: bigint,
   ): boolean {
-    const addedBuyingLiquidity = newBuyingLiquidity - oldBuyingLiquidity;
-    const addedSellingLiquidity = newSellingLiquidity - oldSellingLiquidity;
-    const addedBuyingA0 = addedBuyingLiquidity * spotBuying;
-    const addedSellingA0 = addedSellingLiquidity * spotSelling;
+    const addedBuyingA0 = buyingAmount * spotBuying;
+    const addedSellingA0 = sellingAmount * spotSelling;
     if (addedBuyingA0 > addedSellingA0) {
       console.log(
         `valueEquation: addedBuyingA0 ${addedBuyingA0} > addedSellingA0 ${addedSellingA0}`,
@@ -228,19 +225,16 @@ export class Swapping {
     sellingJumpSize: bigint,
     buyingWeight: bigint,
     sellingWeight: bigint,
-    oldBuyingLiquidity: bigint,
-    oldSellingLiquidity: bigint,
+    buyingLiquidity: bigint,
+    sellingLiquidity: bigint,
     buyingAmount: bigint,
     sellingAmount: bigint,
   ): boolean {
-    const newBuyingLiquidity = oldBuyingLiquidity + buyingAmount;
-    const newSellingLiquidity = oldSellingLiquidity + sellingAmount;
+    const oldBuyingAmm = buyingWeight * buyingLiquidity;
+    const oldSellingAmm = sellingWeight * sellingLiquidity;
 
-    const oldBuyingAmm = buyingWeight * oldBuyingLiquidity;
-    const oldSellingAmm = sellingWeight * oldSellingLiquidity;
-
-    const newBuyingAmm = buyingWeight * newBuyingLiquidity;
-    const newSellingAmm = sellingWeight * newSellingLiquidity;
+    const newBuyingAmm = buyingWeight * (buyingLiquidity - buyingAmount);
+    const newSellingAmm = sellingWeight * (sellingLiquidity + sellingAmount);
 
     return Swapping.pricesFitDirac(
       spotBuying,
@@ -267,10 +261,8 @@ export class Swapping {
       Swapping.valueEquation(
         spotBuying,
         spotSelling,
-        oldBuyingLiquidity,
-        oldSellingLiquidity,
-        newBuyingLiquidity,
-        newSellingLiquidity,
+        buyingAmount,
+        sellingAmount,
       );
     // TODO othersUnchanged
   }

@@ -14,7 +14,7 @@ import { Assets } from "../types/general/derived/asset/assets.ts";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { Value } from "../types/general/derived/value/value.ts";
 import { Data, f, PConstanted, t } from "../types/general/fundamental/type.ts";
-import { max, maxInteger, min } from "../utils/generators.ts";
+import { min } from "../utils/generators.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { Contract } from "./contract.ts";
 import { Pool } from "./pool.ts";
@@ -227,7 +227,7 @@ export class DiracUtxo {
 
       if (spotSelling > 0n) {
         const ss = Number(spotSelling);
-        const d = l * (((a / ss) ** w) - 1); // amm --> spot
+        const d = l * (((a / ss) ** w) - 1); // amm --> spot (decrease)
         const sellable = sellable_.amountOf(asset, 0n);
         const demand = d !== Infinity
           ? min(BigInt(Math.floor(d)), sellable)
@@ -239,7 +239,7 @@ export class DiracUtxo {
       }
 
       const sb = Number(spotBuying);
-      const o = l * (1 - ((a / sb) ** w)); // amm --> spot
+      const o = l * (1 - ((a / sb) ** w)); // amm --> spot (increase)
       const offer = o !== Infinity
         ? min(BigInt(Math.floor(o)), buyable)
         : buyable;
