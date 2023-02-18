@@ -72,10 +72,8 @@ export class User {
   };
 
   // TODO consider generating several
-  public generateActions = async (
-    spentContractUtxos: Lucid.UTxO[],
-  ): Promise<Action[]> => {
-    await this.update(spentContractUtxos);
+  public generateActions = async (): Promise<Action[]> => {
+    await this.update();
     if (this.balance!.amountOf(Asset.ADA) < feesEtcLovelace) {
       console.log(`not enough ada to pay fees etc.`);
       return [];
@@ -94,12 +92,10 @@ export class User {
     };
   }
 
-  public update = async (
-    spentContractUtxos: Lucid.UTxO[] = [],
-  ): Promise<void> => {
+  public update = async (): Promise<void> => {
     const utxos = (await Promise.all([
       this.lucid.utxosAt(this.address!),
-      this.contract.update(spentContractUtxos),
+      this.contract.update(),
     ]))[0];
     this.balance = utxos.map((utxo) => PositiveValue.fromLucid(utxo.assets))
       .reduce((a, b) => a.normedPlus(b), new PositiveValue());

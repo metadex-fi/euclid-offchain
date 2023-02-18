@@ -2,7 +2,11 @@ import { Lucid } from "../lucid.mod.ts";
 import { Contract } from "../src/chain/contract.ts";
 import { User } from "../src/chain/user.ts";
 import { Data } from "../src/types/general/fundamental/type.ts";
-import { genPositive, randomSubset } from "../src/utils/generators.ts";
+import {
+  genPositive,
+  randomChoice,
+  randomSubset,
+} from "../src/utils/generators.ts";
 
 Deno.test("emulator", async () => {
   const allUsers = await User.genSeveral(10n, 2n); // TODO more
@@ -10,51 +14,59 @@ Deno.test("emulator", async () => {
   console.log(`accounts: ${accounts}`);
   const emulator = new Lucid.Emulator(accounts);
   const traces: string[] = [];
+  const actionCounts = new Map<string, number>();
   const iterations = 100; // TODO more
   for (let i = 0; i < iterations; i++) {
     console.log(`\niteration: ${i} - block: ${emulator.blockHeight}`);
-    const users = await Promise.all(
-      randomSubset(allUsers).map(async (user) => {
-        const lucid = await Lucid.Lucid.new(emulator);
-        return User.from(lucid, user.privateKey);
-      }),
-    );
-    console.log(`users: ${users.length}`);
-    const spentContractUtxos = new Array<Lucid.UTxO>();
+    const lucid = await Lucid.Lucid.new(emulator);
+    const user = await User.from(lucid, randomChoice(allUsers).privateKey);
+
+    // TODO multiple parallel users and actions (requires logging of spent contract utxos or error handling)
+    // const users = await Promise.all(
+    //   randomSubset(allUsers).map(async (user) => {
+    //     const lucid = await Lucid.Lucid.new(emulator);
+    //     return User.from(lucid, user.privateKey);
+    //   }),
+    // );
+    // console.log(`users: ${users.length}`);
     // try {
-    for (const user of users) {
-      const hashes = await user
-        .generateActions(spentContractUtxos)
-        .then((actions) =>
-          Promise.all(
-            actions.map(async (action) => {
-              spentContractUtxos.push(...action.spendsContractUtxos);
-              const tx = action.tx(user.lucid.newTx());
-              // console.log(tx);
-              return await tx
-                .complete()
-                .then((completed) => {
-                  // console.log(completed.txComplete.to_js_value());
-                  return completed
-                    .sign()
-                    .complete()
-                    .then((signed) => {
-                      // console.log(signed.txSigned.to_js_value());
-                      return signed.submit();
-                    });
-                });
-            }),
-          )
-        );
-      // console.log(hashes);
-      traces.push(...hashes);
-    }
+    // for (const user of users) {
+    const hashes = await user
+      .generateActions()
+      .then((actions) =>
+        Promise.all(
+          actions.map(async (action) => {
+            const type = action.type;
+            actionCounts.set(type, (actionCounts.get(type) ?? 0) + 1);
+            const tx = action.tx(user.lucid.newTx());
+            // console.log(tx);
+            return await tx
+              .complete()
+              .then((completed) => {
+                // console.log(completed.txComplete.to_js_value());
+                return completed
+                  .sign()
+                  .complete()
+                  .then((signed) => {
+                    // console.log(signed.txSigned.to_js_value());
+                    return signed.submit();
+                  });
+              });
+          }),
+        )
+      );
+    // console.log(hashes);
+    traces.push(...hashes);
+    // }
     // } catch (e) {
     //   throw new Error(`Error: ${e}`);
     // }
     emulator.awaitBlock(Number(genPositive()));
   }
   console.log(`traces.length: ${traces.length}`);
+  for (const [type, count] of actionCounts) {
+    console.log(`${type}: ${count}`);
+  }
   // for (const user of allUsers) {
   //   const lucid = await Lucid.Lucid.new(emulator);
   //   const user_ = await User.from(lucid, user.privateKey);

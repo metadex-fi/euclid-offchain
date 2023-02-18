@@ -34,8 +34,8 @@ export class Opening {
     // TODO assert 2. numDiracs resulting from numTicks <= lowest deposit
   }
 
-  public get spendsContractUtxos(): Lucid.UTxO[] {
-    return [];
+  public get type(): string {
+    return "Opening";
   }
 
   public tx = (tx: Lucid.Tx): Lucid.Tx => {

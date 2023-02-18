@@ -9,7 +9,7 @@ import { DiracDatum } from "../../types/euclid/euclidDatum.ts";
 import { Swap } from "../../types/euclid/swap.ts";
 import { Asset } from "../../types/general/derived/asset/asset.ts";
 import { Data } from "../../types/general/fundamental/type.ts";
-import { genPositive, max, min, randomChoice } from "../../utils/generators.ts";
+import { genPositive, min, randomChoice } from "../../utils/generators.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 
@@ -40,8 +40,8 @@ export class Swapping {
     assert(soldSpot > 0n, `soldSpot must be positive, but is ${soldSpot}`);
   }
 
-  public get spendsContractUtxos(): Lucid.UTxO[] {
-    return [this.diracUtxo.utxo!];
+  public get type(): string {
+    return "Swapping";
   }
 
   public tx = (tx: Lucid.Tx): Lucid.Tx => {

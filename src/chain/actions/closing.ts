@@ -9,8 +9,8 @@ export class Closing {
     private readonly pool: Pool,
   ) {}
 
-  public get spendsContractUtxos(): Lucid.UTxO[] {
-    return this.pool.utxos;
+  public get type(): string {
+    return "Closing";
   }
 
   public tx = (tx: Lucid.Tx): Lucid.Tx => {

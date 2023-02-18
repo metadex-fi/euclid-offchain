@@ -1,3 +1,4 @@
+import { Lucid } from "../../../lucid.mod.ts";
 import { randomIndexedChoice } from "../../utils/generators.ts";
 import { User } from "../user.ts";
 import { Closing } from "./closing.ts";
