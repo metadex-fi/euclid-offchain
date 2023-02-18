@@ -1,7 +1,13 @@
-import { Data } from "../../lucid/mod.ts";
 import { Lucid } from "../lucid.mod.ts";
 import { Contract } from "../src/chain/contract.ts";
 import { User } from "../src/chain/user.ts";
+import {
+  ParamDatum,
+  PEuclidDatum,
+  PPreEuclidDatum,
+} from "../src/types/euclid/euclidDatum.ts";
+import { PParam } from "../src/types/euclid/param.ts";
+import { Data } from "../src/types/general/fundamental/type.ts";
 import { genPositive, randomChoice } from "../src/utils/generators.ts";
 
 // Deno.test("emulator", async () => {
@@ -86,7 +92,15 @@ Deno.test("constr", async () => {
   lucid.selectWalletFromPrivateKey(privateKey);
 
   const contract = new Contract(lucid);
-  const datum = new Lucid.Constr(1, [new Lucid.Constr(0, [42n])]);
+  const paramDatum = new ParamDatum(PParam.ptype.genData());
+  const peuclidDatum = PPreEuclidDatum.genPType(); //only need this for ParamDatum, so this is fine
+
+  const datum = peuclidDatum.pconstant(paramDatum);
+
+  console.log(datum);
+  (datum.fields[0] as Lucid.Constr<Data>).fields.forEach((f) => {
+    console.log(f);
+  });
   try {
     const tx = lucid.newTx()
       .payToContract(

@@ -1,10 +1,8 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
 import { genPositive } from "../../../../utils/generators.ts";
-import { IdNFT } from "../../../euclid/idnft.ts";
 import { AssocMap } from "../../fundamental/container/map.ts";
-import { PObject } from "../../fundamental/container/object.ts";
-import { PRecord } from "../../fundamental/container/record.ts";
+import { PWrapped } from "../../fundamental/container/wrapped.ts";
 import { Asset } from "../asset/asset.ts";
 import { Assets } from "../asset/assets.ts";
 import { Currency } from "../asset/currency.ts";
@@ -206,12 +204,10 @@ export class PositiveValue {
 
 export const boundPositive = Value.newBoundedWith(new PPositive());
 
-export class PPositiveValue extends PObject<PositiveValue> {
+export class PPositiveValue extends PWrapped<PositiveValue> {
   constructor() {
     super(
-      new PRecord({
-        value: new PValue(new PPositive()),
-      }),
+      new PValue(new PPositive()),
       PositiveValue,
     );
   }

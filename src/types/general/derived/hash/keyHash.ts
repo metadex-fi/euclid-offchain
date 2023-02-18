@@ -6,7 +6,10 @@ import { Hash } from "./hash.ts";
 
 export class KeyHash {
   constructor(public readonly keyHash: Uint8Array) {
-    assert(keyHash.length > 0, "paymentKeyHash must be non-empty");
+    assert(
+      keyHash.length === Number(KeyHash.numBytes),
+      `keyHash must be ${Hash.numBytes} bytes, got ${keyHash.length}`,
+    );
   }
   public hash = (): Hash => new Hash(Lucid.sha256(this.keyHash));
 
@@ -21,12 +24,14 @@ export class KeyHash {
   static fromCredential(credential: Lucid.Credential): KeyHash {
     return new KeyHash(Lucid.fromHex(credential.hash));
   }
+
+  static numBytes = 28n;
 }
 
 export class PKeyHash extends PWrapped<KeyHash> {
   private constructor() {
     super(
-      new PByteString(1n),
+      new PByteString(KeyHash.numBytes, KeyHash.numBytes),
       KeyHash,
     );
   }
