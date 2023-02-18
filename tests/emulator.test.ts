@@ -84,6 +84,7 @@ Deno.test("emulator", async () => {
     //   console.log(await user_.lucid.wallet.getUtxos());
     // }
   }
+  console.log("---");
   for (const [type, count] of actionCounts_) {
     console.log(`${type}: ${count}`);
   }

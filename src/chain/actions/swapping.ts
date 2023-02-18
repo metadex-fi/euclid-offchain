@@ -164,6 +164,16 @@ export class Swapping {
   ): boolean {
     const fitBuying = (spotBuying - buyingLowest) % buyingJumpSize === 0n;
     const fitSelling = (spotSelling - sellingLowest) % sellingJumpSize === 0n;
+    if (!fitBuying) {
+      console.log(
+        `pricesFitDirac: buying ${spotBuying} not fit for ${buyingLowest} with jump ${buyingJumpSize}`,
+      );
+    }
+    if (!fitSelling) {
+      console.log(
+        `pricesFitDirac: selling ${spotSelling} not fit for ${sellingLowest} with jump ${sellingJumpSize}`,
+      );
+    }
     return fitBuying && fitSelling;
   }
 
@@ -172,9 +182,20 @@ export class Swapping {
     spotSelling: bigint,
     buyingAmm: bigint,
     sellingAmm: bigint,
+    oldNew: string,
   ): boolean {
     const fitsBuying = buyingAmm <= spotBuying;
     const fitsSelling = sellingAmm >= spotSelling;
+    if (!fitsBuying) {
+      console.log(
+        `boughtAssetForSale (${oldNew}): buyingAmm ${buyingAmm} > spotBuying ${spotBuying}`,
+      );
+    }
+    if (!fitsSelling) {
+      console.log(
+        `boughtAssetForSale (${oldNew}): sellingAmm ${sellingAmm} < spotSelling ${spotSelling}`,
+      );
+    }
     return fitsBuying && fitsSelling;
   }
 
@@ -190,6 +211,11 @@ export class Swapping {
     const addedSellingLiquidity = newSellingLiquidity - oldSellingLiquidity;
     const addedBuyingA0 = addedBuyingLiquidity * spotBuying;
     const addedSellingA0 = addedSellingLiquidity * spotSelling;
+    if (addedBuyingA0 > addedSellingA0) {
+      console.log(
+        `valueEquation: addedBuyingA0 ${addedBuyingA0} > addedSellingA0 ${addedSellingA0}`,
+      );
+    }
     return addedBuyingA0 <= addedSellingA0;
   }
 
@@ -229,12 +255,14 @@ export class Swapping {
         spotSelling,
         oldBuyingAmm,
         oldSellingAmm,
+        "old",
       ) &&
       Swapping.boughtAssetForSale(
         spotBuying,
         spotSelling,
         newBuyingAmm,
         newSellingAmm,
+        "new",
       ) &&
       Swapping.valueEquation(
         spotBuying,
