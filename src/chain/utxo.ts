@@ -14,7 +14,7 @@ import { Assets } from "../types/general/derived/asset/assets.ts";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { Value } from "../types/general/derived/value/value.ts";
 import { Data, f, PConstanted, t } from "../types/general/fundamental/type.ts";
-import { min } from "../utils/generators.ts";
+import { max, maxInteger, min } from "../utils/generators.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { Contract } from "./contract.ts";
 import { Pool } from "./pool.ts";
@@ -248,14 +248,14 @@ export class DiracUtxo {
     });
 
     demand_.assets.forEach((sellingAsset) => {
-      const demand = demand_.amountOf(sellingAsset);
       const spotSelling = spotSelling_.amountOf(sellingAsset);
+      const demand = demand_.amountOf(sellingAsset);
       const demandA0 = demand * spotSelling;
       const offeredAssets = offer_.assets;
       if (offeredAssets.has(sellingAsset)) offeredAssets.drop(sellingAsset);
       offeredAssets.forEach((buyingAsset) => {
-        const offer = offer_.amountOf(buyingAsset);
         const spotBuying = spotBuying_.amountOf(buyingAsset);
+        const offer = offer_.amountOf(buyingAsset);
         const offerA0 = offer * spotBuying;
         const maxSwapA0 = min(demandA0, offerA0);
         if (maxSwapA0 >= spotBuying && maxSwapA0 >= spotSelling) {

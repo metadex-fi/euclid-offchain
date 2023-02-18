@@ -9,7 +9,12 @@ import { DiracDatum } from "../../types/euclid/euclidDatum.ts";
 import { Swap } from "../../types/euclid/swap.ts";
 import { Asset } from "../../types/general/derived/asset/asset.ts";
 import { Data } from "../../types/general/fundamental/type.ts";
-import { genPositive, min, randomChoice } from "../../utils/generators.ts";
+import {
+  genPositive,
+  maxInteger,
+  min,
+  randomChoice,
+} from "../../utils/generators.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 
@@ -25,24 +30,26 @@ export class Swapping {
     private readonly boughtSpot: bigint,
     private readonly soldSpot: bigint,
   ) {
-    assert(
-      boughtAmount > 0n,
-      `boughtAmount must be positive, but is ${boughtAmount}`,
-    );
-    assert(
-      soldAmount > 0n,
-      `soldAmount must be positive, but is ${soldAmount}`,
-    );
-    assert(
-      boughtSpot > 0n,
-      `boughtSpot must be positive, but is ${boughtSpot}`,
-    );
-    assert(soldSpot > 0n, `soldSpot must be positive, but is ${soldSpot}`);
+    assert(boughtAmount > 0n, `boughtAmount must be positive`);
+    assert(soldAmount > 0n, `soldAmount must be positive`);
+    assert(boughtSpot > 0n, `boughtSpot must be positive`);
+    assert(soldSpot > 0n, `soldSpot must be positive`);
   }
 
   public get type(): string {
     return "Swapping";
   }
+
+  public show = (): string => {
+    return `Swapping (
+boughtAsset: ${this.boughtAsset.show()}
+soldAsset: ${this.soldAsset.show()}
+boughtAmount: ${this.boughtAmount}
+soldAmount: ${this.soldAmount}
+boughtSpot: ${this.boughtSpot}
+soldSpot: ${this.soldSpot}
+)`;
+  };
 
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
     const funds = this.diracUtxo.balance.clone; // TODO cloning probably not required here
@@ -57,11 +64,45 @@ export class Swapping {
           this.boughtAsset,
           this.soldAsset,
           new BoughtSold(
-            this.boughtAmount,
-            this.soldAmount,
+            this.boughtSpot,
+            this.soldSpot,
           ),
         ),
       ),
+    );
+
+    console.log(this.show());
+    console.log(this.diracUtxo.dirac.lowestPrices.concise());
+    console.log(this.paramUtxo.param.jumpSizes.concise());
+    const boughtLowest = this.diracUtxo.dirac.lowestPrices.amountOf(
+      this.boughtAsset,
+      0n,
+    );
+    const soldLowest = this.diracUtxo.dirac.lowestPrices.amountOf(
+      this.soldAsset,
+      0n,
+    );
+    const boughtJump = this.paramUtxo.param.jumpSizes.amountOf(
+      this.boughtAsset,
+    );
+    const soldJump = this.paramUtxo.param.jumpSizes.amountOf(this.soldAsset);
+    console.log(
+      `${this.boughtSpot} - ${boughtLowest} = ${
+        this.boughtSpot - boughtLowest
+      }`,
+    );
+    console.log(
+      `${this.soldSpot} - ${soldLowest} = ${this.soldSpot - soldLowest}`,
+    );
+    console.log(
+      `${this.boughtSpot - boughtLowest} % ${boughtJump} = ${
+        (this.boughtSpot - boughtLowest) % boughtJump
+      }`,
+    );
+    console.log(
+      `${this.soldSpot - soldLowest} % ${soldJump} = ${
+        (this.soldSpot - soldLowest) % soldJump
+      }`,
     );
 
     const datum = this.diracUtxo.peuclidDatum.pconstant(

@@ -1,4 +1,3 @@
-import { Lucid } from "../../../lucid.mod.ts";
 import { randomIndexedChoice } from "../../utils/generators.ts";
 import { User } from "../user.ts";
 import { Closing } from "./closing.ts";
@@ -13,7 +12,7 @@ export class UserAction {
   ) {}
 
   public generate = (): Action | undefined => {
-    const actions = new Permutation([Closing, Opening]); // TODO Closing, Swapping
+    const actions = new Permutation([Closing, Opening, Swapping]); // TODO Closing, Swapping
     return actions.try((a) => {
       return a.genOfUser(this.user);
     });

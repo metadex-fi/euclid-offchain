@@ -1,3 +1,4 @@
+import { maxInteger } from "../../utils/generators.ts";
 import { PPositive } from "../general/derived/bounded/positive.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
 import { PRecord } from "../general/fundamental/container/record.ts";
@@ -11,7 +12,14 @@ export class BoughtSold {
 
 export class PBoughtSold extends PObject<BoughtSold> {
   constructor() {
-    const ppositive = new PPositive(); // leaving this as ppositive, because onchain rep should be positive
+    // leaving this as ppositive, because onchain rep should be positive
+    // TODO high upper bound, but this is required by onchain. set maxInteger accordingly
+    // TODO also the value is just artlessly, excessively high right now
+    // needs to be less than weight * (virtual + balance) + jumpSize
+    const ppositive = new PPositive(
+      1n,
+      maxInteger ** maxInteger,
+    );
     super(
       new PRecord({
         bought: ppositive,

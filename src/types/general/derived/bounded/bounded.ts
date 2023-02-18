@@ -54,10 +54,10 @@ const newAssertInRange =
   (lowerBound?: bigint, upperBound?: bigint) => (i: bigint) => {
     assert(
       !lowerBound || lowerBound <= i,
-      `too small: ${i} < ${lowerBound}`,
+      `too small: ${i} < ${lowerBound} by ${lowerBound! - i}`,
     );
     assert(
       !upperBound || i <= upperBound,
-      `too big: ${i} > ${upperBound}`,
+      `too big: ${i} > ${upperBound} by ${i - upperBound!}`,
     );
   };
