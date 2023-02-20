@@ -13,7 +13,7 @@ import { Data } from "../src/types/general/fundamental/type.ts";
 import { genPositive, randomChoice } from "../src/utils/generators.ts";
 
 Deno.test("emulator", async () => {
-  let trials = 5;
+  let trials = 100;
   const actionCounts_ = new Map<string, number>();
   while (trials > 0) {
     const allUsers = await User.genSeveral(genPositive(10n), genPositive(10n)); // TODO more

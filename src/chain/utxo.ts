@@ -231,7 +231,10 @@ export class DiracUtxo {
 
       if (spotBuying > 0n) {
         const sb = Number(spotBuying);
-        const maxBuying = min(buyable, BigInt(Math.floor(-delta(sb))));
+        const d = delta(sb);
+        const maxBuying = d === Infinity
+          ? buyable
+          : min(buyable, BigInt(Math.floor(-delta(sb))));
         if (maxBuying > 0n) {
           spotBuying_.initAmountOf(asset, spotBuying);
           maxBuying_.initAmountOf(asset, maxBuying);
@@ -240,7 +243,10 @@ export class DiracUtxo {
 
       if (spotSelling > 0n) {
         const ss = Number(spotSelling);
-        const maxSelling = min(sellable, BigInt(Math.floor(delta(ss))));
+        const d = delta(ss);
+        const maxSelling = d === Infinity
+          ? sellable
+          : min(sellable, BigInt(Math.floor(d)));
         if (maxSelling > 0n) {
           spotSelling_.initAmountOf(asset, spotSelling);
           maxSelling_.initAmountOf(asset, maxSelling);
@@ -284,23 +290,23 @@ export class DiracUtxo {
           spotSelling,
         );
 
-        // assert( TODO
-        //   Swapping.validates(
-        //     spotBuying,
-        //     spotSelling,
-        //     this.dirac.lowestPrices.amountOf(buyingAsset, 0n),
-        //     this.dirac.lowestPrices.amountOf(sellingAsset, 0n),
-        //     param.jumpSizes.amountOf(buyingAsset),
-        //     param.jumpSizes.amountOf(sellingAsset),
-        //     param.weights.amountOf(buyingAsset),
-        //     param.weights.amountOf(sellingAsset),
-        //     liquidity_.amountOf(buyingAsset),
-        //     liquidity_.amountOf(sellingAsset),
-        //     buyingAmount,
-        //     sellingAmount,
-        //   ),
-        //   `invalid swap: ${swapping.show()}`,
-        // );
+        assert(
+          Swapping.validates(
+            spotBuying,
+            spotSelling,
+            this.dirac.lowestPrices.amountOf(buyingAsset, 0n),
+            this.dirac.lowestPrices.amountOf(sellingAsset, 0n),
+            param.jumpSizes.amountOf(buyingAsset),
+            param.jumpSizes.amountOf(sellingAsset),
+            param.weights.amountOf(buyingAsset),
+            param.weights.amountOf(sellingAsset),
+            liquidity_.amountOf(buyingAsset),
+            liquidity_.amountOf(sellingAsset),
+            buyingAmount,
+            sellingAmount,
+          ),
+          `invalid swap: ${swapping.show()}`,
+        );
 
         swappings.push(swapping);
       });

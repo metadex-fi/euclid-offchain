@@ -61,6 +61,9 @@ export class Swapping {
     const retour = funds.toLucid;
     retour[this.diracUtxo.dirac.threadNFT.toLucid] = 1n;
 
+    console.log(this.diracUtxo.utxo!.assets);
+    console.log(retour);
+
     const swapRedeemer = PEuclidAction.ptype.pconstant(
       new SwapRedeemer(
         new Swap(
@@ -94,18 +97,17 @@ export class Swapping {
   };
 
   private randomSubSwap = (): Swapping => {
-    return this; //TODO
-    const offerA0 = this.boughtAmount * this.boughtSpot;
-    const demandA0 = this.soldAmount * this.soldSpot;
-    const maxSwapA0 = min(offerA0, demandA0); // those should be equal if freshly generatee
-    const maxBought = maxSwapA0 / this.boughtSpot;
+    const offerA0 = this.boughtAmount * this.soldSpot;
+    const demandA0 = this.soldAmount * this.boughtSpot;
+    const maxSwapA0 = min(offerA0, demandA0); // those should be equal if freshly generated
+    const maxBought = maxSwapA0 / this.soldSpot;
     assert(
       maxBought > 0n,
       `Swapping.randomSubSwap: maxBought must be positive, but is ${maxBought} for ${this.show()}`,
     );
 
     const boughtAmount = genPositive(maxBought);
-    const price = Number(this.boughtSpot) / Number(this.soldSpot);
+    const price = Number(this.soldSpot) / Number(this.boughtSpot);
     const soldAmount = BigInt(Math.ceil(Number(boughtAmount) * price));
 
     return new Swapping(
@@ -167,12 +169,18 @@ export class Swapping {
     const fitSelling = (spotSelling - sellingLowest) % sellingJumpSize === 0n;
     if (!fitBuying) {
       console.log(
-        `pricesFitDirac: buying ${spotBuying} not fit for ${buyingLowest} with jump ${buyingJumpSize}`,
+        `pricesFitDirac: 
+        buying ${spotBuying} 
+        not fit for ${buyingLowest} 
+        with jump ${buyingJumpSize}`,
       );
     }
     if (!fitSelling) {
       console.log(
-        `pricesFitDirac: selling ${spotSelling} not fit for ${sellingLowest} with jump ${sellingJumpSize}`,
+        `pricesFitDirac:
+        selling ${spotSelling}
+        not fit for ${sellingLowest}
+        with jump ${sellingJumpSize}`,
       );
     }
     return fitBuying && fitSelling;
@@ -185,16 +193,20 @@ export class Swapping {
     sellingAmm: bigint,
     oldNew: string,
   ): boolean {
-    const fitsBuying = buyingAmm <= spotBuying;
-    const fitsSelling = spotSelling <= sellingAmm;
+    const fitsBuying = spotBuying <= buyingAmm;
+    const fitsSelling = sellingAmm <= spotSelling;
     if (!fitsBuying) {
       console.log(
-        `boughtAssetForSale (${oldNew}): buyingAmm ${buyingAmm} > spotBuying ${spotBuying}`,
+        `boughtAssetForSale (${oldNew}): 
+        buyingAmm ${buyingAmm} > 
+        spotBuying ${spotBuying}`,
       );
     }
     if (!fitsSelling) {
       console.log(
-        `boughtAssetForSale (${oldNew}): sellingAmm ${sellingAmm} < spotSelling ${spotSelling}`,
+        `boughtAssetForSale (${oldNew}):
+        sellingAmm ${sellingAmm} < 
+        spotSelling ${spotSelling}`,
       );
     }
     return fitsBuying && fitsSelling;
@@ -206,11 +218,13 @@ export class Swapping {
     buyingAmount: bigint,
     sellingAmount: bigint,
   ): boolean {
-    const addedBuyingA0 = buyingAmount * spotBuying;
-    const addedSellingA0 = sellingAmount * spotSelling;
+    const addedBuyingA0 = buyingAmount * spotSelling;
+    const addedSellingA0 = sellingAmount * spotBuying;
     if (addedBuyingA0 > addedSellingA0) {
       console.log(
-        `valueEquation: addedBuyingA0 ${addedBuyingA0} > addedSellingA0 ${addedSellingA0}`,
+        `valueEquation: 
+        addedBuyingA0 ${addedBuyingA0} > 
+        addedSellingA0 ${addedSellingA0}`,
       );
     }
     return addedBuyingA0 <= addedSellingA0;
