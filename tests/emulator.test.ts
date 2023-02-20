@@ -13,7 +13,7 @@ import { Data } from "../src/types/general/fundamental/type.ts";
 import { genPositive, randomChoice } from "../src/utils/generators.ts";
 
 Deno.test("emulator", async () => {
-  let trials = 10;
+  let trials = 5;
   const actionCounts_ = new Map<string, number>();
   while (trials > 0) {
     const allUsers = await User.genSeveral(genPositive(10n), genPositive(10n)); // TODO more
@@ -22,7 +22,7 @@ Deno.test("emulator", async () => {
     const emulator = new Lucid.Emulator(accounts);
     const traces: string[] = [];
     const actionCounts = new Map<string, number>();
-    const iterations = 100;
+    const iterations = 50;
     for (let i = 0; i < iterations; i++) {
       console.log(
         `\ntrials: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`,

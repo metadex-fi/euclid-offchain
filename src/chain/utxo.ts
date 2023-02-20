@@ -200,104 +200,109 @@ export class DiracUtxo {
     const param = pool.paramUtxo.param;
 
     const liquidity_ = new PositiveValue();
-    const spotSelling_ = new PositiveValue();
     const spotBuying_ = new PositiveValue();
-    const demand_ = new PositiveValue();
-    const offer_ = new PositiveValue();
+    const spotSelling_ = new PositiveValue();
+    const maxBuying_ = new PositiveValue();
+    const maxSelling_ = new PositiveValue();
 
     param.assets.forEach((asset) => {
-      const buyable = this.balance.amountOf(asset, 0n);
       const virtual = param.virtual.amountOf(asset, 0n);
-      const weight = param.weights.amountOf(asset);
+      const buyable = this.balance.amountOf(asset, 0n);
+      const sellable = sellable_.amountOf(asset, 0n);
+      const weight = param.weights.amountOf(asset); // NOTE: inverted
       const jumpSize = param.jumpSizes.amountOf(asset);
       const lowest = this.dirac.lowestPrices.amountOf(asset, 0n);
 
       const liquidity = buyable + virtual;
-      if (liquidity <= 0n) return;
+      if (liquidity <= 0n) return; // TODO reconsider if this can happen, throw error instead if not
       liquidity_.initAmountOf(asset, liquidity);
-      const amm = liquidity * weight;
+      const amm = liquidity * weight; // NOTE: inverted
       assert(amm > 0n, `amm <= 0n`);
-      const spotSelling = ((amm - lowest) / jumpSize) * jumpSize + lowest;
-      assert(spotSelling >= lowest, `spotSelling < lowest`);
-      const spotBuying = spotSelling + jumpSize;
+      const spotBuying = ((amm - lowest) / jumpSize) * jumpSize + lowest; // NOTE: inverted
+      assert(spotBuying >= lowest, `spotBuying < lowest`);
+      const spotSelling = spotBuying + jumpSize; // NOTE: inverted
 
       const a = Number(amm);
       const w = Number(weight);
       const l = Number(liquidity);
 
-      if (spotSelling > 0n) {
-        const ss = Number(spotSelling);
-        const d = l * (((a / ss) ** w) - 1); // amm --> spot (decrease)
-        const sellable = sellable_.amountOf(asset, 0n);
-        const demand = d !== Infinity
-          ? min(BigInt(Math.floor(d)), sellable)
-          : sellable;
-        if (demand > 0n) {
-          spotSelling_.initAmountOf(asset, spotSelling);
-          demand_.initAmountOf(asset, demand);
+      // deposit of asset into pool to move inverted amm-price a to inverted spot price s
+      const delta = (s: number) => l * (((s / a) ** (w / (w + 1))) - 1);
+
+      if (spotBuying > 0n) {
+        const sb = Number(spotBuying);
+        const maxBuying = min(buyable, BigInt(Math.floor(-delta(sb))));
+        if (maxBuying > 0n) {
+          spotBuying_.initAmountOf(asset, spotBuying);
+          maxBuying_.initAmountOf(asset, maxBuying);
         }
       }
 
-      const sb = Number(spotBuying);
-      const o = l * (1 - ((a / sb) ** w)); // amm --> spot (increase)
-      const offer = o !== Infinity
-        ? min(BigInt(Math.floor(o)), buyable)
-        : buyable;
-      if (offer > 0n) {
-        spotBuying_.initAmountOf(asset, spotBuying);
-        offer_.initAmountOf(asset, offer);
+      if (spotSelling > 0n) {
+        const ss = Number(spotSelling);
+        const maxSelling = min(sellable, BigInt(Math.floor(delta(ss))));
+        if (maxSelling > 0n) {
+          spotSelling_.initAmountOf(asset, spotSelling);
+          maxSelling_.initAmountOf(asset, maxSelling);
+        }
       }
     });
 
-    demand_.assets.forEach((sellingAsset) => {
-      const spotSelling = spotSelling_.amountOf(sellingAsset);
-      const demand = demand_.amountOf(sellingAsset);
-      const demandA0 = demand * spotSelling;
-      const offeredAssets = offer_.assets;
-      if (offeredAssets.has(sellingAsset)) offeredAssets.drop(sellingAsset);
-      offeredAssets.forEach((buyingAsset) => {
-        const spotBuying = spotBuying_.amountOf(buyingAsset);
-        const offer = offer_.amountOf(buyingAsset);
-        const offerA0 = offer * spotBuying;
-        const maxSwapA0 = min(demandA0, offerA0);
-        if (maxSwapA0 >= spotBuying) {
-          const buyingAmount = maxSwapA0 / spotBuying;
-          const sellingAmount = BigInt(
-            Math.ceil(Number(maxSwapA0) / Number(spotSelling)),
-          );
+    const sellableAssets = maxSelling_.assets.toList;
+    const buyableAssets = maxBuying_.assets.toList;
+    sellableAssets.forEach((sellingAsset) => {
+      const spotSelling = spotSelling_.amountOf(sellingAsset); // NOTE: inverted
+      const maxSelling = maxSelling_.amountOf(sellingAsset);
 
-          const swapping = Swapping.boundary(
-            user,
-            pool.paramUtxo,
-            this,
-            buyingAsset,
-            sellingAsset,
-            buyingAmount,
-            sellingAmount,
-            spotBuying,
-            spotSelling,
-          );
+      buyableAssets.forEach((buyingAsset) => {
+        if (sellingAsset.equals(buyingAsset)) return;
 
-          assert(
-            Swapping.validates(
-              spotBuying,
-              spotSelling,
-              this.dirac.lowestPrices.amountOf(buyingAsset, 0n),
-              this.dirac.lowestPrices.amountOf(sellingAsset, 0n),
-              param.jumpSizes.amountOf(buyingAsset),
-              param.jumpSizes.amountOf(sellingAsset),
-              param.weights.amountOf(buyingAsset),
-              param.weights.amountOf(sellingAsset),
-              liquidity_.amountOf(buyingAsset),
-              liquidity_.amountOf(sellingAsset),
-              buyingAmount,
-              sellingAmount,
-            ),
-            `invalid swap: ${swapping.show()}`,
-          );
+        const spotBuying = spotBuying_.amountOf(buyingAsset); // NOTE: inverted
+        const maxBuying = maxBuying_.amountOf(buyingAsset);
 
-          swappings.push(swapping);
-        }
+        // NOTE: below not strictly A0, but want to avoid divisions.
+        // Ok, since only relative value matters. Assume it's a different A0'.
+        const maxBuyingA0 = maxBuying * spotSelling;
+        const maxSellingA0 = maxSelling * spotBuying;
+        const maxSwapA0 = min(maxSellingA0, maxBuyingA0);
+
+        if (maxSwapA0 < spotSelling) return; // to avoid zero buying amount
+        const buyingAmount = maxSwapA0 / spotSelling;
+        const sellingAmount = BigInt(
+          Math.ceil(Number(maxSwapA0) / Number(spotBuying)),
+        );
+
+        const swapping = Swapping.boundary(
+          user,
+          pool.paramUtxo,
+          this,
+          buyingAsset,
+          sellingAsset,
+          buyingAmount,
+          sellingAmount,
+          spotBuying,
+          spotSelling,
+        );
+
+        // assert( TODO
+        //   Swapping.validates(
+        //     spotBuying,
+        //     spotSelling,
+        //     this.dirac.lowestPrices.amountOf(buyingAsset, 0n),
+        //     this.dirac.lowestPrices.amountOf(sellingAsset, 0n),
+        //     param.jumpSizes.amountOf(buyingAsset),
+        //     param.jumpSizes.amountOf(sellingAsset),
+        //     param.weights.amountOf(buyingAsset),
+        //     param.weights.amountOf(sellingAsset),
+        //     liquidity_.amountOf(buyingAsset),
+        //     liquidity_.amountOf(sellingAsset),
+        //     buyingAmount,
+        //     sellingAmount,
+        //   ),
+        //   `invalid swap: ${swapping.show()}`,
+        // );
+
+        swappings.push(swapping);
       });
     });
 

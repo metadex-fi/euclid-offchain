@@ -135,7 +135,7 @@ export class Assets {
   };
 
   public boundedSubset = (minSize?: bigint, maxSize?: bigint): Assets => {
-    return Assets.fromList(boundedSubset(this.toList(), minSize, maxSize));
+    return Assets.fromList(boundedSubset(this.toList, minSize, maxSize));
   };
 
   public has = (asset: Asset): boolean => {
@@ -176,7 +176,7 @@ export class Assets {
     return true;
   };
 
-  public toList = (): Asset[] => {
+  public get toList(): Asset[] {
     const assets: Asset[] = [];
     for (const [ccy, tkns] of this.assets) {
       for (const tkn of tkns) {
@@ -184,11 +184,11 @@ export class Assets {
       }
     }
     return assets;
-  };
+  }
 
   public forEach = (
     f: (value: Asset, index?: number, array?: Asset[]) => void,
-  ) => this.toList().forEach(f);
+  ) => this.toList.forEach(f);
 
   static fromList(assets: Asset[]): Assets {
     const assets_ = new Assets();
