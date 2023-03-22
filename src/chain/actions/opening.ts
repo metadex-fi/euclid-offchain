@@ -146,7 +146,7 @@ export class Opening {
     // console.log(`numDiracs: ${numTicks.unsigned.mulAmounts()}`);
     // NOTE 27 diracs slightly exceeds the max tx size (17444 vs. 16384)
     // TODO consider splitting up the tx
-    console.log(`Opening`);
+    // console.log(`Opening`);
     return new Opening(
       user,
       param,

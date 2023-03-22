@@ -16,17 +16,18 @@ Deno.test("emulator", async () => {
   let trials = 100;
   const actionCounts_ = new Map<string, number>();
   while (trials > 0) {
+    console.log(`trials: ${trials}`);
     const allUsers = await User.genSeveral(genPositive(10n), genPositive(10n)); // TODO more
     const accounts = allUsers.map((u) => u.account);
-    console.log(`accounts: ${accounts}`);
+    console.log(`accounts: ${accounts.length}`);
     const emulator = new Lucid.Emulator(accounts);
     const traces: string[] = [];
     const actionCounts = new Map<string, number>();
     const iterations = 50;
     for (let i = 0; i < iterations; i++) {
-      console.log(
-        `\ntrials: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`,
-      );
+      // console.log(
+      //   `\ntrials: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`,
+      // );
       const lucid = await Lucid.Lucid.new(emulator);
       const user = await User.from(lucid, randomChoice(allUsers).privateKey);
 

@@ -27,7 +27,7 @@ export class Closing {
     if (!pools) return undefined;
     if (!pools.size) return undefined;
     const pool = randomChoice([...pools.values()]);
-    console.log(`Closing`);
+    // console.log(`Closing`);
     return new Closing(user, pool);
   };
 }

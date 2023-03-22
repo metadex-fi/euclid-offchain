@@ -161,6 +161,6 @@ export function genByteString(
 export function genName(minLength = 0n, maxLength = gMaxStringLength): string {
   const lower = letters;
   const upper = lower.toUpperCase();
-  const alph = lower + upper + symbols;
+  const alph = lower + upper; //+ symbols; TODO reactivate symbols (apparently sometimes breaks something onchain in tokenNames)
   return genString(alph, minLength, maxLength, 1n);
 }

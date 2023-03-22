@@ -8,6 +8,7 @@ import {
 import { DiracDatum } from "../../types/euclid/euclidDatum.ts";
 import { Swap } from "../../types/euclid/swap.ts";
 import { Asset } from "../../types/general/derived/asset/asset.ts";
+import { PositiveValue } from "../../types/general/derived/value/positiveValue.ts";
 import { Data } from "../../types/general/fundamental/type.ts";
 import {
   genPositive,
@@ -61,9 +62,6 @@ export class Swapping {
     const retour = funds.toLucid;
     retour[this.diracUtxo.dirac.threadNFT.toLucid] = 1n;
 
-    console.log(this.diracUtxo.utxo!.assets);
-    console.log(retour);
-
     const swapRedeemer = PEuclidAction.ptype.pconstant(
       new SwapRedeemer(
         new Swap(
@@ -80,6 +78,11 @@ export class Swapping {
     const datum = this.diracUtxo.peuclidDatum.pconstant(
       new DiracDatum(this.diracUtxo.dirac),
     );
+
+    console.log(PositiveValue.fromLucid(this.diracUtxo.utxo!.assets).concise());
+    console.log(PositiveValue.fromLucid(retour).concise());
+    console.log(this.diracUtxo.utxo!.assets);
+    console.log(retour);
 
     return tx
       .readFrom([this.paramUtxo.utxo!])
@@ -153,7 +156,7 @@ export class Swapping {
     const swappings = user.contract!.state!.swappingsFor(user);
     // console.log(`\tswappings: ${swappings}`);
     if (swappings.length < 1) return undefined;
-    console.log(`Swapping`);
+    // console.log(`Swapping`);
     return randomChoice(swappings).randomSubSwap();
   }
 
