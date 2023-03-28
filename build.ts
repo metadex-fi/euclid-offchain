@@ -32,11 +32,18 @@ Deno.copyFileSync("README.md", "dist/README.md");
 
 // Copy WebAssembly
 const lucidPath = Deno.realPathSync(`${scriptDir}/lucid`);
+const wasmOutputPath1 = `${scriptDir}/dist/esm/src/core/libs/cardano_multiplatform_lib`;
+const wasmOutputPath2 = `${scriptDir}/dist/esm/src/core/libs/cardano_message_signing`;
+
+// Create target directories
+await Deno.mkdir(wasmOutputPath1, { recursive: true });
+await Deno.mkdir(wasmOutputPath2, { recursive: true });
+
 Deno.copyFileSync(
   `${lucidPath}/src/core/libs/cardano_multiplatform_lib/cardano_multiplatform_lib_bg.wasm`,
-  `${scriptDir}/dist/esm/src/core/libs/cardano_multiplatform_lib/cardano_multiplatform_lib_bg.wasm`,
+  `${wasmOutputPath1}/cardano_multiplatform_lib_bg.wasm`,
 );
 Deno.copyFileSync(
   `${lucidPath}/src/core/libs/cardano_message_signing/cardano_message_signing_bg.wasm`,
-  `${scriptDir}/dist/esm/src/core/libs/cardano_message_signing/cardano_message_signing_bg.wasm`,
+  `${wasmOutputPath2}/cardano_message_signing_bg.wasm`,
 );
