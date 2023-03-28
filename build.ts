@@ -1,10 +1,10 @@
-// this file is closely based on the equivalent in lucid
-
 import * as dnt from "https://deno.land/x/dnt@0.30.0/mod.ts";
 import * as esbuild from "https://deno.land/x/esbuild@v0.17.11/mod.js";
 import packageInfo from "./package.json" assert { type: "json" };
 
 await dnt.emptyDir("./dist");
+
+//** NPM ES Module for Node.js and Browser */
 
 await dnt.build({
   entryPoints: ["./mod.ts"],
@@ -28,65 +28,59 @@ await dnt.build({
   },
 });
 
+// Deno.copyFileSync("LICENSE", "dist/LICENSE");
 Deno.copyFileSync("README.md", "dist/README.md");
 
-// // Copy WebAssembly files from submodule
-// const wasmOutputPath1 = "./dist/esm/src/core/libs/cardano_multiplatform_lib";
-// const wasmOutputPath2 = "./dist/esm/src/core/libs/cardano_message_signing";
+// Copy WebAssembly
 
-// await dnt.emptyDir(wasmOutputPath1);
-// await dnt.emptyDir(wasmOutputPath2);
-
-// Deno.copyFileSync(
-//   "lucid/src/core/libs/cardano_multiplatform_lib/cardano_multiplatform_lib_bg.wasm",
-//   wasmOutputPath1 + "/cardano_multiplatform_lib_bg.wasm",
-// );
-
-// Deno.copyFileSync(
-//   "lucid/src/core/libs/cardano_message_signing/cardano_message_signing_bg.wasm",
-//   wasmOutputPath2 + "/cardano_message_signing_bg.wasm",
-// );
-
+Deno.copyFileSync(
+  "../lucid/src/core/libs/cardano_multiplatform_lib/cardano_multiplatform_lib_bg.wasm",
+  "dist/esm/lucid/src/core/libs/cardano_multiplatform_lib/cardano_multiplatform_lib_bg.wasm",
+);
+Deno.copyFileSync(
+  "../lucid/src/core/libs/cardano_message_signing/cardano_message_signing_bg.wasm",
+  "dist/esm/lucid/src/core/libs/cardano_message_signing/cardano_message_signing_bg.wasm",
+);
 
 // //** Web ES Module */
 
-// const importPathPlugin = {
-//   name: "core-import-path",
-//   setup(build: any) {
-//     build.onResolve({
-//       filter:
-//         /^\.\/libs\/cardano_multiplatform_lib\/cardano_multiplatform_lib.generated.js$/,
-//     }, (args: any) => {
-//       return {
-//         path:
-//           "../esm/src/core/libs/cardano_multiplatform_lib/cardano_multiplatform_lib.generated.js",
-//         external: true,
-//       };
-//     });
-//     build.onResolve({
-//       filter:
-//         /^\.\/libs\/cardano_message_signing\/cardano_message_signing.generated.js$/,
-//     }, (args: any) => {
-//       return {
-//         path:
-//           "../esm/src/core/libs/cardano_message_signing/cardano_message_signing.generated.js",
-//         external: true,
-//       };
-//     });
-//   },
-// };
+const importPathPlugin = {
+  name: "core-import-path",
+  setup(build: any) {
+    build.onResolve({
+      filter:
+        /^\.\/libs\/cardano_multiplatform_lib\/cardano_multiplatform_lib.generated.js$/,
+    }, (args: any) => {
+      return {
+        path:
+          "../esm/lucid/src/core/libs/cardano_multiplatform_lib/cardano_multiplatform_lib.generated.js",
+        external: true,
+      };
+    });
+    build.onResolve({
+      filter:
+        /^\.\/libs\/cardano_message_signing\/cardano_message_signing.generated.js$/,
+    }, (args: any) => {
+      return {
+        path:
+          "../esm/lucid/src/core/libs/cardano_message_signing/cardano_message_signing.generated.js",
+        external: true,
+      };
+    });
+  },
+};
 
-// await esbuild.build({
-//   bundle: true,
-//   format: "esm",
-//   entryPoints: ["./dist/esm/mod.js"],
-//   outfile: "./dist/web/mod.js",
-//   minify: true,
-//   plugins: [
-//     importPathPlugin,
-//   ],
-// });
-// esbuild.stop();
+await esbuild.build({
+  bundle: true,
+  format: "esm",
+  entryPoints: ["./dist/esm/euclid-offchain/mod.js"],
+  outfile: "./dist/web/mod.js",
+  minify: true,
+  plugins: [
+    importPathPlugin,
+  ],
+});
+esbuild.stop();
 
 // /** Add necessary global import statements to NPM ES Module. */
 // const coreFile = `const isNode = globalThis?.process?.versions?.node;
@@ -107,6 +101,7 @@ Deno.copyFileSync("README.md", "dist/README.md");
 //     if (!globalThis.require) globalThis.require = require; 
 //     if (!globalThis.fs) globalThis.fs = fs; 
 // }
-// ${Deno.readTextFileSync("./dist/esm/lucid/src/core/core.js")}
+
+// ${Deno.readTextFileSync("./dist/esm/src/core/core.js")}
 // `;
-// Deno.writeTextFileSync("./dist/esm/lucid/src/core/core.js", coreFile);
+// Deno.writeTextFileSync("./dist/esm/src/core/core.js", coreFile);

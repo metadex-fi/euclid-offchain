@@ -1,0 +1,22 @@
+{
+  "module": "./esm/euclid-offchain/mod.js",
+  "main": "./esm/mod.js",
+  "types": "./types/euclid-offchain/mod.d.ts",
+  "name": "euclid-offchain",
+  "author": "Chris M. Hiatt",
+  "engines": {
+    "node": ">=14"
+  },
+  "dependencies": {
+    "node-fetch": "^3.2.3",
+    "@peculiar/webcrypto": "^1.4.0",
+    "ws": "^8.10.0"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./esm/euclid-offchain/mod.js",
+      "types": "./types/euclid-offchain/mod.d.ts"
+    }
+  }
+}
