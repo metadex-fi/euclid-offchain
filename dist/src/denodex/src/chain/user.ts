@@ -4,7 +4,7 @@ import { IdNFT } from "../types/euclid/idnft.js";
 import { Asset } from "../types/general/derived/asset/asset.js";
 import { Assets } from "../types/general/derived/asset/assets.js";
 import { KeyHash, PKeyHash } from "../types/general/derived/hash/keyHash.js";
-import { feesEtcLovelace, gMaxLength } from "../utils/generators.js";
+import { feesEtcLovelace } from "../utils/generators.js";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.js";
 import { Action, UserAction } from "./actions/action.js";
 
