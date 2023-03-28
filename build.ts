@@ -1,3 +1,5 @@
+// this file is closely based on the equivalent in lucid
+
 import * as dnt from "https://deno.land/x/dnt@0.30.0/mod.ts";
 import * as esbuild from "https://deno.land/x/esbuild@v0.17.11/mod.js";
 import packageInfo from "./package.json" assert { type: "json" };
@@ -26,7 +28,7 @@ await dnt.build({
   },
 });
 
-// Deno.copyFileSync("README.md", "dist/README.md");
+Deno.copyFileSync("README.md", "dist/README.md");
 
 // // Copy WebAssembly files from submodule
 // const wasmOutputPath1 = "./dist/esm/src/core/libs/cardano_multiplatform_lib";
