@@ -1,13 +1,13 @@
-import { Core } from "../core/mod.js";
+import { C } from "../core/mod.js";
 import { PrivateKey, Transaction, TransactionWitnesses, TxHash } from "../types/mod.js";
 import { Lucid } from "./lucid.js";
 import { TxSigned } from "./tx_signed.js";
 export declare class TxComplete {
-    txComplete: Core.Transaction;
-    witnessSetBuilder: Core.TransactionWitnessSetBuilder;
+    txComplete: C.Transaction;
+    witnessSetBuilder: C.TransactionWitnessSetBuilder;
     private tasks;
     private lucid;
-    constructor(lucid: Lucid, tx: Core.Transaction);
+    constructor(lucid: Lucid, tx: C.Transaction);
     sign(): TxComplete;
     /** Add an extra signature from a private key. */
     signWithPrivateKey(privateKey: PrivateKey): TxComplete;

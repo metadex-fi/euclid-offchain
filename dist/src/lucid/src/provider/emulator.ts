@@ -1,4 +1,4 @@
-import { C, Core } from "../core/core.js";
+import { C } from "../core/core.js";
 import {
   Address,
   Assets,
@@ -332,7 +332,7 @@ export class Emulator implements Provider {
       return scriptHashes;
     })();
 
-    const nativeHashesOptional: Record<ScriptHash, Core.NativeScript> = {};
+    const nativeHashesOptional: Record<ScriptHash, C.NativeScript> = {};
     const plutusHashesOptional: ScriptHash[] = [];
 
     const plutusHashes = (() => {
@@ -579,9 +579,6 @@ export class Emulator implements Provider {
     }
 
     // Check mint witnesses
-    // console.log(body.mint()?.to_js_value())
-    // console.log(body.mint()?.keys().to_js_value())
-    // console.log(body.mint()?.keys().len())
 
     for (let index = 0; index < (body.mint()?.keys().len() || 0); index++) {
       const policyId = body.mint()!.keys().get(index).to_hex();

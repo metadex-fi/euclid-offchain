@@ -1,4 +1,4 @@
-import { Core } from "../core/mod.js";
+import { C } from "../core/mod.js";
 import { Utils } from "../utils/mod.js";
 import { Address, Datum, Delegation, ExternalWallet, Network, OutRef, Payload, PrivateKey, Provider, RewardAddress, SignedMessage, Slot, Transaction, TxHash, Unit, UTxO, Wallet, WalletApi } from "../types/mod.js";
 import { Tx } from "./tx.js";
@@ -7,7 +7,7 @@ import { Message } from "./message.js";
 import { TSchema } from "../../../deps/deno.land/x/typebox@0.25.13/src/typebox.js";
 import { Credential } from "../types/types.js";
 export declare class Lucid {
-    txBuilderConfig: Core.TransactionBuilderConfig;
+    txBuilderConfig: C.TransactionBuilderConfig;
     wallet: Wallet;
     provider: Provider;
     network: Network;

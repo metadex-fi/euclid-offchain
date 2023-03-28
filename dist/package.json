@@ -1,7 +1,7 @@
 {
-  "module": "./esm/denodex/mod.js",
+  "module": "./esm/mod.js",
   "main": "./esm/mod.js",
-  "types": "./types/denodex/mod.d.ts",
+  "types": "./types/mod.d.ts",
   "name": "euclid-offchain",
   "author": "Chris M. Hiatt",
   "engines": {
@@ -15,8 +15,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./esm/denodex/mod.js",
-      "types": "./types/denodex/mod.d.ts"
+      "import": "./esm/mod.js",
+      "types": "./types/mod.d.ts"
     }
   }
 }

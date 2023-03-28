@@ -1,9 +1,9 @@
-import { Core } from "../core/mod.js";
+import { C } from "../core/mod.js";
 import { Address, Assets, CertificateValidator, Datum, Json, Label, Lovelace, MintingPolicy, OutputData, PaymentKeyHash, PoolId, PoolParams, Redeemer, RewardAddress, SpendingValidator, StakeKeyHash, UnixTime, UTxO, WithdrawalValidator } from "../types/mod.js";
 import { Lucid } from "./lucid.js";
 import { TxComplete } from "./tx_complete.js";
 export declare class Tx {
-    txBuilder: Core.TransactionBuilder;
+    txBuilder: C.TransactionBuilder;
     /** Stores the tx instructions, which get executed after calling .complete() */
     private tasks;
     private lucid;
@@ -18,7 +18,7 @@ export declare class Tx {
     /**
      * All assets should be of the same policy id.
      * You can chain mintAssets functions together if you need to mint assets with different policy ids.
-     * If the plutus script doesn't need a redeemer, you still need to specifiy the empty redeemer.
+     * If the plutus script doesn't need a redeemer, you still need to specifiy the void redeemer.
      */
     mintAssets(assets: Assets, redeemer?: Redeemer): Tx;
     /** Pay to a public key or native script address. */
@@ -56,6 +56,8 @@ export declare class Tx {
     attachMetadata(label: Label, metadata: Json): Tx;
     /** Converts strings to bytes if prefixed with **'0x'**. */
     attachMetadataWithConversion(label: Label, metadata: Json): Tx;
+    /** Explicitely set the network id in the transaction body. */
+    addNetworkId(id: number): Tx;
     attachSpendingValidator(spendingValidator: SpendingValidator): Tx;
     attachMintingPolicy(mintingPolicy: MintingPolicy): Tx;
     attachCertificateValidator(certValidator: CertificateValidator): Tx;

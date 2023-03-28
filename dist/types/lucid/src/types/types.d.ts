@@ -1,4 +1,4 @@
-import { Core } from "../core/mod.js";
+import { C } from "../core/mod.js";
 declare type CostModel = Record<string, number>;
 export declare type CostModels = Record<PlutusVersion, CostModel>;
 export declare type ProtocolParameters = {
@@ -154,9 +154,9 @@ export interface Wallet {
     address(): Promise<Address>;
     rewardAddress(): Promise<RewardAddress | null>;
     getUtxos(): Promise<UTxO[]>;
-    getUtxosCore(): Promise<Core.TransactionUnspentOutputs>;
+    getUtxosCore(): Promise<C.TransactionUnspentOutputs>;
     getDelegation(): Promise<Delegation>;
-    signTx(tx: Core.Transaction): Promise<Core.TransactionWitnessSet>;
+    signTx(tx: C.Transaction): Promise<C.TransactionWitnessSet>;
     signMessage(address: Address | RewardAddress, payload: Payload): Promise<SignedMessage>;
     submitTx(signedTx: Transaction): Promise<TxHash>;
 }

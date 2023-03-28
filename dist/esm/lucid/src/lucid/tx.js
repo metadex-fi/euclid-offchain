@@ -1,5 +1,6 @@
 import { C } from "../core/mod.js";
 import { assetsToValue, fromHex, networkToId, toHex, toScriptRef, utxoToCore, } from "../utils/mod.js";
+import { applyDoubleCborEncoding } from "../utils/utils.js";
 import { TxComplete } from "./tx_complete.js";
 export class Tx {
     constructor(lucid) {
@@ -64,7 +65,7 @@ export class Tx {
     /**
      * All assets should be of the same policy id.
      * You can chain mintAssets functions together if you need to mint assets with different policy ids.
-     * If the plutus script doesn't need a redeemer, you still need to specifiy the empty redeemer.
+     * If the plutus script doesn't need a redeemer, you still need to specifiy the void redeemer.
      */
     mintAssets(assets, redeemer) {
         this.tasks.push((that) => {
@@ -73,7 +74,7 @@ export class Tx {
             const mintAssets = C.MintAssets.new();
             units.forEach((unit) => {
                 if (unit.slice(0, 56) !== policyId) {
-                    throw new Error("Only one Policy Id allowed. You can chain multiple mintAssets functions together if you need to mint assets with different Policy Ids.");
+                    throw new Error("Only one policy id allowed. You can chain multiple mintAssets functions together if you need to mint assets with different policy ids.");
                 }
                 mintAssets.insert(C.AssetName.new(fromHex(unit.slice(56))), C.Int.from_str(assets[unit].toString()));
             });
@@ -273,6 +274,13 @@ export class Tx {
         });
         return this;
     }
+    /** Explicitely set the network id in the transaction body. */
+    addNetworkId(id) {
+        this.tasks.push((that) => {
+            that.txBuilder.set_network_id(C.NetworkId.from_bytes(fromHex(id.toString(16).padStart(2, "0"))));
+        });
+        return this;
+    }
     attachSpendingValidator(spendingValidator) {
         this.tasks.push((that) => {
             attachScript(that, spendingValidator);
@@ -320,15 +328,7 @@ export class Tx {
         const utxos = await this.lucid.wallet.getUtxosCore();
         const changeAddress = addressFromWithNetworkCheck(options?.change?.address || (await this.lucid.wallet.address()), this.lucid);
         if (options?.coinSelection || options?.coinSelection === undefined) {
-            try {
-                this.txBuilder.add_inputs_from(utxos, changeAddress);
-            }
-            catch (e) {
-                if (e.startsWith("Maximum transaction size of ")) {
-                    console.log("ADFSDGSDGSD");
-                }
-                throw e;
-            }
+            this.txBuilder.add_inputs_from(utxos, changeAddress);
         }
         this.txBuilder.balance(changeAddress, (() => {
             if (options?.change?.outputData?.hash) {
@@ -357,15 +357,15 @@ export class Tx {
         return toHex(this.txBuilder.to_bytes());
     }
 }
-function attachScript(tx, script) {
-    if (script.type === "Native") {
-        return tx.txBuilder.add_native_script(C.NativeScript.from_bytes(fromHex(script.script)));
+function attachScript(tx, { type, script }) {
+    if (type === "Native") {
+        return tx.txBuilder.add_native_script(C.NativeScript.from_bytes(fromHex(script)));
     }
-    else if (script.type === "PlutusV1") {
-        return tx.txBuilder.add_plutus_script(C.PlutusScript.from_bytes(fromHex(script.script)));
+    else if (type === "PlutusV1") {
+        return tx.txBuilder.add_plutus_script(C.PlutusScript.from_bytes(fromHex(applyDoubleCborEncoding(script))));
     }
-    else if (script.type === "PlutusV2") {
-        return tx.txBuilder.add_plutus_v2_script(C.PlutusScript.from_bytes(fromHex(script.script)));
+    else if (type === "PlutusV2") {
+        return tx.txBuilder.add_plutus_v2_script(C.PlutusScript.from_bytes(fromHex(applyDoubleCborEncoding(script))));
     }
     throw new Error("No variant matched.");
 }
@@ -410,7 +410,7 @@ async function createPoolRegistration(poolParams, lucid) {
         }
     });
     return C.PoolRegistration.new(C.PoolParams.new(C.Ed25519KeyHash.from_bech32(poolParams.poolId), C.VRFKeyHash.from_hex(poolParams.vrfKeyHash), C.BigNum.from_str(poolParams.pledge.toString()), C.BigNum.from_str(poolParams.cost.toString()), C.UnitInterval.from_float(poolParams.margin), C.RewardAddress.from_address(addressFromWithNetworkCheck(poolParams.rewardAddress, lucid)), poolOwners, relays, metadataHash
-        ? C.PoolMetadata.new(C.URL.new(poolParams.metadataUrl), metadataHash)
+        ? C.PoolMetadata.new(C.Url.new(poolParams.metadataUrl), metadataHash)
         : undefined));
 }
 function addressFromWithNetworkCheck(address, lucid) {

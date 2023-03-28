@@ -1,4 +1,4 @@
-import { C, Core } from "../core/mod.js";
+import { C } from "../core/mod.js";
 import { applyDoubleCborEncoding, fromHex, toHex } from "../utils/mod.js";
 import {
   Address,
@@ -285,7 +285,7 @@ export class Blockfrost implements Provider {
  * The conversion is ambigious, that's why it's better to get the datum directly in Cbor.
  */
 export function datumJsonToCbor(json: DatumJson): Datum {
-  const convert = (json: DatumJson): Core.PlutusData => {
+  const convert = (json: DatumJson): C.PlutusData => {
     if (!isNaN(json.int!)) {
       return C.PlutusData.new_integer(C.BigInt.from_str(json.int!.toString()));
     } else if (json.bytes || !isNaN(Number(json.bytes))) {
