@@ -25,7 +25,7 @@ export class User {
 
   private constructor(
     public readonly lucid: Lucid.Lucid,
-    public readonly privateKey: string,
+    public readonly privateKey?: string, // for emulation
     public readonly address?: Lucid.Address,
     paymentKeyHash?: KeyHash,
   ) {
@@ -104,7 +104,16 @@ export class User {
       ?.lastIdNFT;
   };
 
-  static async from(
+  static async fromWalletApi(
+    lucid: Lucid.Lucid,
+    api: Lucid.WalletApi,
+  ): Promise<User> {
+    const address = await lucid.selectWallet(api).wallet
+      .address();
+    return new User(lucid, undefined, address);
+  }
+
+  static async fromPrivateKey(
     lucid: Lucid.Lucid,
     privateKey: string,
   ): Promise<User> {

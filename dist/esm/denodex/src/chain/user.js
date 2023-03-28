@@ -11,7 +11,8 @@ import { Contract } from "./contract.js";
 const forFeesEtc = PositiveValue.singleton(Asset.ADA, 10n * feesEtcLovelace); // costs in lovelace for fees etc. TODO excessive
 // const feesEtc = PositiveValue.singleton(Asset.ADA, feesEtcLovelace);
 export class User {
-    constructor(lucid, privateKey, address, paymentKeyHash) {
+    constructor(lucid, privateKey, // for emulation
+    address, paymentKeyHash) {
         Object.defineProperty(this, "lucid", {
             enumerable: true,
             configurable: true,
@@ -139,7 +140,12 @@ export class User {
             assets: this.balance.toLucid,
         };
     }
-    static async from(lucid, privateKey) {
+    static async fromWalletApi(lucid, api) {
+        const address = await lucid.selectWallet(api).wallet
+            .address();
+        return new User(lucid, undefined, address);
+    }
+    static async fromPrivateKey(lucid, privateKey) {
         const address = await lucid.selectWalletFromPrivateKey(privateKey).wallet
             .address();
         return new User(lucid, privateKey, address);

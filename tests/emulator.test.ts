@@ -29,7 +29,7 @@ Deno.test("emulator", async () => {
       //   `\ntrials: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`,
       // );
       const lucid = await Lucid.Lucid.new(emulator);
-      const user = await User.from(lucid, randomChoice(allUsers).privateKey);
+      const user = await User.fromPrivateKey(lucid, randomChoice(allUsers).privateKey!);
 
       // TODO multiple parallel users and actions (requires logging of spent contract utxos or error handling)
       // const users = await Promise.all(

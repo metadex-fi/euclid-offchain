@@ -7,7 +7,7 @@ import { Action } from "./actions/action.js";
 import { Contract } from "./contract.js";
 export declare class User {
     readonly lucid: Lucid.Lucid;
-    readonly privateKey: string;
+    readonly privateKey?: string | undefined;
     readonly address?: string | undefined;
     readonly contract: Contract;
     readonly paymentKeyHash: KeyHash;
@@ -24,7 +24,8 @@ export declare class User {
         assets: Lucid.Assets;
     };
     update: () => Promise<void>;
-    static from(lucid: Lucid.Lucid, privateKey: string): Promise<User>;
+    static fromWalletApi(lucid: Lucid.Lucid, api: Lucid.WalletApi): Promise<User>;
+    static fromPrivateKey(lucid: Lucid.Lucid, privateKey: string): Promise<User>;
     static generateWith(lucid: Lucid.Lucid, allAssets: Assets): Promise<User>;
     static generateDummy(): User;
     static genSeveral(numUsers: bigint, numAssets: bigint): Promise<User[]>;
