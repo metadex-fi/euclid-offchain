@@ -5,6 +5,7 @@ import { Swapping } from "./actions/swapping.js";
 import { Contract } from "./contract.js";
 import { User } from "./user.js";
 import { DiracUtxo, ParamUtxo, PreDiracUtxo } from "./utxo.js";
+import { PositiveValue } from "../types/general/derived/value/positiveValue.js";
 export declare class PrePool {
     paramUtxo?: ParamUtxo;
     preDiracUtxos?: AssocMap<IdNFT, PreDiracUtxo>;
@@ -19,6 +20,7 @@ export declare class Pool {
     private constructor();
     get utxos(): Lucid.UTxO[];
     get lastIdNFT(): IdNFT;
+    get balance(): PositiveValue;
     openingTx: (tx: Lucid.Tx, contract: Contract) => Lucid.Tx;
     closingTx: (tx: Lucid.Tx, contract: Contract) => Lucid.Tx;
     swappingsFor(user: User): Swapping[];

@@ -25,6 +25,19 @@ export class Currency {
                 return `Currency(${this.toString()})`;
             }
         });
+        Object.defineProperty(this, "concise", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: () => {
+                if (this.symbol.length === 0) {
+                    return "ADA";
+                }
+                else {
+                    return this.toString();
+                }
+            }
+        });
         Object.defineProperty(this, "valueOf", {
             enumerable: true,
             configurable: true,

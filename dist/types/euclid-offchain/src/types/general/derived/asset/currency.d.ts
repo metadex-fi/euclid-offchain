@@ -4,6 +4,7 @@ export declare class Currency {
     constructor(symbol: Uint8Array);
     toString: () => string;
     show: () => string;
+    concise: () => string;
     valueOf: () => string;
     toLucid: () => string;
     static fromLucid(hexCurrencySymbol: string): Currency;

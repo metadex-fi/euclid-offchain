@@ -19,8 +19,8 @@ const forFeesEtc = PositiveValue.singleton(
 export class User {
   public readonly contract: Contract;
   public readonly paymentKeyHash: KeyHash;
+  public balance?: PositiveValue;
 
-  private balance?: PositiveValue;
   private lastIdNFT?: IdNFT;
 
   private constructor(

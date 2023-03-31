@@ -18,6 +18,17 @@ export class Token {
                 return `Token(${this.name})`;
             }
         });
+        Object.defineProperty(this, "concise", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: () => {
+                if (this.name.length === 0)
+                    return "Lovelace";
+                else
+                    return this.name;
+            }
+        });
         Object.defineProperty(this, "valueOf", {
             enumerable: true,
             configurable: true,

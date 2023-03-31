@@ -18,6 +18,14 @@ export class Currency {
     return `Currency(${this.toString()})`;
   };
 
+  public concise = (): string => {
+    if (this.symbol.length === 0) {
+      return "ADA";
+    } else {
+      return this.toString();
+    }
+  };
+
   public valueOf = this.show;
 
   public toLucid = (): string => {

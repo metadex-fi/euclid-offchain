@@ -8,6 +8,7 @@ import { Swapping } from "./actions/swapping.js";
 import { Contract } from "./contract.js";
 import { User } from "./user.js";
 import { DiracUtxo, ParamUtxo, PreDiracUtxo } from "./utxo.js";
+import { PositiveValue } from "../types/general/derived/value/positiveValue.js";
 
 export class PrePool {
   public paramUtxo?: ParamUtxo;
@@ -84,6 +85,10 @@ export class Pool {
     if (this.diracUtxos) {
       return this.diracUtxos[this.diracUtxos.length - 1].dirac.threadNFT;
     } else return this.paramUtxo.paramNFT;
+  }
+
+  public get balance(): PositiveValue {
+    return this.diracUtxos.reduce((a, b) => a.normedPlus(b.balance), new PositiveValue());
   }
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {

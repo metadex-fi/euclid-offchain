@@ -3,6 +3,7 @@ import { Lucid } from "../../lucid.mod.js";
 import { AdminRedeemer, PEuclidAction } from "../types/euclid/euclidAction.js";
 import { AssocMap } from "../types/general/fundamental/container/map.js";
 import { Data, f, t } from "../types/general/fundamental/type.js";
+import { PositiveValue } from "../types/general/derived/value/positiveValue.js";
 export class PrePool {
     constructor() {
         Object.defineProperty(this, "paramUtxo", {
@@ -139,6 +140,9 @@ export class Pool {
         }
         else
             return this.paramUtxo.paramNFT;
+    }
+    get balance() {
+        return this.diracUtxos.reduce((a, b) => a.normedPlus(b.balance), new PositiveValue());
     }
     swappingsFor(user) {
         const balance = user.availableBalance;

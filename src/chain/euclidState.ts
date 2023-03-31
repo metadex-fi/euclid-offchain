@@ -79,7 +79,8 @@ export class EuclidState {
           throw new Error(`unknown preEuclidDatum`);
         }
       } catch (e) {
-        throw e; // TODO revert in prod
+        console.error(e);
+        // throw e; // TODO revert in prod
         // const is = this.invalidUtxos.get(e.message) ?? [];
         // is.push(utxo);
         // this.invalidUtxos.set(e.message, is);

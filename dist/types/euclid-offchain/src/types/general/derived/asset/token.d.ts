@@ -3,6 +3,7 @@ export declare class Token {
     readonly name: string;
     constructor(name: string);
     show: () => string;
+    concise: () => string;
     valueOf: () => string;
     toLucid: () => string;
     static fromLucid(hexTokenName: string): Token;

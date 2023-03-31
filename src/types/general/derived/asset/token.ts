@@ -15,6 +15,11 @@ export class Token {
     return `Token(${this.name})`;
   };
 
+  public concise = (): string => {
+    if (this.name.length === 0) return "Lovelace";
+    else return this.name;
+  };
+
   public valueOf = this.show;
 
   public toLucid = (): string => {

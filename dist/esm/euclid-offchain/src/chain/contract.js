@@ -1,5 +1,5 @@
-import euclidValidator from "../../contract/euclidValidator.js";
-import euclidMinting from "../../contract/euclidMinting.js";
+import euclidValidator from "../../contract/alwaysSucceeds.js";
+import euclidMinting from "../../contract/mintAlways.js";
 import { EuclidState } from "./euclidState.js";
 import { Currency } from "../types/general/derived/asset/currency.js";
 export class Contract {

@@ -11,7 +11,7 @@ export declare class User {
     readonly address?: string | undefined;
     readonly contract: Contract;
     readonly paymentKeyHash: KeyHash;
-    private balance?;
+    balance?: PositiveValue;
     private lastIdNFT?;
     private constructor();
     get availableBalance(): PositiveValue | undefined;
