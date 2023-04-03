@@ -19,7 +19,7 @@ import { DiracUtxo, ParamUtxo } from "../utxo.js";
 
 // complete settings for opening a pool
 export class Opening {
-  private constructor(
+  constructor(
     private readonly user: User,
     private readonly param: Param,
     private readonly deposit: PositiveValue, // total of all Diracs

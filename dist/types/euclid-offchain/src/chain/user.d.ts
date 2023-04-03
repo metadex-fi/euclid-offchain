@@ -5,6 +5,7 @@ import { KeyHash } from "../types/general/derived/hash/keyHash.js";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.js";
 import { Action } from "./actions/action.js";
 import { Contract } from "./contract.js";
+import { Swapping } from "./actions/swapping.js";
 export declare class User {
     readonly lucid: Lucid.Lucid;
     readonly privateKey?: string | undefined;
@@ -12,6 +13,7 @@ export declare class User {
     readonly contract: Contract;
     readonly paymentKeyHash: KeyHash;
     balance?: PositiveValue;
+    swappings: Swapping[];
     private lastIdNFT?;
     private constructor();
     get availableBalance(): PositiveValue | undefined;

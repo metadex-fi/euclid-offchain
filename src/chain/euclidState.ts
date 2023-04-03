@@ -27,6 +27,7 @@ export class EuclidState {
   public invalidPools = new AssocMap<KeyHash, AssocMap<IdNFT, PrePool>>(
     (kh) => kh.show(),
   );
+  
 
   constructor(
     utxos: Lucid.UTxO[],

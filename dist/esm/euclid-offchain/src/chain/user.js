@@ -49,6 +49,12 @@ export class User {
             writable: true,
             value: void 0
         });
+        Object.defineProperty(this, "swappings", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
         Object.defineProperty(this, "lastIdNFT", {
             enumerable: true,
             configurable: true,
@@ -96,6 +102,7 @@ export class User {
                 // console.log(`balance: ${this.balance.concise()}`);
                 this.lastIdNFT = this.contract.state.pools.get(this.paymentKeyHash)?.last
                     ?.lastIdNFT;
+                this.swappings = this.contract.state.swappingsFor(this);
             }
         });
         this.contract = new Contract(lucid);

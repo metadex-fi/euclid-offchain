@@ -1,11 +1,15 @@
 import { Lucid } from "../../../lucid.mod.js";
+import { EuclidValue } from "../../types/euclid/euclidValue.js";
+import { Param } from "../../types/euclid/param.js";
+import { PositiveValue } from "../../types/general/derived/value/positiveValue.js";
 import { User } from "../user.js";
 export declare class Opening {
     private readonly user;
     private readonly param;
     private readonly deposit;
     private readonly numTicks;
-    private constructor();
+    constructor(user: User, param: Param, deposit: PositiveValue, // total of all Diracs
+    numTicks: EuclidValue);
     get type(): string;
     tx: (tx: Lucid.Tx) => Lucid.Tx;
     private pool;

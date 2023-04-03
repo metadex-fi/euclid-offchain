@@ -9,6 +9,7 @@ import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { Action, UserAction } from "./actions/action.ts";
 
 import { Contract } from "./contract.ts";
+import { Swapping } from "./actions/swapping.ts";
 
 const forFeesEtc = PositiveValue.singleton(
   Asset.ADA,
@@ -20,6 +21,7 @@ export class User {
   public readonly contract: Contract;
   public readonly paymentKeyHash: KeyHash;
   public balance?: PositiveValue;
+  public swappings: Swapping[];
 
   private lastIdNFT?: IdNFT;
 
@@ -102,6 +104,7 @@ export class User {
     // console.log(`balance: ${this.balance.concise()}`);
     this.lastIdNFT = this.contract.state!.pools.get(this.paymentKeyHash)?.last
       ?.lastIdNFT;
+    this.swappings = this.contract.state!.swappingsFor(this);
   };
 
   static async fromWalletApi(
