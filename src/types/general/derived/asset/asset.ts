@@ -24,6 +24,10 @@ export class Asset {
     return `Asset(${this.currency.toString()}, ${this.token.name})`;
   };
 
+  public concise = (): string => {
+    return `${this.currency.concise()}.${this.token.concise()}`;
+  };
+
   public toLucid = (): string => {
     if (this.currency.symbol.length === 0) return "lovelace";
     else return Lucid.toUnit(this.currency.toLucid(), this.token.toLucid());

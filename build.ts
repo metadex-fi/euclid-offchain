@@ -98,8 +98,8 @@ esbuild.stop();
 //     if (!globalThis.Headers) globalThis.Headers = fetch.Headers;
 //     if (!globalThis.Request) globalThis.Request = fetch.Request;
 //     if (!globalThis.Response) globalThis.Response = fetch.Response;
-//     if (!globalThis.require) globalThis.require = require; 
-//     if (!globalThis.fs) globalThis.fs = fs; 
+//     if (!globalThis.require) globalThis.require = require;
+//     if (!globalThis.fs) globalThis.fs = fs;
 // }
 
 // ${Deno.readTextFileSync("./dist/esm/src/core/core.js")}

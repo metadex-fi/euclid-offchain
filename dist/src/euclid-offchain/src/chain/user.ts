@@ -10,6 +10,7 @@ import { Action, UserAction } from "./actions/action.js";
 
 import { Contract } from "./contract.js";
 import { Swapping } from "./actions/swapping.js";
+import { AssocMap } from "../types/general/fundamental/container/map.js";
 
 const forFeesEtc = PositiveValue.singleton(
   Asset.ADA,
@@ -21,7 +22,11 @@ export class User {
   public readonly contract: Contract;
   public readonly paymentKeyHash: KeyHash;
   public balance?: PositiveValue;
-  public swappings: Swapping[];
+  // sold asset -> bought asset -> spot price -> swappings
+  public swapMap = new AssocMap<
+    Asset,
+    AssocMap<Asset, AssocMap<number, Swapping[]>>
+  >((a) => a.show());
 
   private lastIdNFT?: IdNFT;
 
@@ -104,7 +109,82 @@ export class User {
     // console.log(`balance: ${this.balance.concise()}`);
     this.lastIdNFT = this.contract.state!.pools.get(this.paymentKeyHash)?.last
       ?.lastIdNFT;
-    this.swappings = this.contract.state!.swappingsFor(this);
+
+    const swappings = this.contract.state!.swappingsFor(this);
+    swappings.forEach((swapping) => {
+      let soldMap = this.swapMap.get(swapping.soldAsset);
+      if (soldMap === undefined) {
+        soldMap = new AssocMap<Asset, AssocMap<number, Swapping[]>>((a) =>
+          a.show()
+        );
+        this.swapMap.set(
+          swapping.soldAsset,
+          soldMap,
+        );
+      }
+      let boughtMap = soldMap.get(swapping.boughtAsset);
+      if (boughtMap === undefined) {
+        boughtMap = new AssocMap<number, Swapping[]>((spot) => spot.toString());
+        soldMap.set(
+          swapping.boughtAsset,
+          boughtMap,
+        );
+      }
+      let spotList = boughtMap.get(swapping.spotPrice);
+      if (spotList === undefined) {
+        spotList = [];
+        boughtMap.set(
+          swapping.spotPrice,
+          spotList,
+        );
+      }
+      spotList.push(swapping);
+    });
+  };
+
+  public composeSwappings = (
+    boughtAsset: Asset,
+    soldAsset: Asset,
+    amount: bigint,
+    amountIsSold: boolean,
+  ): [Swapping[], bigint] => {
+    const composed: Swapping[] = [];
+    const spotMap = this.swapMap.get(soldAsset)?.get(boughtAsset);
+    assert(
+      spotMap,
+      `no spot map for ${soldAsset.concise()} -> ${boughtAsset.concise()}`,
+    );
+    const spots = [...spotMap.keys()].sort();
+    let remaining = amount;
+    let pairedAmnt = 0n;
+    for (const spot of spots) {
+      const swappings = spotMap.get(spot);
+      assert(swappings, `no swappings for spot ${spot}`);
+      for (const swapping of swappings) {
+        const swappingAmnt = amountIsSold
+          ? swapping.soldAmount
+          : swapping.boughtAmount;
+        if (swappingAmnt <= remaining) {
+          composed.push(swapping);
+          pairedAmnt += amountIsSold
+            ? swapping.boughtAmount
+            : swapping.soldAmount;
+          remaining -= swappingAmnt;
+        } else {
+          const subSwap = swapping.subSwap(remaining, amountIsSold);
+          composed.push(subSwap);
+          pairedAmnt += amountIsSold
+            ? subSwap.boughtAmount
+            : subSwap.soldAmount;
+          remaining = 0n;
+        }
+        if (remaining === 0n) break;
+      }
+      if (remaining === 0n) break;
+    }
+    assert(remaining === 0n, `not enough ${soldAsset.concise()} to swap`);
+
+    return [composed, pairedAmnt];
   };
 
   static async fromWalletApi(

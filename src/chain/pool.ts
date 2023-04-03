@@ -88,7 +88,10 @@ export class Pool {
   }
 
   public get balance(): PositiveValue {
-    return this.diracUtxos.reduce((a, b) => a.normedPlus(b.balance), new PositiveValue());
+    return this.diracUtxos.reduce(
+      (a, b) => a.normedPlus(b.balance),
+      new PositiveValue(),
+    );
   }
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {

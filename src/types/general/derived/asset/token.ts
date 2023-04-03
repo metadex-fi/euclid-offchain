@@ -16,8 +16,7 @@ export class Token {
   };
 
   public concise = (): string => {
-    if (this.name.length === 0) return "Lovelace";
-    else return this.name;
+    return this.name;
   };
 
   public valueOf = this.show;

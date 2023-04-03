@@ -20,21 +20,25 @@ import { User } from "../user.js";
 import { DiracUtxo, ParamUtxo } from "../utxo.js";
 
 export class Swapping {
+  public readonly spotPrice: number; // uninverted
+
   private constructor(
-    private readonly user: User,
-    private readonly paramUtxo: ParamUtxo,
-    private readonly diracUtxo: DiracUtxo,
-    private readonly boughtAsset: Asset,
-    private readonly soldAsset: Asset,
-    private readonly boughtAmount: bigint,
-    private readonly soldAmount: bigint,
-    private readonly boughtSpot: bigint,
-    private readonly soldSpot: bigint,
+    public readonly user: User,
+    public readonly paramUtxo: ParamUtxo,
+    public readonly diracUtxo: DiracUtxo,
+    public readonly boughtAsset: Asset,
+    public readonly soldAsset: Asset,
+    public readonly boughtAmount: bigint,
+    public readonly soldAmount: bigint,
+    public readonly boughtSpot: bigint, // inverted
+    public readonly soldSpot: bigint, // inverted
   ) {
     assert(boughtAmount > 0n, `boughtAmount must be positive`);
     assert(soldAmount > 0n, `soldAmount must be positive`);
     assert(boughtSpot > 0n, `boughtSpot must be positive`);
     assert(soldSpot > 0n, `soldSpot must be positive`);
+
+    this.spotPrice = Number(soldSpot) / Number(boughtSpot);
   }
 
   public get type(): string {
@@ -99,6 +103,33 @@ export class Swapping {
       );
   };
 
+  public subSwap = (amount: bigint, amountIsSold: boolean): Swapping => {
+    let boughtAmount: bigint;
+    let soldAmount: bigint;
+    if (amountIsSold) {
+      assert(amount <= this.soldAmount, `amount must be <= soldAmount`);
+      boughtAmount = BigInt(Math.floor(Number(amount) / this.spotPrice));
+      soldAmount = amount;
+    } else {
+      assert(amount <= this.boughtAmount, `amount must be <= boughtAmount`);
+      boughtAmount = amount;
+      soldAmount = BigInt(Math.ceil(Number(amount) * this.spotPrice));
+    }
+
+    return new Swapping(
+      this.user,
+      this.paramUtxo,
+      this.diracUtxo,
+      this.boughtAsset,
+      this.soldAsset,
+      boughtAmount,
+      soldAmount,
+      this.boughtSpot,
+      this.soldSpot,
+    );
+  };
+
+  // TODO should this rather be using subSwap for consistency?
   private randomSubSwap = (): Swapping => {
     const offerA0 = this.boughtAmount * this.soldSpot;
     const demandA0 = this.soldAmount * this.boughtSpot;
@@ -110,8 +141,7 @@ export class Swapping {
     );
 
     const boughtAmount = genPositive(maxBought);
-    const price = Number(this.soldSpot) / Number(this.boughtSpot);
-    const soldAmount = BigInt(Math.ceil(Number(boughtAmount) * price));
+    const soldAmount = BigInt(Math.ceil(Number(boughtAmount) * this.spotPrice));
 
     return new Swapping(
       this.user,

@@ -36,6 +36,14 @@ export class Asset {
                 return `Asset(${this.currency.toString()}, ${this.token.name})`;
             }
         });
+        Object.defineProperty(this, "concise", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: () => {
+                return `${this.currency.concise()}.${this.token.concise()}`;
+            }
+        });
         Object.defineProperty(this, "toLucid", {
             enumerable: true,
             configurable: true,

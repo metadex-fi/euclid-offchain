@@ -23,10 +23,7 @@ export class Token {
             configurable: true,
             writable: true,
             value: () => {
-                if (this.name.length === 0)
-                    return "Lovelace";
-                else
-                    return this.name;
+                return this.name;
             }
         });
         Object.defineProperty(this, "valueOf", {

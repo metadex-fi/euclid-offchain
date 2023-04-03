@@ -8,6 +8,7 @@ export declare class Asset {
     constructor(currency: Currency, token: Token);
     equals: (other: Asset) => boolean;
     show: () => string;
+    concise: () => string;
     toLucid: () => string;
     toLucidWith: (amount: bigint) => Lucid.Assets;
     static fromLucid(hexAsset: string): Asset;

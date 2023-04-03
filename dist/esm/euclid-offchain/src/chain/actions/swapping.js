@@ -7,7 +7,8 @@ import { PositiveValue } from "../../types/general/derived/value/positiveValue.j
 import { Data } from "../../types/general/fundamental/type.js";
 import { genPositive, min, randomChoice, } from "../../utils/generators.js";
 export class Swapping {
-    constructor(user, paramUtxo, diracUtxo, boughtAsset, soldAsset, boughtAmount, soldAmount, boughtSpot, soldSpot) {
+    constructor(user, paramUtxo, diracUtxo, boughtAsset, soldAsset, boughtAmount, soldAmount, boughtSpot, // inverted
+    soldSpot) {
         Object.defineProperty(this, "user", {
             enumerable: true,
             configurable: true,
@@ -62,6 +63,12 @@ export class Swapping {
             writable: true,
             value: soldSpot
         });
+        Object.defineProperty(this, "spotPrice", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        }); // uninverted
         Object.defineProperty(this, "show", {
             enumerable: true,
             configurable: true,
@@ -104,6 +111,27 @@ export class Swapping {
                 }, retour);
             }
         });
+        Object.defineProperty(this, "subSwap", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: (amount, amountIsSold) => {
+                let boughtAmount;
+                let soldAmount;
+                if (amountIsSold) {
+                    assert(amount <= this.soldAmount, `amount must be <= soldAmount`);
+                    boughtAmount = BigInt(Math.floor(Number(amount) / this.spotPrice));
+                    soldAmount = amount;
+                }
+                else {
+                    assert(amount <= this.boughtAmount, `amount must be <= boughtAmount`);
+                    boughtAmount = amount;
+                    soldAmount = BigInt(Math.ceil(Number(amount) * this.spotPrice));
+                }
+                return new Swapping(this.user, this.paramUtxo, this.diracUtxo, this.boughtAsset, this.soldAsset, boughtAmount, soldAmount, this.boughtSpot, this.soldSpot);
+            }
+        });
+        // TODO should this rather be using subSwap for consistency?
         Object.defineProperty(this, "randomSubSwap", {
             enumerable: true,
             configurable: true,
@@ -115,8 +143,7 @@ export class Swapping {
                 const maxBought = maxSwapA0 / this.soldSpot;
                 assert(maxBought > 0n, `Swapping.randomSubSwap: maxBought must be positive, but is ${maxBought} for ${this.show()}`);
                 const boughtAmount = genPositive(maxBought);
-                const price = Number(this.soldSpot) / Number(this.boughtSpot);
-                const soldAmount = BigInt(Math.ceil(Number(boughtAmount) * price));
+                const soldAmount = BigInt(Math.ceil(Number(boughtAmount) * this.spotPrice));
                 return new Swapping(this.user, this.paramUtxo, this.diracUtxo, this.boughtAsset, this.soldAsset, boughtAmount, soldAmount, this.boughtSpot, this.soldSpot);
             }
         });
@@ -124,6 +151,7 @@ export class Swapping {
         assert(soldAmount > 0n, `soldAmount must be positive`);
         assert(boughtSpot > 0n, `boughtSpot must be positive`);
         assert(soldSpot > 0n, `soldSpot must be positive`);
+        this.spotPrice = Number(soldSpot) / Number(boughtSpot);
     }
     get type() {
         return "Swapping";
