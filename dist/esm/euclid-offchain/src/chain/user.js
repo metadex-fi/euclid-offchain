@@ -8,7 +8,6 @@ import { feesEtcLovelace } from "../utils/generators.js";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.js";
 import { UserAction } from "./actions/action.js";
 import { Contract } from "./contract.js";
-import { AssocMap } from "../types/general/fundamental/container/map.js";
 const forFeesEtc = PositiveValue.singleton(Asset.ADA, 10n * feesEtcLovelace); // costs in lovelace for fees etc. TODO excessive
 // const feesEtc = PositiveValue.singleton(Asset.ADA, feesEtcLovelace);
 export class User {
@@ -49,13 +48,6 @@ export class User {
             configurable: true,
             writable: true,
             value: void 0
-        });
-        // sold asset -> bought asset -> spot price -> swappings
-        Object.defineProperty(this, "swapMap", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: new AssocMap((a) => a.show())
         });
         Object.defineProperty(this, "lastIdNFT", {
             enumerable: true,
@@ -104,68 +96,6 @@ export class User {
                 // console.log(`balance: ${this.balance.concise()}`);
                 this.lastIdNFT = this.contract.state.pools.get(this.paymentKeyHash)?.last
                     ?.lastIdNFT;
-                const swappings = this.contract.state.swappingsFor(this);
-                swappings.forEach((swapping) => {
-                    let soldMap = this.swapMap.get(swapping.soldAsset);
-                    if (soldMap === undefined) {
-                        soldMap = new AssocMap((a) => a.show());
-                        this.swapMap.set(swapping.soldAsset, soldMap);
-                    }
-                    let boughtMap = soldMap.get(swapping.boughtAsset);
-                    if (boughtMap === undefined) {
-                        boughtMap = new AssocMap((spot) => spot.toString());
-                        soldMap.set(swapping.boughtAsset, boughtMap);
-                    }
-                    let spotList = boughtMap.get(swapping.spotPrice);
-                    if (spotList === undefined) {
-                        spotList = [];
-                        boughtMap.set(swapping.spotPrice, spotList);
-                    }
-                    spotList.push(swapping);
-                });
-            }
-        });
-        Object.defineProperty(this, "composeSwappings", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: (boughtAsset, soldAsset, amount, amountIsSold) => {
-                const composed = [];
-                const spotMap = this.swapMap.get(soldAsset)?.get(boughtAsset);
-                assert(spotMap, `no spot map for ${soldAsset.concise()} -> ${boughtAsset.concise()}`);
-                const spots = [...spotMap.keys()].sort();
-                let remaining = amount;
-                let pairedAmnt = 0n;
-                for (const spot of spots) {
-                    const swappings = spotMap.get(spot);
-                    assert(swappings, `no swappings for spot ${spot}`);
-                    for (const swapping of swappings) {
-                        const swappingAmnt = amountIsSold
-                            ? swapping.soldAmount
-                            : swapping.boughtAmount;
-                        if (swappingAmnt <= remaining) {
-                            composed.push(swapping);
-                            pairedAmnt += amountIsSold
-                                ? swapping.boughtAmount
-                                : swapping.soldAmount;
-                            remaining -= swappingAmnt;
-                        }
-                        else {
-                            const subSwap = swapping.subSwap(remaining, amountIsSold);
-                            composed.push(subSwap);
-                            pairedAmnt += amountIsSold
-                                ? subSwap.boughtAmount
-                                : subSwap.soldAmount;
-                            remaining = 0n;
-                        }
-                        if (remaining === 0n)
-                            break;
-                    }
-                    if (remaining === 0n)
-                        break;
-                }
-                assert(remaining === 0n, `not enough ${soldAsset.concise()} to swap`);
-                return [composed, pairedAmnt];
             }
         });
         this.contract = new Contract(lucid);
