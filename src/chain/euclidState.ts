@@ -127,6 +127,7 @@ export class EuclidState {
   public swappingsFor(user: User): Swapping[] {
     // TODO consider removing the user's own pools beforehand
     const pools = [...this.pools.values()].flatMap((p) => [...p.values()]);
+    // console.log("euclidState.swappingsFor pools", pools)
     // if (pools.length) {
     //   console.log(`\t\tpools: ${pools.length}`);
     // }

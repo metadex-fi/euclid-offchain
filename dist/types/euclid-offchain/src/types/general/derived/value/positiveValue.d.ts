@@ -21,6 +21,7 @@ export declare class PositiveValue {
     get size(): bigint;
     get headAsset(): Asset;
     get smallestAmount(): bigint;
+    get biggestAmount(): bigint;
     amountOf: (asset: Asset, defaultAmnt?: bigint) => bigint;
     drop: (asset: Asset) => void;
     ofAssets: (assets: Assets) => PositiveValue;

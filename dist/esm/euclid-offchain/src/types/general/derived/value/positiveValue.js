@@ -208,6 +208,9 @@ export class PositiveValue {
     get smallestAmount() {
         return this.value.smallestAmount;
     }
+    get biggestAmount() {
+        return this.value.biggestAmount;
+    }
     get clone() {
         return new PositiveValue(this.value.clone);
     }

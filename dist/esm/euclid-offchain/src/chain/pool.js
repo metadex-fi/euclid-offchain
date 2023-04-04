@@ -146,9 +146,11 @@ export class Pool {
     }
     swappingsFor(user) {
         const balance = user.availableBalance;
+        // console.log("pool.swappingsFor balance", balance)
         if (!balance)
             return [];
         const sellableBalance = balance.ofAssets(this.paramUtxo.param.assets);
+        // console.log("pool.swappingsFor sellableBalance", sellableBalance)
         if (!sellableBalance.size)
             return [];
         return this.diracUtxos.flatMap((d) => d.swappingsFor(user, this, sellableBalance.unsigned));

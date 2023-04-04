@@ -44,7 +44,7 @@ export declare class Value {
     addAmountOf: (asset: Asset, amount: bigint) => void;
     fill: (assets: Assets, amount: bigint) => Value;
     get smallestAmount(): bigint;
-    biggestAmount: () => bigint;
+    get biggestAmount(): bigint;
     static nullOfAssets: (assets: Assets) => Value;
     static assert(value: Value): void;
     static generateWith: (bounded: PBounded) => Value;

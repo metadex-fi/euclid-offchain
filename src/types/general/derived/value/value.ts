@@ -326,7 +326,7 @@ export class Value {
     return smallest;
   }
 
-  public biggestAmount = (): bigint => {
+  public get biggestAmount(): bigint {
     let biggest: bigint | undefined = undefined;
     for (const amounts of this.value.values()) {
       for (const amount of amounts.values()) {

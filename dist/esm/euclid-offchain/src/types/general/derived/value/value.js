@@ -253,23 +253,6 @@ export class Value {
                 return value;
             }
         });
-        Object.defineProperty(this, "biggestAmount", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: () => {
-                let biggest = undefined;
-                for (const amounts of this.value.values()) {
-                    for (const amount of amounts.values()) {
-                        if (!biggest || biggest < amount) {
-                            biggest = amount;
-                        }
-                    }
-                }
-                assert(biggest, `biggestAmount: no biggest found in ${this.concise()}`);
-                return biggest;
-            }
-        });
         Object.defineProperty(this, "newAmountsCheck", {
             enumerable: true,
             configurable: true,
@@ -386,6 +369,19 @@ export class Value {
         assert(smallest, `smallestAmount: no smallest found in ${this.concise()}`);
         return smallest;
     }
+    get biggestAmount() {
+        let biggest = undefined;
+        for (const amounts of this.value.values()) {
+            for (const amount of amounts.values()) {
+                if (!biggest || biggest < amount) {
+                    biggest = amount;
+                }
+            }
+        }
+        assert(biggest, `biggestAmount: no biggest found in ${this.concise()}`);
+        return biggest;
+    }
+    ;
     static assert(value) {
         assert(value.value instanceof AssocMap, `Value must be a AssocMap, not ${value.value}`);
         Assets.assert(value.assets);

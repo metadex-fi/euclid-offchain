@@ -20,10 +20,10 @@ import { DiracUtxo, ParamUtxo } from "../utxo.js";
 // complete settings for opening a pool
 export class Opening {
   constructor(
-    private readonly user: User,
-    private readonly param: Param,
-    private readonly deposit: PositiveValue, // total of all Diracs
-    private readonly numTicks: EuclidValue,
+    public readonly user: User,
+    public readonly param: Param,
+    public readonly deposit: PositiveValue, // total of all Diracs
+    public readonly numTicks: EuclidValue,
   ) {
     // console.log(deposit.assets.union(this.param.virtual.assets).show());
     assert(

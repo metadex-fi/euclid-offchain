@@ -206,6 +206,7 @@ export class DiracUtxo {
                 const maxBuying_ = new PositiveValue();
                 const maxSelling_ = new PositiveValue();
                 param.assets.forEach((asset) => {
+                    // console.log("asset", asset.concise())
                     const virtual = param.virtual.amountOf(asset, 0n);
                     const buyable = this.balance.amountOf(asset, 0n);
                     const sellable = sellable_.amountOf(asset, 0n);
@@ -218,43 +219,80 @@ export class DiracUtxo {
                     liquidity_.initAmountOf(asset, liquidity);
                     const amm = liquidity * weight; // NOTE: inverted
                     assert(amm > 0n, `amm <= 0n`);
-                    const spotBuying = ((amm - lowest) / jumpSize) * jumpSize + lowest; // NOTE: inverted
-                    assert(spotBuying >= lowest, `spotBuying < lowest`);
-                    const spotSelling = spotBuying + jumpSize; // NOTE: inverted
+                    let spotBuying = ((amm - lowest) / jumpSize) * jumpSize + lowest; // NOTE: inverted
+                    assert(spotBuying >= lowest, `spotBuying < lowest`); // TODO do we want that in the loop below? ("Lowest" should be rather termed "anchor")
+                    let spotSelling = spotBuying + jumpSize; // NOTE: inverted
                     const a = Number(amm);
                     const w = Number(weight);
                     const l = Number(liquidity);
+                    // console.log("amm", amm)
+                    // console.log("weight", weight)
+                    // console.log("liquidity", liquidity)
                     // deposit of asset into pool to move inverted amm-price a to inverted spot price s
                     const delta = (s) => l * (((s / a) ** (w / (w + 1))) - 1);
-                    if (spotBuying > 0n) {
-                        const sb = Number(spotBuying);
-                        const d = delta(sb);
-                        const maxBuying = d === Infinity
-                            ? buyable
-                            : min(buyable, BigInt(Math.floor(-delta(sb))));
-                        if (maxBuying > 0n) {
-                            spotBuying_.initAmountOf(asset, spotBuying);
-                            maxBuying_.initAmountOf(asset, maxBuying);
+                    // console.log("spotSelling", spotSelling)
+                    if (buyable > 0n) {
+                        while (spotBuying > 0n) {
+                            // console.log("spotBuying", spotBuying)
+                            const sb = Number(spotBuying);
+                            const d = delta(sb);
+                            const maxBuying = d === Infinity
+                                ? buyable
+                                : min(buyable, BigInt(Math.floor(-d)));
+                            // console.log("buyable", buyable)
+                            // console.log("d", d)
+                            // console.log("maxBuying", maxBuying)
+                            if (maxBuying > 0n) {
+                                spotBuying_.initAmountOf(asset, spotBuying);
+                                maxBuying_.initAmountOf(asset, maxBuying);
+                                break;
+                            }
+                            else {
+                                spotBuying -= jumpSize;
+                                // if maxBuying is 0, then d is too low, which means that
+                                // we are too close at the amm-price. So we ~increase~ the 
+                                // (uninverted) price we are willing to ~buy~ at stepwise
+                                // until either we hit the bounds or find a d >= 1.
+                            }
                         }
                     }
-                    if (spotSelling > 0n) {
-                        const ss = Number(spotSelling);
-                        const d = delta(ss);
-                        const maxSelling = d === Infinity
-                            ? sellable
-                            : min(sellable, BigInt(Math.floor(d)));
-                        if (maxSelling > 0n) {
-                            spotSelling_.initAmountOf(asset, spotSelling);
-                            maxSelling_.initAmountOf(asset, maxSelling);
+                    if (sellable > 0n && spotSelling > 0n) {
+                        while (true) {
+                            // console.log("spotSelling", spotBuying)
+                            const ss = Number(spotSelling);
+                            const d = delta(ss);
+                            const maxSelling = d === Infinity
+                                ? sellable
+                                : min(sellable, BigInt(Math.floor(d)));
+                            // console.log("sellable", sellable)
+                            // console.log("d", d)
+                            // console.log("maxSelling", maxSelling)
+                            if (maxSelling > 0n) {
+                                spotSelling_.initAmountOf(asset, spotSelling);
+                                maxSelling_.initAmountOf(asset, maxSelling);
+                                break;
+                            }
+                            else {
+                                spotSelling += jumpSize;
+                                // if maxSelling is 0, then d is too low, which means that
+                                // we are too close at the amm-price. So we ~decrease~ the 
+                                // (uninverted) price we are willing to ~sell~ at stepwise
+                                // until we find a d >= 1.
+                                // NOTE/TODO: This should never result in an infite loop, 
+                                // as decreasing uninverted selling price should eventually 
+                                // result in some delta.
+                            }
                         }
                     }
                 });
                 const sellableAssets = maxSelling_.assets.toList;
                 const buyableAssets = maxBuying_.assets.toList;
                 sellableAssets.forEach((sellingAsset) => {
+                    // console.log("sellingAsset", sellingAsset.concise())
                     const spotSelling = spotSelling_.amountOf(sellingAsset); // NOTE: inverted
                     const maxSelling = maxSelling_.amountOf(sellingAsset);
                     buyableAssets.forEach((buyingAsset) => {
+                        // console.log("buyingAsset", buyingAsset.concise())
                         if (sellingAsset.equals(buyingAsset))
                             return;
                         const spotBuying = spotBuying_.amountOf(buyingAsset); // NOTE: inverted
@@ -270,9 +308,11 @@ export class DiracUtxo {
                         const sellingAmount = BigInt(Math.ceil(Number(maxSwapA0) / Number(spotBuying)));
                         const swapping = Swapping.boundary(user, pool.paramUtxo, this, buyingAsset, sellingAsset, buyingAmount, sellingAmount, spotBuying, spotSelling);
                         assert(Swapping.validates(spotBuying, spotSelling, this.dirac.lowestPrices.amountOf(buyingAsset, 0n), this.dirac.lowestPrices.amountOf(sellingAsset, 0n), param.jumpSizes.amountOf(buyingAsset), param.jumpSizes.amountOf(sellingAsset), param.weights.amountOf(buyingAsset), param.weights.amountOf(sellingAsset), liquidity_.amountOf(buyingAsset), liquidity_.amountOf(sellingAsset), buyingAmount, sellingAmount), `invalid swap: ${swapping.show()}`);
+                        // console.log("swapping", swapping.show())
                         swappings.push(swapping);
                     });
                 });
+                // console.log("swappings", swappings)
                 return swappings;
             }
         });
