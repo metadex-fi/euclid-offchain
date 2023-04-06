@@ -23,7 +23,7 @@ export declare class User {
         address: Lucid.Address;
         assets: Lucid.Assets;
     };
-    update: () => Promise<void>;
+    update: () => Promise<number>;
     static fromWalletApi(lucid: Lucid.Lucid, api: Lucid.WalletApi): Promise<User>;
     static fromPrivateKey(lucid: Lucid.Lucid, privateKey: string): Promise<User>;
     static generateWith(lucid: Lucid.Lucid, allAssets: Assets): Promise<User>;

@@ -4,7 +4,7 @@ import { Pool } from "../pool.ts";
 import { User } from "../user.ts";
 
 export class Closing {
-  private constructor(
+  constructor(
     private readonly user: User,
     private readonly pool: Pool,
   ) {}

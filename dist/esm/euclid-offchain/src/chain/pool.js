@@ -175,6 +175,9 @@ export class Pool {
     get utxos() {
         return [this.paramUtxo.utxo, ...this.diracUtxos.map((d) => d.utxo)];
     }
+    get idNFT() {
+        return this.paramUtxo.paramNFT;
+    }
     get lastIdNFT() {
         if (this.diracUtxos) {
             return this.diracUtxos[this.diracUtxos.length - 1].dirac.threadNFT;

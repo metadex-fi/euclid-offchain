@@ -94,7 +94,7 @@ export class User {
     };
   }
 
-  public update = async (): Promise<void> => {
+  public update = async (): Promise<number> => {
     const utxos = (await Promise.all([
       this.lucid.utxosAt(this.address!),
       this.contract.update(),
@@ -104,6 +104,8 @@ export class User {
     // console.log(`balance: ${this.balance.concise()}`);
     this.lastIdNFT = this.contract.state!.pools.get(this.paymentKeyHash)?.last
       ?.lastIdNFT;
+
+    return this.lucid.currentSlot();
   };
 
   static async fromWalletApi(

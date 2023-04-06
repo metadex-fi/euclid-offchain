@@ -96,6 +96,7 @@ export class User {
                 // console.log(`balance: ${this.balance.concise()}`);
                 this.lastIdNFT = this.contract.state.pools.get(this.paymentKeyHash)?.last
                     ?.lastIdNFT;
+                return this.lucid.currentSlot();
             }
         });
         this.contract = new Contract(lucid);

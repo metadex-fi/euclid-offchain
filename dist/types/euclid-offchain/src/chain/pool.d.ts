@@ -21,6 +21,7 @@ export declare class Pool {
     readonly diracUtxos: DiracUtxo[];
     private constructor();
     get utxos(): Lucid.UTxO[];
+    get idNFT(): IdNFT;
     get lastIdNFT(): IdNFT;
     get balance(): PositiveValue;
     openingTx: (tx: Lucid.Tx, contract: Contract) => Lucid.Tx;
