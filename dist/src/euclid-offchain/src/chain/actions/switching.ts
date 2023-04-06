@@ -1,24 +1,25 @@
-// import { Lucid } from "../../../lucid.mod.js";
-// import { randomChoice } from "../../utils/generators.js";
-// import { Pool } from "../pool.js";
-// import { User } from "../user.js";
+import { Lucid } from "../../../lucid.mod.js";
+import { randomChoice } from "../../utils/generators.js";
+import { Pool } from "../pool.js";
+import { User } from "../user.js";
 
-// export class Switching {
-//   private constructor(
-//     private readonly user: User,
-//     private readonly pool: Pool,
-//   ) {}
+export class Switching {
+  private constructor(
+    private readonly user: User,
+    private readonly pool: Pool,
+  ) {}
 
-//   public get type(): string {
-//     return "Switching";
-//   }
+  public get type(): string {
+    return "Switching";
+  }
 
-//   public tx = (tx: Lucid.Tx): Lucid.Tx => {
-//     return this.pool.switchingTx(tx, this.user.contract).addSigner(
-//       this.user.address!,
-//     );
-//   };
+  public tx = (tx: Lucid.Tx): Lucid.Tx => {
+    return this.pool.switchingTx(tx, this.user.contract).addSigner(
+      this.user.address!,
+    );
+  };
 
+  // TODO implement and test
 //   static genOfUser = (user: User): Switching | undefined => {
 //     // console.log(`attempting to switch`);
 //     const enoughForFees = user.availableBalance;
@@ -30,4 +31,4 @@
 //     // console.log(`Switching`);
 //     return new Switching(user, pool);
 //   };
-// }
+}
