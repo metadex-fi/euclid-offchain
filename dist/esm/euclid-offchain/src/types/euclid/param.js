@@ -75,7 +75,7 @@ ${tt})`;
         return this.weights.assets;
     }
     get switched() {
-        return new Param(this.owner, this.virtual, this.jumpSizes, this.weights, this.active ? 0n : 1n);
+        return new Param(this.owner, this.virtual, this.weights, this.jumpSizes, this.active ? 0n : 1n);
     }
     static asserts(param) {
         const assets = param.jumpSizes.assets;
@@ -83,7 +83,7 @@ ${tt})`;
         assert(param.virtual.assets.subsetOf(assets), `assets of virtual must be a subset of assets of jumpSizes and weights, but ${param.virtual.assets.show()}\nis not a subset of ${assets.show()}`);
         const minAnchorPrices = param.minAnchorPrices;
         const maxAnchorPrices = Value.add(minAnchorPrices, param.jumpSizes.unsigned);
-        assert(maxAnchorPrices.leqMaxInteger, `max lowest price must be leq max integer, but is ${maxAnchorPrices.concise()}`);
+        assert(maxAnchorPrices.leqMaxInteger, `max anchor price must be leq max integer, but is ${maxAnchorPrices.concise()}`);
     }
     static generate() {
         const owner = PKeyHash.ptype.genData();

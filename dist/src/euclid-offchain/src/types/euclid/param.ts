@@ -40,8 +40,8 @@ export class Param {
     return new Param(
       this.owner,
       this.virtual,
-      this.jumpSizes,
       this.weights,
+      this.jumpSizes,
       this.active ? 0n : 1n,
     );
   }
@@ -78,7 +78,7 @@ ${tt})`;
     );
     assert(
       maxAnchorPrices.leqMaxInteger,
-      `max lowest price must be leq max integer, but is ${maxAnchorPrices.concise()}`,
+      `max anchor price must be leq max integer, but is ${maxAnchorPrices.concise()}`,
     );
   }
 
