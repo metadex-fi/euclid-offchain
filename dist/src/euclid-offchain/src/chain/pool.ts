@@ -9,6 +9,7 @@ import { Contract } from "./contract.js";
 import { User } from "./user.js";
 import { DiracUtxo, ParamUtxo, PreDiracUtxo } from "./utxo.js";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.js";
+import { ParamDatum, PPreEuclidDatum } from "../types/euclid/euclidDatum.js";
 
 export class PrePool {
   public paramUtxo?: ParamUtxo;
@@ -164,25 +165,33 @@ export class Pool {
       );
   };
 
-  public disablingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
+  public switchingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     const adminRedeemer = PEuclidAction.ptype.pconstant(
       new AdminRedeemer(),
     );
 
-    const burningNFT: Lucid.Assets = {};
-    burningNFT[this.paramUtxo.paramNFT.toLucid] = -1n;
+    const peuclidDatum = PPreEuclidDatum.genPType(); //only need this for ParamDatum, so this is fine
+    const paramDatum = peuclidDatum.pconstant(
+      new ParamDatum(this.paramUtxo.param.switched),
+    );
 
-    return tx // TODO read script?
-      .attachMintingPolicy(contract.mintingPolicy)
-      .mintAssets(burningNFT, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+    return tx
       .collectFrom(
         [this.paramUtxo.utxo!],
         Data.to(adminRedeemer),
+      )
+      .payToContract(
+        contract.address,
+        {
+          inline: Data.to(paramDatum),
+          scriptRef: contract.validator, // for now, for simplicities' sake
+        },
+        this.paramUtxo.utxo!.assets,
       );
   };
 
   public swappingsFor(user: User): Swapping[] {
-    // if (!this.paramUtxo.param.active) return []
+    if (this.paramUtxo.param.active === 0n) return [];
     const balance = user.availableBalance;
     // console.log("pool.swappingsFor balance", balance)
     if (!balance) return [];

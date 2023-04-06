@@ -26,7 +26,7 @@ export declare class Pool {
     get balance(): PositiveValue;
     openingTx: (tx: Lucid.Tx, contract: Contract) => Lucid.Tx;
     closingTx: (tx: Lucid.Tx, contract: Contract) => Lucid.Tx;
-    disablingTx: (tx: Lucid.Tx, contract: Contract) => Lucid.Tx;
+    switchingTx: (tx: Lucid.Tx, contract: Contract) => Lucid.Tx;
     swappingsFor(user: User): Swapping[];
     static parse(paramUtxo: ParamUtxo, diracUtxos: DiracUtxo[]): Pool;
     static open(paramUtxo: ParamUtxo, diracUtxos: DiracUtxo[]): Pool;

@@ -46,7 +46,7 @@ export class Opening {
 
   private pool = (): Pool => {
     const assets = this.param.weights.assets;
-    const minLowestPrices = this.param.minLowestPrices;
+    const minAnchorPrices = this.param.minAnchorPrices;
     const tickSizes = this.param.jumpSizes.divideBy(this.numTicks);
 
     const paramNFT = this.user.nextParamNFT.next(); // TODO remove next()
@@ -58,7 +58,7 @@ export class Opening {
         this.user.paymentKeyHash,
         threadNFT,
         paramNFT,
-        PositiveValue.normed(minLowestPrices),
+        PositiveValue.normed(minAnchorPrices),
       ),
     ];
 
@@ -72,8 +72,8 @@ export class Opening {
       const diracs_ = new Array<Dirac>();
       diracs.forEach((dirac) => {
         for (let i = 1n; i < ticks; i++) {
-          const lowestPrices = dirac.lowestPrices.clone;
-          lowestPrices.addAmountOf(
+          const anchorPrices = dirac.anchorPrices.clone;
+          anchorPrices.addAmountOf(
             asset,
             i * tickSize,
           );
@@ -83,7 +83,7 @@ export class Opening {
               this.user.paymentKeyHash,
               threadNFT,
               paramNFT,
-              lowestPrices,
+              anchorPrices,
             ),
           );
         }

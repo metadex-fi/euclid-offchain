@@ -51,13 +51,13 @@ export class Opening {
             writable: true,
             value: () => {
                 const assets = this.param.weights.assets;
-                const minLowestPrices = this.param.minLowestPrices;
+                const minAnchorPrices = this.param.minAnchorPrices;
                 const tickSizes = this.param.jumpSizes.divideBy(this.numTicks);
                 const paramNFT = this.user.nextParamNFT.next(); // TODO remove next()
                 const paramUtxo = ParamUtxo.open(this.param, paramNFT);
                 let threadNFT = paramNFT.next();
                 let diracs = [
-                    new Dirac(this.user.paymentKeyHash, threadNFT, paramNFT, PositiveValue.normed(minLowestPrices)),
+                    new Dirac(this.user.paymentKeyHash, threadNFT, paramNFT, PositiveValue.normed(minAnchorPrices)),
                 ];
                 // for each asset and for each existing dirac, "spread" that dirac
                 // in that asset's dimension. "spread" means: add all other tick
@@ -69,10 +69,10 @@ export class Opening {
                     const diracs_ = new Array();
                     diracs.forEach((dirac) => {
                         for (let i = 1n; i < ticks; i++) {
-                            const lowestPrices = dirac.lowestPrices.clone;
-                            lowestPrices.addAmountOf(asset, i * tickSize);
+                            const anchorPrices = dirac.anchorPrices.clone;
+                            anchorPrices.addAmountOf(asset, i * tickSize);
                             threadNFT = threadNFT.next();
-                            diracs_.push(new Dirac(this.user.paymentKeyHash, threadNFT, paramNFT, lowestPrices));
+                            diracs_.push(new Dirac(this.user.paymentKeyHash, threadNFT, paramNFT, anchorPrices));
                         }
                     });
                     diracs = diracs.concat(diracs_);

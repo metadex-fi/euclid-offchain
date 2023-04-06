@@ -212,7 +212,7 @@ export class DiracUtxo {
       const sellable = sellable_.amountOf(asset, 0n);
       const weight = param.weights.amountOf(asset); // NOTE: inverted
       const jumpSize = param.jumpSizes.amountOf(asset);
-      const lowest = this.dirac.lowestPrices.amountOf(asset, 0n);
+      const lowest = this.dirac.anchorPrices.amountOf(asset, 0n);
 
       const liquidity = buyable + virtual;
       if (liquidity <= 0n) return; // TODO reconsider if this can happen, throw error instead if not
@@ -335,8 +335,8 @@ export class DiracUtxo {
           Swapping.validates(
             spotBuying,
             spotSelling,
-            this.dirac.lowestPrices.amountOf(buyingAsset, 0n),
-            this.dirac.lowestPrices.amountOf(sellingAsset, 0n),
+            this.dirac.anchorPrices.amountOf(buyingAsset, 0n),
+            this.dirac.anchorPrices.amountOf(sellingAsset, 0n),
             param.jumpSizes.amountOf(buyingAsset),
             param.jumpSizes.amountOf(sellingAsset),
             param.weights.amountOf(buyingAsset),

@@ -8,10 +8,11 @@ import { PObject } from "../general/fundamental/container/object.js";
 import { PRecord } from "../general/fundamental/container/record.js";
 import { f, t } from "../general/fundamental/type.js";
 import { EuclidValue, PEuclidValue } from "./euclidValue.js";
+import { PInteger } from "../general/fundamental/primitive/integer.js";
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
 export class Param {
     constructor(owner, virtual, weights, // NOTE those are actually inverted
-    jumpSizes) {
+    jumpSizes, active) {
         Object.defineProperty(this, "owner", {
             enumerable: true,
             configurable: true,
@@ -36,6 +37,12 @@ export class Param {
             writable: true,
             value: jumpSizes
         });
+        Object.defineProperty(this, "active", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: active
+        });
         Object.defineProperty(this, "sharedAssets", {
             enumerable: true,
             configurable: true,
@@ -54,25 +61,29 @@ ${ttf}owner: ${this.owner.toString()},
 ${ttf}virtual: ${this.virtual.concise(ttf)}, 
 ${ttf}weights: ${this.weights.concise(ttf)}
 ${ttf}jumpSizes: ${this.jumpSizes.concise(ttf)}, 
+${ttf}active: ${this.active.toString()}
 ${tt})`;
             }
         });
         Param.asserts(this);
     }
     // filled with zeroes for assets without virtual liquidity
-    get minLowestPrices() {
+    get minAnchorPrices() {
         return Value.hadamard_(this.virtual.unsigned, this.weights.unsigned);
     }
     get assets() {
         return this.weights.assets;
     }
+    get switched() {
+        return new Param(this.owner, this.virtual, this.jumpSizes, this.weights, this.active ? 0n : 1n);
+    }
     static asserts(param) {
         const assets = param.jumpSizes.assets;
         assert(assets.equals(param.weights.assets), "assets of jumpSizes and weights must match");
         assert(param.virtual.assets.subsetOf(assets), `assets of virtual must be a subset of assets of jumpSizes and weights, but ${param.virtual.assets.show()}\nis not a subset of ${assets.show()}`);
-        const minLowestPrices = param.minLowestPrices;
-        const maxLowestPrices = Value.add(minLowestPrices, param.jumpSizes.unsigned);
-        assert(maxLowestPrices.leqMaxInteger, `max lowest price must be leq max integer, but is ${maxLowestPrices.concise()}`);
+        const minAnchorPrices = param.minAnchorPrices;
+        const maxAnchorPrices = Value.add(minAnchorPrices, param.jumpSizes.unsigned);
+        assert(maxAnchorPrices.leqMaxInteger, `max lowest price must be leq max integer, but is ${maxAnchorPrices.concise()}`);
     }
     static generate() {
         const owner = PKeyHash.ptype.genData();
@@ -108,7 +119,7 @@ ${tt})`;
                 weights.initAmountOf(asset, weight);
             }
         });
-        return new Param(owner, virtual, new EuclidValue(weights), new EuclidValue(jumpSizes));
+        return new Param(owner, virtual, new EuclidValue(weights), new EuclidValue(jumpSizes), 1n);
     }
 }
 export class PParam extends PObject {
@@ -118,7 +129,7 @@ export class PParam extends PObject {
             virtual: PPositiveValue.ptype,
             weights: PEuclidValue.ptype,
             jumpSizes: PEuclidValue.ptype,
-            // active:
+            active: PInteger.ptype,
         }), Param);
         Object.defineProperty(this, "genData", {
             enumerable: true,

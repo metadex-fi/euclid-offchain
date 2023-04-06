@@ -9,10 +9,12 @@ export declare class Param {
     readonly virtual: PositiveValue;
     readonly weights: EuclidValue;
     readonly jumpSizes: EuclidValue;
+    readonly active: bigint;
     constructor(owner: KeyHash, virtual: PositiveValue, weights: EuclidValue, // NOTE those are actually inverted
-    jumpSizes: EuclidValue);
-    get minLowestPrices(): Value;
+    jumpSizes: EuclidValue, active: bigint);
+    get minAnchorPrices(): Value;
     get assets(): Assets;
+    get switched(): Param;
     sharedAssets: (assets: Assets) => Assets;
     concise: (tabs?: string) => string;
     static asserts(param: Param): void;

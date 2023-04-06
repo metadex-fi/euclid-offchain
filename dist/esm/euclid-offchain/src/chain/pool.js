@@ -4,6 +4,7 @@ import { AdminRedeemer, PEuclidAction } from "../types/euclid/euclidAction.js";
 import { AssocMap } from "../types/general/fundamental/container/map.js";
 import { Data, f, t } from "../types/general/fundamental/type.js";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.js";
+import { ParamDatum, PPreEuclidDatum } from "../types/euclid/euclidDatum.js";
 export class PrePool {
     constructor() {
         Object.defineProperty(this, "paramUtxo", {
@@ -157,18 +158,20 @@ export class Pool {
                     .collectFrom(this.utxos, Data.to(adminRedeemer));
             }
         });
-        Object.defineProperty(this, "disablingTx", {
+        Object.defineProperty(this, "switchingTx", {
             enumerable: true,
             configurable: true,
             writable: true,
             value: (tx, contract) => {
                 const adminRedeemer = PEuclidAction.ptype.pconstant(new AdminRedeemer());
-                const burningNFT = {};
-                burningNFT[this.paramUtxo.paramNFT.toLucid] = -1n;
-                return tx // TODO read script?
-                    .attachMintingPolicy(contract.mintingPolicy)
-                    .mintAssets(burningNFT, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
-                    .collectFrom([this.paramUtxo.utxo], Data.to(adminRedeemer));
+                const peuclidDatum = PPreEuclidDatum.genPType(); //only need this for ParamDatum, so this is fine
+                const paramDatum = peuclidDatum.pconstant(new ParamDatum(this.paramUtxo.param.switched));
+                return tx
+                    .collectFrom([this.paramUtxo.utxo], Data.to(adminRedeemer))
+                    .payToContract(contract.address, {
+                    inline: Data.to(paramDatum),
+                    scriptRef: contract.validator, // for now, for simplicities' sake
+                }, this.paramUtxo.utxo.assets);
             }
         });
     }
@@ -189,7 +192,8 @@ export class Pool {
         return this.diracUtxos.reduce((a, b) => a.normedPlus(b.balance), new PositiveValue());
     }
     swappingsFor(user) {
-        // if (!this.paramUtxo.param.active) return []
+        if (this.paramUtxo.param.active === 0n)
+            return [];
         const balance = user.availableBalance;
         // console.log("pool.swappingsFor balance", balance)
         if (!balance)

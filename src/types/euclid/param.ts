@@ -11,6 +11,8 @@ import { PObject } from "../general/fundamental/container/object.ts";
 import { PRecord } from "../general/fundamental/container/record.ts";
 import { f, t } from "../general/fundamental/type.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
+import { PLiteral } from "../general/fundamental/container/literal.ts";
+import { PInteger } from "../general/fundamental/primitive/integer.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
 
@@ -20,19 +22,30 @@ export class Param {
     public readonly virtual: PositiveValue,
     public readonly weights: EuclidValue, // NOTE those are actually inverted
     public readonly jumpSizes: EuclidValue,
-    // public readonly active: boolean,
+    public readonly active: bigint,
   ) {
     Param.asserts(this);
   }
 
   // filled with zeroes for assets without virtual liquidity
-  public get minLowestPrices(): Value {
+  public get minAnchorPrices(): Value {
     return Value.hadamard_(this.virtual.unsigned, this.weights.unsigned);
   }
 
   public get assets(): Assets {
     return this.weights.assets;
   }
+
+  public get switched(): Param {
+    return new Param(
+      this.owner,
+      this.virtual,
+      this.jumpSizes,
+      this.weights,
+      this.active ? 0n : 1n,
+    );
+  }
+
   public sharedAssets = (assets: Assets): Assets =>
     this.assets.intersect(assets);
 
@@ -44,6 +57,7 @@ ${ttf}owner: ${this.owner.toString()},
 ${ttf}virtual: ${this.virtual.concise(ttf)}, 
 ${ttf}weights: ${this.weights.concise(ttf)}
 ${ttf}jumpSizes: ${this.jumpSizes.concise(ttf)}, 
+${ttf}active: ${this.active.toString()}
 ${tt})`;
   };
 
@@ -57,14 +71,14 @@ ${tt})`;
       param.virtual.assets.subsetOf(assets),
       `assets of virtual must be a subset of assets of jumpSizes and weights, but ${param.virtual.assets.show()}\nis not a subset of ${assets.show()}`,
     );
-    const minLowestPrices = param.minLowestPrices;
-    const maxLowestPrices = Value.add(
-      minLowestPrices,
+    const minAnchorPrices = param.minAnchorPrices;
+    const maxAnchorPrices = Value.add(
+      minAnchorPrices,
       param.jumpSizes.unsigned,
     );
     assert(
-      maxLowestPrices.leqMaxInteger,
-      `max lowest price must be leq max integer, but is ${maxLowestPrices.concise()}`,
+      maxAnchorPrices.leqMaxInteger,
+      `max lowest price must be leq max integer, but is ${maxAnchorPrices.concise()}`,
     );
   }
 
@@ -118,16 +132,16 @@ ${tt})`;
       virtual,
       new EuclidValue(weights),
       new EuclidValue(jumpSizes),
-      // true, // TODO include active-status in testing
+      1n, // TODO include active-status in testing
     );
   }
 
   // static genOf(owner: KeyHash, assets: Assets): Param {
   //   const weights = EuclidValue.genOfAssets(assets);
-  //   const maxLowestPrices = EuclidValue.genOfAssets(assets);
-  //   const jumpSizes = EuclidValue.genBelow(maxLowestPrices.bounded(2n));
-  //   const minLowestPrices = maxLowestPrices.normedMinus(jumpSizes);
-  //   const virtual = minLowestPrices.normedDivideBy(weights.unsized);
+  //   const maxAnchorPrices = EuclidValue.genOfAssets(assets);
+  //   const jumpSizes = EuclidValue.genBelow(maxAnchorPrices.bounded(2n));
+  //   const minAnchorPrices = maxAnchorPrices.normedMinus(jumpSizes);
+  //   const virtual = minAnchorPrices.normedDivideBy(weights.unsized);
 
   //   return new Param(
   //     owner,
@@ -146,7 +160,7 @@ export class PParam extends PObject<Param> {
         virtual: PPositiveValue.ptype,
         weights: PEuclidValue.ptype,
         jumpSizes: PEuclidValue.ptype,
-        // active:
+        active: PInteger.ptype,
       }),
       Param,
     );

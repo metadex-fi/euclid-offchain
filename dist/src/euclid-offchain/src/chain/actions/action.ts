@@ -1,13 +1,11 @@
 import { randomIndexedChoice } from "../../utils/generators.js";
 import { User } from "../user.js";
-// import { Cleaning } from "./cleaning.ts";
 import { Closing } from "./closing.js";
-// import { Disabling } from "./disabling.ts";
 import { Opening } from "./opening.js";
 import { Swapping } from "./swapping.js";
 
-export type Action = Closing | Opening | Swapping; //Cleaning | Closing | Disabling | Opening | Swapping;
-export const allActions = [Closing, Opening, Swapping]; //[Cleaning, Closing, Disabling, Opening, Swapping];
+export type Action = Closing | Opening | Swapping;
+export const allActions = [Closing, Opening, Swapping];
 
 export class UserAction {
   constructor(

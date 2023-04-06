@@ -1,10 +1,8 @@
 import { randomIndexedChoice } from "../../utils/generators.js";
-// import { Cleaning } from "./cleaning.ts";
 import { Closing } from "./closing.js";
-// import { Disabling } from "./disabling.ts";
 import { Opening } from "./opening.js";
 import { Swapping } from "./swapping.js";
-export const allActions = [Closing, Opening, Swapping]; //[Cleaning, Closing, Disabling, Opening, Swapping];
+export const allActions = [Closing, Opening, Swapping];
 export class UserAction {
     constructor(user) {
         Object.defineProperty(this, "user", {

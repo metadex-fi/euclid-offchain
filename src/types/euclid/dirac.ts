@@ -20,7 +20,7 @@ export class Dirac {
     public readonly owner: KeyHash,
     public readonly threadNFT: IdNFT,
     public readonly paramNFT: IdNFT,
-    public readonly lowestPrices: PositiveValue,
+    public readonly anchorPrices: PositiveValue,
   ) {}
 
   public concise = (tabs = ""): string => {
@@ -30,43 +30,43 @@ export class Dirac {
 ${ttf}owner: ${this.owner},
 ${ttf}threadNFT: ${this.threadNFT.show()},
 ${ttf}paramNFT: ${this.paramNFT.show()},
-${ttf}lowestPrices: ${this.lowestPrices.concise(ttf)},
+${ttf}anchorPrices: ${this.anchorPrices.concise(ttf)},
 ${tt})`;
   };
 
   static assertWith = (param: Param) => (dirac: Dirac): void => {
-    const lowestPrices = dirac.lowestPrices.unsigned;
-    const minLowestPrices = param.minLowestPrices;
-    const maxLowestPrices = Value.add(
-      minLowestPrices,
+    const anchorPrices = dirac.anchorPrices.unsigned;
+    const minAnchorPrices = param.minAnchorPrices;
+    const maxAnchorPrices = Value.add(
+      minAnchorPrices,
       param.jumpSizes.unsigned,
     );
     // leq_/lt_ assert assets are subsets too (in one (different) direction, resp.)
     assert(
-      Value.leq_(minLowestPrices, lowestPrices),
-      `lowestPrices must be at least minLowestPrices, but ${lowestPrices.show()}\nis not at least ${minLowestPrices.show()}`,
+      Value.leq_(minAnchorPrices, anchorPrices),
+      `anchorPrices must be at least minAnchorPrices, but ${anchorPrices.show()}\nis not at least ${minAnchorPrices.show()}`,
     );
     assert(
-      Value.lt_(lowestPrices, maxLowestPrices),
-      `lowestPrices must be strictly less than maxLowestPrices, but ${lowestPrices.show()}\nis not strictly less than ${maxLowestPrices.show()}`,
+      Value.lt_(anchorPrices, maxAnchorPrices),
+      `anchorPrices must be strictly less than maxAnchorPrices, but ${anchorPrices.show()}\nis not strictly less than ${maxAnchorPrices.show()}`,
     );
   };
 
   static generateWith =
     (param: Param, paramNFT: IdNFT, threadNFT: IdNFT) => (): Dirac => {
-      const minLowestPrices = param.minLowestPrices;
-      const maxLowestPrices = Value.add(
-        minLowestPrices,
+      const minAnchorPrices = param.minAnchorPrices;
+      const maxAnchorPrices = Value.add(
+        minAnchorPrices,
         param.jumpSizes.unsigned,
       );
-      const lowestPrices = PositiveValue.normed(
-        Value.genBetween(minLowestPrices, maxLowestPrices),
+      const anchorPrices = PositiveValue.normed(
+        Value.genBetween(minAnchorPrices, maxAnchorPrices),
       );
       return new Dirac(
         param.owner,
         threadNFT,
         paramNFT,
-        lowestPrices,
+        anchorPrices,
       );
     };
 }
@@ -80,7 +80,7 @@ export class PPreDirac extends PObject<Dirac> {
         owner: PKeyHash.ptype,
         threadNFT: new PIdNFT(policy),
         paramNFT: new PIdNFT(policy),
-        lowestPrices: PPositiveValue.ptype,
+        anchorPrices: PPositiveValue.ptype,
       }),
       Dirac,
     );
@@ -104,7 +104,7 @@ export class PDirac extends PConstraint<PObject<Dirac>> {
           owner: new PLiteral<PKeyHash>(PKeyHash.ptype, param.owner),
           threadNFT: new PLiteral(pidNFT, threadNFT),
           paramNFT: new PLiteral(pidNFT, paramNFT),
-          lowestPrices: PPositiveValue.ptype,
+          anchorPrices: PPositiveValue.ptype,
         }),
         Dirac,
       ),

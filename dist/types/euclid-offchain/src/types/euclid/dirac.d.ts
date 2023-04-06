@@ -9,8 +9,8 @@ export declare class Dirac {
     readonly owner: KeyHash;
     readonly threadNFT: IdNFT;
     readonly paramNFT: IdNFT;
-    readonly lowestPrices: PositiveValue;
-    constructor(owner: KeyHash, threadNFT: IdNFT, paramNFT: IdNFT, lowestPrices: PositiveValue);
+    readonly anchorPrices: PositiveValue;
+    constructor(owner: KeyHash, threadNFT: IdNFT, paramNFT: IdNFT, anchorPrices: PositiveValue);
     concise: (tabs?: string) => string;
     static assertWith: (param: Param) => (dirac: Dirac) => void;
     static generateWith: (param: Param, paramNFT: IdNFT, threadNFT: IdNFT) => () => Dirac;

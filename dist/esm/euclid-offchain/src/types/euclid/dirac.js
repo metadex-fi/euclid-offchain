@@ -12,7 +12,7 @@ import { f, t } from "../general/fundamental/type.js";
 import { gMaxHashes, IdNFT, PIdNFT } from "./idnft.js";
 import { PParam } from "./param.js";
 export class Dirac {
-    constructor(owner, threadNFT, paramNFT, lowestPrices) {
+    constructor(owner, threadNFT, paramNFT, anchorPrices) {
         Object.defineProperty(this, "owner", {
             enumerable: true,
             configurable: true,
@@ -31,11 +31,11 @@ export class Dirac {
             writable: true,
             value: paramNFT
         });
-        Object.defineProperty(this, "lowestPrices", {
+        Object.defineProperty(this, "anchorPrices", {
             enumerable: true,
             configurable: true,
             writable: true,
-            value: lowestPrices
+            value: anchorPrices
         });
         Object.defineProperty(this, "concise", {
             enumerable: true,
@@ -48,7 +48,7 @@ export class Dirac {
 ${ttf}owner: ${this.owner},
 ${ttf}threadNFT: ${this.threadNFT.show()},
 ${ttf}paramNFT: ${this.paramNFT.show()},
-${ttf}lowestPrices: ${this.lowestPrices.concise(ttf)},
+${ttf}anchorPrices: ${this.anchorPrices.concise(ttf)},
 ${tt})`;
             }
         });
@@ -59,12 +59,12 @@ Object.defineProperty(Dirac, "assertWith", {
     configurable: true,
     writable: true,
     value: (param) => (dirac) => {
-        const lowestPrices = dirac.lowestPrices.unsigned;
-        const minLowestPrices = param.minLowestPrices;
-        const maxLowestPrices = Value.add(minLowestPrices, param.jumpSizes.unsigned);
+        const anchorPrices = dirac.anchorPrices.unsigned;
+        const minAnchorPrices = param.minAnchorPrices;
+        const maxAnchorPrices = Value.add(minAnchorPrices, param.jumpSizes.unsigned);
         // leq_/lt_ assert assets are subsets too (in one (different) direction, resp.)
-        assert(Value.leq_(minLowestPrices, lowestPrices), `lowestPrices must be at least minLowestPrices, but ${lowestPrices.show()}\nis not at least ${minLowestPrices.show()}`);
-        assert(Value.lt_(lowestPrices, maxLowestPrices), `lowestPrices must be strictly less than maxLowestPrices, but ${lowestPrices.show()}\nis not strictly less than ${maxLowestPrices.show()}`);
+        assert(Value.leq_(minAnchorPrices, anchorPrices), `anchorPrices must be at least minAnchorPrices, but ${anchorPrices.show()}\nis not at least ${minAnchorPrices.show()}`);
+        assert(Value.lt_(anchorPrices, maxAnchorPrices), `anchorPrices must be strictly less than maxAnchorPrices, but ${anchorPrices.show()}\nis not strictly less than ${maxAnchorPrices.show()}`);
     }
 });
 Object.defineProperty(Dirac, "generateWith", {
@@ -72,10 +72,10 @@ Object.defineProperty(Dirac, "generateWith", {
     configurable: true,
     writable: true,
     value: (param, paramNFT, threadNFT) => () => {
-        const minLowestPrices = param.minLowestPrices;
-        const maxLowestPrices = Value.add(minLowestPrices, param.jumpSizes.unsigned);
-        const lowestPrices = PositiveValue.normed(Value.genBetween(minLowestPrices, maxLowestPrices));
-        return new Dirac(param.owner, threadNFT, paramNFT, lowestPrices);
+        const minAnchorPrices = param.minAnchorPrices;
+        const maxAnchorPrices = Value.add(minAnchorPrices, param.jumpSizes.unsigned);
+        const anchorPrices = PositiveValue.normed(Value.genBetween(minAnchorPrices, maxAnchorPrices));
+        return new Dirac(param.owner, threadNFT, paramNFT, anchorPrices);
     }
 });
 export class PPreDirac extends PObject {
@@ -84,7 +84,7 @@ export class PPreDirac extends PObject {
             owner: PKeyHash.ptype,
             threadNFT: new PIdNFT(policy),
             paramNFT: new PIdNFT(policy),
-            lowestPrices: PPositiveValue.ptype,
+            anchorPrices: PPositiveValue.ptype,
         }), Dirac);
     }
     static genPType() {
@@ -98,7 +98,7 @@ export class PDirac extends PConstraint {
             owner: new PLiteral(PKeyHash.ptype, param.owner),
             threadNFT: new PLiteral(pidNFT, threadNFT),
             paramNFT: new PLiteral(pidNFT, paramNFT),
-            lowestPrices: PPositiveValue.ptype,
+            anchorPrices: PPositiveValue.ptype,
         }), Dirac), [Dirac.assertWith(param)], Dirac.generateWith(param, paramNFT, threadNFT));
         Object.defineProperty(this, "param", {
             enumerable: true,
