@@ -1,11 +1,13 @@
 import { randomIndexedChoice } from "../../utils/generators.ts";
 import { User } from "../user.ts";
+import { Cleaning } from "./cleaning.ts";
 import { Closing } from "./closing.ts";
+import { Disabling } from "./disabling.ts";
 import { Opening } from "./opening.ts";
 import { Swapping } from "./swapping.ts";
 
-export type Action = Closing | Opening | Swapping;
-export const allActions = [Closing, Opening, Swapping];
+export type Action = Cleaning | Closing | Disabling | Opening | Swapping;
+export const allActions = [Cleaning, Closing, Disabling, Opening, Swapping];
 
 export class UserAction {
   constructor(

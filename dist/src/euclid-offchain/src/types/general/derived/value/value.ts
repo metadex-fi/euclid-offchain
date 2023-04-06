@@ -337,7 +337,7 @@ export class Value {
     }
     assert(biggest, `biggestAmount: no biggest found in ${this.concise()}`);
     return biggest;
-  };
+  }
 
   static nullOfAssets = (assets: Assets): Value => {
     const value = ccysTknsAmnts.anew;

@@ -118,6 +118,7 @@ export class PParam extends PObject {
             virtual: PPositiveValue.ptype,
             weights: PEuclidValue.ptype,
             jumpSizes: PEuclidValue.ptype,
+            // active:
         }), Param);
         Object.defineProperty(this, "genData", {
             enumerable: true,

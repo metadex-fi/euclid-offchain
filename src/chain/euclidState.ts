@@ -111,8 +111,8 @@ export class EuclidState {
             paramNFT = lastIdNFT;
             hits--;
           } else {
-            throw new Error(`invalid prePool: ${prePool.show()}`); // TODO revert in prod
-            // invalidOwnerPools.set(paramNFT, prePool);
+            // throw new Error(`invalid prePool: ${prePool.show()}`); // TODO revert in prod
+            invalidOwnerPools.set(paramNFT, prePool);
           }
         } else {
           misses--;

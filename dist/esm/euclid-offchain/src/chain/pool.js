@@ -84,6 +84,33 @@ ${ttf}preDiracUtxos: ${this.preDiracUtxos?.show((pdu, ts) => pdu.show(ts), ttf)}
 ${tt}}`;
             }
         });
+        Object.defineProperty(this, "cleaningTx", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: (tx, contract) => {
+                const adminRedeemer = PEuclidAction.ptype.pconstant(new AdminRedeemer());
+                const burningNFTs = {};
+                for (const nft of [
+                    ...(this.paramUtxo ? [this.paramUtxo.paramNFT] : []),
+                    ...(this.preDiracUtxos ? [...this.preDiracUtxos.keys()] : []),
+                ]) {
+                    burningNFTs[nft.toLucid] = -1n;
+                }
+                return tx // TODO read script?
+                    .attachMintingPolicy(contract.mintingPolicy)
+                    .mintAssets(burningNFTs, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+                    .collectFrom(this.utxos, Data.to(adminRedeemer));
+            }
+        });
+    }
+    get utxos() {
+        return [
+            ...(this.paramUtxo ? [this.paramUtxo.utxo] : []),
+            ...(this.preDiracUtxos
+                ? [...this.preDiracUtxos.values()].map((d) => d.utxo)
+                : []),
+        ];
     }
 }
 export class Pool {
@@ -130,6 +157,20 @@ export class Pool {
                     .collectFrom(this.utxos, Data.to(adminRedeemer));
             }
         });
+        Object.defineProperty(this, "disablingTx", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: (tx, contract) => {
+                const adminRedeemer = PEuclidAction.ptype.pconstant(new AdminRedeemer());
+                const burningNFT = {};
+                burningNFT[this.paramUtxo.paramNFT.toLucid] = -1n;
+                return tx // TODO read script?
+                    .attachMintingPolicy(contract.mintingPolicy)
+                    .mintAssets(burningNFT, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+                    .collectFrom([this.paramUtxo.utxo], Data.to(adminRedeemer));
+            }
+        });
     }
     get utxos() {
         return [this.paramUtxo.utxo, ...this.diracUtxos.map((d) => d.utxo)];
@@ -145,6 +186,7 @@ export class Pool {
         return this.diracUtxos.reduce((a, b) => a.normedPlus(b.balance), new PositiveValue());
     }
     swappingsFor(user) {
+        // if (!this.paramUtxo.param.active) return []
         const balance = user.availableBalance;
         // console.log("pool.swappingsFor balance", balance)
         if (!balance)

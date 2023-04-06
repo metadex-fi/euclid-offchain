@@ -105,7 +105,8 @@ export class Swapping {
 
   public subSwap = (amount: bigint, amountIsSold: boolean): Swapping => {
     const offerA0 = (amountIsSold ? this.boughtAmount : amount) * this.soldSpot;
-    const demandA0 = (amountIsSold ? amount : this.soldAmount) * this.boughtSpot;
+    const demandA0 = (amountIsSold ? amount : this.soldAmount) *
+      this.boughtSpot;
     const swapA0 = min(offerA0, demandA0);
     const boughtAmount = swapA0 / this.soldSpot;
     assert(
@@ -114,9 +115,15 @@ export class Swapping {
     );
     const soldAmount = BigInt(Math.ceil(Number(boughtAmount) * this.spotPrice));
 
-    assert(soldAmount <= this.soldAmount, `soldAmount cannot increase: ${soldAmount} > ${this.soldAmount}`);
-    assert(boughtAmount <= this.boughtAmount, `boughtAmount cannot increase: ${boughtAmount} > ${this.boughtAmount}`)
- 
+    assert(
+      soldAmount <= this.soldAmount,
+      `soldAmount cannot increase: ${soldAmount} > ${this.soldAmount}`,
+    );
+    assert(
+      boughtAmount <= this.boughtAmount,
+      `boughtAmount cannot increase: ${boughtAmount} > ${this.boughtAmount}`,
+    );
+
     return new Swapping(
       this.user,
       this.paramUtxo,
@@ -128,7 +135,7 @@ export class Swapping {
       this.boughtSpot,
       this.soldSpot,
     );
-  }
+  };
 
   // TODO should this rather be using subSwap for consistency?
   private randomSubSwap = (): Swapping => {

@@ -14,6 +14,15 @@ export class PrePool {
   public paramUtxo?: ParamUtxo;
   public preDiracUtxos?: AssocMap<IdNFT, PreDiracUtxo>;
 
+  public get utxos(): Lucid.UTxO[] {
+    return [
+      ...(this.paramUtxo ? [this.paramUtxo.utxo!] : []),
+      ...(this.preDiracUtxos
+        ? [...this.preDiracUtxos.values()].map((d) => d.utxo!)
+        : []),
+    ];
+  }
+
   public setParamUtxo = (paramUtxo: ParamUtxo): PrePool => {
     assert(
       !this.paramUtxo,
@@ -68,6 +77,30 @@ export class PrePool {
 ${ttf}paramUtxo: ${this.paramUtxo?.show(ttf)}
 ${ttf}preDiracUtxos: ${this.preDiracUtxos?.show((pdu, ts) => pdu.show(ts), ttf)}
 ${tt}}`;
+  };
+
+  public cleaningTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
+    const adminRedeemer = PEuclidAction.ptype.pconstant(
+      new AdminRedeemer(),
+    );
+
+    const burningNFTs: Lucid.Assets = {};
+    for (
+      const nft of [
+        ...(this.paramUtxo ? [this.paramUtxo.paramNFT] : []),
+        ...(this.preDiracUtxos ? [...this.preDiracUtxos.keys()] : []),
+      ]
+    ) {
+      burningNFTs[nft.toLucid] = -1n;
+    }
+
+    return tx // TODO read script?
+      .attachMintingPolicy(contract.mintingPolicy)
+      .mintAssets(burningNFTs, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+      .collectFrom(
+        this.utxos,
+        Data.to(adminRedeemer),
+      );
   };
 }
 
@@ -127,7 +160,25 @@ export class Pool {
       );
   };
 
+  public disablingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
+    const adminRedeemer = PEuclidAction.ptype.pconstant(
+      new AdminRedeemer(),
+    );
+
+    const burningNFT: Lucid.Assets = {};
+    burningNFT[this.paramUtxo.paramNFT.toLucid] = -1n;
+
+    return tx // TODO read script?
+      .attachMintingPolicy(contract.mintingPolicy)
+      .mintAssets(burningNFT, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+      .collectFrom(
+        [this.paramUtxo.utxo!],
+        Data.to(adminRedeemer),
+      );
+  };
+
   public swappingsFor(user: User): Swapping[] {
+    // if (!this.paramUtxo.param.active) return []
     const balance = user.availableBalance;
     // console.log("pool.swappingsFor balance", balance)
     if (!balance) return [];

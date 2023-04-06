@@ -217,11 +217,11 @@ export class DiracUtxo {
       const liquidity = buyable + virtual;
       if (liquidity <= 0n) return; // TODO reconsider if this can happen, throw error instead if not
       liquidity_.initAmountOf(asset, liquidity);
-      const amm = liquidity * weight; // NOTE: inverted
+      const amm = liquidity * weight; // NOTE: inverted aka "price when selling for A0"
       assert(amm > 0n, `amm <= 0n`);
       let spotBuying = ((amm - lowest) / jumpSize) * jumpSize + lowest; // NOTE: inverted
       assert(spotBuying >= lowest, `spotBuying < lowest`); // TODO do we want that in the loop below? ("Lowest" should be rather termed "anchor")
-      let spotSelling = spotBuying + jumpSize; // NOTE: inverted
+      let spotSelling = spotBuying + jumpSize; // NOTE: inverted aka "price when selling for A0"
 
       const a = Number(amm);
       const w = Number(weight);
@@ -244,7 +244,7 @@ export class DiracUtxo {
           const maxBuying = d === Infinity
             ? buyable
             : min(buyable, BigInt(Math.floor(-d)));
-  
+
           // console.log("buyable", buyable)
           // console.log("d", d)
           // console.log("maxBuying", maxBuying)
@@ -255,7 +255,7 @@ export class DiracUtxo {
           } else {
             spotBuying -= jumpSize;
             // if maxBuying is 0, then d is too low, which means that
-            // we are too close at the amm-price. So we ~increase~ the 
+            // we are too close at the amm-price. So we ~increase~ the
             // (uninverted) price we are willing to ~buy~ at stepwise
             // until either we hit the bounds or find a d >= 1.
           }
@@ -271,7 +271,7 @@ export class DiracUtxo {
           const maxSelling = d === Infinity
             ? sellable
             : min(sellable, BigInt(Math.floor(d)));
-  
+
           // console.log("sellable", sellable)
           // console.log("d", d)
           // console.log("maxSelling", maxSelling)
@@ -280,13 +280,13 @@ export class DiracUtxo {
             maxSelling_.initAmountOf(asset, maxSelling);
             break;
           } else {
-            spotSelling += jumpSize; 
+            spotSelling += jumpSize;
             // if maxSelling is 0, then d is too low, which means that
-            // we are too close at the amm-price. So we ~decrease~ the 
+            // we are too close at the amm-price. So we ~decrease~ the
             // (uninverted) price we are willing to ~sell~ at stepwise
             // until we find a d >= 1.
-            // NOTE/TODO: This should never result in an infite loop, 
-            // as decreasing uninverted selling price should eventually 
+            // NOTE/TODO: This should never result in an infite loop,
+            // as decreasing uninverted selling price should eventually
             // result in some delta.
           }
         }

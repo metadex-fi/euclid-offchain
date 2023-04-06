@@ -381,7 +381,6 @@ export class Value {
         assert(biggest, `biggestAmount: no biggest found in ${this.concise()}`);
         return biggest;
     }
-    ;
     static assert(value) {
         assert(value.value instanceof AssocMap, `Value must be a AssocMap, not ${value.value}`);
         Assets.assert(value.assets);

@@ -117,7 +117,8 @@ export class Swapping {
             writable: true,
             value: (amount, amountIsSold) => {
                 const offerA0 = (amountIsSold ? this.boughtAmount : amount) * this.soldSpot;
-                const demandA0 = (amountIsSold ? amount : this.soldAmount) * this.boughtSpot;
+                const demandA0 = (amountIsSold ? amount : this.soldAmount) *
+                    this.boughtSpot;
                 const swapA0 = min(offerA0, demandA0);
                 const boughtAmount = swapA0 / this.soldSpot;
                 assert(boughtAmount > 0n, `Swapping.subSwap: boughtAmount must be positive, but is ${boughtAmount} for ${this.show()}`);

@@ -20,6 +20,7 @@ export class Param {
     public readonly virtual: PositiveValue,
     public readonly weights: EuclidValue, // NOTE those are actually inverted
     public readonly jumpSizes: EuclidValue,
+    // public readonly active: boolean,
   ) {
     Param.asserts(this);
   }
@@ -117,6 +118,7 @@ ${tt})`;
       virtual,
       new EuclidValue(weights),
       new EuclidValue(jumpSizes),
+      // true, // TODO include active-status in testing
     );
   }
 
@@ -144,6 +146,7 @@ export class PParam extends PObject<Param> {
         virtual: PPositiveValue.ptype,
         weights: PEuclidValue.ptype,
         jumpSizes: PEuclidValue.ptype,
+        // active:
       }),
       Param,
     );
