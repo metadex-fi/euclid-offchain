@@ -18,6 +18,8 @@ import {
 } from "../../utils/generators.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
+import { Pool } from "../pool.ts";
+import { Value } from "../../types/general/derived/value/value.ts";
 
 export class Swapping {
   public readonly spotPrice: number; // uninverted
@@ -101,6 +103,32 @@ export class Swapping {
         },
         retour,
       );
+  };
+
+  public subsequents = (pool: Pool): Swapping[] => {
+    const swappings: Swapping[] = [];
+    let sellableAmount = this.user.balance!.amountOf(this.soldAsset) -
+      this.soldAmount;
+    let diracUtxo = this.diracUtxo.applySwapping(this);
+
+    while (sellableAmount > 0n) {
+      const subsequents = diracUtxo.swappingsFor(
+        this.user,
+        this.paramUtxo,
+        Value.singleton(this.soldAsset, sellableAmount),
+        this.boughtAsset,
+      );
+      if (subsequents.length === 0) break;
+      assert(subsequents.length === 1, `subsequents.length must be 1`);
+
+      const swapping = subsequents[0];
+      sellableAmount -= swapping.soldAmount;
+      diracUtxo = diracUtxo.applySwapping(swapping);
+
+      swappings.push(swapping);
+    }
+
+    return swappings;
   };
 
   public subSwap = (amount: bigint, amountIsSold: boolean): Swapping => {

@@ -3,13 +3,13 @@ import { Dirac } from "../types/euclid/dirac.js";
 import { PEuclidDatum } from "../types/euclid/euclidDatum.js";
 import { IdNFT } from "../types/euclid/idnft.js";
 import { Param } from "../types/euclid/param.js";
+import { Asset } from "../types/general/derived/asset/asset.js";
 import { Assets } from "../types/general/derived/asset/assets.js";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.js";
 import { Value } from "../types/general/derived/value/value.js";
 import { PConstanted } from "../types/general/fundamental/type.js";
 import { Swapping } from "./actions/swapping.js";
 import { Contract } from "./contract.js";
-import { Pool } from "./pool.js";
 import { User } from "./user.js";
 export declare class ParamUtxo {
     readonly param: Param;
@@ -41,5 +41,6 @@ export declare class DiracUtxo {
     static open(param: Param, dirac: Dirac, balance: PositiveValue): DiracUtxo;
     show: (tabs?: string) => string;
     openingTx: (tx: Lucid.Tx, contract: Contract) => Lucid.Tx;
-    swappingsFor: (user: User, pool: Pool, sellable_: Value) => Swapping[];
+    applySwapping: (swapping: Swapping) => DiracUtxo;
+    swappingsFor: (user: User, paramUtxo: ParamUtxo, sellable_: Value, buyingAsset?: Asset) => Swapping[];
 }

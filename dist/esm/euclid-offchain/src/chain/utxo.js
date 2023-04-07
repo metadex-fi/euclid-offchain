@@ -193,23 +193,38 @@ export class DiracUtxo {
                 }, funds);
             }
         });
+        Object.defineProperty(this, "applySwapping", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: (swapping) => {
+                return new DiracUtxo(this.peuclidDatum, this.dirac, this.balance
+                    .normedPlus(PositiveValue.singleton(swapping.soldAsset, swapping.soldAmount))
+                    .normedMinus(PositiveValue.singleton(swapping.boughtAsset, swapping.boughtAmount)));
+            }
+        });
         Object.defineProperty(this, "swappingsFor", {
             enumerable: true,
             configurable: true,
             writable: true,
-            value: (user, pool, sellable_) => {
+            value: (user, paramUtxo, sellable_, // subset of pool-assets
+            buyingAsset) => {
                 const swappings = new Array();
-                const param = pool.paramUtxo.param;
+                const buyable_ = buyingAsset
+                    ? PositiveValue.singleton(buyingAsset, this.balance.amountOf(buyingAsset, 0n))
+                    : this.balance;
+                const param = paramUtxo.param;
                 const liquidity_ = new PositiveValue();
                 const spotBuying_ = new PositiveValue();
                 const spotSelling_ = new PositiveValue();
                 const maxBuying_ = new PositiveValue();
                 const maxSelling_ = new PositiveValue();
                 param.assets.forEach((asset) => {
-                    // console.log("asset", asset.concise())
-                    const virtual = param.virtual.amountOf(asset, 0n);
-                    const buyable = this.balance.amountOf(asset, 0n);
+                    const buyable = buyable_.amountOf(asset, 0n);
                     const sellable = sellable_.amountOf(asset, 0n);
+                    if (buyable <= 0n && sellable <= 0n)
+                        return;
+                    const virtual = param.virtual.amountOf(asset, 0n);
                     const weight = param.weights.amountOf(asset); // NOTE: inverted
                     const jumpSize = param.jumpSizes.amountOf(asset);
                     const lowest = this.dirac.anchorPrices.amountOf(asset, 0n);
@@ -225,23 +240,15 @@ export class DiracUtxo {
                     const a = Number(amm);
                     const w = Number(weight);
                     const l = Number(liquidity);
-                    // console.log("amm", amm)
-                    // console.log("weight", weight)
-                    // console.log("liquidity", liquidity)
                     // deposit of asset into pool to move inverted amm-price a to inverted spot price s
                     const delta = (s) => l * (((s / a) ** (w / (w + 1))) - 1);
-                    // console.log("spotSelling", spotSelling)
                     if (buyable > 0n) {
                         while (spotBuying > 0n) {
-                            // console.log("spotBuying", spotBuying)
                             const sb = Number(spotBuying);
                             const d = delta(sb);
                             const maxBuying = d === Infinity
                                 ? buyable
                                 : min(buyable, BigInt(Math.floor(-d)));
-                            // console.log("buyable", buyable)
-                            // console.log("d", d)
-                            // console.log("maxBuying", maxBuying)
                             if (maxBuying > 0n) {
                                 spotBuying_.initAmountOf(asset, spotBuying);
                                 maxBuying_.initAmountOf(asset, maxBuying);
@@ -306,7 +313,7 @@ export class DiracUtxo {
                             return; // to avoid zero buying amount
                         const buyingAmount = maxSwapA0 / spotSelling;
                         const sellingAmount = BigInt(Math.ceil(Number(maxSwapA0) / Number(spotBuying)));
-                        const swapping = Swapping.boundary(user, pool.paramUtxo, this, buyingAsset, sellingAsset, buyingAmount, sellingAmount, spotBuying, spotSelling);
+                        const swapping = Swapping.boundary(user, paramUtxo, this, buyingAsset, sellingAsset, buyingAmount, sellingAmount, spotBuying, spotSelling);
                         assert(Swapping.validates(spotBuying, spotSelling, this.dirac.anchorPrices.amountOf(buyingAsset, 0n), this.dirac.anchorPrices.amountOf(sellingAsset, 0n), param.jumpSizes.amountOf(buyingAsset), param.jumpSizes.amountOf(sellingAsset), param.weights.amountOf(buyingAsset), param.weights.amountOf(sellingAsset), liquidity_.amountOf(buyingAsset), liquidity_.amountOf(sellingAsset), buyingAmount, sellingAmount), `invalid swap: ${swapping.show()}`);
                         // console.log("swapping", swapping.show())
                         swappings.push(swapping);

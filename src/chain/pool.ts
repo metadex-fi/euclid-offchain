@@ -126,10 +126,17 @@ export class Pool {
   }
 
   public get balance(): PositiveValue {
-    return this.diracUtxos.reduce(
+    const assets = this.paramUtxo.param.assets;
+    const total = this.diracUtxos.reduce(
       (a, b) => a.normedPlus(b.balance),
       new PositiveValue(),
-    );
+    ).ofAssets(this.paramUtxo.param.assets);
+
+    assets.forEach((asset) => {
+      total.addAmountOf(asset, 0n);
+    });
+
+    return total;
   }
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
@@ -199,7 +206,7 @@ export class Pool {
     // console.log("pool.swappingsFor sellableBalance", sellableBalance)
     if (!sellableBalance.size) return [];
     return this.diracUtxos.flatMap((d) =>
-      d.swappingsFor(user, this, sellableBalance.unsigned)
+      d.swappingsFor(user, this.paramUtxo, sellableBalance.unsigned)
     );
   }
 

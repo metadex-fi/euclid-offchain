@@ -6,6 +6,7 @@ import { Swap } from "../../types/euclid/swap.js";
 import { PositiveValue } from "../../types/general/derived/value/positiveValue.js";
 import { Data } from "../../types/general/fundamental/type.js";
 import { genPositive, min, randomChoice, } from "../../utils/generators.js";
+import { Value } from "../../types/general/derived/value/value.js";
 export class Swapping {
     constructor(user, paramUtxo, diracUtxo, boughtAsset, soldAsset, boughtAmount, soldAmount, boughtSpot, // inverted
     soldSpot) {
@@ -109,6 +110,28 @@ export class Swapping {
                     .payToContract(this.user.contract.address, {
                     inline: Data.to(datum),
                 }, retour);
+            }
+        });
+        Object.defineProperty(this, "subsequents", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: (pool) => {
+                const swappings = [];
+                let sellableAmount = this.user.balance.amountOf(this.soldAsset) -
+                    this.soldAmount;
+                let diracUtxo = this.diracUtxo.applySwapping(this);
+                while (sellableAmount > 0n) {
+                    const subsequents = diracUtxo.swappingsFor(this.user, this.paramUtxo, Value.singleton(this.soldAsset, sellableAmount), this.boughtAsset);
+                    if (subsequents.length === 0)
+                        break;
+                    assert(subsequents.length === 1, `subsequents.length must be 1`);
+                    const swapping = subsequents[0];
+                    sellableAmount -= swapping.soldAmount;
+                    diracUtxo = diracUtxo.applySwapping(swapping);
+                    swappings.push(swapping);
+                }
+                return swappings;
             }
         });
         Object.defineProperty(this, "subSwap", {

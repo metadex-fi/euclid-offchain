@@ -20,15 +20,15 @@ export class Switching {
   };
 
   // TODO implement and test
-//   static genOfUser = (user: User): Switching | undefined => {
-//     // console.log(`attempting to switch`);
-//     const enoughForFees = user.availableBalance;
-//     if (!enoughForFees) return undefined;
-//     const pools = user.contract.state?.pools.get(user.paymentKeyHash);
-//     if (!pools) return undefined;
-//     if (!pools.size) return undefined;
-//     const pool = randomChoice([...pools.values()]);
-//     // console.log(`Switching`);
-//     return new Switching(user, pool);
-//   };
+  //   static genOfUser = (user: User): Switching | undefined => {
+  //     // console.log(`attempting to switch`);
+  //     const enoughForFees = user.availableBalance;
+  //     if (!enoughForFees) return undefined;
+  //     const pools = user.contract.state?.pools.get(user.paymentKeyHash);
+  //     if (!pools) return undefined;
+  //     if (!pools.size) return undefined;
+  //     const pool = randomChoice([...pools.values()]);
+  //     // console.log(`Switching`);
+  //     return new Switching(user, pool);
+  //   };
 }

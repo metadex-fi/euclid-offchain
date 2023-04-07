@@ -189,7 +189,12 @@ export class Pool {
             return this.paramUtxo.paramNFT;
     }
     get balance() {
-        return this.diracUtxos.reduce((a, b) => a.normedPlus(b.balance), new PositiveValue());
+        const assets = this.paramUtxo.param.assets;
+        const total = this.diracUtxos.reduce((a, b) => a.normedPlus(b.balance), new PositiveValue()).ofAssets(this.paramUtxo.param.assets);
+        assets.forEach((asset) => {
+            total.addAmountOf(asset, 0n);
+        });
+        return total;
     }
     swappingsFor(user) {
         if (this.paramUtxo.param.active === 0n)
@@ -202,7 +207,7 @@ export class Pool {
         // console.log("pool.swappingsFor sellableBalance", sellableBalance)
         if (!sellableBalance.size)
             return [];
-        return this.diracUtxos.flatMap((d) => d.swappingsFor(user, this, sellableBalance.unsigned));
+        return this.diracUtxos.flatMap((d) => d.swappingsFor(user, this.paramUtxo, sellableBalance.unsigned));
     }
     static parse(paramUtxo, diracUtxos) {
         return new Pool(paramUtxo, diracUtxos);

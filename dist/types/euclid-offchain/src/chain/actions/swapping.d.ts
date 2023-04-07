@@ -2,6 +2,7 @@ import { Lucid } from "../../../lucid.mod.js";
 import { Asset } from "../../types/general/derived/asset/asset.js";
 import { User } from "../user.js";
 import { DiracUtxo, ParamUtxo } from "../utxo.js";
+import { Pool } from "../pool.js";
 export declare class Swapping {
     readonly user: User;
     readonly paramUtxo: ParamUtxo;
@@ -17,6 +18,7 @@ export declare class Swapping {
     get type(): string;
     show: () => string;
     tx: (tx: Lucid.Tx) => Lucid.Tx;
+    subsequents: (pool: Pool) => Swapping[];
     subSwap: (amount: bigint, amountIsSold: boolean) => Swapping;
     private randomSubSwap;
     static boundary(user: User, paramUtxo: ParamUtxo, diracUtxo: DiracUtxo, boughtAsset: Asset, soldAsset: Asset, boughtAmount: bigint, soldAmount: bigint, boughtSpot: bigint, soldSpot: bigint): Swapping;
