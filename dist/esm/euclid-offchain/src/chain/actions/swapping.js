@@ -116,7 +116,7 @@ export class Swapping {
             enumerable: true,
             configurable: true,
             writable: true,
-            value: (pool) => {
+            value: () => {
                 const swappings = [];
                 let sellableAmount = this.user.balance.amountOf(this.soldAsset) -
                     this.soldAmount;

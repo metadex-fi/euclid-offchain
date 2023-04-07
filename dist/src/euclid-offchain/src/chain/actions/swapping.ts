@@ -105,7 +105,7 @@ export class Swapping {
       );
   };
 
-  public subsequents = (pool: Pool): Swapping[] => {
+  public subsequents = (): Swapping[] => {
     const swappings: Swapping[] = [];
     let sellableAmount = this.user.balance!.amountOf(this.soldAsset) -
       this.soldAmount;
