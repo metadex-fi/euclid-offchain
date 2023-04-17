@@ -60,6 +60,10 @@ export class EuclidValue {
   //   return new PositiveValue(Value.normedDivide(this.unsigned, other.unsigned));
   // };
 
+  public divideByScalar = (scalar: bigint): EuclidValue => {
+    return EuclidValue.fromValue(this.unsigned.divideByScalar(scalar));
+  };
+
   public leq = (other: EuclidValue): boolean => {
     return Value.leq(this.unsigned, other.unsigned);
   };

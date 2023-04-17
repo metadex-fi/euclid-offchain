@@ -17,7 +17,6 @@ import { Data, f, PConstanted, t } from "../types/general/fundamental/type.ts";
 import { min } from "../utils/generators.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { Contract } from "./contract.ts";
-import { Pool } from "./pool.ts";
 import { User } from "./user.ts";
 
 export class ParamUtxo {
@@ -211,6 +210,7 @@ export class DiracUtxo {
     paramUtxo: ParamUtxo,
     sellable_: Value, // subset of pool-assets
     buyingAsset?: Asset, // for subsequent swappings we want only a single direction
+    minTrade = 0n, // crude tool to prevent excessive edge case behavior
   ): Swapping[] => {
     const swappings = new Array<Swapping>();
     const buyable_ = buyingAsset
@@ -235,23 +235,24 @@ export class DiracUtxo {
       const virtual = param.virtual.amountOf(asset, 0n);
       const weight = param.weights.amountOf(asset); // NOTE: inverted
       const jumpSize = param.jumpSizes.amountOf(asset);
-      const lowest = this.dirac.anchorPrices.amountOf(asset, 0n);
+      const anchor = this.dirac.anchorPrices.amountOf(asset, 0n);
 
       const liquidity = buyable + virtual;
       if (liquidity <= 0n) return; // TODO reconsider if this can happen, throw error instead if not
       liquidity_.initAmountOf(asset, liquidity);
       const amm = liquidity * weight; // NOTE: inverted aka "price when selling for A0"
       assert(amm > 0n, `amm <= 0n`);
-      let spotBuying = ((amm - lowest) / jumpSize) * jumpSize + lowest; // NOTE: inverted
-      assert(spotBuying >= lowest, `spotBuying < lowest`); // TODO do we want that in the loop below? ("Lowest" should be rather termed "anchor")
+      let spotBuying = ((amm - anchor) / jumpSize) * jumpSize + anchor; // NOTE: inverted
+      assert(spotBuying >= anchor, `spotBuying < anchor`); // TODO do we want that in the loop below? Do we want it at all?
       let spotSelling = spotBuying + jumpSize; // NOTE: inverted aka "price when selling for A0"
 
-      const a = Number(amm);
+      // const a = Number(amm);
       const w = Number(weight);
       const l = Number(liquidity);
 
       // deposit of asset into pool to move inverted amm-price a to inverted spot price s
-      const delta = (s: number) => l * (((s / a) ** (w / (w + 1))) - 1);
+      const  delta = (s: number) => (s / w) - l
+      // const delta = (s: number) => l * (((s / a) ** (w / (w + 1))) - 1);
 
       if (buyable > 0n) {
         while (spotBuying > 0n) {
@@ -261,7 +262,7 @@ export class DiracUtxo {
             ? buyable
             : min(buyable, BigInt(Math.floor(-d)));
 
-          if (maxBuying > 0n) {
+          if (maxBuying > minTrade) {
             spotBuying_.initAmountOf(asset, spotBuying);
             maxBuying_.initAmountOf(asset, maxBuying);
             break;
@@ -288,7 +289,7 @@ export class DiracUtxo {
           // console.log("sellable", sellable)
           // console.log("d", d)
           // console.log("maxSelling", maxSelling)
-          if (maxSelling > 0n) {
+          if (maxSelling > minTrade) {
             spotSelling_.initAmountOf(asset, spotSelling);
             maxSelling_.initAmountOf(asset, maxSelling);
             break;
@@ -321,9 +322,14 @@ export class DiracUtxo {
         const maxBuying = maxBuying_.amountOf(buyingAsset);
 
         // NOTE: below not strictly A0, but want to avoid divisions.
-        // Ok, since only relative value matters. Assume it's a different A0'.
+        // Ok, since only relative value matters. Assume it's a different A0', derived from:
+        //  const maxBuyingA0 = (maxBuying / spotBuying) * (spotSelling * spotBuying);
+        //  const maxSellingA0 = (maxSelling / spotSelling) * (spotSelling * spotBuying);
+        //  (spotSelling * spotBuying) are the same for both and added so we can remove divisions.
+
         const maxBuyingA0 = maxBuying * spotSelling;
         const maxSellingA0 = maxSelling * spotBuying;
+
         const maxSwapA0 = min(maxSellingA0, maxBuyingA0);
 
         if (maxSwapA0 < spotSelling) return; // to avoid zero buying amount
