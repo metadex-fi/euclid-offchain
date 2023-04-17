@@ -19,6 +19,7 @@ export declare class EuclidValue {
     normedMinus: (other: EuclidValue) => PositiveValue;
     hadamard: (other: EuclidValue) => EuclidValue;
     divideBy: (other: EuclidValue) => EuclidValue;
+    divideByScalar: (scalar: bigint) => EuclidValue;
     leq: (other: EuclidValue) => boolean;
     bounded: (lower?: bigint, upper?: bigint) => EuclidValue;
     static asserts(euclidValue: EuclidValue): void;

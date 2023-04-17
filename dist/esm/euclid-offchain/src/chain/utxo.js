@@ -227,21 +227,22 @@ export class DiracUtxo {
                     const virtual = param.virtual.amountOf(asset, 0n);
                     const weight = param.weights.amountOf(asset); // NOTE: inverted
                     const jumpSize = param.jumpSizes.amountOf(asset);
-                    const lowest = this.dirac.anchorPrices.amountOf(asset, 0n);
+                    const anchor = this.dirac.anchorPrices.amountOf(asset, 0n);
                     const liquidity = buyable + virtual;
                     if (liquidity <= 0n)
                         return; // TODO reconsider if this can happen, throw error instead if not
                     liquidity_.initAmountOf(asset, liquidity);
                     const amm = liquidity * weight; // NOTE: inverted aka "price when selling for A0"
                     assert(amm > 0n, `amm <= 0n`);
-                    let spotBuying = ((amm - lowest) / jumpSize) * jumpSize + lowest; // NOTE: inverted
-                    assert(spotBuying >= lowest, `spotBuying < lowest`); // TODO do we want that in the loop below? ("Lowest" should be rather termed "anchor")
+                    let spotBuying = ((amm - anchor) / jumpSize) * jumpSize + anchor; // NOTE: inverted
+                    assert(spotBuying >= anchor, `spotBuying < anchor`); // TODO do we want that in the loop below? Do we want it at all?
                     let spotSelling = spotBuying + jumpSize; // NOTE: inverted aka "price when selling for A0"
-                    const a = Number(amm);
+                    // const a = Number(amm);
                     const w = Number(weight);
                     const l = Number(liquidity);
                     // deposit of asset into pool to move inverted amm-price a to inverted spot price s
-                    const delta = (s) => l * (((s / a) ** (w / (w + 1))) - 1);
+                    const delta = (s) => (s / w) - l;
+                    // const delta = (s: number) => l * (((s / a) ** (w / (w + 1))) - 1);
                     if (buyable > 0n) {
                         while (spotBuying > 0n) {
                             const sb = Number(spotBuying);
@@ -305,7 +306,10 @@ export class DiracUtxo {
                         const spotBuying = spotBuying_.amountOf(buyingAsset); // NOTE: inverted
                         const maxBuying = maxBuying_.amountOf(buyingAsset);
                         // NOTE: below not strictly A0, but want to avoid divisions.
-                        // Ok, since only relative value matters. Assume it's a different A0'.
+                        // Ok, since only relative value matters. Assume it's a different A0', derived from:
+                        //  const maxBuyingA0 = (maxBuying / spotBuying) * (spotSelling * spotBuying);
+                        //  const maxSellingA0 = (maxSelling / spotSelling) * (spotSelling * spotBuying);
+                        //  (spotSelling * spotBuying) are the same for both and added so we can remove divisions.
                         const maxBuyingA0 = maxBuying * spotSelling;
                         const maxSellingA0 = maxSelling * spotBuying;
                         const maxSwapA0 = min(maxSellingA0, maxBuyingA0);

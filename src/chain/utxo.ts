@@ -210,7 +210,6 @@ export class DiracUtxo {
     paramUtxo: ParamUtxo,
     sellable_: Value, // subset of pool-assets
     buyingAsset?: Asset, // for subsequent swappings we want only a single direction
-    minTrade = 0n, // crude tool to prevent excessive edge case behavior
   ): Swapping[] => {
     const swappings = new Array<Swapping>();
     const buyable_ = buyingAsset
@@ -262,7 +261,7 @@ export class DiracUtxo {
             ? buyable
             : min(buyable, BigInt(Math.floor(-d)));
 
-          if (maxBuying > minTrade) {
+          if (maxBuying > 0n) {
             spotBuying_.initAmountOf(asset, spotBuying);
             maxBuying_.initAmountOf(asset, maxBuying);
             break;
@@ -289,7 +288,7 @@ export class DiracUtxo {
           // console.log("sellable", sellable)
           // console.log("d", d)
           // console.log("maxSelling", maxSelling)
-          if (maxSelling > minTrade) {
+          if (maxSelling > 0n) {
             spotSelling_.initAmountOf(asset, spotSelling);
             maxSelling_.initAmountOf(asset, maxSelling);
             break;

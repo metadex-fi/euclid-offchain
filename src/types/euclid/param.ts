@@ -16,7 +16,7 @@ import { min } from "../../utils/generators.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
 
-export const minLiquidityJumpSize = 100n; // TODO/NOTE should never be less than 1n
+export const minLiquidityJumpSize = 1n;//100n; // TODO/NOTE should never be less than 1n
 
 export class Param {
   constructor(

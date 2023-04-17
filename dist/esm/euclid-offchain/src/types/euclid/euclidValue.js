@@ -69,6 +69,14 @@ export class EuclidValue {
         // public normedDivideBy = (other: EuclidValue): PositiveValue => {
         //   return new PositiveValue(Value.normedDivide(this.unsigned, other.unsigned));
         // };
+        Object.defineProperty(this, "divideByScalar", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: (scalar) => {
+                return EuclidValue.fromValue(this.unsigned.divideByScalar(scalar));
+            }
+        });
         Object.defineProperty(this, "leq", {
             enumerable: true,
             configurable: true,
