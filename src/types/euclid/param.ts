@@ -12,11 +12,10 @@ import { PRecord } from "../general/fundamental/container/record.ts";
 import { f, t } from "../general/fundamental/type.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
 import { PInteger } from "../general/fundamental/primitive/integer.ts";
-import { min } from "../../utils/generators.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
 
-export const minLiquidityJumpSize = 1n;//100n; // TODO/NOTE should never be less than 1n
+// export const minLiquidityJumpSize = 1n;//100n; // TODO/NOTE should never be less than 1n
 
 export class Param {
   constructor(
@@ -82,10 +81,10 @@ ${tt})`;
       maxAnchorPrices.leqMaxInteger,
       `max anchor price must be leq max integer, but is ${maxAnchorPrices.concise()}`,
     );
-    assert(
-      param.weights.leq(param.jumpSizes.divideByScalar(minLiquidityJumpSize)),
-      `weights must be leq jumpSizes / ${minLiquidityJumpSize.toString()}, but are ${param.weights.concise()} and ${param.jumpSizes.concise()}`,
-    )
+    // assert(
+    //   param.weights.leq(param.jumpSizes.divideByScalar(minLiquidityJumpSize)),
+    //   `weights must be leq jumpSizes / ${minLiquidityJumpSize.toString()}, but are ${param.weights.concise()} and ${param.jumpSizes.concise()}`,
+    // )
   }
 
   static generate(): Param {
@@ -108,21 +107,28 @@ ${tt})`;
     const weights = new PositiveValue();
     const virtual = new PositiveValue();
 
+    const ppositive = new PPositive();
     allAssets.forEach((asset) => {
       if (virtualAssets.has(asset)) {
-        const maxLowestPrice = new PPositive(minLiquidityJumpSize + 1n).genData();
-        const jumpSize = new PPositive(minLiquidityJumpSize, maxLowestPrice - 1n).genData();
+        // const maxLowestPrice = new PPositive(minLiquidityJumpSize + 1n).genData();
+        // const jumpSize = new PPositive(minLiquidityJumpSize, maxLowestPrice - 1n).genData();
+        const maxLowestPrice = new PPositive(2n).genData();
+        const jumpSize = new PPositive(1n, maxLowestPrice - 1n).genData();
         const minLowestPrice = maxLowestPrice - jumpSize;
-        const weight = new PPositive(1n, min(minLowestPrice, jumpSize / minLiquidityJumpSize)).genData();
+        // const weight = new PPositive(1n, min(minLowestPrice, jumpSize / minLiquidityJumpSize)).genData();
+        const weight = new PPositive(1n, minLowestPrice).genData();
         
         virtual.initAmountOf(asset, minLowestPrice / weight);
         jumpSizes.initAmountOf(asset, jumpSize);
         weights.initAmountOf(asset, weight);
       } else {
-        const maxLowestPrice = new PPositive(minLiquidityJumpSize).genData();
-        const jumpSize = new PPositive(minLiquidityJumpSize, maxLowestPrice).genData();
+        const weight = ppositive.genData();
+        const maxLowestPrice = ppositive.genData();
+        const jumpSize = new PPositive(1n, maxLowestPrice).genData();
+        // const maxLowestPrice = new PPositive(minLiquidityJumpSize).genData();
+        // const jumpSize = new PPositive(minLiquidityJumpSize, maxLowestPrice).genData();
         const minLowestPrice = maxLowestPrice - jumpSize;
-        const weight = new PPositive(1n, jumpSize / minLiquidityJumpSize).genData();
+        // const weight = new PPositive(1n, jumpSize / minLiquidityJumpSize).genData();
 
         if (weight <= minLowestPrice) {
           virtual.initAmountOf(asset, minLowestPrice / weight);
