@@ -1,6 +1,6 @@
 export declare class AssertionError extends Error {
-    name: string;
-    constructor(message: string);
+  name: string;
+  constructor(message: string);
 }
 /**
  * Deep equality comparison used in assertions
@@ -12,7 +12,10 @@ export declare function equal(c: unknown, d: unknown): boolean;
 export declare function assert(expr: unknown, msg?: string): asserts expr;
 /** Make an assertion, error will be thrown if `expr` have truthy value. */
 declare type Falsy = false | 0 | 0n | "" | null | undefined;
-export declare function assertFalse(expr: unknown, msg?: string): asserts expr is Falsy;
+export declare function assertFalse(
+  expr: unknown,
+  msg?: string,
+): asserts expr is Falsy;
 /**
  * Make an assertion that `actual` and `expected` are equal, deeply. If not
  * deeply equal, then throw.
@@ -29,7 +32,11 @@ export declare function assertFalse(expr: unknown, msg?: string): asserts expr i
  * });
  * ```
  */
-export declare function assertEquals<T>(actual: T, expected: T, msg?: string): void;
+export declare function assertEquals<T>(
+  actual: T,
+  expected: T,
+  msg?: string,
+): void;
 /**
  * Make an assertion that `actual` and `expected` are not equal, deeply.
  * If not then throw.
@@ -43,7 +50,11 @@ export declare function assertEquals<T>(actual: T, expected: T, msg?: string): v
  * assertNotEquals<number>(1, 2)
  * ```
  */
-export declare function assertNotEquals<T>(actual: T, expected: T, msg?: string): void;
+export declare function assertNotEquals<T>(
+  actual: T,
+  expected: T,
+  msg?: string,
+): void;
 /**
  * Make an assertion that `actual` and `expected` are strictly equal. If
  * not then throw.
@@ -66,7 +77,11 @@ export declare function assertNotEquals<T>(actual: T, expected: T, msg?: string)
  * });
  * ```
  */
-export declare function assertStrictEquals<T>(actual: unknown, expected: T, msg?: string): asserts actual is T;
+export declare function assertStrictEquals<T>(
+  actual: unknown,
+  expected: T,
+  msg?: string,
+): asserts actual is T;
 /**
  * Make an assertion that `actual` and `expected` are not strictly equal.
  * If the values are strictly equal then throw.
@@ -77,7 +92,11 @@ export declare function assertStrictEquals<T>(actual: unknown, expected: T, msg?
  * assertNotStrictEquals(1, 1)
  * ```
  */
-export declare function assertNotStrictEquals<T>(actual: T, expected: T, msg?: string): void;
+export declare function assertNotStrictEquals<T>(
+  actual: T,
+  expected: T,
+  msg?: string,
+): void;
 /**
  * Make an assertion that `actual` and `expected` are almost equal numbers through
  * a given tolerance. It can be used to take into account IEEE-754 double-precision
@@ -95,29 +114,50 @@ export declare function assertNotStrictEquals<T>(actual: T, expected: T, msg?: s
  * assertThrows(() => assertAlmostEquals(0.1 + 0.2, 0.3, 1e-17));
  * ```
  */
-export declare function assertAlmostEquals(actual: number, expected: number, tolerance?: number, msg?: string): void;
+export declare function assertAlmostEquals(
+  actual: number,
+  expected: number,
+  tolerance?: number,
+  msg?: string,
+): void;
 declare type AnyConstructor = new (...args: any[]) => any;
-declare type GetConstructorType<T extends AnyConstructor> = T extends new (...args: any) => infer C ? C : never;
+declare type GetConstructorType<T extends AnyConstructor> = T extends
+  new (...args: any) => infer C ? C : never;
 /**
  * Make an assertion that `obj` is an instance of `type`.
  * If not then throw.
  */
-export declare function assertInstanceOf<T extends AnyConstructor>(actual: unknown, expectedType: T, msg?: string): asserts actual is GetConstructorType<T>;
+export declare function assertInstanceOf<T extends AnyConstructor>(
+  actual: unknown,
+  expectedType: T,
+  msg?: string,
+): asserts actual is GetConstructorType<T>;
 /**
  * Make an assertion that `obj` is not an instance of `type`.
  * If so, then throw.
  */
-export declare function assertNotInstanceOf<A, T>(actual: A, unexpectedType: new (...args: any[]) => T, msg?: string): asserts actual is Exclude<A, T>;
+export declare function assertNotInstanceOf<A, T>(
+  actual: A,
+  unexpectedType: new (...args: any[]) => T,
+  msg?: string,
+): asserts actual is Exclude<A, T>;
 /**
  * Make an assertion that actual is not null or undefined.
  * If not then throw.
  */
-export declare function assertExists<T>(actual: T, msg?: string): asserts actual is NonNullable<T>;
+export declare function assertExists<T>(
+  actual: T,
+  msg?: string,
+): asserts actual is NonNullable<T>;
 /**
  * Make an assertion that actual includes expected. If not
  * then throw.
  */
-export declare function assertStringIncludes(actual: string, expected: string, msg?: string): void;
+export declare function assertStringIncludes(
+  actual: string,
+  expected: string,
+  msg?: string,
+): void;
 /**
  * Make an assertion that `actual` includes the `expected` values.
  * If not then an error will be thrown.
@@ -131,22 +171,37 @@ export declare function assertStringIncludes(actual: string, expected: string, m
  * assertArrayIncludes<number>([1, 2], [2])
  * ```
  */
-export declare function assertArrayIncludes<T>(actual: ArrayLike<T>, expected: ArrayLike<T>, msg?: string): void;
+export declare function assertArrayIncludes<T>(
+  actual: ArrayLike<T>,
+  expected: ArrayLike<T>,
+  msg?: string,
+): void;
 /**
  * Make an assertion that `actual` match RegExp `expected`. If not
  * then throw.
  */
-export declare function assertMatch(actual: string, expected: RegExp, msg?: string): void;
+export declare function assertMatch(
+  actual: string,
+  expected: RegExp,
+  msg?: string,
+): void;
 /**
  * Make an assertion that `actual` not match RegExp `expected`. If match
  * then throw.
  */
-export declare function assertNotMatch(actual: string, expected: RegExp, msg?: string): void;
+export declare function assertNotMatch(
+  actual: string,
+  expected: RegExp,
+  msg?: string,
+): void;
 /**
  * Make an assertion that `actual` object is a subset of `expected` object, deeply.
  * If not, then throw.
  */
-export declare function assertObjectMatch(actual: Record<PropertyKey, any>, expected: Record<PropertyKey, unknown>): void;
+export declare function assertObjectMatch(
+  actual: Record<PropertyKey, any>,
+  expected: Record<PropertyKey, unknown>,
+): void;
 /**
  * Forcefully throws a failed assertion
  */
@@ -157,7 +212,12 @@ export declare function fail(msg?: string): never;
  * An error class and a string that should be included in the
  * error message can also be asserted.
  */
-export declare function assertIsError<E extends Error = Error>(error: unknown, ErrorClass?: new (...args: any[]) => E, msgIncludes?: string, msg?: string): asserts error is E;
+export declare function assertIsError<E extends Error = Error>(
+  error: unknown,
+  ErrorClass?: new (...args: any[]) => E,
+  msgIncludes?: string,
+  msg?: string,
+): asserts error is E;
 /**
  * Executes a function, expecting it to throw. If it does not, then it
  * throws.
@@ -212,7 +272,12 @@ export declare function assertThrows(fn: () => unknown, msg?: string): unknown;
  * });
  * ```
  */
-export declare function assertThrows<E extends Error = Error>(fn: () => unknown, ErrorClass: new (...args: any[]) => E, msgIncludes?: string, msg?: string): E;
+export declare function assertThrows<E extends Error = Error>(
+  fn: () => unknown,
+  ErrorClass: new (...args: any[]) => E,
+  msgIncludes?: string,
+  msg?: string,
+): E;
 /**
  * Executes a function which returns a promise, expecting it to reject.
  *
@@ -243,7 +308,10 @@ export declare function assertThrows<E extends Error = Error>(fn: () => unknown,
  * });
  * ```
  */
-export declare function assertRejects(fn: () => PromiseLike<unknown>, msg?: string): Promise<unknown>;
+export declare function assertRejects(
+  fn: () => PromiseLike<unknown>,
+  msg?: string,
+): Promise<unknown>;
 /**
  * Executes a function which returns a promise, expecting it to reject.
  * If it does not, then it throws. An error class and a string that should be
@@ -276,7 +344,12 @@ export declare function assertRejects(fn: () => PromiseLike<unknown>, msg?: stri
  * });
  * ```
  */
-export declare function assertRejects<E extends Error = Error>(fn: () => PromiseLike<unknown>, ErrorClass: new (...args: any[]) => E, msgIncludes?: string, msg?: string): Promise<E>;
+export declare function assertRejects<E extends Error = Error>(
+  fn: () => PromiseLike<unknown>,
+  ErrorClass: new (...args: any[]) => E,
+  msgIncludes?: string,
+  msg?: string,
+): Promise<E>;
 /** Use this to stub out methods that will throw when invoked. */
 export declare function unimplemented(msg?: string): never;
 /** Use this to assert unreachable code. */

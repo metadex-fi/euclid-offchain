@@ -418,7 +418,7 @@ export class Value {
   static subtract = Value.newUnionWith((a, b) => a - b);
   static normedSubtract = Value.newUnionWith((a, b) => a - b, 0n, 0n, 0n);
   static hadamard = Value.newUnionWith((a, b) => a * b);
-  static hadamard_ = Value.newUnionWith((a, b) => a * b, undefined, 0n);
+  // static hadamard_ = Value.newUnionWith((a, b) => a * b, undefined, 0n);
   static divide = Value.newUnionWith((a, b) => a / b); // reverse hadamard-product
   static normedDivide = Value.newUnionWith((a, b) => a / b, 0n, 0n, 0n);
 
@@ -503,6 +503,12 @@ export class Value {
     undefined,
     0n,
   );
+
+  static lt = Value.newCompareWith(
+    (a, b) => a < b,
+    // no defaults, as we use it to assert assets match as well
+  );
+
   static lt_ = Value.newCompareWith(
     (a, b) => a < b,
     0n,

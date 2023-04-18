@@ -117,7 +117,7 @@ ${tt})`;
         const minLowestPrice = maxLowestPrice - jumpSize;
         // const weight = new PPositive(1n, min(minLowestPrice, jumpSize / minLiquidityJumpSize)).genData();
         const weight = new PPositive(1n, minLowestPrice).genData();
-        
+
         virtual.initAmountOf(asset, minLowestPrice / weight);
         jumpSizes.initAmountOf(asset, jumpSize);
         weights.initAmountOf(asset, weight);

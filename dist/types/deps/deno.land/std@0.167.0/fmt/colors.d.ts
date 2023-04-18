@@ -1,8 +1,8 @@
 /** RGB 8-bits per channel. Each in range `0->255` or `0x00->0xff` */
 interface Rgb {
-    r: number;
-    g: number;
-    b: number;
+  r: number;
+  g: number;
+  b: number;
 }
 /**
  * Set changing text color to enabled or disabled

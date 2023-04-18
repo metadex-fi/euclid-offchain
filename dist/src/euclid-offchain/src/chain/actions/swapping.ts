@@ -34,9 +34,13 @@ export class Swapping {
     public readonly soldAmount: bigint,
     public readonly boughtSpot: bigint, // inverted
     public readonly soldSpot: bigint, // inverted
+    public readonly boughtExp: bigint,
+    public readonly soldExp: bigint,
   ) {
-    assert(boughtAmount > 0n, `boughtAmount must be positive`);
-    assert(soldAmount > 0n, `soldAmount must be positive`);
+    // assert(boughtAmount > 0n, `boughtAmount must be positive`);
+    // assert(soldAmount > 0n, `soldAmount must be positive`);
+    assert(boughtAmount >= 0n, `boughtAmount must be nonnegative`);
+    assert(soldAmount >= 0n, `soldAmount must be nonnegative`);
     assert(boughtSpot > 0n, `boughtSpot must be positive`);
     assert(soldSpot > 0n, `soldSpot must be positive`);
 
@@ -137,9 +141,13 @@ export class Swapping {
       this.boughtSpot;
     const swapA0 = min(offerA0, demandA0);
     const boughtAmount = swapA0 / this.soldSpot;
+    // assert(
+    //   boughtAmount > 0n,
+    //   `Swapping.subSwap: boughtAmount must be positive, but is ${boughtAmount} for ${this.show()}`,
+    // );
     assert(
-      boughtAmount > 0n,
-      `Swapping.subSwap: boughtAmount must be positive, but is ${boughtAmount} for ${this.show()}`,
+      boughtAmount >= 0n,
+      `Swapping.subSwap: boughtAmount must be nonnegative, but is ${boughtAmount} for ${this.show()}`,
     );
     const soldAmount = BigInt(Math.ceil(Number(boughtAmount) * this.spotPrice));
 
@@ -162,6 +170,8 @@ export class Swapping {
       soldAmount,
       this.boughtSpot,
       this.soldSpot,
+      this.boughtExp,
+      this.soldExp,
     );
   };
 
@@ -171,9 +181,13 @@ export class Swapping {
     const demandA0 = this.soldAmount * this.boughtSpot;
     const maxSwapA0 = min(offerA0, demandA0);
     const maxBought = maxSwapA0 / this.soldSpot;
+    // assert(
+    //   maxBought > 0n,
+    //   `Swapping.randomSubSwap: maxBought must be positive, but is ${maxBought} for ${this.show()}`,
+    // );
     assert(
-      maxBought > 0n,
-      `Swapping.randomSubSwap: maxBought must be positive, but is ${maxBought} for ${this.show()}`,
+      maxBought >= 0n,
+      `Swapping.randomSubSwap: maxBought must be nonnegative, but is ${maxBought} for ${this.show()}`,
     );
 
     const boughtAmount = genPositive(maxBought);
@@ -189,6 +203,8 @@ export class Swapping {
       soldAmount,
       this.boughtSpot,
       this.soldSpot,
+      this.boughtExp,
+      this.soldExp,
     );
   };
 
@@ -202,6 +218,8 @@ export class Swapping {
     soldAmount: bigint,
     boughtSpot: bigint,
     soldSpot: bigint,
+    boughtExp: bigint,
+    soldExp: bigint,
   ): Swapping {
     return new Swapping(
       user,
@@ -213,6 +231,8 @@ export class Swapping {
       soldAmount,
       boughtSpot,
       soldSpot,
+      boughtExp,
+      soldExp,
     );
   }
 
@@ -226,34 +246,34 @@ export class Swapping {
     return randomChoice(swappings).randomSubSwap();
   }
 
-  private static pricesFitDirac(
-    spotBuying: bigint,
-    spotSelling: bigint,
-    buyingLowest: bigint,
-    sellingLowest: bigint,
-    buyingJumpSize: bigint,
-    sellingJumpSize: bigint,
-  ): boolean {
-    const fitBuying = (spotBuying - buyingLowest) % buyingJumpSize === 0n;
-    const fitSelling = (spotSelling - sellingLowest) % sellingJumpSize === 0n;
-    if (!fitBuying) {
-      console.log(
-        `pricesFitDirac: 
-        buying ${spotBuying} 
-        not fit for ${buyingLowest} 
-        with jump ${buyingJumpSize}`,
-      );
-    }
-    if (!fitSelling) {
-      console.log(
-        `pricesFitDirac:
-        selling ${spotSelling}
-        not fit for ${sellingLowest}
-        with jump ${sellingJumpSize}`,
-      );
-    }
-    return fitBuying && fitSelling;
-  }
+  // private static pricesFitDirac(
+  //   spotBuying: bigint,
+  //   spotSelling: bigint,
+  //   buyingLowest: bigint,
+  //   sellingLowest: bigint,
+  //   buyingJumpSize: bigint,
+  //   sellingJumpSize: bigint,
+  // ): boolean {
+  //   const fitBuying = (spotBuying - buyingLowest) % buyingJumpSize === 0n;
+  //   const fitSelling = (spotSelling - sellingLowest) % sellingJumpSize === 0n;
+  //   if (!fitBuying) {
+  //     console.log(
+  //       `pricesFitDirac:
+  //       buying ${spotBuying}
+  //       not fit for ${buyingLowest}
+  //       with jump ${buyingJumpSize}`,
+  //     );
+  //   }
+  //   if (!fitSelling) {
+  //     console.log(
+  //       `pricesFitDirac:
+  //       selling ${spotSelling}
+  //       not fit for ${sellingLowest}
+  //       with jump ${sellingJumpSize}`,
+  //     );
+  //   }
+  //   return fitBuying && fitSelling;
+  // }
 
   private static boughtAssetForSale(
     spotBuying: bigint,
@@ -319,14 +339,15 @@ export class Swapping {
     const newBuyingAmm = buyingWeight * (buyingLiquidity - buyingAmount);
     const newSellingAmm = sellingWeight * (sellingLiquidity + sellingAmount);
 
-    return Swapping.pricesFitDirac(
-      spotBuying,
-      spotSelling,
-      buyingLowest,
-      sellingLowest,
-      buyingJumpSize,
-      sellingJumpSize,
-    ) &&
+    return true && // TODO check that exponents and spot prices fit together, either here or in constructor
+      // Swapping.pricesFitDirac(
+      //   spotBuying,
+      //   spotSelling,
+      //   buyingLowest,
+      //   sellingLowest,
+      //   buyingJumpSize,
+      //   sellingJumpSize,
+      // ) &&
       Swapping.boughtAssetForSale(
         spotBuying,
         spotSelling,

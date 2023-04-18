@@ -1,5 +1,4 @@
-const dntGlobals = {
-};
+const dntGlobals = {};
 export const dntGlobalThis = createMergeProxy(globalThis, dntGlobals);
 
 // deno-lint-ignore ban-types

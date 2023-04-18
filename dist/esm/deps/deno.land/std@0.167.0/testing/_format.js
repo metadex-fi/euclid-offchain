@@ -7,17 +7,17 @@
  */
 import * as dntShim from "../../../../_dnt.shims.js";
 export function format(v) {
-    // deno-lint-ignore no-explicit-any
-    const { Deno } = dntShim.dntGlobalThis;
-    return typeof Deno?.inspect === "function"
-        ? Deno.inspect(v, {
-            depth: Infinity,
-            sorted: true,
-            trailingComma: true,
-            compact: false,
-            iterableLimit: Infinity,
-            // getters should be true in assertEquals.
-            getters: true,
-        })
-        : `"${String(v).replace(/(?=["\\])/g, "\\")}"`;
+  // deno-lint-ignore no-explicit-any
+  const { Deno } = dntShim.dntGlobalThis;
+  return typeof Deno?.inspect === "function"
+    ? Deno.inspect(v, {
+      depth: Infinity,
+      sorted: true,
+      trailingComma: true,
+      compact: false,
+      iterableLimit: Infinity,
+      // getters should be true in assertEquals.
+      getters: true,
+    })
+    : `"${String(v).replace(/(?=["\\])/g, "\\")}"`;
 }

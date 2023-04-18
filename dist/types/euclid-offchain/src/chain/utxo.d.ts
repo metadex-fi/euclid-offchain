@@ -12,35 +12,44 @@ import { Swapping } from "./actions/swapping.js";
 import { Contract } from "./contract.js";
 import { User } from "./user.js";
 export declare class ParamUtxo {
-    readonly param: Param;
-    readonly paramNFT: IdNFT;
-    readonly utxo?: Lucid.UTxO | undefined;
-    private constructor();
-    static parse(utxo: Lucid.UTxO, param: Param): ParamUtxo;
-    static open(param: Param, paramNFT: IdNFT): ParamUtxo;
-    openingTx: (tx: Lucid.Tx, contract: Contract) => Lucid.Tx;
-    sharedAssets: (assets: Assets) => Assets;
-    show: (tabs?: string) => string;
+  readonly param: Param;
+  readonly paramNFT: IdNFT;
+  readonly utxo?: Lucid.UTxO | undefined;
+  private constructor();
+  static parse(utxo: Lucid.UTxO, param: Param): ParamUtxo;
+  static open(param: Param, paramNFT: IdNFT): ParamUtxo;
+  openingTx: (tx: Lucid.Tx, contract: Contract) => Lucid.Tx;
+  sharedAssets: (assets: Assets) => Assets;
+  show: (tabs?: string) => string;
 }
 export declare class PreDiracUtxo {
-    readonly utxo: Lucid.UTxO;
-    readonly datum: PConstanted<PEuclidDatum>;
-    readonly preDirac: Dirac;
-    readonly balance: PositiveValue;
-    constructor(utxo: Lucid.UTxO, datum: PConstanted<PEuclidDatum>, preDirac: Dirac);
-    parse: (param: Param) => DiracUtxo | undefined;
-    show: (tabs?: string) => string;
+  readonly utxo: Lucid.UTxO;
+  readonly datum: PConstanted<PEuclidDatum>;
+  readonly preDirac: Dirac;
+  readonly balance: PositiveValue;
+  constructor(
+    utxo: Lucid.UTxO,
+    datum: PConstanted<PEuclidDatum>,
+    preDirac: Dirac,
+  );
+  parse: (param: Param) => DiracUtxo | undefined;
+  show: (tabs?: string) => string;
 }
 export declare class DiracUtxo {
-    readonly peuclidDatum: PEuclidDatum;
-    readonly dirac: Dirac;
-    readonly balance: PositiveValue;
-    readonly utxo?: Lucid.UTxO | undefined;
-    private constructor();
-    static parse(from: PreDiracUtxo, param: Param): DiracUtxo;
-    static open(param: Param, dirac: Dirac, balance: PositiveValue): DiracUtxo;
-    show: (tabs?: string) => string;
-    openingTx: (tx: Lucid.Tx, contract: Contract) => Lucid.Tx;
-    applySwapping: (swapping: Swapping) => DiracUtxo;
-    swappingsFor: (user: User, paramUtxo: ParamUtxo, sellable_: Value, buyingAsset?: Asset) => Swapping[];
+  readonly peuclidDatum: PEuclidDatum;
+  readonly dirac: Dirac;
+  readonly balance: PositiveValue;
+  readonly utxo?: Lucid.UTxO | undefined;
+  private constructor();
+  static parse(from: PreDiracUtxo, param: Param): DiracUtxo;
+  static open(param: Param, dirac: Dirac, balance: PositiveValue): DiracUtxo;
+  show: (tabs?: string) => string;
+  openingTx: (tx: Lucid.Tx, contract: Contract) => Lucid.Tx;
+  applySwapping: (swapping: Swapping) => DiracUtxo;
+  swappingsFor: (
+    user: User,
+    paramUtxo: ParamUtxo,
+    sellable_: Value,
+    buyingAsset?: Asset,
+  ) => Swapping[];
 }

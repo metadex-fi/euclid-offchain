@@ -72,7 +72,11 @@ Deno.test("emulator", async () => {
         traces.push(...hashes);
         // }
       } catch (e) {
-        throw new Error(`Error: ${e}`);
+        console.error("---");
+        for (const [type, count] of actionCounts_) {
+          console.error(`${type}: ${count}`);
+        }
+        throw new Error(`Error: ${e}\n${e.stack}`);
       }
       emulator.awaitBlock(Number(genPositive()));
     }
