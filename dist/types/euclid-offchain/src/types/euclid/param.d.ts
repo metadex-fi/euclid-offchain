@@ -4,7 +4,6 @@ import { PositiveValue } from "../general/derived/value/positiveValue.js";
 import { Value } from "../general/derived/value/value.js";
 import { PObject } from "../general/fundamental/container/object.js";
 import { EuclidValue } from "./euclidValue.js";
-export declare const minLiquidityJumpSize = 1n;
 export declare class Param {
     readonly owner: KeyHash;
     readonly virtual: PositiveValue;
