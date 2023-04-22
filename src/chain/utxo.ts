@@ -212,12 +212,15 @@ export class DiracUtxo {
     buyingAsset?: Asset, // for subsequent swappings we want only a single direction
   ): Swapping[] => {
     const swappings = new Array<Swapping>();
-    const buyable_ = buyingAsset
-      ? PositiveValue.singleton(
-        buyingAsset,
-        this.balance.amountOf(buyingAsset, 0n),
-      )
-      : this.balance;
+    let buyable_ = this.balance;
+    if (buyingAsset) {
+      const buyableAmnt = this.balance.amountOf(buyingAsset, 0n);
+      if (buyableAmnt > 0n) {
+        buyable_ = PositiveValue.singleton(buyingAsset, buyableAmnt);
+      } else {
+        return [];
+      }
+    }
     const param = paramUtxo.param;
 
     const liquidity_ = new PositiveValue();
@@ -241,9 +244,9 @@ export class DiracUtxo {
       const virtual = param.virtual.amountOf(asset);
       const weight = param.weights.amountOf(asset); // NOTE: inverted
       const jumpSize = param.jumpSizes.amountOf(asset);
-      const anchor = this.dirac.anchorPrices.amountOf(asset);
+      const anchor = this.dirac.anchorPrices.amountOf(asset); // NOTE: inverted aka "price when selling for A0"
 
-      const liquidity = buyable + virtual;
+      const liquidity = virtual + this.balance.amountOf(asset, 0n);
       if (liquidity <= 0n) return; // TODO reconsider if this can happen, throw error instead if not
       liquidity_.initAmountOf(asset, liquidity);
 
@@ -253,6 +256,8 @@ export class DiracUtxo {
       const jumpMultiplier = (Number(jumpSize) + 1) / Number(jumpSize);
       const exp = Math.log(Number(amm) / Number(anchor)) /
         Math.log(jumpMultiplier);
+
+      console.warn(`asset: ${asset.concise()}`);
       console.log(`virtual: ${virtual}`);
       console.log(`buyable: ${buyable}`);
       console.log(`liquidity: ${liquidity}`);
@@ -271,6 +276,7 @@ export class DiracUtxo {
       );
       console.log(`Math.log(jumpMultiplier): ${Math.log(jumpMultiplier)}`);
       console.log(`exp: ${exp}`);
+
       let expBuying = Math.floor(exp);
       let expSelling = Math.ceil(exp);
       console.log(`expBuying: ${expBuying}, expSelling: ${expSelling}`);

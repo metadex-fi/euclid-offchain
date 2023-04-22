@@ -4,7 +4,6 @@ import { Dirac } from "../../types/euclid/dirac.js";
 import { EuclidValue } from "../../types/euclid/euclidValue.js";
 import { Param } from "../../types/euclid/param.js";
 import { Asset } from "../../types/general/derived/asset/asset.js";
-import { Assets } from "../../types/general/derived/asset/assets.js";
 import { PPositive } from "../../types/general/derived/bounded/positive.js";
 import { PositiveValue } from "../../types/general/derived/value/positiveValue.js";
 import {
@@ -58,7 +57,7 @@ export class Opening {
         this.user.paymentKeyHash,
         threadNFT,
         paramNFT,
-        PositiveValue.normed(minAnchorPrices),
+        minAnchorPrices,
       ),
     ];
 
@@ -67,7 +66,7 @@ export class Opening {
     // offsets for that asset's lowest price.
     assets.forEach((asset) => {
       // if (numJumps.amountOf(asset) === 0n) return;
-      const ticks = this.numTicks.amountOf(asset);
+      const ticks = 1n; //this.numTicks.amountOf(asset); TODO update to multiplicative
       const tickSize = tickSizes.amountOf(asset);
       const diracs_ = new Array<Dirac>();
       diracs.forEach((dirac) => {
@@ -118,17 +117,15 @@ export class Opening {
     const maxAssets = gMaxLength;
     const deposit = balance.boundedSubValue(1n, maxAssets);
     const allAssets = deposit.assets;
-    const virtualAssets = new Assets();
     let addVirtualAssets = max(genNonNegative(maxAssets), 2n) - allAssets.size;
     while (addVirtualAssets > 0n) {
       const asset = Asset.generate();
       if (allAssets.has(asset)) continue;
       allAssets.insert(asset);
-      virtualAssets.insert(asset);
       addVirtualAssets--;
     }
     // console.log(allAssets.show());
-    const param = Param.genOf(user.paymentKeyHash, allAssets, virtualAssets);
+    const param = Param.genOf(user.paymentKeyHash, allAssets);
 
     const gMaxDiracs = 26n; // because tx size
     const maxDiracs = deposit.smallestAmount; // because minimum deposit

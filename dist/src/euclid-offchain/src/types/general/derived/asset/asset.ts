@@ -15,17 +15,17 @@ export class Asset {
     // Asset.assertLength(this);
   }
 
-  public equals = (other: Asset): boolean => {
-    return this.currency.symbol === other.currency.symbol &&
-      this.token.name === other.token.name;
-  };
-
+  
   public show = (): string => {
     return `Asset(${this.currency.toString()}, ${this.token.name})`;
   };
-
+  
   public concise = (): string => {
     return `${this.currency.concise()}.${this.token.concise()}`;
+  };
+  
+  public equals = (other: Asset): boolean => {
+    return this.concise() === other.concise();
   };
 
   public toLucid = (): string => {

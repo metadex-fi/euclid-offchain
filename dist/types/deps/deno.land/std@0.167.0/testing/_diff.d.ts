@@ -1,12 +1,12 @@
 export declare enum DiffType {
-  removed = "removed",
-  common = "common",
-  added = "added",
+    removed = "removed",
+    common = "common",
+    added = "added"
 }
 export interface DiffResult<T> {
-  type: DiffType;
-  value: T;
-  details?: Array<DiffResult<T>>;
+    type: DiffType;
+    value: T;
+    details?: Array<DiffResult<T>>;
 }
 /**
  * Renders the differences between the actual and expected values
@@ -21,9 +21,6 @@ export declare function diff<T>(A: T[], B: T[]): Array<DiffResult<T>>;
  * @param B Expected string
  */
 export declare function diffstr(A: string, B: string): DiffResult<string>[];
-export declare function buildMessage(
-  diffResult: ReadonlyArray<DiffResult<string>>,
-  { stringDiff }?: {
+export declare function buildMessage(diffResult: ReadonlyArray<DiffResult<string>>, { stringDiff }?: {
     stringDiff?: boolean | undefined;
-  },
-): string[];
+}): string[];

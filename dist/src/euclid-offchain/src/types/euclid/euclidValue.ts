@@ -30,12 +30,21 @@ export class EuclidValue {
   public get unit(): Value {
     return this.value.unit;
   }
+
+  public get clone(): EuclidValue {
+    return new EuclidValue(this.value.clone);
+  }
+
   public concise = (tabs = ""): string => this.value.concise(tabs);
   public amountOf = (asset: Asset, defaultAmnt?: bigint): bigint =>
     this.value.amountOf(asset, defaultAmnt);
   public get toLucid(): Lucid.Assets {
     return this.value.toLucid;
   }
+
+  public addAmountOf = (asset: Asset, amount: bigint): void => {
+    this.value.addAmountOf(asset, amount);
+  };
 
   public plus = (other: EuclidValue): EuclidValue => {
     return EuclidValue.fromValue(Value.add(this.unsigned, other.unsigned));
@@ -64,9 +73,17 @@ export class EuclidValue {
     return EuclidValue.fromValue(this.unsigned.divideByScalar(scalar));
   };
 
+  public lt = (other: EuclidValue): boolean => {
+    return Value.lt(this.unsigned, other.unsigned);
+  };
+
   public leq = (other: EuclidValue): boolean => {
     return Value.leq(this.unsigned, other.unsigned);
   };
+
+  public get leqMaxInteger(): boolean {
+    return this.unsigned.leqMaxInteger;
+  }
 
   public bounded = (lower = 1n, upper = maxInteger): EuclidValue => {
     return EuclidValue.fromValue(

@@ -20,11 +20,7 @@
  * console.log(indexOfNeedle(source, needle, 2)); // 3
  * ```
  */
-export declare function indexOfNeedle(
-  source: Uint8Array,
-  needle: Uint8Array,
-  start?: number,
-): number;
+export declare function indexOfNeedle(source: Uint8Array, needle: Uint8Array, start?: number): number;
 /** Returns the index of the last occurrence of the needle array in the source
  * array, or -1 if it is not present.
  *
@@ -41,11 +37,7 @@ export declare function indexOfNeedle(
  * console.log(lastIndexOfNeedle(source, needle, 4)); // 3
  * ```
  */
-export declare function lastIndexOfNeedle(
-  source: Uint8Array,
-  needle: Uint8Array,
-  start?: number,
-): number;
+export declare function lastIndexOfNeedle(source: Uint8Array, needle: Uint8Array, start?: number): number;
 /** Returns true if the prefix array appears at the start of the source array,
  * false otherwise.
  *
@@ -58,10 +50,7 @@ export declare function lastIndexOfNeedle(
  * console.log(startsWith(source, prefix)); // true
  * ```
  */
-export declare function startsWith(
-  source: Uint8Array,
-  prefix: Uint8Array,
-): boolean;
+export declare function startsWith(source: Uint8Array, prefix: Uint8Array): boolean;
 /** Returns true if the suffix array appears at the end of the source array,
  * false otherwise.
  *
@@ -74,10 +63,7 @@ export declare function startsWith(
  * console.log(endsWith(source, suffix)); // true
  * ```
  */
-export declare function endsWith(
-  source: Uint8Array,
-  suffix: Uint8Array,
-): boolean;
+export declare function endsWith(source: Uint8Array, suffix: Uint8Array): boolean;
 /** Returns a new Uint8Array composed of `count` repetitions of the `source`
  * array.
  *
@@ -116,11 +102,7 @@ export declare function concat(...buf: Uint8Array[]): Uint8Array;
  * console.log(includesNeedle(source, needle, 6)); // false
  * ```
  */
-export declare function includesNeedle(
-  source: Uint8Array,
-  needle: Uint8Array,
-  start?: number,
-): boolean;
+export declare function includesNeedle(source: Uint8Array, needle: Uint8Array, start?: number): boolean;
 /** Copy bytes from the `src` array to the `dst` array. Returns the number of
  * bytes copied.
  *
@@ -147,9 +129,5 @@ export declare function includesNeedle(
  * console.log(dst); // [0, 1, 1, 1]
  * ```
  */
-export declare function copy(
-  src: Uint8Array,
-  dst: Uint8Array,
-  off?: number,
-): number;
+export declare function copy(src: Uint8Array, dst: Uint8Array, off?: number): number;
 export { equals } from "./equals.js";

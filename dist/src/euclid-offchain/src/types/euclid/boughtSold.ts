@@ -1,4 +1,5 @@
 import { maxInteger } from "../../utils/generators.js";
+import { PBounded } from "../general/derived/bounded/bounded.js";
 import { PPositive } from "../general/derived/bounded/positive.js";
 import { PObject } from "../general/fundamental/container/object.js";
 import { PRecord } from "../general/fundamental/container/record.js";
@@ -12,18 +13,17 @@ export class BoughtSold {
 
 export class PBoughtSold extends PObject<BoughtSold> {
   constructor() {
-    // leaving this as ppositive, because onchain rep should be positive
     // TODO high upper bound, but this is required by onchain. set maxInteger accordingly
     // TODO also the value is just artlessly, excessively high right now
     // needs to be less than weight * (virtual + balance) + jumpSize
-    const ppositive = new PPositive(
-      1n,
+    const pbounded = new PBounded(
+      0n,
       maxInteger ** maxInteger,
     );
     super(
       new PRecord({
-        bought: ppositive,
-        sold: ppositive,
+        bought: pbounded,
+        sold: pbounded,
       }),
       BoughtSold,
     );

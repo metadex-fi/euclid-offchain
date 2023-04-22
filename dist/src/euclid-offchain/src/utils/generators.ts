@@ -108,9 +108,16 @@ export function maybeNdef<T>(value: T) {
 
 export function genNonNegative(maxValue = maxInteger): bigint {
   assert(maxValue >= 0n, `genNonNegative: maxValue < 0: ${maxValue}`);
+  const n = Math.floor(Math.random() * Number(maxValue));
+  let n_;
+  try {
+    n_ = BigInt(n);
+  } catch (_e) { // TODO isFinite does not work, but this is excessive
+    n_ = maxValue;
+  }
   return randomChoice([
     0n,
-    BigInt(Math.floor(Math.random() * Number(maxValue))),
+    n_,
     maxValue,
   ]);
 }

@@ -12,17 +12,16 @@ import { PositiveValue } from "../../types/general/derived/value/positiveValue.t
 import { Data } from "../../types/general/fundamental/type.ts";
 import {
   genPositive,
-  maxInteger,
   min,
   randomChoice,
 } from "../../utils/generators.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
-import { Pool } from "../pool.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
 
 export class Swapping {
   public readonly spotPrice: number; // uninverted
+  public readonly effectivePrice: number; // uninverted
 
   private constructor(
     public readonly user: User,
@@ -45,6 +44,7 @@ export class Swapping {
     assert(soldSpot > 0n, `soldSpot must be positive`);
 
     this.spotPrice = Number(soldSpot) / Number(boughtSpot);
+    this.effectivePrice = Number(soldAmount) / Number(boughtAmount);
   }
 
   public get type(): string {
@@ -63,6 +63,8 @@ export class Swapping {
   soldSpot: ${this.soldSpot}
   boughtExp: ${this.boughtExp}
   soldExp: ${this.soldExp}
+  spotPrice: ${this.spotPrice}
+  effectivePrice: ${this.effectivePrice}
 )`;
   };
 
@@ -111,13 +113,15 @@ export class Swapping {
       );
   };
 
-  public subsequents = (): Swapping[] => {
-    const swappings: Swapping[] = [];
+  public subsequents = (maxSubsequents?: number): Swapping[] => {
+    const swappings: Swapping[] = [this];
     let sellableAmount = this.user.balance!.amountOf(this.soldAsset) -
       this.soldAmount;
     let diracUtxo = this.diracUtxo.applySwapping(this);
 
     while (sellableAmount > 0n) {
+      if (maxSubsequents && swappings.length >= maxSubsequents) break;
+
       const subsequents = diracUtxo.swappingsFor(
         this.user,
         this.paramUtxo,
@@ -132,25 +136,18 @@ export class Swapping {
       diracUtxo = diracUtxo.applySwapping(swapping);
 
       swappings.push(swapping);
+
     }
 
     return swappings;
   };
 
-  public subSwap = (amount: bigint, amountIsSold: boolean): Swapping => {
-    const offerA0 = (amountIsSold ? this.boughtAmount : amount) * this.soldSpot;
-    const demandA0 = (amountIsSold ? amount : this.soldAmount) *
-      this.boughtSpot;
+  public subSwap = (amount: bigint, amntIsSold: boolean): Swapping | undefined => {
+    const offerA0 = (amntIsSold ? this.boughtAmount : amount) * this.soldSpot;
+    const demandA0 = (amntIsSold ? amount : this.soldAmount) * this.boughtSpot;
     const swapA0 = min(offerA0, demandA0);
     const boughtAmount = swapA0 / this.soldSpot;
-    assert(
-      boughtAmount > 0n,
-      `Swapping.subSwap: boughtAmount must be positive, but is ${boughtAmount} for ${this.show()}`,
-    );
-    // assert(
-    //   boughtAmount >= 0n,
-    //   `Swapping.subSwap: boughtAmount must be nonnegative, but is ${boughtAmount} for ${this.show()}`,
-    // );
+    if (!boughtAmount) return undefined;
     const soldAmount = BigInt(Math.ceil(Number(boughtAmount) * this.spotPrice));
 
     assert(

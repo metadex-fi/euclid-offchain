@@ -10,30 +10,25 @@ const hexTable = new TextEncoder().encode("0123456789abcdef");
  * @param byte
  */
 export function errInvalidByte(byte) {
-  return new Error(
-    "encoding/hex: invalid byte: " +
-      new TextDecoder().decode(new Uint8Array([byte])),
-  );
+    return new Error("encoding/hex: invalid byte: " +
+        new TextDecoder().decode(new Uint8Array([byte])));
 }
 /** ErrLength returns an error about odd string length. */
 export function errLength() {
-  return new Error("encoding/hex: odd length hex string");
+    return new Error("encoding/hex: odd length hex string");
 }
 // fromHexChar converts a hex character into its value.
 function fromHexChar(byte) {
-  // '0' <= byte && byte <= '9'
-  if (48 <= byte && byte <= 57) {
-    return byte - 48;
-  }
-  // 'a' <= byte && byte <= 'f'
-  if (97 <= byte && byte <= 102) {
-    return byte - 97 + 10;
-  }
-  // 'A' <= byte && byte <= 'F'
-  if (65 <= byte && byte <= 70) {
-    return byte - 65 + 10;
-  }
-  throw errInvalidByte(byte);
+    // '0' <= byte && byte <= '9'
+    if (48 <= byte && byte <= 57)
+        return byte - 48;
+    // 'a' <= byte && byte <= 'f'
+    if (97 <= byte && byte <= 102)
+        return byte - 97 + 10;
+    // 'A' <= byte && byte <= 'F'
+    if (65 <= byte && byte <= 70)
+        return byte - 65 + 10;
+    throw errInvalidByte(byte);
 }
 /**
  * EncodedLen returns the length of an encoding of n source bytes. Specifically,
@@ -41,27 +36,27 @@ function fromHexChar(byte) {
  * @param n
  */
 export function encodedLen(n) {
-  return n * 2;
+    return n * 2;
 }
 /**
  * Encode encodes `src` into `encodedLen(src.length)` bytes.
  * @param src
  */
 export function encode(src) {
-  const dst = new Uint8Array(encodedLen(src.length));
-  for (let i = 0; i < dst.length; i++) {
-    const v = src[i];
-    dst[i * 2] = hexTable[v >> 4];
-    dst[i * 2 + 1] = hexTable[v & 0x0f];
-  }
-  return dst;
+    const dst = new Uint8Array(encodedLen(src.length));
+    for (let i = 0; i < dst.length; i++) {
+        const v = src[i];
+        dst[i * 2] = hexTable[v >> 4];
+        dst[i * 2 + 1] = hexTable[v & 0x0f];
+    }
+    return dst;
 }
 /**
  * EncodeToString returns the hexadecimal encoding of `src`.
  * @param src
  */
 export function encodeToString(src) {
-  return new TextDecoder().decode(encode(src));
+    return new TextDecoder().decode(encode(src));
 }
 /**
  * Decode decodes `src` into `decodedLen(src.length)` bytes
@@ -70,19 +65,19 @@ export function encodeToString(src) {
  * @param src
  */
 export function decode(src) {
-  const dst = new Uint8Array(decodedLen(src.length));
-  for (let i = 0; i < dst.length; i++) {
-    const a = fromHexChar(src[i * 2]);
-    const b = fromHexChar(src[i * 2 + 1]);
-    dst[i] = (a << 4) | b;
-  }
-  if (src.length % 2 == 1) {
-    // Check for invalid char before reporting bad length,
-    // since the invalid char (if present) is an earlier problem.
-    fromHexChar(src[dst.length * 2]);
-    throw errLength();
-  }
-  return dst;
+    const dst = new Uint8Array(decodedLen(src.length));
+    for (let i = 0; i < dst.length; i++) {
+        const a = fromHexChar(src[i * 2]);
+        const b = fromHexChar(src[i * 2 + 1]);
+        dst[i] = (a << 4) | b;
+    }
+    if (src.length % 2 == 1) {
+        // Check for invalid char before reporting bad length,
+        // since the invalid char (if present) is an earlier problem.
+        fromHexChar(src[dst.length * 2]);
+        throw errLength();
+    }
+    return dst;
 }
 /**
  * DecodedLen returns the length of decoding `x` source bytes.
@@ -90,7 +85,7 @@ export function decode(src) {
  * @param x
  */
 export function decodedLen(x) {
-  return x >>> 1;
+    return x >>> 1;
 }
 /**
  * DecodeString returns the bytes represented by the hexadecimal string `s`.
@@ -100,5 +95,5 @@ export function decodedLen(x) {
  * @param s the `string` to decode to `Uint8Array`
  */
 export function decodeString(s) {
-  return decode(new TextEncoder().encode(s));
+    return decode(new TextEncoder().encode(s));
 }
