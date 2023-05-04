@@ -282,7 +282,7 @@ export class DiracUtxo {
 
           if (maxBuying > 0n) {
             spotBuying_.initAmountOf(asset, spotBuying);
-            expBuying_.initAmountOf(asset, BigInt(expBuying));
+            expBuying_.initAmountOf(asset, BigInt(expBuying) + 1n); // NOTE/TODO +1n is a hack to fit it into PositiveValue
             maxBuying_.initAmountOf(asset, maxBuying);
             break;
           } else {
@@ -338,7 +338,7 @@ export class DiracUtxo {
         if (sellingAsset.equals(buyingAsset)) return;
 
         let spotBuying = spotBuying_.amountOf(buyingAsset); // NOTE: inverted
-        let expBuying = expBuying_.amountOf(buyingAsset);
+        let expBuying = expBuying_.amountOf(buyingAsset) - 1n; // NOTE/TODO +1n is a hack to fit it into PositiveValue
         let maxBuying = maxBuying_.amountOf(buyingAsset);
 
         // NOTE: below not strictly A0, but want to avoid divisions.

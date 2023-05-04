@@ -19,7 +19,7 @@ export class PositiveValue {
 
   public initAmountOf = (asset: Asset, amount: bigint): void => {
     assert(
-      amount >= 0n,
+      amount > 0n,
       `initAmountOf: amount must be positive, got ${amount} for asset ${asset.show()}`,
     );
     this.value?.initAmountOf(asset, amount);

@@ -48,7 +48,7 @@
 //       ...derivedContainerGenerators,
 //     ],
 //   );
-//   proptestPTypes(gen, 1000);
+//   proptestPTypes(gen, 100);
 // });
 
 // const fundamentalPrimitiveGenerators = [

@@ -8,7 +8,8 @@ import { PRecord } from "../general/fundamental/container/record.ts";
 import { f, t } from "../general/fundamental/type.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
 import { PInteger } from "../general/fundamental/primitive/integer.ts";
-import { min } from "../../utils/generators.ts";
+import { maxInteger, min } from "../../utils/generators.ts";
+import { Value } from "../general/derived/value/value.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
 
@@ -27,7 +28,15 @@ export class Param {
   }
 
   public get minAnchorPrices(): EuclidValue {
-    return this.virtual.hadamard(this.weights);
+    const f = Value.newUnionWith((
+      virtual: bigint,
+      weight: bigint,
+      jumpSize: bigint,
+    ) => (virtual * weight * jumpSize) / (jumpSize + 1n));
+
+    return EuclidValue.fromValue(
+      f(this.virtual.unsigned, this.weights.unsigned, this.jumpSizes.unsigned),
+    );
   }
 
   public get assets(): Assets {
@@ -69,13 +78,27 @@ ${tt})`;
       param.virtual.assets.subsetOf(assets),
       `assets of virtual must be a subset of assets of jumpSizes and weights, but ${param.virtual.assets.show()}\nis not a subset of ${assets.show()}`,
     );
-    const minAnchorPrices = param.minAnchorPrices;
-    const maxAnchorPrices = minAnchorPrices.plus(param.jumpSizes);
+    // const minAnchorPrices = param.maxAnchorPrices;
+    // const maxAnchorPrices = minAnchorPrices.plus(param.jumpSizes);
 
-    assert(
-      maxAnchorPrices.leqMaxInteger,
-      `max anchor price must be leq max integer, but is ${maxAnchorPrices.concise()}`,
-    );
+    /* TODO update to multiplicative ticks - for example this:
+
+    (virtual * weight * jumpSize) / (jumpSize + 1n)) >= 1n
+    => virtual * weight * jumpSize >= jumpSize + 1n
+    => weight >= (jumpSize + 1n) / (virtual * jumpSize)
+    => jumpSize >= 1n / (virtual * weight - 1n)
+
+    and:
+
+    (virtual * weight * jumpSize) / (jumpSize + 1n)) <= maxInteger
+    => virtual * weight * jumpSize <= maxInteger * (jumpSize + 1n)
+    => weight <= (maxInteger * (jumpSize + 1n)) / (virtual * jumpSize)
+    */
+
+    // assert(
+    //   maxAnchorPrices.leqMaxInteger,
+    //   `max anchor price must be leq max integer, but is ${maxAnchorPrices.concise()}`,
+    // );
   }
 
   static generate(): Param {
@@ -90,24 +113,39 @@ ${tt})`;
   ): Param {
     const jumpSizes = new PositiveValue();
     const weights = new PositiveValue();
-    const virtual = new PositiveValue();
+    const virtuals = new PositiveValue();
 
-    allAssets.forEach((asset) => {
-      const maxLowestPrice = new PPositive(2n).genData();
-      const maxJumpSize_ = min(maxLowestPrice - 1n, maxJumpSize);
-      const jumpSize = new PPositive(1n, maxJumpSize_).genData();
-      // const jumpSize = new PPositive(1n, maxLowestPrice - 1n).genData();
-      const minLowestPrice = maxLowestPrice - jumpSize;
-      const weight = new PPositive(1n, minLowestPrice).genData();
+    allAssets.forEach((asset) => { // TODO update to multiplicative ticks
+      // const maxLowestPrice = new PPositive(2n).genData();
+      // const maxJumpSize_ = min(maxLowestPrice - 1n, maxJumpSize);
+      // const jumpSize = new PPositive(1n, maxJumpSize_).genData();
+      // // const jumpSize = new PPositive(1n, maxLowestPrice - 1n).genData();
+      // const minLowestPrice = maxLowestPrice - jumpSize;
+      // const weight = new PPositive(1n, minLowestPrice).genData();
 
-      virtual.initAmountOf(asset, minLowestPrice / weight);
+      // virtual.initAmountOf(asset, minLowestPrice / weight);
+      // jumpSizes.initAmountOf(asset, jumpSize);
+      // weights.initAmountOf(asset, weight);
+
+      const jumpSize = new PPositive(1n, maxJumpSize).genData();
+      const virtual = new PPositive().genData();
+
+      const tmp0 = virtual * jumpSize;
+      const tmp1 = jumpSize + 1n;
+      const ceil = tmp1 % tmp0 ? 1n : 0n;
+      const minWeight = (tmp1 / tmp0) + ceil;
+      const maxWeight = (maxInteger * tmp1) / (tmp0 + 1n); // TODO +1n is a hack to keep it minAnchorPrices <= maxInteger
+
+      const weight = new PPositive(minWeight, maxWeight).genData();
+
       jumpSizes.initAmountOf(asset, jumpSize);
+      virtuals.initAmountOf(asset, virtual);
       weights.initAmountOf(asset, weight);
     });
 
     return new Param(
       owner,
-      new EuclidValue(virtual),
+      new EuclidValue(virtuals),
       new EuclidValue(weights),
       new EuclidValue(jumpSizes),
       1n, // TODO include active-status in testing
