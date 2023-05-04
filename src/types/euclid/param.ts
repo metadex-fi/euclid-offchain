@@ -8,7 +8,7 @@ import { PRecord } from "../general/fundamental/container/record.ts";
 import { f, t } from "../general/fundamental/type.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
 import { PInteger } from "../general/fundamental/primitive/integer.ts";
-import { maxInteger, min } from "../../utils/generators.ts";
+import { maxInteger } from "../../utils/generators.ts";
 import { Value } from "../general/derived/value/value.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
@@ -130,12 +130,7 @@ ${tt})`;
       const jumpSize = new PPositive(1n, maxJumpSize).genData();
       const virtual = new PPositive().genData();
 
-      const tmp0 = virtual * jumpSize;
-      const tmp1 = jumpSize + 1n;
-      const ceil = tmp1 % tmp0 ? 1n : 0n;
-      const minWeight = (tmp1 / tmp0) + ceil;
-      const maxWeight = (maxInteger * tmp1) / (tmp0 + 1n); // TODO +1n is a hack to keep it minAnchorPrices <= maxInteger
-
+      const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual);
       const weight = new PPositive(minWeight, maxWeight).genData();
 
       jumpSizes.initAmountOf(asset, jumpSize);
@@ -150,6 +145,16 @@ ${tt})`;
       new EuclidValue(jumpSizes),
       1n, // TODO include active-status in testing
     );
+  }
+
+  static weightBounds(jumpSize: bigint, virtual: bigint): [bigint, bigint] {
+    const tmp0 = virtual * jumpSize;
+    const tmp1 = jumpSize + 1n;
+    const ceil = tmp1 % tmp0 ? 1n : 0n;
+    const minWeight = (tmp1 / tmp0) + ceil;
+    const maxWeight = (maxInteger * tmp1) / (tmp0 + 1n); // TODO +1n is a hack to keep it minAnchorPrices <= maxInteger
+
+    return [minWeight, maxWeight];
   }
 }
 
