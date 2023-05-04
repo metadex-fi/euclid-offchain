@@ -416,7 +416,9 @@ export class DiracUtxo {
         }
 
         const buyingAmount = maxSwapA0 / spotSelling;
-        const sellingAmount_ = Math.ceil(Number(maxSwapA0) / Number(spotBuying));
+        const sellingAmount_ = Math.ceil(
+          Number(maxSwapA0) / Number(spotBuying),
+        );
         if (!isFinite(sellingAmount_)) return;
         const sellingAmount = BigInt(sellingAmount_);
         // const sellingAmount = maxSellingA0 <= maxBuyingA0 ? maxSelling : BigInt(sellingAmount_);

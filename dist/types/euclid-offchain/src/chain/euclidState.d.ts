@@ -7,9 +7,9 @@ import { Swapping } from "./actions/swapping.js";
 import { Pool, PrePool } from "./pool.js";
 import { User } from "./user.js";
 export declare class EuclidState {
-    private invalidUtxos;
-    pools: AssocMap<KeyHash, AssocMap<IdNFT, Pool>>;
-    invalidPools: AssocMap<KeyHash, AssocMap<IdNFT, PrePool>>;
-    constructor(utxos: Lucid.UTxO[], policy: Currency);
-    swappingsFor(user: User): Swapping[];
+  private invalidUtxos;
+  pools: AssocMap<KeyHash, AssocMap<IdNFT, Pool>>;
+  invalidPools: AssocMap<KeyHash, AssocMap<IdNFT, PrePool>>;
+  constructor(utxos: Lucid.UTxO[], policy: Currency);
+  swappingsFor(user: User): Swapping[];
 }

@@ -46,6 +46,10 @@ export class EuclidValue {
     this.value.addAmountOf(asset, amount);
   };
 
+  public setAmountOf = (asset: Asset, amount: bigint): void => {
+    this.value.setAmountOf(asset, amount);
+  };
+
   public plus = (other: EuclidValue): EuclidValue => {
     return EuclidValue.fromValue(Value.add(this.unsigned, other.unsigned));
   };

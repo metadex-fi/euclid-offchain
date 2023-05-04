@@ -5,15 +5,19 @@ import { PositiveValue } from "../../types/general/derived/value/positiveValue.j
 import { Pool } from "../pool.js";
 import { User } from "../user.js";
 export declare class Opening {
-    readonly user: User;
-    readonly param: Param;
-    readonly deposit: PositiveValue;
-    readonly numTicks: EuclidValue;
-    private poolCache?;
-    constructor(user: User, param: Param, deposit: PositiveValue, // total of all Diracs
-    numTicks: EuclidValue);
-    get type(): string;
-    tx: (tx: Lucid.Tx) => Lucid.Tx;
-    pool: () => Pool;
-    static genOfUser: (user: User) => Opening | undefined;
+  readonly user: User;
+  readonly param: Param;
+  readonly deposit: PositiveValue;
+  readonly numTicks: EuclidValue;
+  private poolCache?;
+  constructor(
+    user: User,
+    param: Param,
+    deposit: PositiveValue, // total of all Diracs
+    numTicks: EuclidValue,
+  );
+  get type(): string;
+  tx: (tx: Lucid.Tx) => Lucid.Tx;
+  pool: () => Pool;
+  static genOfUser: (user: User) => Opening | undefined;
 }

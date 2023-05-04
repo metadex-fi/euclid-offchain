@@ -2,40 +2,43 @@ import { C } from "../core/mod.js";
 declare type CostModel = Record<string, number>;
 export declare type CostModels = Record<PlutusVersion, CostModel>;
 export declare type ProtocolParameters = {
-    minFeeA: number;
-    minFeeB: number;
-    maxTxSize: number;
-    maxValSize: number;
-    keyDeposit: bigint;
-    poolDeposit: bigint;
-    priceMem: number;
-    priceStep: number;
-    maxTxExMem: bigint;
-    maxTxExSteps: bigint;
-    coinsPerUtxoByte: bigint;
-    collateralPercentage: number;
-    maxCollateralInputs: number;
-    costModels: CostModels;
+  minFeeA: number;
+  minFeeB: number;
+  maxTxSize: number;
+  maxValSize: number;
+  keyDeposit: bigint;
+  poolDeposit: bigint;
+  priceMem: number;
+  priceStep: number;
+  maxTxExMem: bigint;
+  maxTxExSteps: bigint;
+  coinsPerUtxoByte: bigint;
+  collateralPercentage: number;
+  maxCollateralInputs: number;
+  costModels: CostModels;
 };
 export declare type Slot = number;
 export interface Provider {
-    getProtocolParameters(): Promise<ProtocolParameters>;
-    /** Query UTxOs by address or payment credential. */
-    getUtxos(addressOrCredential: Address | Credential): Promise<UTxO[]>;
-    /** Query UTxOs by address or payment credential filtered by a specific unit. */
-    getUtxosWithUnit(addressOrCredential: Address | Credential, unit: Unit): Promise<UTxO[]>;
-    /** Query a UTxO by a unit. It needs to be an NFT (or optionally the entire supply in one UTxO). */
-    getUtxoByUnit(unit: Unit): Promise<UTxO>;
-    /** Query UTxOs by the output reference (tx hash and index). */
-    getUtxosByOutRef(outRefs: Array<OutRef>): Promise<UTxO[]>;
-    getDelegation(rewardAddress: RewardAddress): Promise<Delegation>;
-    getDatum(datumHash: DatumHash): Promise<Datum>;
-    awaitTx(txHash: TxHash, checkInterval?: number): Promise<boolean>;
-    submitTx(tx: Transaction): Promise<TxHash>;
+  getProtocolParameters(): Promise<ProtocolParameters>;
+  /** Query UTxOs by address or payment credential. */
+  getUtxos(addressOrCredential: Address | Credential): Promise<UTxO[]>;
+  /** Query UTxOs by address or payment credential filtered by a specific unit. */
+  getUtxosWithUnit(
+    addressOrCredential: Address | Credential,
+    unit: Unit,
+  ): Promise<UTxO[]>;
+  /** Query a UTxO by a unit. It needs to be an NFT (or optionally the entire supply in one UTxO). */
+  getUtxoByUnit(unit: Unit): Promise<UTxO>;
+  /** Query UTxOs by the output reference (tx hash and index). */
+  getUtxosByOutRef(outRefs: Array<OutRef>): Promise<UTxO[]>;
+  getDelegation(rewardAddress: RewardAddress): Promise<Delegation>;
+  getDatum(datumHash: DatumHash): Promise<Datum>;
+  awaitTx(txHash: TxHash, checkInterval?: number): Promise<boolean>;
+  submitTx(tx: Transaction): Promise<TxHash>;
 }
 export declare type Credential = {
-    type: "Key" | "Script";
-    hash: KeyHash | ScriptHash;
+  type: "Key" | "Script";
+  hash: KeyHash | ScriptHash;
 };
 /** Concatenation of policy id and asset name in Hex. */
 export declare type Unit = string;
@@ -45,10 +48,14 @@ export declare type PlutusVersion = "PlutusV1" | "PlutusV2";
 /** Hex */
 export declare type PolicyId = string;
 export declare type Script = {
-    type: ScriptType;
-    script: string;
+  type: ScriptType;
+  script: string;
 };
-export declare type Validator = MintingPolicy | SpendingValidator | CertificateValidator | WithdrawalValidator;
+export declare type Validator =
+  | MintingPolicy
+  | SpendingValidator
+  | CertificateValidator
+  | WithdrawalValidator;
 export declare type MintingPolicy = Script;
 export declare type SpendingValidator = Script;
 export declare type CertificateValidator = Script;
@@ -85,10 +92,10 @@ export declare type Datum = string;
  * You can either specify **hash**, **asHash** or **inline**, only one option is allowed.
  */
 export declare type OutputData = {
-    hash?: DatumHash;
-    asHash?: Datum;
-    inline?: Datum;
-    scriptRef?: Script;
+  hash?: DatumHash;
+  asHash?: Datum;
+  inline?: Datum;
+  scriptRef?: Script;
 };
 /** Hex */
 export declare type DatumHash = string;
@@ -109,102 +116,105 @@ export declare type ScriptRef = string;
 /** Hex */
 export declare type Payload = string;
 export declare type UTxO = {
-    txHash: TxHash;
-    outputIndex: number;
-    assets: Assets;
-    address: Address;
-    datumHash?: DatumHash | null;
-    datum?: Datum | null;
-    scriptRef?: Script | null;
+  txHash: TxHash;
+  outputIndex: number;
+  assets: Assets;
+  address: Address;
+  datumHash?: DatumHash | null;
+  datum?: Datum | null;
+  scriptRef?: Script | null;
 };
 export declare type OutRef = {
-    txHash: TxHash;
-    outputIndex: number;
+  txHash: TxHash;
+  outputIndex: number;
 };
 export declare type AddressType = "Base" | "Enterprise" | "Pointer" | "Reward";
 export declare type Network = "Mainnet" | "Preview" | "Preprod" | "Custom";
 export declare type AddressDetails = {
-    type: AddressType;
-    networkId: number;
-    address: {
-        bech32: Address;
-        hex: string;
-    };
-    paymentCredential?: Credential;
-    stakeCredential?: Credential;
+  type: AddressType;
+  networkId: number;
+  address: {
+    bech32: Address;
+    hex: string;
+  };
+  paymentCredential?: Credential;
+  stakeCredential?: Credential;
 };
 export declare type Delegation = {
-    poolId: PoolId | null;
-    rewards: Lovelace;
+  poolId: PoolId | null;
+  rewards: Lovelace;
 };
 /**
  * A wallet that can be constructed from external data e.g utxos and an address.
  * It doesn't allow you to sign transactions/messages. This needs to be handled separately.
  */
 export interface ExternalWallet {
-    address: Address;
-    utxos?: UTxO[];
-    rewardAddress?: RewardAddress;
+  address: Address;
+  utxos?: UTxO[];
+  rewardAddress?: RewardAddress;
 }
 export declare type SignedMessage = {
-    signature: string;
-    key: string;
+  signature: string;
+  key: string;
 };
 export interface Wallet {
-    address(): Promise<Address>;
-    rewardAddress(): Promise<RewardAddress | null>;
-    getUtxos(): Promise<UTxO[]>;
-    getUtxosCore(): Promise<C.TransactionUnspentOutputs>;
-    getDelegation(): Promise<Delegation>;
-    signTx(tx: C.Transaction): Promise<C.TransactionWitnessSet>;
-    signMessage(address: Address | RewardAddress, payload: Payload): Promise<SignedMessage>;
-    submitTx(signedTx: Transaction): Promise<TxHash>;
+  address(): Promise<Address>;
+  rewardAddress(): Promise<RewardAddress | null>;
+  getUtxos(): Promise<UTxO[]>;
+  getUtxosCore(): Promise<C.TransactionUnspentOutputs>;
+  getDelegation(): Promise<Delegation>;
+  signTx(tx: C.Transaction): Promise<C.TransactionWitnessSet>;
+  signMessage(
+    address: Address | RewardAddress,
+    payload: Payload,
+  ): Promise<SignedMessage>;
+  submitTx(signedTx: Transaction): Promise<TxHash>;
 }
 /** JSON object */
 export declare type Json = any;
 /** Time in milliseconds */
 export declare type UnixTime = number;
 declare type NFTFile = {
-    name?: string;
-    mediaType: string;
-    src: string | string[];
+  name?: string;
+  mediaType: string;
+  src: string | string[];
 };
 export declare type NFTMetadataDetails = {
-    name: string;
-    image: string;
-    mediaType?: string;
-    description?: string | string[];
-    files?: NFTFile[];
-    [key: string]: unknown;
+  name: string;
+  image: string;
+  mediaType?: string;
+  description?: string | string[];
+  files?: NFTFile[];
+  [key: string]: unknown;
 };
 export declare type PoolParams = {
-    poolId: PoolId;
-    vrfKeyHash: VrfKeyHash;
-    pledge: Lovelace;
-    cost: Lovelace;
-    margin: number;
-    rewardAddress: RewardAddress;
-    owners: Array<RewardAddress>;
-    relays: Array<Relay>;
-    metadataUrl?: string;
+  poolId: PoolId;
+  vrfKeyHash: VrfKeyHash;
+  pledge: Lovelace;
+  cost: Lovelace;
+  margin: number;
+  rewardAddress: RewardAddress;
+  owners: Array<RewardAddress>;
+  relays: Array<Relay>;
+  metadataUrl?: string;
 };
 export declare type Relay = {
-    type: "SingleHostIp" | "SingleHostDomainName" | "MultiHost";
-    ipV4?: string;
-    ipV6?: string;
-    port?: number;
-    domainName?: string;
+  type: "SingleHostIp" | "SingleHostDomainName" | "MultiHost";
+  ipV4?: string;
+  ipV6?: string;
+  port?: number;
+  domainName?: string;
 };
 export declare type NativeScript = {
-    type: "sig" | "all" | "any" | "before" | "atLeast" | "after";
-    keyHash?: KeyHash;
-    required?: number;
-    slot?: Slot;
-    scripts?: NativeScript[];
+  type: "sig" | "all" | "any" | "before" | "atLeast" | "after";
+  keyHash?: KeyHash;
+  required?: number;
+  slot?: Slot;
+  scripts?: NativeScript[];
 };
 export declare type SlotConfig = {
-    zeroTime: UnixTime;
-    zeroSlot: Slot;
-    slotLength: number;
+  zeroTime: UnixTime;
+  zeroSlot: Slot;
+  slotLength: number;
 };
 export {};

@@ -49,7 +49,7 @@ export class Opening {
     if (this.poolCache) return this.poolCache;
     const assets = this.param.weights.assets;
     const minAnchorPrices = this.param.minAnchorPrices;
-    const tickSizes = this.param.jumpSizes.divideBy(this.numTicks);
+    // const tickSizes = this.param.jumpSizes.divideBy(this.numTicks);
 
     const paramNFT = this.user.nextParamNFT.next(); // TODO remove next()
     const paramUtxo = ParamUtxo.open(this.param, paramNFT);
@@ -68,17 +68,32 @@ export class Opening {
     // in that asset's dimension. "spread" means: add all other tick
     // offsets for that asset's lowest price.
     assets.forEach((asset) => {
-      // if (numJumps.amountOf(asset) === 0n) return;
-      const ticks = 1n; //this.numTicks.amountOf(asset); TODO update to multiplicative
-      const tickSize = tickSizes.amountOf(asset);
+      const ticks = Number(this.numTicks.amountOf(asset));
+      const jumpMultiplier = 1 +
+        (1 / Number(this.param.jumpSizes.amountOf(asset)));
+      const tickMultiplier = jumpMultiplier ** (1 / ticks);
       const diracs_ = new Array<Dirac>();
+
+      /* TODO important: assert everywhere that anchorPrices allow for the required tickSizes - consider:
+
+- tickMultiplier must be >= 1 + (1 / anchor0), otherwise different anchors will round to the same price
+- -> tickSize must be <= anchor0, which unfortunately is not a used parameter, but can be deduced via
+- tickSize = 1 / (calcTic)
+
+      */
+
       diracs.forEach((dirac) => {
-        for (let i = 1n; i < ticks; i++) {
+        for (let i = 1; i < ticks; i++) {
           const anchorPrices = dirac.anchorPrices.clone;
-          anchorPrices.addAmountOf(
-            asset,
-            i * tickSize,
+          const firstAnchor = anchorPrices.amountOf(asset);
+          const currentAnchor = BigInt(
+            Math.floor(Number(firstAnchor) * (tickMultiplier ** i)),
           );
+          assert(
+            firstAnchor < currentAnchor,
+            `anchor price collision - first: ${firstAnchor} >= current: ${currentAnchor}`,
+          );
+          anchorPrices.setAmountOf(asset, currentAnchor);
           threadNFT = threadNFT.next();
           diracs_.push(
             new Dirac(
@@ -138,9 +153,15 @@ export class Opening {
     let maxTicks = min(gMaxDiracs, maxDiracs);
     const numTicks = new PositiveValue();
     allAssets.forEach((asset) => {
+      const jumpMultiplier = 1 + (1 / Number(param.jumpSizes.amountOf(asset)));
+      const anchorMultiplier = 1 +
+        (1 / Number(param.minAnchorPrices.amountOf(asset)));
+      const maxTicks_ = BigInt(
+        Math.floor(Math.log(jumpMultiplier) / Math.log(anchorMultiplier)),
+      );
       const ticks = new PPositive(
         1n,
-        min(min(gMaxLength, param.jumpSizes.amountOf(asset)), maxTicks),
+        min(min(gMaxLength, maxTicks_), maxTicks),
       ).genData();
       maxTicks /= ticks;
       numTicks.initAmountOf(asset, ticks);
