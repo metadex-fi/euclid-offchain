@@ -155,12 +155,10 @@ export class Opening {
     let maxTicks = min(gMaxDiracs, maxDiracs);
     const numTicks = new PositiveValue();
     allAssets.forEach((asset) => {
-      const jumpMultiplier = 1 +
-        (1 / Number(param.jumpSizes.amountOf(asset)));
-      const anchorMultiplier = 1 +
-        (1 / Number(param.minAnchorPrices.amountOf(asset)));
-      const maxTicks_ = BigInt(
-        Math.floor(Math.log(jumpMultiplier) / Math.log(anchorMultiplier)),
+      const maxTicks_ = Opening.maxTicks(
+        param.virtual.amountOf(asset),
+        param.weights.amountOf(asset),
+        param.jumpSizes.amountOf(asset),
       );
       const ticks = new PPositive(
         1n,
@@ -179,6 +177,25 @@ export class Opening {
       param,
       deposit,
       new EuclidValue(numTicks),
+    );
+  };
+
+  static maxTicks = (
+    virtual: bigint,
+    weight: bigint,
+    jumpSize: bigint,
+  ) => {
+    const minAnchorPrice = Param.minAnchorPrice(
+      virtual,
+      weight,
+      jumpSize,
+    );
+    const jumpMultiplier = 1 +
+      (1 / Number(jumpSize));
+    const anchorMultiplier = 1 +
+      (1 / Number(minAnchorPrice));
+    return BigInt(
+      Math.floor(Math.log(jumpMultiplier) / Math.log(anchorMultiplier)),
     );
   };
 }

@@ -27,12 +27,14 @@ export class Param {
     Param.asserts(this);
   }
 
+  static minAnchorPrice = (
+    virtual: bigint,
+    weight: bigint,
+    jumpSize: bigint,
+  ) => (virtual * weight * jumpSize) / (jumpSize + 1n);
+
   public get minAnchorPrices(): EuclidValue {
-    const f = Value.newUnionWith((
-      virtual: bigint,
-      weight: bigint,
-      jumpSize: bigint,
-    ) => (virtual * weight * jumpSize) / (jumpSize + 1n));
+    const f = Value.newUnionWith(Param.minAnchorPrice);
 
     return EuclidValue.fromValue(
       f(this.virtual.unsigned, this.weights.unsigned, this.jumpSizes.unsigned),

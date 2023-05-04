@@ -10,6 +10,7 @@ import { User } from "./user.ts";
 import { DiracUtxo, ParamUtxo, PreDiracUtxo } from "./utxo.ts";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { ParamDatum, PPreEuclidDatum } from "../types/euclid/euclidDatum.ts";
+import { Value } from "../types/general/derived/value/value.ts";
 
 export class PrePool {
   public paramUtxo?: ParamUtxo;
@@ -125,18 +126,19 @@ export class Pool {
     } else return this.paramUtxo.paramNFT;
   }
 
-  public get balance(): PositiveValue {
+  public get balance(): Value {
     const assets = this.paramUtxo.param.assets;
     const total = this.diracUtxos.reduce(
       (a, b) => a.normedPlus(b.balance),
       new PositiveValue(),
     ).ofAssets(this.paramUtxo.param.assets);
 
+    const total_ = total.unsigned;
     assets.forEach((asset) => {
-      total.addAmountOf(asset, 0n);
+      total_.addAmountOf(asset, 0n);
     });
 
-    return total;
+    return total_;
   }
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
