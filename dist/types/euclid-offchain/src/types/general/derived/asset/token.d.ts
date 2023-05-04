@@ -4,6 +4,7 @@ export declare class Token {
     constructor(name: string);
     show: () => string;
     concise: () => string;
+    equals: (other: Token) => boolean;
     valueOf: () => string;
     toLucid: () => string;
     static fromLucid(hexTokenName: string): Token;

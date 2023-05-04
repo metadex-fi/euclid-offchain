@@ -25,7 +25,7 @@ export declare class Assets {
     get size(): bigint;
     subsetOf: (other: Assets) => boolean;
     get toList(): Asset[];
-    forEach: (f: (value: Asset, index?: number, array?: Asset[]) => void) => void;
+    forEach: (f: (value: Asset, index: number, array: Asset[]) => void) => void;
     static fromList(assets: Asset[]): Assets;
     intersect: (assets: Assets) => Assets;
     union: (assets: Assets) => Assets;

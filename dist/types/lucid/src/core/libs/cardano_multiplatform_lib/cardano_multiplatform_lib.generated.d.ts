@@ -6110,8 +6110,9 @@ export class TransactionBuilder {
      * change_address is required here in order to determine the min ada requirement precisely
      * @param {TransactionUnspentOutputs} inputs
      * @param {Address} change_address
+     * @param {Uint32Array} weights
      */
-    add_inputs_from(inputs: TransactionUnspentOutputs, change_address: Address): void;
+    add_inputs_from(inputs: TransactionUnspentOutputs, change_address: Address, weights: Uint32Array): void;
     /**
      * @param {TransactionUnspentOutput} utxo
      * @param {ScriptWitness | undefined} script_witness

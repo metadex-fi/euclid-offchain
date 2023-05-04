@@ -18,7 +18,10 @@ export class TxSigned {
         this.txSigned = tx;
     }
     async submit() {
-        return await (this.lucid.wallet || this.lucid.provider).submitTx(toHex(this.txSigned.to_bytes()));
+        const txHash = await (this.lucid.wallet || this.lucid.provider).submitTx(toHex(this.txSigned.to_bytes()));
+        this.lucid.spentOutputs = [];
+        this.lucid.addedOutputs = [];
+        return txHash;
     }
     /** Returns the transaction in Hex encoded Cbor. */
     toString() {

@@ -41,6 +41,7 @@ export declare function fromScriptRef(scriptRef: C.ScriptRef): Script;
 export declare function toScriptRef(script: Script): C.ScriptRef;
 export declare function utxoToCore(utxo: UTxO): C.TransactionUnspentOutput;
 export declare function coreToUtxo(coreUtxo: C.TransactionUnspentOutput): UTxO;
+export declare function coreToUtxo_(txHash: string, index: number, txo: C.TransactionOutput): UTxO;
 export declare function networkToId(network: Network): number;
 export declare function fromHex(hex: string): Uint8Array;
 export declare function toHex(bytes: Uint8Array): string;

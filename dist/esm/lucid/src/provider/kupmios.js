@@ -133,8 +133,8 @@ export class Kupmios {
                 const isConfirmed = await fetch(`${this.kupoUrl}/matches/*@${txHash}?unspent`).then((res) => res.json());
                 if (isConfirmed && isConfirmed.length > 0) {
                     clearInterval(confirmation);
-                    res(true);
-                    return;
+                    await new Promise((res) => setTimeout(() => res(1), 1000));
+                    return res(true);
                 }
             }, checkInterval);
         });

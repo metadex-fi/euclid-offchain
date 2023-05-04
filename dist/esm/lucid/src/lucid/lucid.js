@@ -40,6 +40,18 @@ export class Lucid {
             writable: true,
             value: void 0
         });
+        Object.defineProperty(this, "spentOutputs", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: []
+        });
+        Object.defineProperty(this, "addedOutputs", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: []
+        });
     }
     static async new(provider, network) {
         const lucid = new this();
@@ -123,6 +135,13 @@ export class Lucid {
     }
     utxosAtWithUnit(addressOrCredential, unit) {
         return this.provider.getUtxosWithUnit(addressOrCredential, unit);
+    }
+    chainingUtxos(utxos) {
+        this.spentOutputs.forEach((spent) => {
+            utxos = utxos.filter((utxo) => spent.txHash !== utxo.txHash ||
+                spent.outputIndex !== utxo.outputIndex);
+        });
+        return [...utxos, ...this.addedOutputs];
     }
     /** Unit needs to be an NFT (or optionally the entire supply in one UTxO). */
     utxoByUnit(unit) {

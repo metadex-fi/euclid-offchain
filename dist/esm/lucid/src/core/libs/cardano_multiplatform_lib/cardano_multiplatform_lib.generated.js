@@ -1,7 +1,7 @@
 // @generated file from wasmbuild -- do not edit
 // deno-lint-ignore-file
 // deno-fmt-ignore-file
-// source-hash: c7b921328acd83e1ca0f5c2cea438815d12716d7
+// source-hash: e67634d97fca67156dbf2e19510eaac7a72aa0ad
 let wasm;
 const cachedTextDecoder = new TextDecoder("utf-8", {
     ignoreBOM: true,
@@ -187,7 +187,7 @@ function makeMutClosure(arg0, arg1, dtor, f) {
 }
 function __wbg_adapter_30(arg0, arg1, arg2) {
     wasm
-        ._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__had8868bf22870955(arg0, arg1, addHeapObject(arg2));
+        ._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h9de9452916ac8cca(arg0, arg1, addHeapObject(arg2));
 }
 function _assertClass(instance, klass) {
     if (!(instance instanceof klass)) {
@@ -439,6 +439,12 @@ function getUint32Memory0() {
         cachedUint32Memory0 = new Uint32Array(wasm.memory.buffer);
     }
     return cachedUint32Memory0;
+}
+function passArray32ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 4);
+    getUint32Memory0().set(arg, ptr / 4);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
 }
 function getArrayU32FromWasm0(ptr, len) {
     return getUint32Memory0().subarray(ptr / 4, ptr / 4 + len);
@@ -704,7 +710,7 @@ function handleError(f, args) {
     }
 }
 function __wbg_adapter_1371(arg0, arg1, arg2, arg3) {
-    wasm.wasm_bindgen__convert__closures__invoke2_mut__hce44a91c7a197280(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
+    wasm.wasm_bindgen__convert__closures__invoke2_mut__h36afefe016e25d40(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 /** */
 export const StakeCredKind = Object.freeze({
@@ -17389,13 +17395,16 @@ export class TransactionBuilder {
      * change_address is required here in order to determine the min ada requirement precisely
      * @param {TransactionUnspentOutputs} inputs
      * @param {Address} change_address
+     * @param {Uint32Array} weights
      */
-    add_inputs_from(inputs, change_address) {
+    add_inputs_from(inputs, change_address, weights) {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
             _assertClass(inputs, TransactionUnspentOutputs);
             _assertClass(change_address, Address);
-            wasm.transactionbuilder_add_inputs_from(retptr, this.ptr, inputs.ptr, change_address.ptr);
+            const ptr0 = passArray32ToWasm0(weights, wasm.__wbindgen_malloc);
+            const len0 = WASM_VECTOR_LEN;
+            wasm.transactionbuilder_add_inputs_from(retptr, this.ptr, inputs.ptr, change_address.ptr, ptr0, len0);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             if (r1) {
@@ -22130,7 +22139,7 @@ const imports = {
             const ret = wasm.memory;
             return addHeapObject(ret);
         },
-        __wbindgen_closure_wrapper5954: function (arg0, arg1, arg2) {
+        __wbindgen_closure_wrapper5957: function (arg0, arg1, arg2) {
             const ret = makeMutClosure(arg0, arg1, 194, __wbg_adapter_30);
             return addHeapObject(ret);
         },

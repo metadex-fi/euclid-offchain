@@ -15,15 +15,14 @@ export class Asset {
     // Asset.assertLength(this);
   }
 
-  
   public show = (): string => {
     return `Asset(${this.currency.toString()}, ${this.token.name})`;
   };
-  
+
   public concise = (): string => {
     return `${this.currency.concise()}.${this.token.concise()}`;
   };
-  
+
   public equals = (other: Asset): boolean => {
     return this.concise() === other.concise();
   };

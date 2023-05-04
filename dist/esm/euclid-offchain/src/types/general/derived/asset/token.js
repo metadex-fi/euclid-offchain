@@ -26,6 +26,14 @@ export class Token {
                 return this.name;
             }
         });
+        Object.defineProperty(this, "equals", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: (other) => {
+                return this.concise() === other.concise();
+            }
+        });
         Object.defineProperty(this, "valueOf", {
             enumerable: true,
             configurable: true,

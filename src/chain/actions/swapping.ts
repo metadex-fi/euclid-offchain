@@ -8,13 +8,8 @@ import {
 import { DiracDatum } from "../../types/euclid/euclidDatum.ts";
 import { Swap } from "../../types/euclid/swap.ts";
 import { Asset } from "../../types/general/derived/asset/asset.ts";
-import { PositiveValue } from "../../types/general/derived/value/positiveValue.ts";
 import { Data } from "../../types/general/fundamental/type.ts";
-import {
-  genPositive,
-  min,
-  randomChoice,
-} from "../../utils/generators.ts";
+import { genPositive, min, randomChoice } from "../../utils/generators.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
@@ -22,9 +17,11 @@ import { Value } from "../../types/general/derived/value/value.ts";
 export class Swapping {
   public readonly spotPrice: number; // uninverted
   public readonly effectivePrice: number; // uninverted
+  public previous?: Swapping;
+  public subsequent?: Swapping;
 
   private constructor(
-    public readonly user: User,
+    public readonly user: User | undefined,
     public readonly paramUtxo: ParamUtxo,
     public readonly diracUtxo: DiracUtxo,
     public readonly boughtAsset: Asset,
@@ -93,11 +90,6 @@ export class Swapping {
       new DiracDatum(this.diracUtxo.dirac),
     );
 
-    console.log(PositiveValue.fromLucid(this.diracUtxo.utxo!.assets).concise());
-    console.log(PositiveValue.fromLucid(retour).concise());
-    console.log(this.diracUtxo.utxo!.assets);
-    console.log(retour);
-
     return tx
       .readFrom([this.paramUtxo.utxo!])
       .collectFrom(
@@ -105,7 +97,7 @@ export class Swapping {
         Data.to(swapRedeemer),
       )
       .payToContract(
-        this.user.contract.address,
+        this.user!.contract.address,
         {
           inline: Data.to(datum),
         },
@@ -115,11 +107,14 @@ export class Swapping {
 
   public subsequents = (maxSubsequents?: number): Swapping[] => {
     const swappings: Swapping[] = [this];
-    let sellableAmount = this.user.balance!.amountOf(this.soldAsset) -
-      this.soldAmount;
+    let previous = swappings[0];
+    let sellableAmount = this.user
+      ? this.user.balance!.amountOf(this.soldAsset) -
+        this.soldAmount
+      : -1n;
     let diracUtxo = this.diracUtxo.applySwapping(this);
 
-    while (sellableAmount > 0n) {
+    while (sellableAmount != 0n) {
       if (maxSubsequents && swappings.length >= maxSubsequents) break;
 
       const subsequents = diracUtxo.swappingsFor(
@@ -129,20 +124,33 @@ export class Swapping {
         this.boughtAsset,
       );
       if (subsequents.length === 0) break;
-      assert(subsequents.length === 1, `subsequents.length must be 1`);
+      assert(
+        subsequents.length === 1,
+        `subsequents.length must be 1, but got:\n${
+          subsequents.map((s) => s.show()).join("\n")
+        }`,
+      );
 
       const swapping = subsequents[0];
-      sellableAmount -= swapping.soldAmount;
+      if (sellableAmount > 0) {
+        sellableAmount -= swapping.soldAmount;
+        assert(sellableAmount >= 0n, `sold too much: ${swapping.show()}`);
+      }
       diracUtxo = diracUtxo.applySwapping(swapping);
 
+      previous.subsequent = swapping;
+      swapping.previous = previous;
+      previous = swapping;
       swappings.push(swapping);
-
     }
 
     return swappings;
   };
 
-  public subSwap = (amount: bigint, amntIsSold: boolean): Swapping | undefined => {
+  public subSwap = (
+    amount: bigint,
+    amntIsSold: boolean,
+  ): Swapping | undefined => {
     const offerA0 = (amntIsSold ? this.boughtAmount : amount) * this.soldSpot;
     const demandA0 = (amntIsSold ? amount : this.soldAmount) * this.boughtSpot;
     const swapA0 = min(offerA0, demandA0);
@@ -208,7 +216,7 @@ export class Swapping {
   };
 
   static boundary(
-    user: User,
+    user: User | undefined,
     paramUtxo: ParamUtxo,
     diracUtxo: DiracUtxo,
     boughtAsset: Asset,
@@ -284,16 +292,16 @@ export class Swapping {
     const fitsBuying = spotBuying <= buyingAmm;
     const fitsSelling = sellingAmm <= spotSelling;
     if (!fitsBuying) {
-      console.log(
+      console.error(
         `boughtAssetForSale (${oldNew}): 
         buyingAmm ${buyingAmm} > 
         spotBuying ${spotBuying}`,
       );
     }
     if (!fitsSelling) {
-      console.log(
+      console.error(
         `boughtAssetForSale (${oldNew}):
-        sellingAmm ${sellingAmm} < 
+        sellingAmm ${sellingAmm} > 
         spotSelling ${spotSelling}`,
       );
     }
@@ -309,7 +317,7 @@ export class Swapping {
     const addedBuyingA0 = buyingAmount * spotSelling;
     const addedSellingA0 = sellingAmount * spotBuying;
     if (addedBuyingA0 > addedSellingA0) {
-      console.log(
+      console.error(
         `valueEquation: 
         addedBuyingA0 ${addedBuyingA0} > 
         addedSellingA0 ${addedSellingA0}`,
@@ -321,10 +329,10 @@ export class Swapping {
   static validates(
     spotBuying: bigint,
     spotSelling: bigint,
-    buyingLowest: bigint,
-    sellingLowest: bigint,
-    buyingJumpSize: bigint,
-    sellingJumpSize: bigint,
+    // buyingLowest: bigint,
+    // sellingLowest: bigint,
+    // buyingJumpSize: bigint,
+    // sellingJumpSize: bigint,
     buyingWeight: bigint,
     sellingWeight: bigint,
     buyingLiquidity: bigint,

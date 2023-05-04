@@ -14,7 +14,7 @@ import { Assets } from "../types/general/derived/asset/assets.js";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.js";
 import { Value } from "../types/general/derived/value/value.js";
 import { Data, f, PConstanted, t } from "../types/general/fundamental/type.js";
-import { min } from "../utils/generators.js";
+import { maxInteger, min } from "../utils/generators.js";
 import { Swapping } from "./actions/swapping.js";
 import { Contract } from "./contract.js";
 import { User } from "./user.js";
@@ -206,9 +206,9 @@ export class DiracUtxo {
   };
 
   public swappingsFor = (
-    user: User,
+    user: User | undefined,
     paramUtxo: ParamUtxo,
-    sellable_: Value, // subset of pool-assets
+    sellable_?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
     buyingAsset?: Asset, // for subsequent swappings we want only a single direction
   ): Swapping[] => {
     const swappings = new Array<Swapping>();
@@ -233,13 +233,15 @@ export class DiracUtxo {
     const maxSelling_ = new PositiveValue();
 
     // deposit of asset into pool to move inverted amm-price a to inverted spot price s
-    const delta = (w: number, l: number) => (s: number) => (s / w) - l;
+    // s := a = (l + d) * w => d = (s / w) - l
+    const delta = (w: bigint, l: bigint) => (s: bigint) => (s - l * w) / w;
+    // const delta = (w: number, l: number) => (s: number) => (s / w) - l;
     // const delta = (s: number) => l * (((s / a) ** (w / (w + 1))) - 1);
 
     param.assets.forEach((asset) => {
       const buyable = buyable_.amountOf(asset, 0n);
-      const sellable = sellable_.amountOf(asset, 0n);
-      if (buyable <= 0n && sellable <= 0n) return;
+      const sellable = sellable_?.amountOf(asset, 0n);
+      if (buyable <= 0n && sellable && sellable === 0n) return;
 
       const virtual = param.virtual.amountOf(asset);
       const weight = param.weights.amountOf(asset); // NOTE: inverted
@@ -257,53 +259,26 @@ export class DiracUtxo {
       const exp = Math.log(Number(amm) / Number(anchor)) /
         Math.log(jumpMultiplier);
 
-      console.warn(`asset: ${asset.concise()}`);
-      console.log(`virtual: ${virtual}`);
-      console.log(`buyable: ${buyable}`);
-      console.log(`liquidity: ${liquidity}`);
-      console.log(`weight: ${weight}`);
-      console.log(`amm: ${Number(amm)}`);
-      console.log(`anchor: ${Number(anchor)}`);
-      console.log(`jumpSize: ${jumpSize}`);
-      console.log(`jumpMultiplier: ${jumpMultiplier}`);
-      console.log(
-        `Number(amm) / Number(anchor): ${Number(amm) / Number(anchor)}`,
-      );
-      console.log(
-        `Math.log(Number(amm) / Number(anchor)): ${
-          Math.log(Number(amm) / Number(anchor))
-        }`,
-      );
-      console.log(`Math.log(jumpMultiplier): ${Math.log(jumpMultiplier)}`);
-      console.log(`exp: ${exp}`);
-
       let expBuying = Math.floor(exp);
       let expSelling = Math.ceil(exp);
-      console.log(`expBuying: ${expBuying}, expSelling: ${expSelling}`);
 
       let spotBuying = BigInt(
-        Math.floor(Number(anchor) * jumpMultiplier ** expBuying),
+        Math.floor(Number(anchor) * (jumpMultiplier ** expBuying)),
       );
       let spotSelling = BigInt(
-        Math.floor(Number(anchor) * jumpMultiplier ** expSelling),
+        Math.floor(Number(anchor) * (jumpMultiplier ** expSelling)),
       );
 
       // let spotBuying = ((amm - anchor) / jumpSize) * jumpSize + anchor; // NOTE: inverted
       // assert(spotBuying >= anchor, `spotBuying < anchor`); // TODO do we want that in the loop below? Do we want it at all?
       // let spotSelling = spotBuying + jumpSize; // NOTE: inverted aka "price when selling for A0"
 
-      // const a = Number(amm);
-      const w = Number(weight);
-      const l = Number(liquidity);
-      const delta_ = delta(w, l);
+      const delta_ = delta(weight, liquidity);
 
       if (buyable > 0n) {
         while (spotBuying > 0n) {
-          const sb = Number(spotBuying);
-          const d = delta_(sb);
-          const maxBuying = d === Infinity
-            ? buyable
-            : min(buyable, BigInt(Math.floor(-d)));
+          const d = delta_(spotBuying);
+          const maxBuying = min(buyable, -d);
 
           if (maxBuying > 0n) {
             spotBuying_.initAmountOf(asset, spotBuying);
@@ -313,7 +288,7 @@ export class DiracUtxo {
           } else {
             expBuying--;
             spotBuying = BigInt(
-              Math.floor(Number(anchor) * jumpMultiplier ** (expBuying)),
+              Math.floor(Number(anchor) * (jumpMultiplier ** expBuying)),
             );
             // if maxBuying is 0, then d is too low, which means that
             // we are too close at the amm-price. So we ~increase~ the
@@ -323,13 +298,10 @@ export class DiracUtxo {
         }
       }
 
-      if (sellable > 0n && spotSelling > 0n) {
+      if ((sellable === undefined || sellable != 0n) && spotSelling > 0n) {
         while (true) {
-          const ss = Number(spotSelling);
-          const d = delta_(ss);
-          const maxSelling = d === Infinity
-            ? sellable
-            : min(sellable, BigInt(Math.floor(d)));
+          const d = delta_(spotSelling);
+          const maxSelling = sellable && sellable > 0n ? min(sellable, d) : d;
 
           if (maxSelling > 0n) {
             spotSelling_.initAmountOf(asset, spotSelling);
@@ -339,7 +311,7 @@ export class DiracUtxo {
           } else {
             expSelling++;
             spotSelling = BigInt(
-              Math.floor(Number(anchor) * jumpMultiplier ** (expSelling)),
+              Math.floor(Number(anchor) * (jumpMultiplier ** expSelling)),
             );
             // if maxSelling is 0, then d is too low, which means that
             // we are too close at the amm-price. So we ~decrease~ the
@@ -377,7 +349,6 @@ export class DiracUtxo {
 
         let maxBuyingA0 = maxBuying * spotSelling;
         let maxSellingA0 = maxSelling * spotBuying;
-
         let maxSwapA0 = min(maxSellingA0, maxBuyingA0);
 
         // if (maxSwapA0 < spotSelling) return; // to avoid zero buying amount TODO this is somewhat wrong, correct would be to instead relax the prices further instead
@@ -399,21 +370,18 @@ export class DiracUtxo {
           const sellingJumpMultiplier = (sellingJumpSize + 1) / sellingJumpSize;
           const buyingJumpMultiplier = (buyingJumpSize + 1) / buyingJumpSize;
 
-          const sellingWeight = Number(param.weights.amountOf(sellingAsset));
-          const buyingWeight = Number(param.weights.amountOf(buyingAsset));
+          const buyable = buyable_.amountOf(buyingAsset, 0n);
+          const sellable = sellable_?.amountOf(sellingAsset, 0n);
+          if (buyable <= 0n || (sellable && sellable === 0n)) return;
 
-          const sellingVirtual = param.virtual.amountOf(sellingAsset);
-          const buyingVirtual = param.virtual.amountOf(buyingAsset);
-
-          const sellable = sellable_.amountOf(sellingAsset);
-          const buyable = this.balance.amountOf(buyingAsset);
-
-          const sellingLiquidity = sellingVirtual +
-            this.balance.amountOf(sellingAsset, 0n);
-          const buyingLiquidity = buyingVirtual + buyable;
-
-          const deltaSelling = delta(sellingWeight, Number(sellingLiquidity));
-          const deltaBuying = delta(buyingWeight, Number(buyingLiquidity));
+          const deltaSelling = delta(
+            param.weights.amountOf(sellingAsset),
+            liquidity_.amountOf(sellingAsset),
+          );
+          const deltaBuying = delta(
+            param.weights.amountOf(buyingAsset),
+            liquidity_.amountOf(buyingAsset),
+          );
 
           // TODO not sure if infinite loop is possible here
           while (maxSwapA0 < spotSelling) {
@@ -421,44 +389,37 @@ export class DiracUtxo {
               expSelling++;
 
               const spotSelling_ = Math.floor(
-                sellingAnchor * sellingJumpMultiplier ** Number(expSelling),
+                sellingAnchor * (sellingJumpMultiplier ** Number(expSelling)),
               );
               if (!isFinite(spotSelling_)) return;
               spotSelling = BigInt(spotSelling_);
 
-              const ss = Number(spotSelling);
-              const d = deltaSelling(ss);
-              maxSelling = d === Infinity
-                ? sellable
-                : min(sellable, BigInt(Math.floor(d)));
+              const d = deltaSelling(spotSelling);
+              maxSelling = sellable && sellable > 0n ? min(sellable, d) : d;
             } else {
               // TODO not sure if this branch adds value
-
               expBuying--;
               spotBuying = BigInt(
                 Math.floor(
-                  buyingAnchor * buyingJumpMultiplier ** Number(expBuying),
+                  buyingAnchor * (buyingJumpMultiplier ** Number(expBuying)),
                 ),
               );
 
-              const sb = Number(spotBuying);
-              const d = deltaBuying(sb);
-              maxBuying = d === Infinity
-                ? buyable
-                : min(buyable, BigInt(Math.floor(-d)));
+              const d = deltaBuying(spotBuying);
+              maxBuying = min(buyable, -d);
             }
 
             maxBuyingA0 = maxBuying * spotSelling;
             maxSellingA0 = maxSelling * spotBuying;
-
             maxSwapA0 = min(maxSellingA0, maxBuyingA0);
           }
         }
 
         const buyingAmount = maxSwapA0 / spotSelling;
-        const sellingAmount = BigInt(
-          Math.ceil(Number(maxSwapA0) / Number(spotBuying)),
-        );
+        const sellingAmount_ = Math.ceil(Number(maxSwapA0) / Number(spotBuying));
+        if (!isFinite(sellingAmount_)) return;
+        const sellingAmount = BigInt(sellingAmount_);
+        // const sellingAmount = maxSellingA0 <= maxBuyingA0 ? maxSelling : BigInt(sellingAmount_);
 
         const swapping = Swapping.boundary(
           user,
@@ -474,25 +435,30 @@ export class DiracUtxo {
           expSelling,
         );
 
-        assert(
+        // TODO FIXME
+        if (
           Swapping.validates(
             spotBuying,
             spotSelling,
-            this.dirac.anchorPrices.amountOf(buyingAsset, 0n),
-            this.dirac.anchorPrices.amountOf(sellingAsset, 0n),
-            param.jumpSizes.amountOf(buyingAsset),
-            param.jumpSizes.amountOf(sellingAsset),
+            // this.dirac.anchorPrices.amountOf(buyingAsset),
+            // this.dirac.anchorPrices.amountOf(sellingAsset),
+            // param.jumpSizes.amountOf(buyingAsset),
+            // param.jumpSizes.amountOf(sellingAsset),
             param.weights.amountOf(buyingAsset),
             param.weights.amountOf(sellingAsset),
             liquidity_.amountOf(buyingAsset),
             liquidity_.amountOf(sellingAsset),
             buyingAmount,
             sellingAmount,
-          ),
-          `invalid swap: ${swapping.show()}`,
-        );
+          )
+        ) {
+          swappings.push(swapping);
+        } else {
+          // console.error("invalid swap", swapping.show())
+          // return
+          throw new Error(`invalid swap: ${swapping.show()}`); // TODO throw error and fix
+        }
         // console.log("swapping", swapping.show())
-        swappings.push(swapping);
       });
     });
 

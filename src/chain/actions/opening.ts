@@ -18,6 +18,8 @@ import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 
 // complete settings for opening a pool
 export class Opening {
+  private poolCache?: Pool;
+
   constructor(
     public readonly user: User,
     public readonly param: Param,
@@ -43,7 +45,8 @@ export class Opening {
     );
   };
 
-  private pool = (): Pool => {
+  public pool = (): Pool => {
+    if (this.poolCache) return this.poolCache;
     const assets = this.param.weights.assets;
     const minAnchorPrices = this.param.minAnchorPrices;
     const tickSizes = this.param.jumpSizes.divideBy(this.numTicks);
@@ -103,10 +106,13 @@ export class Opening {
     });
 
     this.user.setLastIdNFT(threadNFT);
-    return Pool.open(
+    const pool = Pool.open(
       paramUtxo,
       diracUtxos,
     );
+
+    this.poolCache = pool;
+    return pool;
   };
 
   // splitting it up this way to later use the same class to process actual user input

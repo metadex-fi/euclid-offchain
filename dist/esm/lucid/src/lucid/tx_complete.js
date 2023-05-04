@@ -27,10 +27,33 @@ export class TxComplete {
             writable: true,
             value: void 0
         });
+        Object.defineProperty(this, "fee", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "exUnits", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: null
+        });
         this.lucid = lucid;
         this.txComplete = tx;
         this.witnessSetBuilder = C.TransactionWitnessSetBuilder.new();
         this.tasks = [];
+        this.fee = parseInt(tx.body().fee().to_str());
+        const redeemers = tx.witness_set().redeemers();
+        if (redeemers) {
+            const exUnits = { cpu: 0, mem: 0 };
+            for (let i = 0; i < redeemers.len(); i++) {
+                const redeemer = redeemers.get(i);
+                exUnits.cpu += parseInt(redeemer.ex_units().steps().to_str());
+                exUnits.mem += parseInt(redeemer.ex_units().mem().to_str());
+            }
+            this.exUnits = exUnits;
+        }
     }
     sign() {
         this.tasks.push(async () => {

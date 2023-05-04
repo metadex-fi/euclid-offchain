@@ -7,6 +7,11 @@ export declare class TxComplete {
     witnessSetBuilder: C.TransactionWitnessSetBuilder;
     private tasks;
     private lucid;
+    fee: number;
+    exUnits: {
+        cpu: number;
+        mem: number;
+    } | null;
     constructor(lucid: Lucid, tx: C.Transaction);
     sign(): TxComplete;
     /** Add an extra signature from a private key. */

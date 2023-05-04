@@ -1,3 +1,4 @@
+import { assert } from "../../../../../../deps/deno.land/std@0.167.0/testing/asserts.js";
 import { Lucid } from "../../../../../lucid.mod.js";
 import { PWrapped } from "../../fundamental/container/wrapped.js";
 import { PByteString } from "../../fundamental/primitive/bytestring.js";
@@ -38,6 +39,14 @@ export class Currency {
                 }
             }
         });
+        Object.defineProperty(this, "equals", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: (other) => {
+                return this.concise() === other.concise();
+            }
+        });
         Object.defineProperty(this, "valueOf", {
             enumerable: true,
             configurable: true,
@@ -52,10 +61,8 @@ export class Currency {
                 return Lucid.toHex(this.symbol);
             }
         });
-        // assert( // TODO reactivate if true
-        //   symbol.length === 0 || symbol.length === Number(Currency.numBytes),
-        //   `Currency wrong size: ${symbol}`,
-        // );
+        assert(// TODO reactivate if true
+        symbol.length === 0 || symbol.length === Number(Currency.numBytes), `Currency wrong size - ${symbol}: ${symbol.length}`);
     }
     static fromLucid(hexCurrencySymbol) {
         return new Currency(Lucid.fromHex(hexCurrencySymbol));
@@ -85,7 +92,7 @@ Object.defineProperty(Currency, "dummy", {
     enumerable: true,
     configurable: true,
     writable: true,
-    value: new Currency(Lucid.fromHex("cc"))
+    value: new Currency(Lucid.fromHex("cc".repeat(Number(Currency.numBytes))))
 });
 export class PCurrency extends PWrapped {
     constructor() {

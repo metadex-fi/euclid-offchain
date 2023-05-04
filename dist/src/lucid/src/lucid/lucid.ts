@@ -46,6 +46,11 @@ export class Lucid {
   provider!: Provider;
   network: Network = "Mainnet";
   utils!: Utils;
+  spentOutputs: {
+    txHash: TxHash;
+    outputIndex: number;
+  }[] = [];
+  addedOutputs: UTxO[] = [];
 
   static async new(provider?: Provider, network?: Network): Promise<Lucid> {
     const lucid = new this();
@@ -178,6 +183,16 @@ export class Lucid {
     unit: Unit,
   ): Promise<UTxO[]> {
     return this.provider.getUtxosWithUnit(addressOrCredential, unit);
+  }
+
+  chainingUtxos(utxos: UTxO[]): UTxO[] {
+    this.spentOutputs.forEach((spent) => {
+      utxos = utxos.filter((utxo) =>
+        spent.txHash !== utxo.txHash ||
+        spent.outputIndex !== utxo.outputIndex
+      );
+    });
+    return [...utxos, ...this.addedOutputs];
   }
 
   /** Unit needs to be an NFT (or optionally the entire supply in one UTxO). */

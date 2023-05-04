@@ -19,6 +19,10 @@ export class Token {
     return this.name;
   };
 
+  public equals = (other: Token): boolean => {
+    return this.concise() === other.concise();
+  };
+
   public valueOf = this.show;
 
   public toLucid = (): string => {

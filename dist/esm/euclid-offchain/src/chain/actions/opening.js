@@ -36,6 +36,12 @@ export class Opening {
             writable: true,
             value: numTicks
         });
+        Object.defineProperty(this, "poolCache", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
         Object.defineProperty(this, "tx", {
             enumerable: true,
             configurable: true,
@@ -49,6 +55,8 @@ export class Opening {
             configurable: true,
             writable: true,
             value: () => {
+                if (this.poolCache)
+                    return this.poolCache;
                 const assets = this.param.weights.assets;
                 const minAnchorPrices = this.param.minAnchorPrices;
                 const tickSizes = this.param.jumpSizes.divideBy(this.numTicks);
@@ -83,7 +91,9 @@ export class Opening {
                     return DiracUtxo.open(this.param, dirac, balance);
                 });
                 this.user.setLastIdNFT(threadNFT);
-                return Pool.open(paramUtxo, diracUtxos);
+                const pool = Pool.open(paramUtxo, diracUtxos);
+                this.poolCache = pool;
+                return pool;
             }
         });
         // console.log(deposit.assets.union(this.param.virtual.assets).show());

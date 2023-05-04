@@ -1,13 +1,14 @@
+import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
 import { PWrapped } from "../../fundamental/container/wrapped.ts";
 import { PByteString } from "../../fundamental/primitive/bytestring.ts";
 
 export class Currency {
   constructor(public readonly symbol: Uint8Array) {
-    // assert( // TODO reactivate if true
-    //   symbol.length === 0 || symbol.length === Number(Currency.numBytes),
-    //   `Currency wrong size: ${symbol}`,
-    // );
+    assert( // TODO reactivate if true
+      symbol.length === 0 || symbol.length === Number(Currency.numBytes),
+      `Currency wrong size - ${symbol}: ${symbol.length}`,
+    );
   }
 
   public toString = (): string => {
@@ -26,6 +27,10 @@ export class Currency {
     }
   };
 
+  public equals = (other: Currency): boolean => {
+    return this.concise() === other.concise();
+  };
+
   public valueOf = this.show;
 
   public toLucid = (): string => {
@@ -42,7 +47,9 @@ export class Currency {
 
   static numBytes = 28n;
   static ADA = new Currency(new Uint8Array(0));
-  static dummy = new Currency(Lucid.fromHex("cc"));
+  static dummy = new Currency(
+    Lucid.fromHex("cc".repeat(Number(Currency.numBytes))),
+  );
 }
 
 export class PCurrency extends PWrapped<Currency> {

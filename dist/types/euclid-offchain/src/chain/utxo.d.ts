@@ -42,5 +42,5 @@ export declare class DiracUtxo {
     show: (tabs?: string) => string;
     openingTx: (tx: Lucid.Tx, contract: Contract) => Lucid.Tx;
     applySwapping: (swapping: Swapping) => DiracUtxo;
-    swappingsFor: (user: User, paramUtxo: ParamUtxo, sellable_: Value, buyingAsset?: Asset) => Swapping[];
+    swappingsFor: (user: User | undefined, paramUtxo: ParamUtxo, sellable_?: Value, buyingAsset?: Asset) => Swapping[];
 }

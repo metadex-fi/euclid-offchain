@@ -187,7 +187,7 @@ export class Assets {
   }
 
   public forEach = (
-    f: (value: Asset, index?: number, array?: Asset[]) => void,
+    f: (value: Asset, index: number, array: Asset[]) => void,
   ) => this.toList.forEach(f);
 
   static fromList(assets: Asset[]): Assets {

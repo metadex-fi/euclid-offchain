@@ -12,6 +12,11 @@ export declare class Lucid {
     provider: Provider;
     network: Network;
     utils: Utils;
+    spentOutputs: {
+        txHash: TxHash;
+        outputIndex: number;
+    }[];
+    addedOutputs: UTxO[];
     static new(provider?: Provider, network?: Network): Promise<Lucid>;
     /**
      * Switch provider and/or network.
@@ -27,6 +32,7 @@ export declare class Lucid {
     currentSlot(): Slot;
     utxosAt(addressOrCredential: Address | Credential): Promise<UTxO[]>;
     utxosAtWithUnit(addressOrCredential: Address | Credential, unit: Unit): Promise<UTxO[]>;
+    chainingUtxos(utxos: UTxO[]): UTxO[];
     /** Unit needs to be an NFT (or optionally the entire supply in one UTxO). */
     utxoByUnit(unit: Unit): Promise<UTxO>;
     utxosByOutRef(outRefs: Array<OutRef>): Promise<UTxO[]>;

@@ -156,8 +156,8 @@ export class Blockfrost {
                 }).then((res) => res.json());
                 if (isConfirmed && !isConfirmed.error) {
                     clearInterval(confirmation);
-                    res(true);
-                    return;
+                    await new Promise((res) => setTimeout(() => res(1), 1000));
+                    return res(true);
                 }
             }, checkInterval);
         });

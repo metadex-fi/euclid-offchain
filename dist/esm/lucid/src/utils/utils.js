@@ -362,18 +362,22 @@ export function utxoToCore(utxo) {
     return C.TransactionUnspentOutput.new(C.TransactionInput.new(C.TransactionHash.from_bytes(fromHex(utxo.txHash)), C.BigNum.from_str(utxo.outputIndex.toString())), output);
 }
 export function coreToUtxo(coreUtxo) {
+    return coreToUtxo_(toHex(coreUtxo.input().transaction_id().to_bytes()), parseInt(coreUtxo.input().index().to_str()), coreUtxo.output());
+}
+// for tx-chaining
+export function coreToUtxo_(txHash, index, txo) {
     return {
-        txHash: toHex(coreUtxo.input().transaction_id().to_bytes()),
-        outputIndex: parseInt(coreUtxo.input().index().to_str()),
-        assets: valueToAssets(coreUtxo.output().amount()),
-        address: coreUtxo.output().address().as_byron()
-            ? coreUtxo.output().address().as_byron()?.to_base58()
-            : coreUtxo.output().address().to_bech32(undefined),
-        datumHash: coreUtxo.output()?.datum()?.as_data_hash()?.to_hex(),
-        datum: coreUtxo.output()?.datum()?.as_data() &&
-            toHex(coreUtxo.output().datum().as_data().get().to_bytes()),
-        scriptRef: coreUtxo.output()?.script_ref() &&
-            fromScriptRef(coreUtxo.output().script_ref()),
+        txHash: txHash,
+        outputIndex: index,
+        assets: valueToAssets(txo.amount()),
+        address: txo.address().as_byron()
+            ? txo.address().as_byron()?.to_base58()
+            : txo.address().to_bech32(undefined),
+        datumHash: txo.datum()?.as_data_hash()?.to_hex(),
+        datum: txo.datum()?.as_data() &&
+            toHex(txo.datum().as_data().get().to_bytes()),
+        scriptRef: txo.script_ref() &&
+            fromScriptRef(txo.script_ref()),
     };
 }
 export function networkToId(network) {

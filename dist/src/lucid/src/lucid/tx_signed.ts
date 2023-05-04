@@ -12,9 +12,13 @@ export class TxSigned {
   }
 
   async submit(): Promise<TxHash> {
-    return await (this.lucid.wallet || this.lucid.provider).submitTx(
+    const txHash = await (this.lucid.wallet || this.lucid.provider).submitTx(
       toHex(this.txSigned.to_bytes()),
     );
+    this.lucid.spentOutputs = [];
+    this.lucid.addedOutputs = [];
+
+    return txHash;
   }
 
   /** Returns the transaction in Hex encoded Cbor. */

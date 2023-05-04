@@ -28,7 +28,7 @@ import {
   toScriptRef,
   utxoToCore,
 } from "../utils/mod.js";
-import { applyDoubleCborEncoding } from "../utils/utils.js";
+import { applyDoubleCborEncoding, coreToUtxo_ } from "../utils/utils.js";
 import { Lucid } from "./lucid.js";
 import { TxComplete } from "./tx_complete.js";
 
@@ -545,7 +545,12 @@ export class Tx {
       task = this.tasks.shift();
     }
 
-    const utxos = await this.lucid.wallet.getUtxosCore();
+    const utxos = C.TransactionUnspentOutputs.new();
+    this.lucid.chainingUtxos(await this.lucid.wallet.getUtxos()).forEach(
+      (utxo) => {
+        utxos.add(utxoToCore(utxo));
+      },
+    );
 
     const changeAddress: C.Address = addressFromWithNetworkCheck(
       options?.change?.address || (await this.lucid.wallet.address()),
@@ -553,7 +558,18 @@ export class Tx {
     );
 
     if (options?.coinSelection || options?.coinSelection === undefined) {
-      this.txBuilder.add_inputs_from(utxos, changeAddress);
+      this.txBuilder.add_inputs_from(
+        utxos,
+        changeAddress,
+        Uint32Array.from([
+          200, // weight ideal > 100 inputs
+          1000, // weight ideal < 100 inputs
+          1500, // weight assets if plutus
+          800, // weight assets if not plutus
+          800, // weight distance if not plutus
+          5000, // weight utxos
+        ]),
+      );
     }
 
     this.txBuilder.balance(
@@ -590,7 +606,7 @@ export class Tx {
       })(),
     );
 
-    return new TxComplete(
+    const txComplete = new TxComplete(
       this.lucid,
       await this.txBuilder.construct(
         utxos,
@@ -598,6 +614,30 @@ export class Tx {
         options?.nativeUplc === undefined ? true : options?.nativeUplc,
       ),
     );
+
+    const consumed = txComplete.txComplete.body().inputs();
+    for (let i = 0; i < consumed.len(); i++) {
+      const input = consumed.get(i);
+      this.lucid.spentOutputs.push({
+        txHash: toHex(input.transaction_id().to_bytes()),
+        outputIndex: parseInt(input.index().to_str()),
+      });
+    }
+
+    const produced = txComplete.txComplete.body().outputs();
+    const txHash = txComplete.toHash();
+    for (let i = 0; i < produced.len(); i++) {
+      const output = produced.get(i);
+      this.lucid.addedOutputs.push(
+        coreToUtxo_(
+          txHash,
+          i, // TODO wild guess
+          output,
+        ),
+      );
+    }
+
+    return txComplete;
   }
 
   /** Return the current transaction body in Hex encoded Cbor. */

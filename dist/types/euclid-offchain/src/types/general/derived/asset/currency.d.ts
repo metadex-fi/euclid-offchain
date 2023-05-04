@@ -5,6 +5,7 @@ export declare class Currency {
     toString: () => string;
     show: () => string;
     concise: () => string;
+    equals: (other: Currency) => boolean;
     valueOf: () => string;
     toLucid: () => string;
     static fromLucid(hexCurrencySymbol: string): Currency;
