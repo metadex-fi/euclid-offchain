@@ -154,7 +154,7 @@ ${tt})`;
     const tmp1 = jumpSize + 1n;
     const ceil = tmp1 % tmp0 ? 1n : 0n;
     const minWeight = (tmp1 / tmp0) + ceil;
-    const maxWeight = (maxInteger * tmp1) / (tmp0 + 1n); // TODO +1n is a hack to keep it minAnchorPrices <= maxInteger
+    const maxWeight = (maxInteger * tmp1) / (tmp0 + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
 
     return [minWeight, maxWeight];
   }

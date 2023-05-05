@@ -456,9 +456,9 @@ export class DiracUtxo {
         ) {
           swappings.push(swapping);
         } else {
-          // console.error("invalid swap", swapping.show())
-          // return
-          throw new Error(`invalid swap: ${swapping.show()}`); // TODO throw error and fix
+          console.error("invalid swap", swapping.show());
+          return;
+          // throw new Error(`invalid swap: ${swapping.show()}`); // TODO throw error and fix
         }
         // console.log("swapping", swapping.show())
       });

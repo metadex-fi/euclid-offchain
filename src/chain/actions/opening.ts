@@ -92,7 +92,22 @@ export class Opening {
           );
           assert(
             firstAnchor < currentAnchor,
-            `anchor price collision - first: ${firstAnchor} >= current: ${currentAnchor}`,
+            `anchor price collision - first: ${firstAnchor} >= current: ${currentAnchor};
+            tickMultiplier: ${tickMultiplier}
+            i: ${i}
+            ticks: ${ticks}
+            jumpMultiplier: ${jumpMultiplier}
+            virtual: ${this.param.virtual.amountOf(asset)}
+            weights: ${this.param.weights.amountOf(asset)}
+            jumpSizes: ${this.param.jumpSizes.amountOf(asset)}
+            maxTicks: ${
+              Opening.maxTicks(
+                this.param.virtual.amountOf(asset),
+                this.param.weights.amountOf(asset),
+                this.param.jumpSizes.amountOf(asset),
+              )
+            }
+            `,
           );
           if (currentAnchor > maxInteger) break; // TODO instead ensure this does not happen in the first place
           anchorPrices.setAmountOf(asset, currentAnchor);
@@ -116,7 +131,7 @@ export class Opening {
     );
     assert(
       balance.size === this.deposit.size,
-      "balance size should match deposit size",
+      `balance size should match deposit size: ${balance.concise()} vs. ${this.deposit.concise()}`,
     );
     const diracUtxos = diracs.map((dirac) => {
       return DiracUtxo.open(this.param, dirac, balance);
@@ -162,7 +177,7 @@ export class Opening {
       );
       const ticks = new PPositive(
         1n,
-        min(min(gMaxLength, max(1n, maxTicks_)), maxTicks), // NOTE/TODO the max is due to rounding errors (probably)
+        min(min(gMaxLength, maxTicks_), maxTicks), // TODO what to do when maxTicks_ < 1n? Should this be possible..?
       ).genData();
       maxTicks /= ticks;
       numTicks.initAmountOf(asset, ticks);
