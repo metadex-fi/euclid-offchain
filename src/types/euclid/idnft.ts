@@ -9,7 +9,7 @@ import { AssocMap } from "../general/fundamental/container/map.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
 import { PRecord } from "../general/fundamental/container/record.ts";
 
-export const gMaxHashes = maxInteger; // maximum distance between two subsequent idNFTs before we stop trying
+export const gMaxHashes = 9000n; //maxInteger; // maximum distance between two subsequent idNFTs before we stop trying
 
 // NOTE biggest difference to regular Asset is that tokenName is not decoded/encoded
 // when parsing to/from lucid, as this is not symmetric unless starting with text-strings

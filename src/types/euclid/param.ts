@@ -8,13 +8,13 @@ import { PRecord } from "../general/fundamental/container/record.ts";
 import { f, t } from "../general/fundamental/type.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
 import { PInteger } from "../general/fundamental/primitive/integer.ts";
-import { maxInteger } from "../../utils/generators.ts";
+import { maxInteger, min } from "../../utils/generators.ts";
 import { Value } from "../general/derived/value/value.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
 
 // export const minLiquidityJumpSize = 1n;//100n; // TODO/NOTE should never be less than 1n
-export const maxJumpSize = 100n;
+export const gMaxJumpSize = 100n;
 
 export class Param {
   constructor(
@@ -85,16 +85,33 @@ ${tt})`;
 
     /* TODO update to multiplicative ticks - for example this:
 
-    (virtual * weight * jumpSize) / (jumpSize + 1n)) >= 1n
+    minAnchorPrice >= 1n
+
+    => (virtual * weight * jumpSize) / (jumpSize + 1n)) >= 1n
     => virtual * weight * jumpSize >= jumpSize + 1n
+
     => weight >= (jumpSize + 1n) / (virtual * jumpSize)
-    => jumpSize >= 1n / (virtual * weight - 1n)
+    => virtual >= (jumpSize + 1n) / (weight * jumpSize)
+
+    => 1 + (1 / jumpSize) <= (virtual * weight)
+    => 1 / jumpSize <= (virtual * weight) - 1n
+    => jumpSize >= 1n / ((virtual * weight) - 1n) ~~ >= 1n
 
     and:
 
-    (virtual * weight * jumpSize) / (jumpSize + 1n)) <= maxInteger
+    minAnchorPrice <= maxInteger
+
+    => (virtual * weight * jumpSize) / (jumpSize + 1n)) <= maxInteger
     => virtual * weight * jumpSize <= maxInteger * (jumpSize + 1n)
+
     => weight <= (maxInteger * (jumpSize + 1n)) / (virtual * jumpSize)
+    => virtual <= (maxInteger * (jumpSize + 1n)) / (weight * jumpSize)
+
+    => 1 + (1 / jumpSize) >= (virtual * weight) / maxInteger
+    => 1 / jumpSize >= ((virtual * weight) - maxInteger) / maxInteger  !!! rhs can be <= 0
+    => if virtual * weight > maxInteger:
+      jumpSize <= maxInteger / ((virtual * weight) - maxInteger)
+
     */
 
     // assert(
@@ -129,7 +146,7 @@ ${tt})`;
       // jumpSizes.initAmountOf(asset, jumpSize);
       // weights.initAmountOf(asset, weight);
 
-      const jumpSize = new PPositive(1n, maxJumpSize).genData();
+      const jumpSize = new PPositive(1n, gMaxJumpSize).genData();
       const virtual = new PPositive().genData();
 
       const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual);
@@ -149,14 +166,44 @@ ${tt})`;
     );
   }
 
+  // => weight >= (jumpSize + 1n) / (virtual * jumpSize)
+  // => weight <= (maxInteger * (jumpSize + 1n)) / (virtual * jumpSize)
   static weightBounds(jumpSize: bigint, virtual: bigint): [bigint, bigint] {
-    const tmp0 = virtual * jumpSize;
-    const tmp1 = jumpSize + 1n;
-    const ceil = tmp1 % tmp0 ? 1n : 0n;
-    const minWeight = (tmp1 / tmp0) + ceil;
-    const maxWeight = (maxInteger * tmp1) / (tmp0 + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
+    const vjs = virtual * jumpSize;
+    const js1 = jumpSize + 1n;
+    const ceil = js1 % vjs ? 1n : 0n;
+    const minWeight = (js1 / vjs) + ceil;
+    const maxWeight = (maxInteger * js1) / (vjs + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
 
     return [minWeight, maxWeight];
+  }
+
+  // => virtual >= (jumpSize + 1n) / (weight * jumpSize)
+  // => virtual <= (maxInteger * (jumpSize + 1n)) / (weight * jumpSize)
+  static virtualBounds(jumpSize: bigint, weight: bigint): [bigint, bigint] {
+    const wjs = weight * jumpSize;
+    const js1 = jumpSize + 1n;
+    const ceil = js1 % wjs ? 1n : 0n;
+    const minVirtual = (js1 / wjs) + ceil;
+    const maxVirtual = (maxInteger * js1) / (wjs); // + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
+
+    return [minVirtual, maxVirtual];
+  }
+
+  // => jumpSize >= 1n / (virtual * weight - 1n) ~~> 1n
+  // => if virtual * weight > maxInteger:
+  // jumpSize <= maxInteger / ((virtual * weight) - maxInteger)
+  static jumpSizeBounds(virtual: bigint, weight: bigint): [bigint, bigint] {
+    const minJumpSize = 1n;
+    const vw = virtual * weight;
+    const maxJumpSize = vw > maxInteger
+      ? min(
+        maxInteger / (vw - maxInteger),
+        gMaxJumpSize,
+      )
+      : gMaxJumpSize;
+    console.log("maxJumpSize", maxJumpSize.toString());
+    return [minJumpSize, maxJumpSize];
   }
 }
 

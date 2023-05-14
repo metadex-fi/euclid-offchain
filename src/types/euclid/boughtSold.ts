@@ -1,6 +1,5 @@
 import { maxInteger } from "../../utils/generators.ts";
 import { PBounded } from "../general/derived/bounded/bounded.ts";
-import { PPositive } from "../general/derived/bounded/positive.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
 import { PRecord } from "../general/fundamental/container/record.ts";
 
@@ -18,7 +17,7 @@ export class PBoughtSold extends PObject<BoughtSold> {
     // needs to be less than weight * (virtual + balance) + jumpSize
     const pbounded = new PBounded(
       0n,
-      maxInteger ** maxInteger,
+      maxInteger,
     );
     super(
       new PRecord({

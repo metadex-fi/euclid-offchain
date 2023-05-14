@@ -4,14 +4,14 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../lucid.mod.ts";
 import { PData } from "../types/general/fundamental/type.ts";
 
-export const maxInteger = 9000n; //BigInt(Number.MAX_SAFE_INTEGER); // TODO better value, maybe look at chain/plutus max
-export const gMaxStringLength = maxInteger;
+export const maxInteger = BigInt(Number.MAX_SAFE_INTEGER); //9000n; //// TODO better value, maybe look at chain/plutus max
+export const gMaxStringLength = 9000n; //maxInteger;
 export const gMaxStringBytes = gMaxStringLength / 2n;
 export const gMaxLength = 3n;
 export const gMaxDepth = 4n;
 export const feesEtcLovelace = 100000000n; // costs in lovelace for fees etc. TODO excessive
 const letters = `abcdefghijklmnopqrstuvwxyz`;
-const symbols = "!@#$%^&*()_-+={[}]|\\;:'\",<.>/?`~";
+// const symbols = "!@#$%^&*()_-+={[}]|\\;:'\",<.>/?`~";
 const dropChance = 0.5;
 
 export class Generators {
