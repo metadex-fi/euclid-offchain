@@ -134,18 +134,7 @@ ${tt})`;
     const weights = new PositiveValue();
     const virtuals = new PositiveValue();
 
-    allAssets.forEach((asset) => { // TODO update to multiplicative ticks
-      // const maxLowestPrice = new PPositive(2n).genData();
-      // const maxJumpSize_ = min(maxLowestPrice - 1n, maxJumpSize);
-      // const jumpSize = new PPositive(1n, maxJumpSize_).genData();
-      // // const jumpSize = new PPositive(1n, maxLowestPrice - 1n).genData();
-      // const minLowestPrice = maxLowestPrice - jumpSize;
-      // const weight = new PPositive(1n, minLowestPrice).genData();
-
-      // virtual.initAmountOf(asset, minLowestPrice / weight);
-      // jumpSizes.initAmountOf(asset, jumpSize);
-      // weights.initAmountOf(asset, weight);
-
+    allAssets.forEach((asset) => {
       const jumpSize = new PPositive(1n, gMaxJumpSize).genData();
       const virtual = new PPositive().genData();
 
@@ -168,24 +157,26 @@ ${tt})`;
 
   // => weight >= (jumpSize + 1n) / (virtual * jumpSize)
   // => weight <= (maxInteger * (jumpSize + 1n)) / (virtual * jumpSize)
+  // weight >= (jumpSize + 1n) / virtual (NOTE: this comes from tickSize >= 1n)
   static weightBounds(jumpSize: bigint, virtual: bigint): [bigint, bigint] {
-    const vjs = virtual * jumpSize;
+    // const vjs = virtual * jumpSize;
     const js1 = jumpSize + 1n;
-    const ceil = js1 % vjs ? 1n : 0n;
-    const minWeight = (js1 / vjs) + ceil;
-    const maxWeight = (maxInteger * js1) / (vjs + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
+    const ceil = js1 % virtual ? 1n : 0n;
+    const minWeight = (js1 / virtual) + ceil;
+    const maxWeight = (maxInteger * js1) / (virtual * jumpSize + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
 
     return [minWeight, maxWeight];
   }
 
   // => virtual >= (jumpSize + 1n) / (weight * jumpSize)
   // => virtual <= (maxInteger * (jumpSize + 1n)) / (weight * jumpSize)
+  // virtual >= (jumpSize + 1n) / weight (NOTE: this comes from tickSize >= 1n)
   static virtualBounds(jumpSize: bigint, weight: bigint): [bigint, bigint] {
-    const wjs = weight * jumpSize;
+    // const wjs = weight * jumpSize;
     const js1 = jumpSize + 1n;
-    const ceil = js1 % wjs ? 1n : 0n;
-    const minVirtual = (js1 / wjs) + ceil;
-    const maxVirtual = (maxInteger * js1) / (wjs); // + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
+    const ceil = js1 % weight ? 1n : 0n;
+    const minVirtual = (js1 / weight) + ceil;
+    const maxVirtual = (maxInteger * js1) / (weight * jumpSize); // + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
 
     return [minVirtual, maxVirtual];
   }
@@ -193,15 +184,17 @@ ${tt})`;
   // => jumpSize >= 1n / (virtual * weight - 1n) ~~> 1n
   // => if virtual * weight > maxInteger:
   // jumpSize <= maxInteger / ((virtual * weight) - maxInteger)
+  // jumpSize <= virtual * weight - 1n (NOTE: this comes from tickSize >= 1n)
   static jumpSizeBounds(virtual: bigint, weight: bigint): [bigint, bigint] {
     const minJumpSize = 1n;
     const vw = virtual * weight;
-    const maxJumpSize = vw > maxInteger
+    let maxJumpSize = vw > maxInteger
       ? min(
         maxInteger / (vw - maxInteger),
         gMaxJumpSize,
       )
       : gMaxJumpSize;
+    maxJumpSize = min(maxJumpSize, vw - 1n);
     console.log("maxJumpSize", maxJumpSize.toString());
     return [minJumpSize, maxJumpSize];
   }

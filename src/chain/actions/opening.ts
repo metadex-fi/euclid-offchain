@@ -209,8 +209,11 @@ export class Opening {
       (1 / Number(jumpSize));
     const anchorMultiplier = 1 +
       (1 / Number(minAnchorPrice));
-    return BigInt(
+
+    const maxTicks = BigInt(
       Math.floor(Math.log(jumpMultiplier) / Math.log(anchorMultiplier)),
     );
+
+    return maxTicks;
   };
 }
