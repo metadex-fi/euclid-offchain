@@ -195,7 +195,7 @@ ${tt})`;
       )
       : gMaxJumpSize;
     maxJumpSize = min(maxJumpSize, vw - 1n);
-    console.log("maxJumpSize", maxJumpSize.toString());
+    // console.log("maxJumpSize", maxJumpSize.toString());
     return [minJumpSize, maxJumpSize];
   }
 }

@@ -30,11 +30,11 @@ export class Token {
   };
 
   static fromLucid(hexTokenName: string): Token {
-    try {
+    // try {
       return new Token(Lucid.toText(hexTokenName));
-    } catch (e) {
-      throw new Error(`Token.fromLucid ${hexTokenName}:\n${e}`);
-    }
+    // } catch (e) {
+    //   throw new Error(`Token.fromLucid ${hexTokenName}:\n${e}`);
+    // }
   }
 
   // static fromOwner = (owner: KeyHash) => {

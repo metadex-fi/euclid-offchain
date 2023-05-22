@@ -135,7 +135,7 @@ export class Pool {
 
     const total_ = total.unsigned;
     assets.forEach((asset) => {
-      total_.addAmountOf(asset, 0n);
+      total_.fillAmountOf(asset, 0n);
     });
 
     return total_;
