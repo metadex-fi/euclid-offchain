@@ -210,10 +210,13 @@ export class Opening {
     const anchorMultiplier = 1 +
       (1 / Number(minAnchorPrice));
 
-    const maxTicks = BigInt(
-      Math.floor(Math.log(jumpMultiplier) / Math.log(anchorMultiplier)),
-    );
-
-    return maxTicks;
+    let jumpLog = Math.log(jumpMultiplier);
+    jumpLog = isFinite(jumpLog) ? jumpLog : Number(maxInteger);
+    let anchorLog = Math.log(anchorMultiplier);
+    anchorLog = isFinite(anchorLog) ? anchorLog : Number(maxInteger);
+    const maxTicks = Math.floor(jumpLog / anchorLog);
+    if (isFinite(maxTicks)) return BigInt(maxTicks);
+    else return maxInteger;
+    
   };
 }

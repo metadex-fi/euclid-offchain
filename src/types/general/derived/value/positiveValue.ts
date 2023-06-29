@@ -124,9 +124,9 @@ export class PositiveValue {
       Value.normedSubtract(this.unsigned, other.unsigned),
     );
   };
-  // public hadamard = (other: PositiveValue): PositiveValue => {
-  //   return new PositiveValue(Value.hadamard(this.unsigned, other.unsigned));
-  // };
+  public hadamard = (other: PositiveValue): PositiveValue => {
+    return new PositiveValue(Value.hadamard(this.unsigned, other.unsigned));
+  };
   // reverse hadamard product
   public divideBy = (other: PositiveValue): PositiveValue => {
     return new PositiveValue(Value.divide(this.unsigned, other.unsigned));
@@ -134,6 +134,10 @@ export class PositiveValue {
 
   public normedDivideBy = (other: PositiveValue): PositiveValue => {
     return new PositiveValue(Value.normedDivide(this.unsigned, other.unsigned));
+  };
+
+  public scale = (scalar: bigint): PositiveValue => {
+    return new PositiveValue(this.value.scale(scalar));
   };
 
   public leq = (other: PositiveValue): boolean => {

@@ -66,6 +66,10 @@ export class Value {
     return Value.newSetAmounts(1n)(this);
   }
 
+  public scale = (scalar: bigint): Value => {
+    return Value.newMapAmounts((a) => a * scalar)(this);
+  };
+
   public divideByScalar = (scalar: bigint): Value => {
     return Value.newMapAmounts((a) => a / scalar)(this);
   };

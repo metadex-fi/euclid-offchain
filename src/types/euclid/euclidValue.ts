@@ -77,6 +77,10 @@ export class EuclidValue {
     return EuclidValue.fromValue(this.unsigned.divideByScalar(scalar));
   };
 
+  public scale = (scalar: bigint): EuclidValue => {
+    return new EuclidValue(this.value.scale(scalar));
+  };
+
   public lt = (other: EuclidValue): boolean => {
     return Value.lt(this.unsigned, other.unsigned);
   };

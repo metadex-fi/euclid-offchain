@@ -11,6 +11,9 @@ import { DiracUtxo, ParamUtxo, PreDiracUtxo } from "./utxo.ts";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { ParamDatum, PPreEuclidDatum } from "../types/euclid/euclidDatum.ts";
 import { Value } from "../types/general/derived/value/value.ts";
+import { Asset } from "../types/general/derived/asset/asset.ts";
+import { Assets } from "../types/general/derived/asset/assets.ts";
+import { EuclidValue } from "../mod.ts";
 
 export class PrePool {
   public paramUtxo?: ParamUtxo;
@@ -106,6 +109,11 @@ ${tt}}`;
   };
 }
 
+export type DiracPriceValueA1 = {
+  pricesA1: AssocMap<Asset, number>; // uninverted
+  valueA1: number;
+};
+
 export class Pool {
   private constructor(
     public readonly paramUtxo: ParamUtxo,
@@ -139,6 +147,32 @@ export class Pool {
     });
 
     return total_;
+  }
+
+  public get assets(): Assets {
+    return this.paramUtxo.param.assets;
+  }
+
+  public get weightedPrices(): DiracPriceValueA1[] {
+    const assets = this.assets;
+    const a1 = assets.head;
+    const weights = this.paramUtxo.param.weights.unsigned;
+    const virtual = this.paramUtxo.param.virtual.unsigned;
+    return this.diracUtxos.map((d) => {
+      const pricesA0 = Value.hadamard(Value.normedAdd(d.balance.ofAssets(assets).unsigned, virtual), weights);
+      const pricesA1 = new AssocMap<Asset, number>((a) => a.concise());
+      const priceA0_1 = Number(pricesA0.amountOf(a1));
+      let valueA1 = 0;
+      assets.forEach((asset) => {
+        const priceA1_i = priceA0_1 / Number(pricesA0.amountOf(asset));
+        pricesA1.set(asset, priceA1_i);
+        valueA1 += Number(d.balance.amountOf(asset, 0n)) * priceA1_i;
+      });
+      return {
+        pricesA1: pricesA1,
+        valueA1: valueA1,
+      }
+    });
   }
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {

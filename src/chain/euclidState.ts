@@ -14,6 +14,9 @@ import { Swapping } from "./actions/swapping.ts";
 import { Pool, PrePool } from "./pool.ts";
 import { User } from "./user.ts";
 import { ParamUtxo, PreDiracUtxo } from "./utxo.ts";
+import { EuclidValue } from "../types/euclid/euclidValue.ts";
+import { Asset } from "../types/general/derived/asset/asset.ts";
+import { Assets } from "../types/general/derived/asset/assets.ts";
 
 type ErrorMessage = string;
 
@@ -28,6 +31,10 @@ export class EuclidState {
     (kh) => kh.show(),
   );
 
+  public get listPools(): Pool[] {
+    return [...this.pools.values()].flatMap((p) => [...p.values()]);
+  }
+  
   constructor(
     utxos: Lucid.UTxO[],
     policy: Currency,
@@ -121,7 +128,26 @@ export class EuclidState {
       }
       this.pools.set(owner, parsedOwnerPools);
       this.invalidPools.set(owner, invalidOwnerPools);
+
     });
+  }
+
+  // uninverted
+  public weightedPrice(denominator: Asset, numerator: Asset): number {
+    const pools = this.listPools;
+    const diracPrices = pools.filter((p) => {
+      const assets = p.assets;
+      return assets.has(denominator) && assets.has(numerator);
+    }).flatMap((pool) => pool.weightedPrices);
+    const [priceSum, valueSum] = diracPrices.reduce(
+      ([priceSum, valueSum], dp) => {
+        const price = dp.pricesA1.get(numerator)! / dp.pricesA1.get(denominator)!;
+        const value = dp.valueA1;
+        return [priceSum + price * value, valueSum + value];
+      },
+      [0, 0],
+    );
+    return priceSum / valueSum;
   }
 
   public swappingsFor(user: User): Swapping[] {
