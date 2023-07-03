@@ -34,7 +34,8 @@ Deno.copyFileSync("README.md", "dist/README.md");
 
 async function downloadAndCopyWasmFiles() {
   const lucidWasmDir = "https://deno.land/x/lucid@0.10.6/src/core/libs";
-  const denodexWasmDir = "dist/esm/lucid/src/core/libs";
+  // const denodexWasmDir = "dist/esm/lucid/src/core/libs";
+  const denodexWasmDir = "dist/esm/deps/deno.land/x/lucid@0.10.6/src/core/libs";
 
   const wasmFiles = [
     "cardano_multiplatform_lib/cardano_multiplatform_lib_bg.wasm",
