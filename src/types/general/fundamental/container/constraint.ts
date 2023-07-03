@@ -33,7 +33,7 @@ export class PConstraint<PInner extends PData>
         assertion(data);
       } catch (e) {
         throw new Error(
-          `Assertion failed in pconstant: ${e.message} of ${this.showPType()}`,
+          `Assertion failed in pconstant: ${(e as Error).message} of ${this.showPType()}`,
         );
       }
     });

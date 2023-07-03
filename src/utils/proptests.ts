@@ -32,7 +32,7 @@ export function proptestPTypes(gen: Generators, iterations: number) {
       // console.log("testing ptype parsing")
       testPTypeParse(plutusData, data, ptype, ptypeErrs);
     } catch (err) {
-      logError(err, otherErrs);
+      logError(err as Error, otherErrs);
     }
   }
   let correct = iterations;
@@ -49,7 +49,7 @@ function testDataParse(plutusData: Data, errors: Map<string, number>) {
   try {
     assertEquals(plutusData, Data.from(Data.to(plutusData)));
   } catch (err) {
-    logError(err, errors);
+    logError(err as Error, errors);
   }
 }
 
@@ -69,11 +69,11 @@ function testPTypeParse(
       try {
         assertEquals(data, data_);
       } catch (err) {
-        throw new Error(ptype.showPType() + "\n" + err.message);
+        throw new Error(ptype.showPType() + "\n" + (err as Error).message);
       }
     }
   } catch (err) {
-    logError(err, errors);
+    logError(err as Error, errors);
   }
 }
 
@@ -127,7 +127,7 @@ function testSmallPopulation(ptype: PData, errors: Map<string, number>) {
       }
     }
   } catch (err) {
-    logError(err, errors);
+    logError(err as Error, errors);
   }
 }
 
