@@ -27,5 +27,29 @@ await dnt.build({
   },
 });
 
-// Deno.copyFileSync("LICENSE", "dist/LICENSE");
+Deno.copyFileSync("LICENSE", "dist/LICENSE");
 Deno.copyFileSync("README.md", "dist/README.md");
+
+// Copy WebAssembly
+
+async function downloadAndCopyWasmFiles() {
+  const lucidWasmDir = "https://deno.land/x/lucid@0.10.6/src/core/libs";
+  const denodexWasmDir = "dist/esm/lucid/src/core/libs";
+
+  const wasmFiles = [
+    "cardano_multiplatform_lib/cardano_multiplatform_lib_bg.wasm",
+    "cardano_message_signing/cardano_message_signing_bg.wasm",
+  ];
+
+  for (const file of wasmFiles) {
+    const lucidWasmUrl = `${lucidWasmDir}/${file}`;
+    const denodexWasmPath = `${denodexWasmDir}/${file}`;
+
+    const response = await fetch(lucidWasmUrl);
+    const wasm = await response.arrayBuffer();
+
+    await Deno.writeFile(denodexWasmPath, new Uint8Array(wasm));
+  }
+}
+
+await downloadAndCopyWasmFiles();
