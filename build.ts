@@ -33,14 +33,14 @@ Deno.copyFileSync("README.md", "dist/README.md");
 
 // Copy WebAssembly
 
-// Deno.copyFileSync(
-//   "../lucid/src/core/libs/cardano_multiplatform_lib/cardano_multiplatform_lib_bg.wasm",
-//   "dist/esm/lucid/src/core/libs/cardano_multiplatform_lib/cardano_multiplatform_lib_bg.wasm",
-// );
-// Deno.copyFileSync(
-//   "../lucid/src/core/libs/cardano_message_signing/cardano_message_signing_bg.wasm",
-//   "dist/esm/lucid/src/core/libs/cardano_message_signing/cardano_message_signing_bg.wasm",
-// );
+Deno.copyFileSync(
+  "../lucid/src/core/libs/cardano_multiplatform_lib/cardano_multiplatform_lib_bg.wasm",
+  "dist/esm/lucid/src/core/libs/cardano_multiplatform_lib/cardano_multiplatform_lib_bg.wasm",
+);
+Deno.copyFileSync(
+  "../lucid/src/core/libs/cardano_message_signing/cardano_message_signing_bg.wasm",
+  "dist/esm/lucid/src/core/libs/cardano_message_signing/cardano_message_signing_bg.wasm",
+);
 
 // //** Web ES Module */
 
