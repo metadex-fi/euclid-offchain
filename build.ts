@@ -27,7 +27,7 @@ await dnt.build({
   },
 });
 
-Deno.copyFileSync("LICENSE", "dist/LICENSE");
+// Deno.copyFileSync("LICENSE", "dist/LICENSE");
 Deno.copyFileSync("README.md", "dist/README.md");
 
 // Copy WebAssembly
