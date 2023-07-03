@@ -29,9 +29,3 @@ await dnt.build({
 
 // Deno.copyFileSync("LICENSE", "dist/LICENSE");
 Deno.copyFileSync("README.md", "dist/README.md");
-
-// Optional: Additional build steps specific to Denodex
-
-/** Add necessary global import statements to NPM ES Module. */
-const coreFile = `${Deno.readTextFileSync("./dist/esm/src/core/core.js")}`;
-Deno.writeTextFileSync("./dist/esm/src/core/core.js", coreFile);
