@@ -12,4 +12,6 @@ jobs:
       - uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
+      - run: npm set registry "https://npm.pkg.github.com"
+      - run: npm set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
       - run: deno task publish
