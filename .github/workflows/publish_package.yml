@@ -9,13 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       # Setup .npmrc file to publish to GitHub Packages
-      - uses: actions/setup-node@v3
+      - uses: denoland/setup-deno@v1
         with:
-          node-version: '16.x'
-          registry-url: 'https://npm.pkg.github.com'
-          # Defaults to the user or organization that owns the workflow file
-          scope: '@metadex-fi'
-      - run: npm ci
-      - run: npm publish
+          deno-version: v1.x
+      - run: deno publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
