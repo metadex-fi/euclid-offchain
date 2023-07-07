@@ -31,7 +31,7 @@ export class Token {
 
   static fromLucid(hexTokenName: string): Token {
     // try {
-      return new Token(Lucid.toText(hexTokenName));
+    return new Token(Lucid.toText(hexTokenName));
     // } catch (e) {
     //   throw new Error(`Token.fromLucid ${hexTokenName}:\n${e}`);
     // }

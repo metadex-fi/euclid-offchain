@@ -34,7 +34,7 @@ export class EuclidState {
   public get listPools(): Pool[] {
     return [...this.pools.values()].flatMap((p) => [...p.values()]);
   }
-  
+
   constructor(
     utxos: Lucid.UTxO[],
     policy: Currency,
@@ -128,7 +128,6 @@ export class EuclidState {
       }
       this.pools.set(owner, parsedOwnerPools);
       this.invalidPools.set(owner, invalidOwnerPools);
-
     });
   }
 
@@ -141,7 +140,8 @@ export class EuclidState {
     }).flatMap((pool) => pool.weightedPrices);
     const [priceSum, valueSum] = diracPrices.reduce(
       ([priceSum, valueSum], dp) => {
-        const price = dp.pricesA1.get(numerator)! / dp.pricesA1.get(denominator)!;
+        const price = dp.pricesA1.get(numerator)! /
+          dp.pricesA1.get(denominator)!;
         const value = dp.valueA1;
         return [priceSum + price * value, valueSum + value];
       },

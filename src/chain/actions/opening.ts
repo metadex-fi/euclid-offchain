@@ -217,6 +217,5 @@ export class Opening {
     const maxTicks = Math.floor(jumpLog / anchorLog);
     if (isFinite(maxTicks)) return BigInt(maxTicks);
     else return maxInteger;
-    
   };
 }

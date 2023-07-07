@@ -9,17 +9,19 @@ import { f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
 
 export class PList<PElem extends PData>
   implements PType<PConstanted<PElem>[], PLifted<PElem>[]> {
-  public readonly population: number;
+  public readonly population: bigint | undefined;
 
   constructor(
     public readonly pelem: PElem,
     public readonly length?: bigint,
   ) {
     assert(!length || length >= 0, "negative length");
-    if (!length || length === 0n) this.population = 1; // worst case, consider preventing this by setting minimum size
-    else this.population = pelem.population ** Number(length);
+    if (!length || length === 0n) this.population = 1n; // worst case, consider preventing this by setting minimum size
+    else {this.population = pelem.population
+        ? pelem.population ** length
+        : undefined;}
     assert(
-      this.population > 0,
+      !this.population || this.population > 0,
       `Population not positive in ${this.showPType()}`,
     );
   }

@@ -3,7 +3,7 @@ import { genNumber, maxInteger } from "../../../../utils/generators.ts";
 import { PType } from "../type.ts";
 
 export class PInteger implements PType<bigint, bigint> {
-  public readonly population = Number(maxInteger) * 2 + 1;
+  public readonly population = maxInteger * 2n + 1n;
 
   public plift = (i: bigint): bigint => {
     assert(

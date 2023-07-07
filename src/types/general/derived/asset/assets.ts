@@ -96,7 +96,7 @@ export class Assets {
     const ccy = [...this.assets.keys()].sort()[0];
     const tkn = this.assets.get(ccy)!.slice(0).sort()[0];
     return new Asset(ccy, tkn);
-  };
+  }
 
   public get tail(): Assets {
     assert(this.assets.size > 0, "empty assets tell no tails");
@@ -116,7 +116,7 @@ export class Assets {
     const tail_ = new Assets(tail);
     assert(tail_.add(this.head).equals(this), "tail is not tail");
     return tail_;
-  };
+  }
 
   public randomChoice = (): Asset => {
     const ccy = randomChoice([...this.assets.keys()]);

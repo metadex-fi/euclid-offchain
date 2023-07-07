@@ -4,7 +4,7 @@ import { f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
 
 export class PConstraint<PInner extends PData>
   implements PType<PConstanted<PInner>, PLifted<PInner>> {
-  public population: number;
+  public population: bigint | undefined;
 
   constructor(
     public pinner: PInner,
@@ -14,7 +14,7 @@ export class PConstraint<PInner extends PData>
   ) {
     this.population = pinner.population;
     assert(
-      this.population > 0,
+      !this.population || this.population > 0,
       `Population not positive in ${this.showPType()}`,
     );
   }
@@ -33,7 +33,9 @@ export class PConstraint<PInner extends PData>
         assertion(data);
       } catch (e) {
         throw new Error(
-          `Assertion failed in pconstant: ${(e as Error).message} of ${this.showPType()}`,
+          `Assertion failed in pconstant: ${
+            (e as Error).message
+          } of ${this.showPType()}`,
         );
       }
     });

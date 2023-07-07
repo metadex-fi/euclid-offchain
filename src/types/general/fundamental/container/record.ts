@@ -20,19 +20,23 @@ import {
 export class PRecord<PFields extends PData>
   implements
     PType<Lucid.Constr<PConstanted<PFields>>, RecordOfMaybe<PLifted<PFields>>> {
-  public readonly population: number;
+  public readonly population: bigint | undefined;
   private index = 0; // for sum types
 
   constructor(
     public readonly pfields: RecordOfMaybe<PFields>,
   ) {
-    let population = 1;
+    let population: bigint | undefined = 1n;
     Object.values(pfields).forEach((pfield) => {
-      if (pfield) population *= pfield.population;
+      if (pfield) {
+        population = pfield.population && population
+          ? population * pfield.population
+          : undefined;
+      }
     });
     this.population = population;
     assert(
-      this.population > 0,
+      !this.population || this.population > 0,
       `Population not positive in ${this.showPType()}`,
     );
   }

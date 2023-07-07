@@ -6,7 +6,7 @@ import { filterFunctions } from "./object.ts";
 // like PObject, but only one field in the PRecord.
 // Purpose is removing the extra Arrays around pconstanted wrappers.
 export class PWrapped<O extends Object> implements PType<Data, O> {
-  population: number;
+  population: bigint | undefined;
 
   constructor(
     public readonly pinner: PData,
@@ -14,7 +14,7 @@ export class PWrapped<O extends Object> implements PType<Data, O> {
   ) {
     this.population = pinner.population;
     assert(
-      this.population > 0,
+      !this.population || this.population > 0,
       `Population not positive in ${this.showPType()}`,
     );
   }

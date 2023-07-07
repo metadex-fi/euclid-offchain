@@ -22,7 +22,7 @@ export class PByteString implements PType<Uint8Array, Uint8Array> {
       maxBytes >= minBytes,
       `PByteString: maxBytes must be greater than or equal to minBytes, got ${maxBytes} < ${minBytes}`,
     );
-    this.population = maxBytes ? Infinity : 1; // NOTE inaccurate, but serves, and quickly
+    this.population = maxBytes ? undefined : 1n; // NOTE inaccurate, but serves, and quickly
   }
 
   public plift = (s: Uint8Array): Uint8Array => {

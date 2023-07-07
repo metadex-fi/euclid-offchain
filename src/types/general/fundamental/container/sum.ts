@@ -12,7 +12,7 @@ import { PInteger } from "../primitive/integer.ts";
 import { PByteString } from "../primitive/bytestring.ts";
 
 export class PSum<Os extends Object> implements PType<Lucid.Constr<Data>, Os> {
-  public readonly population;
+  public readonly population: bigint | undefined;
   constructor(
     public readonly pconstrs: Array<Os extends Object ? PObject<Os> : never>,
   ) {
@@ -25,8 +25,9 @@ export class PSum<Os extends Object> implements PType<Lucid.Constr<Data>, Os> {
       `PSum: expected all pconstrs to be PObjects`,
     );
     this.population = pconstrs.reduce(
-      (acc, pconstr) => acc + pconstr.population,
-      0,
+      (acc: bigint | undefined, pconstr) =>
+        pconstr.population && acc ? acc + pconstr.population : undefined,
+      0n,
     );
     pconstrs.forEach((pconstr, i) => {
       pconstr.setIndex(i);

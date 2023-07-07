@@ -23,7 +23,7 @@ export class PBounded extends PConstraint<PInteger> {
       newGenInRange(lowerBound, upperBound),
       `PBounded(${lowerBound}, ${upperBound})`,
     );
-    this.population = Number(upperBound - lowerBound) + 1;
+    this.population = upperBound - lowerBound + 1n;
   }
 
   static genPType(): PConstraint<PInteger> {

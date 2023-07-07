@@ -6,7 +6,7 @@ export type PMaybeLiteral<T extends PData> = T | PLiteral<T>;
 
 export class PLiteral<PT extends PData>
   implements PType<PConstanted<PT>, PLifted<PT>> {
-  public population = 1;
+  public population = 1n;
   private plutusLiteral: PConstanted<PT>;
   private str: string;
   constructor(

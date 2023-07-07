@@ -159,7 +159,10 @@ export class Pool {
     const weights = this.paramUtxo.param.weights.unsigned;
     const virtual = this.paramUtxo.param.virtual.unsigned;
     return this.diracUtxos.map((d) => {
-      const pricesA0 = Value.hadamard(Value.normedAdd(d.balance.ofAssets(assets).unsigned, virtual), weights);
+      const pricesA0 = Value.hadamard(
+        Value.normedAdd(d.balance.ofAssets(assets).unsigned, virtual),
+        weights,
+      );
       const pricesA1 = new AssocMap<Asset, number>((a) => a.concise());
       const priceA0_1 = Number(pricesA0.amountOf(a1));
       let valueA1 = 0;
@@ -171,7 +174,7 @@ export class Pool {
       return {
         pricesA1: pricesA1,
         valueA1: valueA1,
-      }
+      };
     });
   }
 

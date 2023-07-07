@@ -9,7 +9,7 @@ import { f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
 
 export class PEnum<PT extends PData>
   implements PType<PConstanted<PT>, PLifted<PT>> {
-  public population;
+  public population: bigint | undefined;
   private plutusLiterals: PConstanted<PT>[];
   private strs: string[];
   constructor(
@@ -26,7 +26,7 @@ export class PEnum<PT extends PData>
       assert(!this.strs.includes(str), `PEnum: Duplicate literal: ${str}`);
       this.strs.push(str);
     });
-    this.population = literals.length;
+    this.population = BigInt(literals.length);
   }
 
   public plift = (l: PConstanted<PT>): PLifted<PT> => {

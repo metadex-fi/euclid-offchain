@@ -4,13 +4,14 @@ import {
   genNonNegative,
   gMaxLength,
   maybeNdef,
+  min,
 } from "../../../../utils/generators.ts";
 import { maxShowDepth } from "../../../../utils/proptests.ts";
 import { Data, f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
 import { PList } from "./list.ts";
 
-function census(numKeys: number, numValues: number, size: bigint): number {
-  let population = 1;
+function census(numKeys: bigint, numValues: bigint, size: bigint): bigint {
+  let population = 1n;
   let remaining = numKeys;
   for (let i = 0; i < size; i++) {
     population *= numValues * remaining--;
@@ -144,7 +145,7 @@ export class PMap<PKey extends PData, PValue extends PData> implements
     Map<PConstanted<PKey>, PConstanted<PValue>>,
     AssocMap<PLifted<PKey>, PLifted<PValue>>
   > {
-  public readonly population: number;
+  public readonly population: bigint | undefined;
 
   constructor(
     public readonly pkey: PKey,
@@ -161,16 +162,20 @@ export class PMap<PKey extends PData, PValue extends PData> implements
       } else {
         this.size = length;
       }
-      this.population = pvalue.population ** keys.length; //if keys given, their ordering is fixed
+      this.population = pvalue.population
+        ? pvalue.population ** length
+        : undefined; //if keys given, their ordering is fixed
     } else if (size) {
       assert(
-        Number(size) <= pkey.population,
+        !pkey.population || size <= pkey.population,
         `PMap: not enough keys for size ${size} in\n${pkey.showPType()}`,
       );
-      this.population = census(pkey.population, pvalue.population, size); // if keys not given, their ordering matters
-    } else this.population = 1; // worst case, consider preventing this by setting minimum size, or using undefined
+      this.population = pkey.population && pvalue.population
+        ? census(pkey.population, pvalue.population, size)
+        : undefined; // if keys not given, their ordering matters
+    } else this.population = 1n; // worst case, consider preventing this by setting minimum size, or using undefined
     assert(
-      this.population > 0,
+      !this.population || this.population > 0,
       `Population not positive in ${this.showPType()}`,
     );
   }
@@ -272,13 +277,13 @@ ${t}pkey: ${pkey.showPType(t)}`,
     const maxKeys = pkey.population;
     if (size) {
       assert(
-        size <= maxKeys,
+        !maxKeys || size <= maxKeys,
         `PMap.genKeys: size too big: ${Number(size)} vs. ${maxKeys}`,
       );
       while (keys.length < size) genKey();
     } else {
       const size_ = genNonNegative(
-        BigInt(Math.min(Number(gMaxLength), maxKeys)),
+        maxKeys ? min(gMaxLength, maxKeys) : gMaxLength,
       );
       for (let i = 0; i < size_; i++) genKey();
     }
@@ -291,7 +296,7 @@ ${t}pkey: ${pkey.showPType(t)}`,
     size: bigint,
   ): AssocMap<PLifted<PKey>, PLifted<PValue>> {
     assert(
-      Number(size) <= pkey.population,
+      !pkey.population || size <= pkey.population,
       `PMap: not enough keys for size ${Number(size)} in ${pkey.showPType()}`,
     );
     const m = new AssocMap<PLifted<PKey>, PLifted<PValue>>(pkey.showData);
@@ -316,7 +321,7 @@ ${t}pkey: ${pkey.showPType(t)}`,
     } else {
       // console.log(`generating Data for ${this.showPType()}`);
       const size = this.size ? this.size : genNonNegative(
-        BigInt(Math.min(Number(gMaxLength), this.pkey.population)),
+        this.pkey.population ? min(gMaxLength, this.pkey.population) : gMaxLength,
       );
       // console.log(`generating Map with size: ${Number(size)}`);
       return PMap.genMap(this.pkey, this.pvalue, size);
@@ -382,7 +387,7 @@ ${tt})`;
     const size = maybeNdef(
       BigInt(
         keys?.length ??
-          genNonNegative(BigInt(Math.min(Number(gMaxLength), pkey.population))),
+          genNonNegative(pkey.population ? min(gMaxLength, pkey.population) : gMaxLength),
       ),
     );
 

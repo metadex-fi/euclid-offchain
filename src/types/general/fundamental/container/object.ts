@@ -12,14 +12,14 @@ export const filterFunctions = <O extends Object>(o: O) =>
   );
 
 export class PObject<O extends Object> implements PType<Lucid.Constr<Data>, O> {
-  public readonly population: number;
+  public readonly population: bigint | undefined;
   constructor(
     public readonly precord: PRecord<PData>,
     public readonly O: new (...args: Array<any>) => O,
   ) {
     this.population = precord.population;
     assert(
-      this.population > 0,
+      !this.population || this.population > 0,
       `Population not positive in ${this.showPType()}`,
     );
   }

@@ -23,7 +23,7 @@ export class PString implements PType<Uint8Array, string> {
       maxLength >= minLength,
       `PString: maxLength must be greater than or equal to minLength, got ${maxLength} < ${minLength}`,
     );
-    this.population = maxLength ? Infinity : 1; // NOTE inaccurate, but serves, and quickly
+    this.population = maxLength ? undefined : 1n; // NOTE inaccurate, but serves, and quickly
   }
 
   public plift = (s: Uint8Array): string => {

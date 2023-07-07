@@ -68,7 +68,7 @@ export type RecordOfMaybe<T> = Record<string, T | undefined>;
 // 1. Array maps to Array (via PList), Record (via PRecord) and Object (via PObject)
 // 2. Array (via PObject) and Constr (via PSum) map to Object
 export interface PType<D extends Data, L extends unknown> {
-  readonly population: number; // number because convenient Infinity type
+  readonly population: bigint | undefined; // undefined means infinite TODO better way?
   plift(data: D): L;
   pconstant(data: L): D;
   genData(): L;

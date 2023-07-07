@@ -108,9 +108,12 @@ function testSmallPopulation(ptype: PData, errors: Map<string, number>) {
   let consecutive = 0;
 
   try {
-    assert(ptype.population > 0, "population must be positive");
+    assert(
+      !ptype.population || ptype.population > 0,
+      "population must be positive",
+    );
 
-    while (popStrings.length < ptype.population) {
+    while (!ptype.population || popStrings.length < ptype.population) {
       const p = ptype.genData();
       const s = ptype.showData(p);
       if (!popStrings.includes(s)) {
@@ -132,6 +135,6 @@ function testSmallPopulation(ptype: PData, errors: Map<string, number>) {
 }
 
 function testPopulation(ptype: PData, errors: Map<string, number>) {
-  if (ptype.population > 20) return;
+  if (!ptype.population || ptype.population > 20) return;
   else testSmallPopulation(ptype, errors);
 }
