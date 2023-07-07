@@ -5,7 +5,7 @@ import { Lucid } from "../../lucid.mod.ts";
 import { PData } from "../types/general/fundamental/type.ts";
 
 export const maxInteger = BigInt(
-  Number.MAX_SAFE_INTEGER
+  Number.MAX_SAFE_INTEGER,
   // Math.floor(Math.sqrt(Number.MAX_SAFE_INTEGER)),
 );
 // export const maxInteger = 9000n; //// TODO better value, maybe look at chain/plutus max

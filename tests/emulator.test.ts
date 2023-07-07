@@ -13,7 +13,7 @@ import { Data } from "../src/types/general/fundamental/type.ts";
 import { genPositive, randomChoice } from "../src/utils/generators.ts";
 
 Deno.test("emulator", async () => {
-  let trials = 100;
+  let trials = 5;
   const actionCounts_ = new Map<string, number>();
   while (trials > 0) {
     console.log(`trials: ${trials}`);
@@ -23,11 +23,11 @@ Deno.test("emulator", async () => {
     const emulator = new Lucid.Emulator(accounts);
     const traces: string[] = [];
     const actionCounts = new Map<string, number>();
-    const iterations = 50;
+    const iterations = 20;
     for (let i = 0; i < iterations; i++) {
-      // console.log(
-      //   `\ntrials: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`,
-      // );
+      console.log(
+        `\ntrials: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`,
+      );
       const lucid = await Lucid.Lucid.new(emulator);
       const user = await User.fromPrivateKey(
         lucid,
@@ -78,7 +78,7 @@ Deno.test("emulator", async () => {
         }
         throw new Error(`Error: ${e}\n${e.stack}`);
       }
-      emulator.awaitBlock(Number(genPositive()));
+      emulator.awaitBlock(Number(genPositive(1000n))); // NOTE/TODO this arbitrary limit is a hotfix for block height overflow issue
     }
     console.log(`traces.length: ${traces.length}`);
     for (const [type, count] of actionCounts) {

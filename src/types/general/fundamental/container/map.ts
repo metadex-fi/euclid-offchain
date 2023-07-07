@@ -321,7 +321,9 @@ ${t}pkey: ${pkey.showPType(t)}`,
     } else {
       // console.log(`generating Data for ${this.showPType()}`);
       const size = this.size ? this.size : genNonNegative(
-        this.pkey.population ? min(gMaxLength, this.pkey.population) : gMaxLength,
+        this.pkey.population
+          ? min(gMaxLength, this.pkey.population)
+          : gMaxLength,
       );
       // console.log(`generating Map with size: ${Number(size)}`);
       return PMap.genMap(this.pkey, this.pvalue, size);
@@ -387,7 +389,9 @@ ${tt})`;
     const size = maybeNdef(
       BigInt(
         keys?.length ??
-          genNonNegative(pkey.population ? min(gMaxLength, pkey.population) : gMaxLength),
+          genNonNegative(
+            pkey.population ? min(gMaxLength, pkey.population) : gMaxLength,
+          ),
       ),
     );
 
