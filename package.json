@@ -1,4 +1,12 @@
 {
-  "name": "euclid-offchain",
-  "author": "Chris M. Hiatt"
+  "name": "@metadex-fi/euclid-offchain",
+  "author": "Chris M. Hiatt",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/metadex-fi/euclid-offchain.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
 }
