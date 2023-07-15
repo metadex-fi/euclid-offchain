@@ -163,15 +163,20 @@ ${tt})`;
   static weightBounds(jumpSize: bigint, virtual: bigint): [bigint, bigint] {
     // const vjs = virtual * jumpSize;
     const js1 = jumpSize + 1n;
-    const ceil = js1 % virtual ? 1n : 0n;
-    const minWeight = (js1 / virtual) + ceil;
-    const maxWeight = (maxInteger * js1) / (virtual * jumpSize + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
+    const jsv = jumpSize * virtual;
+    const ceil = js1 % jsv ? 1n : 0n;
+    const minWeight = (js1 / jsv) + ceil;
+    let maxWeight = (maxInteger * js1) / (jsv + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
+    maxWeight = min(maxWeight, maxSmallInteger); //gMaxJumpSize);
 
-    // TODO the fact that maxWeight <= maxSmallInteger appears to be a mere happy little accident here
     assert(
       minWeight <= maxWeight,
-      `minWeight (${minWeight}) must be <= maxWeight (${maxWeight})`,
+      `minWeight (${minWeight}) must be <= maxWeight (${maxWeight}); jumpSize: ${jumpSize}; virtual: ${virtual}`,
     );
+    assert(
+      maxWeight <= maxSmallInteger,
+      `maxWeight (${maxWeight}) must be <= maxSmallInteger (${maxSmallInteger}); jumpSize: ${jumpSize}; virtual: ${virtual}`,
+    )
     return [minWeight, maxWeight]; // TODO check that maxWeight >= minWeight (after adding maxSmallInteger)
   }
 
