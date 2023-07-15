@@ -10,18 +10,19 @@ import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
 import { PInteger } from "../general/fundamental/primitive/integer.ts";
 import { maxInteger, min } from "../../utils/generators.ts";
 import { Value } from "../general/derived/value/value.ts";
+import { maxSmallInteger, PSmallValue, SmallValue } from "./smallValue.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
 
 // export const minLiquidityJumpSize = 1n;//100n; // TODO/NOTE should never be less than 1n
-export const gMaxJumpSize = 100n;
+// export const gMaxJumpSize = 100n;
 
 export class Param {
   constructor(
     public readonly owner: KeyHash,
     public readonly virtual: EuclidValue, // NOTE need those to be nonzero for multiplicative ticks
-    public readonly weights: EuclidValue, // NOTE those are actually inverted
-    public readonly jumpSizes: EuclidValue,
+    public readonly weights: SmallValue, // NOTE those are actually inverted
+    public readonly jumpSizes: SmallValue,
     public readonly active: bigint,
   ) {
     Param.asserts(this);
@@ -135,7 +136,8 @@ ${tt})`;
     const virtuals = new PositiveValue();
 
     allAssets.forEach((asset) => {
-      const jumpSize = new PPositive(1n, gMaxJumpSize).genData();
+      // const jumpSize = new PPositive(1n, gMaxJumpSize).genData();
+      const jumpSize = new PPositive(1n, maxSmallInteger).genData();
       const virtual = new PPositive().genData();
 
       const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual);
@@ -149,8 +151,8 @@ ${tt})`;
     return new Param(
       owner,
       new EuclidValue(virtuals),
-      new EuclidValue(weights),
-      new EuclidValue(jumpSizes),
+      new SmallValue(new EuclidValue(weights)),
+      new SmallValue(new EuclidValue(jumpSizes)),
       1n, // TODO include active-status in testing
     );
   }
@@ -165,7 +167,12 @@ ${tt})`;
     const minWeight = (js1 / virtual) + ceil;
     const maxWeight = (maxInteger * js1) / (virtual * jumpSize + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
 
-    return [minWeight, maxWeight];
+    // TODO the fact that maxWeight <= maxSmallInteger appears to be a mere happy little accident here
+    assert(
+      minWeight <= maxWeight,
+      `minWeight (${minWeight}) must be <= maxWeight (${maxWeight})`,
+    );
+    return [minWeight, maxWeight]; // TODO check that maxWeight >= minWeight (after adding maxSmallInteger)
   }
 
   // => virtual >= (jumpSize + 1n) / (weight * jumpSize)
@@ -191,9 +198,9 @@ ${tt})`;
     let maxJumpSize = vw > maxInteger
       ? min(
         maxInteger / (vw - maxInteger),
-        gMaxJumpSize,
+        maxSmallInteger, //gMaxJumpSize,
       )
-      : gMaxJumpSize;
+      : maxSmallInteger; //gMaxJumpSize;
     maxJumpSize = min(maxJumpSize, vw - 1n);
     // console.log("maxJumpSize", maxJumpSize.toString());
     return [minJumpSize, maxJumpSize];
@@ -206,8 +213,8 @@ export class PParam extends PObject<Param> {
       new PRecord({
         owner: PKeyHash.ptype,
         virtual: PEuclidValue.ptype,
-        weights: PEuclidValue.ptype,
-        jumpSizes: PEuclidValue.ptype,
+        weights: PSmallValue.ptype,
+        jumpSizes: PSmallValue.ptype,
         active: PInteger.ptype,
       }),
       Param,

@@ -8,6 +8,7 @@ import {
 import { PEuclidValue } from "../src/types/euclid/euclidValue.ts";
 import { PIdNFT } from "../src/types/euclid/idnft.ts";
 import { PParam } from "../src/types/euclid/param.ts";
+import { PSmallValue } from "../src/types/euclid/smallValue.ts";
 import { PSwap } from "../src/types/euclid/swap.ts";
 import { PAsset } from "../src/types/general/derived/asset/asset.ts";
 import { PAssets } from "../src/types/general/derived/asset/assets.ts";
@@ -92,6 +93,7 @@ const euclidPrimitiveGenerators = [
   PBoughtSold.genPType,
   PSwap.genPType,
   PEuclidValue.genPType,
+  PSmallValue.genPType,
   PIdNFT.genPType,
   PParam.genPType,
   PPreDirac.genPType,
