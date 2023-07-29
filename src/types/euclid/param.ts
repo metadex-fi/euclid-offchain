@@ -138,7 +138,11 @@ ${tt})`;
     allAssets.forEach((asset) => {
       // const jumpSize = new PPositive(1n, gMaxJumpSize).genData();
       const jumpSize = new PPositive(1n, maxSmallInteger).genData();
-      const virtual = new PPositive().genData();
+      const js1 = jumpSize + 1n;
+      const ceil = js1 % maxSmallInteger ? 1n : 0n;
+      const virtual = new PPositive(
+        (js1 / maxSmallInteger) + ceil,
+      ).genData();
 
       const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual);
       const weight = new PPositive(minWeight, maxWeight).genData();
@@ -164,8 +168,8 @@ ${tt})`;
     // const vjs = virtual * jumpSize;
     const js1 = jumpSize + 1n;
     const jsv = jumpSize * virtual;
-    const ceil = js1 % jsv ? 1n : 0n;
-    const minWeight = (js1 / jsv) + ceil;
+    const ceil = js1 % virtual ? 1n : 0n;
+    const minWeight = (js1 / virtual) + ceil;
     let maxWeight = (maxInteger * js1) / (jsv + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
     maxWeight = min(maxWeight, maxSmallInteger); //gMaxJumpSize);
 
@@ -173,10 +177,10 @@ ${tt})`;
       minWeight <= maxWeight,
       `minWeight (${minWeight}) must be <= maxWeight (${maxWeight}); jumpSize: ${jumpSize}; virtual: ${virtual}`,
     );
-    assert(
-      maxWeight <= maxSmallInteger,
-      `maxWeight (${maxWeight}) must be <= maxSmallInteger (${maxSmallInteger}); jumpSize: ${jumpSize}; virtual: ${virtual}`,
-    )
+    // assert(
+    //   maxWeight <= maxSmallInteger,
+    //   `maxWeight (${maxWeight}) must be <= maxSmallInteger (${maxSmallInteger}); jumpSize: ${jumpSize}; virtual: ${virtual}`,
+    // )
     return [minWeight, maxWeight]; // TODO check that maxWeight >= minWeight (after adding maxSmallInteger)
   }
 
@@ -189,6 +193,11 @@ ${tt})`;
     const ceil = js1 % weight ? 1n : 0n;
     const minVirtual = (js1 / weight) + ceil;
     const maxVirtual = (maxInteger * js1) / (weight * jumpSize); // + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
+
+    assert(
+      minVirtual <= maxVirtual,
+      `minVirtual (${minVirtual}) must be <= maxVirtual (${maxVirtual}); jumpSize: ${jumpSize}; weight: ${weight}`,
+    );
 
     return [minVirtual, maxVirtual];
   }
@@ -207,7 +216,10 @@ ${tt})`;
       )
       : maxSmallInteger; //gMaxJumpSize;
     maxJumpSize = min(maxJumpSize, vw - 1n);
-    // console.log("maxJumpSize", maxJumpSize.toString());
+    assert(
+      minJumpSize <= maxJumpSize, 
+      `minJumpSize (${minJumpSize}) must be <= maxJumpSize ${maxJumpSize}; virtual: ${virtual}; weight: ${weight}`,
+    );
     return [minJumpSize, maxJumpSize];
   }
 }

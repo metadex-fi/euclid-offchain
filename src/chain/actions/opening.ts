@@ -225,6 +225,7 @@ export class Opening {
     console.log(`anchorLog: ${anchorLog}`);
     console.log(`${jumpLog / anchorLog}`);
     const maxTicks = Math.floor(jumpLog / anchorLog);
+    assert(maxTicks > 0, `maxTicks must be > 0, but got ${maxTicks}`)
     if (isFinite(maxTicks)) return BigInt(maxTicks);
     else return maxInteger;
   };
