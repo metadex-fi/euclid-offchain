@@ -14,7 +14,7 @@ import { Assets } from "../types/general/derived/asset/assets.ts";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { Value } from "../types/general/derived/value/value.ts";
 import { Data, f, PConstanted, t } from "../types/general/fundamental/type.ts";
-import { maxInteger, min } from "../utils/generators.ts";
+import { min } from "../utils/generators.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { Contract } from "./contract.ts";
 import { User } from "./user.ts";
