@@ -9,8 +9,6 @@ import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { Action, UserAction } from "./actions/action.ts";
 
 import { Contract } from "./contract.ts";
-import { Swapping } from "./actions/swapping.ts";
-import { AssocMap } from "../types/general/fundamental/container/map.ts";
 
 const forFeesEtc = PositiveValue.singleton(
   Asset.ADA,

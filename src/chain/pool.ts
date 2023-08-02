@@ -13,7 +13,6 @@ import { ParamDatum, PPreEuclidDatum } from "../types/euclid/euclidDatum.ts";
 import { Value } from "../types/general/derived/value/value.ts";
 import { Asset } from "../types/general/derived/asset/asset.ts";
 import { Assets } from "../types/general/derived/asset/assets.ts";
-import { EuclidValue } from "../mod.ts";
 
 export class PrePool {
   public paramUtxo?: ParamUtxo;
