@@ -36,21 +36,10 @@ export const utxoToCML = (utxo: Lucid.UTxO): TransactionUnspentOutput => {
   return TransactionUnspentOutput.new(txin, txout);
 };
 
-export const utxosToCML = (
-  utxos: Lucid.UTxO[], 
-  mempoolUtxos: {
-    txHash: string;
-    outputIndex: number;
-  }[] 
-  ): TransactionUnspentOutputs => {
+export const utxosToCML = (utxos: Lucid.UTxO[]): TransactionUnspentOutputs => {
     const utxos_ = TransactionUnspentOutputs.new();
     utxos.forEach((utxo) => {
-      const i = mempoolUtxos.findIndex((mUtxo) => 
-      mUtxo.txHash === utxo.txHash && mUtxo.outputIndex === utxo.outputIndex
-      );
-      if (i === -1) {
-        utxos_.add(utxoToCML(utxo));
-      }
+      utxos_.add(utxoToCML(utxo));
     });
     return utxos_;
 }
