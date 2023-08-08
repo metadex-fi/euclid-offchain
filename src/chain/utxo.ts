@@ -124,7 +124,7 @@ export class DiracUtxo {
     public readonly peuclidDatum: PEuclidDatum,
     public readonly dirac: Dirac,
     public readonly balance: PositiveValue,
-    public readonly utxo?: Lucid.UTxO, //exists when reading, not when creating
+    public utxo?: Lucid.UTxO, //exists when reading, not when creating. Not readonly because subesequent-swappings needs to set it. TODO more safety here
   ) {}
 
   static parse(

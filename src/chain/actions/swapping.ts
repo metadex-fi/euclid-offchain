@@ -65,8 +65,10 @@ export class Swapping {
 )`;
   };
 
-  public tx = (tx: Lucid.Tx): Lucid.Tx => {
+  // TODO set subsequent's diracUtxo's utxo to the one resulting from this tx
+  public tx = async (tx: Lucid.Tx): Promise<Lucid.Tx> => {
     console.log(this.show());
+    assert(this.diracUtxo.utxo, `diracUtxo.utxo must be defined - subsequents-issue?`)
     const funds = this.diracUtxo.balance.clone; // TODO cloning probably not required here
     funds.addAmountOf(this.boughtAsset, -this.boughtAmount);
     funds.addAmountOf(this.soldAsset, this.soldAmount);
@@ -90,7 +92,7 @@ export class Swapping {
       new DiracDatum(this.diracUtxo.dirac),
     );
 
-    return tx
+    const tx_ = tx
       .readFrom([this.paramUtxo.utxo!])
       .collectFrom(
         [this.diracUtxo.utxo!],
@@ -103,6 +105,28 @@ export class Swapping {
         },
         retour,
       );
+
+    if (this.subsequent) {
+      const txComplete = await tx_.complete();
+      const txBody = txComplete.txComplete.body();
+      const txOuts = txBody.outputs();
+      const txHash = Lucid.C.hash_transaction(txBody);
+      for (let i = 0; i < txOuts.len(); i++) {
+        const txOut = txOuts.get(i);
+        const addr = txOut.address().to_bech32(undefined);
+        if (addr !== this.user!.contract.address) continue;
+        const txIn = Lucid.C.TransactionInput.new(
+          txHash,
+          Lucid.C.BigNum.from_str(i.toString()),
+        );
+        const utxo = Lucid.C.TransactionUnspentOutput.new(txIn, txOut);
+        const utxo_ = Lucid.coreToUtxo(utxo);
+        this.subsequent.diracUtxo.utxo = utxo_;
+        break;
+      }
+    }
+
+    return tx_;
   };
 
   public subsequents = (maxSubsequents?: number): Swapping[] => {

@@ -51,7 +51,7 @@ Deno.test("emulator", async () => {
               actions.map(async (action) => {
                 const type = action.type;
                 actionCounts.set(type, (actionCounts.get(type) ?? 0) + 1);
-                const tx = action.tx(user.lucid.newTx());
+                const tx = await action.tx(user.lucid.newTx());
                 // console.log(tx);
                 return await tx
                   .complete()
