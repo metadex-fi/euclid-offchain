@@ -440,12 +440,14 @@ export class DiracUtxo {
         // TODO FIXME
         if (
           Swapping.validates(
+            expBuying,
+            expSelling,
             spotBuying,
             spotSelling,
-            // this.dirac.anchorPrices.amountOf(buyingAsset),
-            // this.dirac.anchorPrices.amountOf(sellingAsset),
-            // param.jumpSizes.amountOf(buyingAsset),
-            // param.jumpSizes.amountOf(sellingAsset),
+            this.dirac.anchorPrices.amountOf(buyingAsset),
+            this.dirac.anchorPrices.amountOf(sellingAsset),
+            param.jumpSizes.amountOf(buyingAsset),
+            param.jumpSizes.amountOf(sellingAsset),
             param.weights.amountOf(buyingAsset),
             param.weights.amountOf(sellingAsset),
             liquidity_.amountOf(buyingAsset),

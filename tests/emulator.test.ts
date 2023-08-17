@@ -13,7 +13,7 @@ import { Data } from "../src/types/general/fundamental/type.ts";
 import { genPositive, randomChoice } from "../src/utils/generators.ts";
 
 Deno.test("emulator", async () => {
-  let trials = 5;
+  let trials = 20;
   const actionCounts_ = new Map<string, number>();
   while (trials > 0) {
     console.log(`trials: ${trials}`);
@@ -51,7 +51,7 @@ Deno.test("emulator", async () => {
               actions.map(async (action) => {
                 const type = action.type;
                 actionCounts.set(type, (actionCounts.get(type) ?? 0) + 1);
-                const tx = await action.tx(user.lucid.newTx());
+                const tx = action.tx(user.lucid.newTx());
                 // console.log(tx);
                 return await tx
                   .complete()

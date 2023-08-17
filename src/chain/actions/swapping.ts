@@ -66,7 +66,7 @@ export class Swapping {
   };
 
   // TODO set subsequent's diracUtxo's utxo to the one resulting from this tx
-  public tx = async (tx: Lucid.Tx): Promise<Lucid.Tx> => {
+  public tx = (tx: Lucid.Tx): Lucid.Tx => {
     console.log(this.show());
     assert(this.diracUtxo.utxo, `diracUtxo.utxo must be defined - subsequents-issue?`)
     const funds = this.diracUtxo.balance.clone; // TODO cloning probably not required here
@@ -106,15 +106,20 @@ export class Swapping {
         retour,
       );
 
-    if (this.subsequent) {
-      const txComplete = await tx_.complete();
-      const txBody = txComplete.txComplete.body();
-      const txOuts = txBody.outputs();
+    return tx_;
+  };
+
+  public setSubsequentUtxo = (txBody: Lucid.C.TransactionBody) => {
+    if (this.subsequent) {// TODO this is wrong, as it empties the tasks
       const txHash = Lucid.C.hash_transaction(txBody);
+      const txOuts = txBody.outputs();
+      console.log(`dirac's address: ${this.diracUtxo.utxo!.address}`)
       for (let i = 0; i < txOuts.len(); i++) {
         const txOut = txOuts.get(i);
         const addr = txOut.address().to_bech32(undefined);
-        if (addr !== this.user!.contract.address) continue;
+        console.log(`\t${addr} ?`)
+        if (addr !== this.diracUtxo.utxo!.address) continue;
+        console.log(`\tmatches.`)
         const txIn = Lucid.C.TransactionInput.new(
           txHash,
           Lucid.C.BigNum.from_str(i.toString()),
@@ -124,10 +129,11 @@ export class Swapping {
         this.subsequent.diracUtxo.utxo = utxo_;
         break;
       }
+      assert(this.subsequent.diracUtxo.utxo, `failed to set subsequent's diracUtxo's utxo`);
+    } else {
+      console.log(`no subsequent`);
     }
-
-    return tx_;
-  };
+  }
 
   public subsequents = (maxSubsequents?: number): Swapping[] => {
     const swappings: Swapping[] = [this];
@@ -306,6 +312,24 @@ export class Swapping {
   //   return fitBuying && fitSelling;
   // }
 
+  private static exponentsYieldPrice(
+    anchor: bigint,
+    js: bigint,
+    exp: bigint,
+    spot: bigint,
+    buySell: string,
+  ): boolean {
+    const spot_ = (anchor * ((js + 1n) ** exp)) / (js ** exp);
+    if (spot !== spot_) {
+      console.error(
+        `exponentsYieldPrice (${buySell}):
+        spot ${spot} != ${spot_} 
+        for anchor ${anchor}, js ${js}, exp ${exp}`,
+      );
+    }
+    return spot === spot_;
+  }
+
   private static boughtAssetForSale(
     spotBuying: bigint,
     spotSelling: bigint,
@@ -351,12 +375,14 @@ export class Swapping {
   }
 
   static validates(
+    expBuying: bigint,
+    expSelling: bigint,
     spotBuying: bigint,
     spotSelling: bigint,
-    // buyingLowest: bigint,
-    // sellingLowest: bigint,
-    // buyingJumpSize: bigint,
-    // sellingJumpSize: bigint,
+    anchorBuying: bigint,
+    anchorSelling: bigint,
+    jsBuying: bigint,
+    jsSelling: bigint,
     buyingWeight: bigint,
     sellingWeight: bigint,
     buyingLiquidity: bigint,
@@ -379,6 +405,20 @@ export class Swapping {
       //   buyingJumpSize,
       //   sellingJumpSize,
       // ) &&
+      Swapping.exponentsYieldPrice(
+        anchorBuying,
+        jsBuying,
+        expBuying,
+        spotBuying,
+        "buying",
+      ) &&       
+      Swapping.exponentsYieldPrice(
+        anchorSelling,
+        jsSelling,
+        expSelling,
+        spotSelling,
+        "selling",
+      ) &&
       Swapping.boughtAssetForSale(
         spotBuying,
         spotSelling,
@@ -399,6 +439,6 @@ export class Swapping {
         buyingAmount,
         sellingAmount,
       );
-    // TODO othersUnchanged
+    // TODO othersUnchanged - con: this is implicit
   }
 }
