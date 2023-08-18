@@ -8,7 +8,7 @@ import { PRecord } from "../general/fundamental/container/record.ts";
 import { f, t } from "../general/fundamental/type.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
 import { PInteger } from "../general/fundamental/primitive/integer.ts";
-import { maxInteger, min } from "../../utils/generators.ts";
+import { ceilDiv, maxInteger, min } from "../../utils/generators.ts";
 import { Value } from "../general/derived/value/value.ts";
 import { maxSmallInteger, PSmallValue, SmallValue } from "./smallValue.ts";
 
@@ -168,8 +168,7 @@ ${tt})`;
     // const vjs = virtual * jumpSize;
     const js1 = jumpSize + 1n;
     const jsv = jumpSize * virtual;
-    const ceil = js1 % virtual ? 1n : 0n;
-    const minWeight = (js1 / virtual) + ceil;
+    const minWeight = ceilDiv(js1, virtual);
     let maxWeight = (maxInteger * js1) / (jsv + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
     maxWeight = min(maxWeight, maxSmallInteger); //gMaxJumpSize);
 
@@ -190,8 +189,7 @@ ${tt})`;
   static virtualBounds(jumpSize: bigint, weight: bigint): [bigint, bigint] {
     // const wjs = weight * jumpSize;
     const js1 = jumpSize + 1n;
-    const ceil = js1 % weight ? 1n : 0n;
-    const minVirtual = (js1 / weight) + ceil;
+    const minVirtual = ceilDiv(js1, weight);
     const maxVirtual = (maxInteger * js1) / (weight * jumpSize); // + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
 
     assert(

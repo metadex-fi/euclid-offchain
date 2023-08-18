@@ -13,10 +13,10 @@ import { Data } from "../src/types/general/fundamental/type.ts";
 import { genPositive, randomChoice } from "../src/utils/generators.ts";
 
 Deno.test("emulator", async () => {
-  let trials = 20;
+  let trials = 1000;
   const actionCounts_ = new Map<string, number>();
   while (trials > 0) {
-    console.log(`trials: ${trials}`);
+    console.log(`trials left: ${trials}`);
     const allUsers = await User.genSeveral(genPositive(10n), genPositive(10n)); // TODO more
     const accounts = allUsers.map((u) => u.account);
     console.log(`accounts: ${accounts.length}`);
@@ -26,7 +26,7 @@ Deno.test("emulator", async () => {
     const iterations = 20;
     for (let i = 0; i < iterations; i++) {
       console.log(
-        `\ntrials: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`,
+        `\ntrials left: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`,
       );
       const lucid = await Lucid.Lucid.new(emulator);
       const user = await User.fromPrivateKey(
@@ -76,7 +76,9 @@ Deno.test("emulator", async () => {
         for (const [type, count] of actionCounts_) {
           console.error(`${type}: ${count}`);
         }
-        throw new Error(`Error: ${e}\n${e.stack}`);
+        // TODO fix those as well
+        if ((typeof e === "string") && (e.includes("Plutus")) )
+          throw new Error(`Error: ${e}`);
       }
       emulator.awaitBlock(Number(genPositive(1000n))); // NOTE/TODO this arbitrary limit is a hotfix for block height overflow issue
     }

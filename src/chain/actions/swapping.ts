@@ -220,7 +220,7 @@ export class Swapping {
     const maxBought = maxSwapA0 / this.soldSpot;
     assert(
       maxBought > 0n,
-      `Swapping.randomSubSwap: maxBought must be positive, but is ${maxBought} for ${this.show()}`,
+      `Swapping.randomSubSwap: maxBought must be positive, but is ${maxBought} (${maxSwapA0} / ${this.soldSpot}) for ${this.show()}`,
     );
     // assert(
     //   maxBought >= 0n,
@@ -342,14 +342,14 @@ export class Swapping {
     if (!fitsBuying) {
       console.error(
         `boughtAssetForSale (${oldNew}): 
-        buyingAmm ${buyingAmm} > 
+        buyingAmm  ${buyingAmm} > 
         spotBuying ${spotBuying}`,
       );
     }
     if (!fitsSelling) {
       console.error(
         `boughtAssetForSale (${oldNew}):
-        sellingAmm ${sellingAmm} > 
+        sellingAmm  ${sellingAmm} > 
         spotSelling ${spotSelling}`,
       );
     }
@@ -367,7 +367,7 @@ export class Swapping {
     if (addedBuyingA0 > addedSellingA0) {
       console.error(
         `valueEquation: 
-        addedBuyingA0 ${addedBuyingA0} > 
+        addedBuyingA0  ${addedBuyingA0} > 
         addedSellingA0 ${addedSellingA0}`,
       );
     }

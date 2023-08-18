@@ -53,6 +53,11 @@ export function abs(n: bigint): bigint {
   return n < 0n ? -n : n;
 }
 
+export function ceilDiv(a: bigint, b: bigint): bigint {
+  const bonus = a % b === 0n ? 0n : 1n;
+  return a / b + bonus;
+}
+
 export function randomChoice<T>(alternatives: T[]): T {
   return randomIndexedChoice(alternatives)[0];
 }

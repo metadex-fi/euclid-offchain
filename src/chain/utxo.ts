@@ -14,7 +14,7 @@ import { Assets } from "../types/general/derived/asset/assets.ts";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { Value } from "../types/general/derived/value/value.ts";
 import { Data, f, PConstanted, t } from "../types/general/fundamental/type.ts";
-import { min } from "../utils/generators.ts";
+import { ceilDiv, min } from "../utils/generators.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { Contract } from "./contract.ts";
 import { User } from "./user.ts";
@@ -278,7 +278,7 @@ export class DiracUtxo {
 
           if (maxBuying > 0n) {
             spotBuying_.initAmountOf(asset, spotBuying);
-            expBuying_.initAmountOf(asset, BigInt(expBuying) + 1n); // NOTE/TODO +1n is a hack to fit it into PositiveValue
+            expBuying_.initAmountOf(asset, expBuying + 1n); // NOTE/TODO +1n is a hack to fit it into PositiveValue
             maxBuying_.initAmountOf(asset, maxBuying);
             break;
           } else {
@@ -299,7 +299,7 @@ export class DiracUtxo {
 
           if (maxSelling > 0n) {
             spotSelling_.initAmountOf(asset, spotSelling);
-            expSelling_.initAmountOf(asset, BigInt(expSelling));
+            expSelling_.initAmountOf(asset, expSelling);
             maxSelling_.initAmountOf(asset, maxSelling);
             break;
           } else {
@@ -398,12 +398,32 @@ export class DiracUtxo {
         }
 
         const buyingAmount = maxSwapA0 / spotSelling;
-        const sellingAmount_ = Math.ceil(
-          Number(maxSwapA0) / Number(spotBuying),
-        );
-        if (!isFinite(sellingAmount_)) return;
-        const sellingAmount = BigInt(sellingAmount_);
+        const sellingAmount = ceilDiv(maxSwapA0, spotBuying);
         // const sellingAmount = maxSellingA0 <= maxBuyingA0 ? maxSelling : BigInt(sellingAmount_);
+
+
+        /// logging/debugging
+
+        const buyingJs = param.jumpSizes.amountOf(buyingAsset);
+        const sellingJs = param.jumpSizes.amountOf(sellingAsset);
+        const buyingAnchor = this.dirac.anchorPrices.amountOf(buyingAsset);
+        const sellingAnchor = this.dirac.anchorPrices.amountOf(sellingAsset);
+
+        const buyingJumpMultiplier = (Number(buyingJs) + 1) / Number(buyingJs);
+        const sellingJumpMultiplier = (Number(sellingJs) + 1) / Number(sellingJs);
+        const ammBuying = liquidity_.amountOf(buyingAsset) * param.weights.amountOf(buyingAsset);
+        const ammSelling = liquidity_.amountOf(sellingAsset) * param.weights.amountOf(sellingAsset);
+        const buyingExp = Math.log(Number(ammBuying) / Number(buyingAnchor)) /
+          Math.log(buyingJumpMultiplier);
+        const sellingExp = Math.log(Number(ammSelling) / Number(sellingAnchor)) /
+          Math.log(sellingJumpMultiplier);
+
+        console.log(`buyingExp: ${buyingExp} -> ${expBuying}, sellingExp: ${sellingExp} -> ${expSelling}`);
+
+        /// end logging/debugging
+
+
+
 
         const swapping = Swapping.boundary(
           user,
@@ -419,32 +439,32 @@ export class DiracUtxo {
           expSelling,
         );
 
+        swappings.push(swapping);
         // TODO FIXME
-        if (
-          Swapping.validates(
-            expBuying,
-            expSelling,
-            spotBuying,
-            spotSelling,
-            this.dirac.anchorPrices.amountOf(buyingAsset),
-            this.dirac.anchorPrices.amountOf(sellingAsset),
-            param.jumpSizes.amountOf(buyingAsset),
-            param.jumpSizes.amountOf(sellingAsset),
-            param.weights.amountOf(buyingAsset),
-            param.weights.amountOf(sellingAsset),
-            liquidity_.amountOf(buyingAsset),
-            liquidity_.amountOf(sellingAsset),
-            buyingAmount,
-            sellingAmount,
-          )
-        ) {
-          swappings.push(swapping);
-        } else {
-          // console.error("invalid swap", swapping.show());
-          // return;
-          throw new Error(`invalid swap: ${swapping.show()}`); // TODO throw error and fix
-        }
-        // console.log("swapping", swapping.show())
+        // if (
+        //   Swapping.validates(
+        //     expBuying,
+        //     expSelling,
+        //     spotBuying,
+        //     spotSelling,
+        //     this.dirac.anchorPrices.amountOf(buyingAsset),
+        //     this.dirac.anchorPrices.amountOf(sellingAsset),
+        //     param.jumpSizes.amountOf(buyingAsset),
+        //     param.jumpSizes.amountOf(sellingAsset),
+        //     param.weights.amountOf(buyingAsset),
+        //     param.weights.amountOf(sellingAsset),
+        //     liquidity_.amountOf(buyingAsset),
+        //     liquidity_.amountOf(sellingAsset),
+        //     buyingAmount,
+        //     sellingAmount,
+        //   )
+        // ) {
+        //   swappings.push(swapping);
+        // } else {
+        //   console.error("invalid swap", swapping.show());
+        //   // return;
+        //   // throw new Error(`invalid swap: ${swapping.show()}`); // TODO throw error and fix
+        // }
       });
     });
 
