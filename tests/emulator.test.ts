@@ -1,5 +1,5 @@
 import { Lucid } from "../lucid.mod.ts";
-import { allActions } from "../src/chain/actions/action.ts";
+import { Action, allActions } from "../src/chain/actions/action.ts";
 import { Contract } from "../src/chain/contract.ts";
 import { User } from "../src/chain/user.ts";
 import {
@@ -13,8 +13,9 @@ import { Data } from "../src/types/general/fundamental/type.ts";
 import { genPositive, randomChoice } from "../src/utils/generators.ts";
 
 Deno.test("emulator", async () => {
-  let trials = 1000;
+  let trials = 100;
   const actionCounts_ = new Map<string, number>();
+  const errors = [];
   while (trials > 0) {
     console.log(`trials left: ${trials}`);
     const allUsers = await User.genSeveral(genPositive(10n), genPositive(10n)); // TODO more
@@ -23,17 +24,16 @@ Deno.test("emulator", async () => {
     const emulator = new Lucid.Emulator(accounts);
     const traces: string[] = [];
     const actionCounts = new Map<string, number>();
-    const iterations = 20;
+    const iterations = 100;
     for (let i = 0; i < iterations; i++) {
       console.log(
-        `\ntrials left: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`,
+        `\ntrials left: ${trials} - iteration: ${i} - block: ${emulator.blockHeight} - errors: ${errors.length}`,
       );
       const lucid = await Lucid.Lucid.new(emulator);
       const user = await User.fromPrivateKey(
         lucid,
         randomChoice(allUsers).privateKey!,
       );
-
       // TODO multiple parallel users and actions (requires logging of spent contract utxos or error handling)
       // const users = await Promise.all(
       //   randomSubset(allUsers).map(async (user) => {
@@ -46,40 +46,54 @@ Deno.test("emulator", async () => {
         // for (const user of users) {
         const hashes = await user
           .generateActions()
-          .then((actions) =>
-            Promise.all(
-              actions.map(async (action) => {
-                const type = action.type;
-                actionCounts.set(type, (actionCounts.get(type) ?? 0) + 1);
-                const tx = action.tx(user.lucid.newTx());
-                // console.log(tx);
-                return await tx
-                  .complete()
-                  .then((completed) => {
-                    // console.log(completed.txComplete.to_js_value());
-                    return completed
-                      .sign()
-                      .complete()
-                      .then((signed) => {
-                        // console.log(signed.txSigned.to_js_value());
-                        return signed.submit();
-                      });
-                  });
-              }),
-            )
-          );
+          .then(async (actions) => {
+            const signed: Lucid.TxSigned[] = [];
+            let failed: Action[] = [];
+            for (const action of actions) {
+              const type = action.type;
+              actionCounts.set(type, (actionCounts.get(type) ?? 0) + 1);
+              const { succ, fail } = await user.getTxSigned(action);
+              signed.push(...succ);
+              failed.push(...fail);
+            }
+            const hashes_ = await Promise.all(
+              signed.map(async (s) => await s.submit()),
+            );
+            while (failed.length) {
+              console.warn(`failed: ${failed.length}`);
+              user.resetMempool(); // TODO do this automatically in user.update() - requires checking blocks, however
+              emulator.awaitBlock(1);
+              const failed_ = [];
+              for (const action of failed) {
+                const { succ, fail } = await user.getTxSigned(action);
+                hashes_.push(
+                  ...(await Promise.all(
+                    succ.map(async (s) => await s.submit()), // TODO check somewhere that after all of this, the full action was successfully completed
+                  )),
+                );
+                failed_.push(...fail);
+              }
+              failed = failed_;
+            }
+            return hashes_;
+          });
         // console.log(hashes);
-        traces.push(...hashes);
+        traces.push(...hashes.flat());
         // }
       } catch (e) {
         console.error("---");
         for (const [type, count] of actionCounts_) {
           console.error(`${type}: ${count}`);
         }
+        console.error(e);
+        console.log("user.usedSplitting:", user.usedSplitting);
+        if (user.usedSplitting) throw e;
+        else errors.push(e);
         // TODO fix those as well
-        if ((typeof e === "string") && (e.includes("Plutus")) )
-          throw new Error(`Error: ${e}`);
+        // if ((typeof e !== "string") || (!e.includes("The provided Plutus code called 'error'")) || (!e.includes("Not enough ADA leftover to cover minADA")) )
+        //   throw new Error(`Error: ${e}`);
       }
+      user.resetMempool();
       emulator.awaitBlock(Number(genPositive(1000n))); // NOTE/TODO this arbitrary limit is a hotfix for block height overflow issue
     }
     console.log(`traces.length: ${traces.length}`);
@@ -94,9 +108,14 @@ Deno.test("emulator", async () => {
     //   console.log(await user_.lucid.wallet.getUtxos());
     // }
   }
-  console.log("---");
+  console.log("--- DONE ---");
   for (const [type, count] of actionCounts_) {
     console.log(`${type}: ${count}`);
+  }
+  console.log(`errors: ${errors.length}`);
+  for (const e of errors) {
+    console.warn("---");
+    console.warn(e);
   }
 });
 

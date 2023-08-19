@@ -9,6 +9,7 @@ import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { Action, UserAction } from "./actions/action.ts";
 
 import { Contract } from "./contract.ts";
+import { utxosToCore } from "../utils/conversion.ts";
 
 const forFeesEtc = PositiveValue.singleton(
   Asset.ADA,
@@ -20,14 +21,23 @@ export class User {
   public readonly contract: Contract;
   public readonly paymentKeyHash: KeyHash;
   public balance?: PositiveValue;
-
+  public usedSplitting = false;
   private lastIdNFT?: IdNFT;
+  private lastTxHash?: string;
+
+  // for tx-chaining
+  public spentUtxos: {
+    txHash: string;
+    outputIndex: number;
+  }[] = [];
+  public pendingUtxos: Lucid.UTxO[] = [];
 
   private constructor(
     public readonly lucid: Lucid.Lucid,
     public readonly privateKey?: string, // for emulation
     public readonly address?: Lucid.Address,
     paymentKeyHash?: KeyHash,
+    private readonly userChaining = false, // whether the wallet supports chaining user-utxos
   ) {
     this.contract = new Contract(lucid);
     if (address) {
@@ -40,12 +50,48 @@ export class User {
         assert(paymentKeyHash.show() === paymentKeyHash_.show());
       }
       this.paymentKeyHash = paymentKeyHash_;
+
+      lucid.wallet.getUtxos = async () => {
+        console.log("getUtxos()");
+        const utxos = await lucid.utxosAt(address);
+        console.log("utxos (getUtxos):", utxos);
+        console.log("spentUtxos (getUtxos):", this.spentUtxos);
+        // NOTE: using mempool-outputs does not quite work yet with nami/blockfrost for
+        // utxos belonging to the user, see https://github.com/berry-pool/nami/issues/856
+        if (this.userChaining) {
+          console.log("pendingUtxos (getUtxos):", this.pendingUtxos);
+          this.pendingUtxos.forEach((pendingUtxo) => {
+            if (pendingUtxo.address !== address) return;
+            const index = utxos.findIndex((utxo) =>
+              utxo.txHash === pendingUtxo.txHash &&
+              utxo.outputIndex === pendingUtxo.outputIndex
+            );
+            if (index === -1) utxos.push(pendingUtxo);
+          });
+        }
+        this.spentUtxos.forEach((spentUtxo) => {
+          const index = utxos.findIndex((utxo) =>
+            utxo.txHash === spentUtxo.txHash &&
+            utxo.outputIndex === spentUtxo.outputIndex
+          );
+          if (index >= 0) utxos.splice(index, 1);
+        });
+        console.log("utxos (getUtxos, 2):", utxos);
+        return utxos;
+      };
+      lucid.wallet.getUtxosCore = async () => {
+        console.log("getUtxosCore()");
+        const utxos = await lucid.wallet.getUtxos();
+        return utxosToCore(utxos);
+      };
     } else {
       assert(paymentKeyHash, `neither address nor paymentKeyHash provided`);
       this.paymentKeyHash = paymentKeyHash;
+      // TODO what happens here to lucid.wallet.getUtxosCore?
     }
   }
 
+  // TODO does this take mempool into account?
   public get availableBalance(): PositiveValue | undefined {
     assert(this.balance, "No balance");
     if (this.balance.amountOf(Asset.ADA, 0n) < feesEtcLovelace) {
@@ -94,7 +140,7 @@ export class User {
 
   public update = async (): Promise<number> => {
     const utxos = (await Promise.all([
-      this.lucid.utxosAt(this.address!),
+      this.lucid.wallet.getUtxos(), // TODO update utxos-at-address-getting everywhere else to use wallet instead provider as well
       this.contract.update(),
     ]))[0];
     this.balance = utxos.map((utxo) => PositiveValue.fromLucid(utxo.assets))
@@ -104,6 +150,154 @@ export class User {
       ?.lastIdNFT;
 
     return this.lucid.currentSlot();
+  };
+
+  // TODO use this and/or make this automatic in update() for example (only when a new block happens though)
+  public resetMempool = (): void => {
+    console.log(
+      `resetting:\n\nspent utxos: ${this.spentUtxos}\n\npending utxos:${this.pendingUtxos}`,
+    );
+    this.spentUtxos.splice(0, this.spentUtxos.length);
+    this.pendingUtxos.splice(0, this.pendingUtxos.length);
+    this.usedSplitting = false;
+  };
+
+  public finalizeTx = async (
+    tx: Lucid.Tx,
+    submit = true,
+  ): Promise<string | Lucid.TxSigned | null> => {
+    try {
+      // console.log("min fee:", tx.txBuilder.min_fee().to_str()); // TODO figure this out (not working with chaining on emulator)
+      return await tx
+        .complete()
+        .then(async (completed) => {
+          // console.log("finalizeTx() - signing:", completed.txComplete.to_js_value());
+          const signed = await completed
+            .sign()
+            .complete();
+
+          // let is: number[] = [];
+          // if (chainingAddr) { // TODO un-hackify
+          const txBody = signed.txSigned.body();
+          const txHash = Lucid.C.hash_transaction(txBody);
+          const txIns = txBody.inputs();
+          const txOuts = txBody.outputs();
+          const colls = txBody.collateral();
+
+          for (let i = 0; i < txIns.len(); i++) {
+            const txIn = txIns.get(i);
+            this.spentUtxos.push({
+              txHash: txIn.transaction_id().to_hex(),
+              outputIndex: parseInt(txIn.index().to_str()),
+            });
+          }
+          if (colls) {
+            for (let i = 0; i < colls.len(); i++) {
+              const txIn = colls.get(i);
+              this.spentUtxos.push({
+                txHash: txIn.transaction_id().to_hex(),
+                outputIndex: parseInt(txIn.index().to_str()),
+              });
+            }
+          }
+          for (let i = 0; i < txOuts.len(); i++) {
+            const txOut = txOuts.get(i);
+            const address = txOut.address().to_bech32(undefined); // NOTE simplified version which does not work in byron (lol)
+            if ((!this.userChaining) && (address !== this.contract.address)) {
+              continue;
+            }
+            const txIn = Lucid.C.TransactionInput.new(
+              txHash,
+              Lucid.C.BigNum.from_str(i.toString()),
+            );
+            const utxo = Lucid.C.TransactionUnspentOutput.new(txIn, txOut);
+            this.pendingUtxos.push(Lucid.coreToUtxo(utxo));
+          }
+
+          if (submit) {
+            // console.log("submitting", signed.txSigned.to_js_value());
+            const h = await signed.submit();
+            console.log("txHash:", h);
+            return h;
+          } else {
+            return signed;
+          }
+        });
+    } catch (e) { // TODO what then? try again after awaiting a new block?
+      if (
+        this.usedSplitting &&
+          (e.toString().includes("Insufficient input in transaction")) ||
+        e.toString().includes("InputsExhaustedError")
+      ) {
+        console.warn(
+          `catching ${e} in finalizeTx() after splitting`,
+        );
+        return null;
+      } else {
+        throw e;
+      }
+    }
+    // TODO clean this up
+    //   } catch (e) {
+    //     if (this.proptesting) throw e;
+    //     const e_ = e === "Missing input or output for some native asset" ? `
+    // Error: ${e}
+
+    // This is likely due to transaction-chaining not being fully supported yet on Cardano, at the time of writing.
+    // The result often is only partial order execution.
+    // The cause likely is that your assets are spread across too few utxos, and the remedy would be to split them up.
+    // Alternatively, you can work with multiple smaller swaps, waiting for one block (~20s) in between each.
+    // Unfortunately little else we can do about this right now, as it would require hacking wallets ;)
+    // ` : e;
+    //     console.error(e_);
+    //     alert(e_);
+    //     return "failed";
+    //   }
+  };
+
+  // NOTE/TODO this assumes the user is the same as in the action... maybe check that?
+  public getTxSigned = async (action: Action): Promise<{
+    succ: Lucid.TxSigned[];
+    fail: Action[];
+  }> => {
+    const tx = action.tx(this.lucid.newTx());
+    try {
+      const signed = await this.finalizeTx(tx, false);
+      if (signed === null) { // means mempool-related issue right now (TODO remove spaghette)
+        return {
+          succ: [],
+          fail: [action],
+        };
+      } else {return {
+          succ: [signed as Lucid.TxSigned],
+          fail: [],
+        }; // NOTE/TODO this assumes the tx-builder checks if we are over tx size limit, following a lucid-comment
+      }
+    } catch (e) {
+      const e_ = e.toString();
+      if (e_.includes("Maximum transaction size")) {
+        console.log("splitting action...");
+        const actions: Action[] = action.split();
+        // NOTE not using Promise.all here to ensure the mempool is handled correctly
+        const signedTxes: Lucid.TxSigned[] = [];
+        const failed: Action[] = [];
+        let first = true;
+        for (const action of actions) {
+          console.log(`handling split action`);
+          if (first) first = false;
+          else this.usedSplitting = true;
+          const { succ, fail } = await this.getTxSigned(action);
+          signedTxes.push(...succ);
+          failed.push(...fail);
+        }
+        return {
+          succ: signedTxes,
+          fail: failed,
+        };
+      } else {
+        throw e;
+      }
+    }
   };
 
   static async fromWalletApi(

@@ -215,7 +215,7 @@ ${tt})`;
       : maxSmallInteger; //gMaxJumpSize;
     maxJumpSize = min(maxJumpSize, vw - 1n);
     assert(
-      minJumpSize <= maxJumpSize, 
+      minJumpSize <= maxJumpSize,
       `minJumpSize (${minJumpSize}) must be <= maxJumpSize ${maxJumpSize}; virtual: ${virtual}; weight: ${weight}`,
     );
     return [minJumpSize, maxJumpSize];

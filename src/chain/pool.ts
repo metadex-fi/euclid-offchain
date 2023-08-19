@@ -117,6 +117,7 @@ export class Pool {
   private constructor(
     public readonly paramUtxo: ParamUtxo,
     public readonly diracUtxos: DiracUtxo[],
+    private readonly paramContainingSplit = true,
   ) {}
 
   public get utxos(): Lucid.UTxO[] {
@@ -177,8 +178,25 @@ export class Pool {
     });
   }
 
+  public split = (): Pool[] => {
+    console.log(`splitting pool`);
+    assert(this.diracUtxos.length > 1, "Pool is not splittable");
+    const half = Math.floor(this.diracUtxos.length / 2);
+    const diracUtxos1 = this.diracUtxos.slice(0, half);
+    const diracUtxos2 = this.diracUtxos.slice(half);
+    return [
+      new Pool(this.paramUtxo, diracUtxos1, this.paramContainingSplit),
+      new Pool(this.paramUtxo, diracUtxos2, false),
+    ];
+  };
+
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
-    let tx_ = this.paramUtxo.openingTx(tx, contract);
+    console.log(
+      `Opening pool with ${this.diracUtxos.length} dirac utxos and ${
+        this.paramContainingSplit ? 1 : 0
+      } param utxos`,
+    );
+    let tx_ = this.paramUtxo.openingTx(tx, contract, this.paramContainingSplit);
     // let remaining = this.diracUtxos.slice(0, 100); TODO this is for splitting larger txes
     this.diracUtxos.forEach((diracUtxo) =>
       tx_ = diracUtxo.openingTx(tx_, contract)

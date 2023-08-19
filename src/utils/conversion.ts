@@ -16,4 +16,4 @@ export const coreToUtxos = (utxos: TransactionUnspentOutputs): Lucid.UTxO[] => {
     utxos_.push(Lucid.coreToUtxo(utxos.get(i)));
   }
   return utxos_;
-}
+};

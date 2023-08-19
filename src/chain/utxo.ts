@@ -49,22 +49,30 @@ export class ParamUtxo {
     return new ParamUtxo(param, paramNFT);
   }
 
-  public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
-    const peuclidDatum = PPreEuclidDatum.genPType(); //only need this for ParamDatum, so this is fine
-    const paramDatum = peuclidDatum.pconstant(new ParamDatum(this.param));
-    const paramNFT = this.paramNFT.toLucidNFT;
+  public openingTx = (
+    tx: Lucid.Tx,
+    contract: Contract,
+    paramContainingSplit: boolean,
+  ): Lucid.Tx => {
+    if (paramContainingSplit) {
+      const peuclidDatum = PPreEuclidDatum.genPType(); //only need this for ParamDatum, so this is fine
+      const paramDatum = peuclidDatum.pconstant(new ParamDatum(this.param));
+      const paramNFT = this.paramNFT.toLucidNFT;
 
-    return tx
-      .attachMintingPolicy(contract.mintingPolicy)
-      .mintAssets(paramNFT, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
-      .payToContract(
-        contract.address,
-        {
-          inline: Data.to(paramDatum),
-          scriptRef: contract.validator, // for now, for simplicities' sake
-        },
-        paramNFT,
-      );
+      return tx
+        .attachMintingPolicy(contract.mintingPolicy)
+        .mintAssets(paramNFT, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+        .payToContract(
+          contract.address,
+          {
+            inline: Data.to(paramDatum),
+            scriptRef: contract.validator, // for now, for simplicities' sake
+          },
+          paramNFT,
+        );
+    } else {
+      return tx.attachMintingPolicy(contract.mintingPolicy);
+    }
   };
 
   public sharedAssets = (assets: Assets): Assets =>
@@ -236,7 +244,8 @@ export class DiracUtxo {
     const delta = (w: bigint, l: bigint) => (s: bigint) => (s - l * w) / w;
     // const delta = (w: number, l: number) => (s: number) => (s / w) - l;
     // const delta = (s: number) => l * (((s / a) ** (w / (w + 1))) - 1);
-    const spot = (a: bigint, j: bigint, e: bigint) => (a * ((j + 1n) ** e)) / (j ** e);
+    const spot = (a: bigint, j: bigint, e: bigint) =>
+      (a * ((j + 1n) ** e)) / (j ** e);
 
     param.assets.forEach((asset) => {
       const buyable = buyable_.amountOf(asset, 0n);
@@ -351,7 +360,6 @@ export class DiracUtxo {
           const sellingJumpSize = param.jumpSizes.amountOf(sellingAsset);
           // const buyingJumpSize = param.jumpSizes.amountOf(buyingAsset);
 
-
           const buyable = buyable_.amountOf(buyingAsset, 0n);
           const sellable = sellable_?.amountOf(sellingAsset, 0n);
           if (buyable <= 0n || (sellable && sellable === 0n)) return;
@@ -379,7 +387,7 @@ export class DiracUtxo {
                 } else {
                   maxSelling = d;
                 }
-              } else  {
+              } else {
                 maxSelling = d;
               }
             } else {
@@ -401,7 +409,6 @@ export class DiracUtxo {
         const sellingAmount = ceilDiv(maxSwapA0, spotBuying);
         // const sellingAmount = maxSellingA0 <= maxBuyingA0 ? maxSelling : BigInt(sellingAmount_);
 
-
         /// logging/debugging
 
         const buyingJs = param.jumpSizes.amountOf(buyingAsset);
@@ -410,20 +417,23 @@ export class DiracUtxo {
         const sellingAnchor = this.dirac.anchorPrices.amountOf(sellingAsset);
 
         const buyingJumpMultiplier = (Number(buyingJs) + 1) / Number(buyingJs);
-        const sellingJumpMultiplier = (Number(sellingJs) + 1) / Number(sellingJs);
-        const ammBuying = liquidity_.amountOf(buyingAsset) * param.weights.amountOf(buyingAsset);
-        const ammSelling = liquidity_.amountOf(sellingAsset) * param.weights.amountOf(sellingAsset);
+        const sellingJumpMultiplier = (Number(sellingJs) + 1) /
+          Number(sellingJs);
+        const ammBuying = liquidity_.amountOf(buyingAsset) *
+          param.weights.amountOf(buyingAsset);
+        const ammSelling = liquidity_.amountOf(sellingAsset) *
+          param.weights.amountOf(sellingAsset);
         const buyingExp = Math.log(Number(ammBuying) / Number(buyingAnchor)) /
           Math.log(buyingJumpMultiplier);
-        const sellingExp = Math.log(Number(ammSelling) / Number(sellingAnchor)) /
+        const sellingExp =
+          Math.log(Number(ammSelling) / Number(sellingAnchor)) /
           Math.log(sellingJumpMultiplier);
 
-        console.log(`buyingExp: ${buyingExp} -> ${expBuying}, sellingExp: ${sellingExp} -> ${expSelling}`);
+        console.log(
+          `buyingExp: ${buyingExp} -> ${expBuying}, sellingExp: ${sellingExp} -> ${expSelling}`,
+        );
 
         /// end logging/debugging
-
-
-
 
         const swapping = Swapping.boundary(
           user,

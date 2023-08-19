@@ -21,7 +21,7 @@ export class Swapping {
   public subsequent?: Swapping;
 
   private constructor(
-    public readonly user: User | undefined,
+    public readonly user: User | undefined, // TODO why can this be undefined again?
     public readonly paramUtxo: ParamUtxo,
     public readonly diracUtxo: DiracUtxo,
     public readonly boughtAsset: Asset,
@@ -65,10 +65,17 @@ export class Swapping {
 )`;
   };
 
+  public split = (): Swapping[] => {
+    throw new Error("Swapping-split not implemented");
+  };
+
   // TODO set subsequent's diracUtxo's utxo to the one resulting from this tx
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
     console.log(this.show());
-    assert(this.diracUtxo.utxo, `diracUtxo.utxo must be defined - subsequents-issue?`)
+    assert(
+      this.diracUtxo.utxo,
+      `diracUtxo.utxo must be defined - subsequents-issue?`,
+    );
     const funds = this.diracUtxo.balance.clone; // TODO cloning probably not required here
     funds.addAmountOf(this.boughtAsset, -this.boughtAmount);
     funds.addAmountOf(this.soldAsset, this.soldAmount);
@@ -110,16 +117,16 @@ export class Swapping {
   };
 
   public setSubsequentUtxo = (txBody: Lucid.C.TransactionBody) => {
-    if (this.subsequent) {// TODO this is wrong, as it empties the tasks
+    if (this.subsequent) { // TODO this is wrong, as it empties the tasks
       const txHash = Lucid.C.hash_transaction(txBody);
       const txOuts = txBody.outputs();
-      console.log(`dirac's address: ${this.diracUtxo.utxo!.address}`)
+      console.log(`dirac's address: ${this.diracUtxo.utxo!.address}`);
       for (let i = 0; i < txOuts.len(); i++) {
         const txOut = txOuts.get(i);
         const addr = txOut.address().to_bech32(undefined);
-        console.log(`\t${addr} ?`)
+        console.log(`\t${addr} ?`);
         if (addr !== this.diracUtxo.utxo!.address) continue;
-        console.log(`\tmatches.`)
+        console.log(`\tmatches.`);
         const txIn = Lucid.C.TransactionInput.new(
           txHash,
           Lucid.C.BigNum.from_str(i.toString()),
@@ -129,11 +136,14 @@ export class Swapping {
         this.subsequent.diracUtxo.utxo = utxo_;
         break;
       }
-      assert(this.subsequent.diracUtxo.utxo, `failed to set subsequent's diracUtxo's utxo`);
+      assert(
+        this.subsequent.diracUtxo.utxo,
+        `failed to set subsequent's diracUtxo's utxo`,
+      );
     } else {
       console.log(`no subsequent`);
     }
-  }
+  };
 
   public subsequents = (maxSubsequents?: number): Swapping[] => {
     const swappings: Swapping[] = [this];
@@ -411,7 +421,7 @@ export class Swapping {
         expBuying,
         spotBuying,
         "buying",
-      ) &&       
+      ) &&
       Swapping.exponentsYieldPrice(
         anchorSelling,
         jsSelling,

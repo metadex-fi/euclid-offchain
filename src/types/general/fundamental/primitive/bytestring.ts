@@ -63,7 +63,7 @@ export class PByteString implements PType<Uint8Array, Uint8Array> {
     const minBytes = maybeNdef(genNonNegative)?.(gMaxStringBytes);
     const maxBytes = maybeNdef(() =>
       (minBytes ??
-        0n) + genNonNegative((gMaxStringBytes) - (minBytes ?? 0n))
+        0n) + genNonNegative(gMaxStringBytes - (minBytes ?? 0n))
     )?.();
     return new PByteString(minBytes, maxBytes);
   }

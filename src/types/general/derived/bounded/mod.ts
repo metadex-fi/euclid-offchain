@@ -1,2 +1,2 @@
-export * from './bounded.ts';
-export * from './positive.ts';
+export * from "./bounded.ts";
+export * from "./positive.ts";

@@ -5,13 +5,17 @@ import { User } from "../user.ts";
 
 export class Closing {
   constructor(
-    private readonly user: User,
+    public readonly user: User,
     private readonly pool: Pool,
   ) {}
 
   public get type(): string {
     return "Closing";
   }
+
+  public split = (): Closing[] => {
+    throw new Error("Closing-split not implemented");
+  };
 
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
     return this.pool.closingTx(tx, this.user.contract).addSigner(

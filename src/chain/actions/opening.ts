@@ -19,13 +19,12 @@ import { maxInteger } from "../../mod.ts";
 
 // complete settings for opening a pool
 export class Opening {
-  private poolCache?: Pool;
-
   constructor(
     public readonly user: User,
     public readonly param: Param,
     public readonly deposit: PositiveValue, // total of all Diracs
     public readonly numTicks: EuclidValue,
+    private poolCache?: Pool,
   ) {
     // console.log(deposit.assets.union(this.param.virtual.assets).show());
     assert(
@@ -39,6 +38,20 @@ export class Opening {
   public get type(): string {
     return "Opening";
   }
+
+  public split = (): Opening[] => {
+    console.log(`splitting opening`);
+    const pools = this.pool().split();
+    return pools.map((p) => {
+      return new Opening(
+        this.user,
+        this.param,
+        this.deposit,
+        this.numTicks,
+        p,
+      );
+    });
+  };
 
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
     return this.pool().openingTx(tx, this.user.contract).addSigner(
@@ -165,9 +178,9 @@ export class Opening {
     // console.log(allAssets.show());
     const param = Param.genOf(user.paymentKeyHash, allAssets);
 
-    const gMaxDiracs = 26n; // because tx size
+    // const gMaxDiracs = 26n; // because tx size
     const maxDiracs = deposit.smallestAmount; // because minimum deposit
-    let maxTicks = min(gMaxDiracs, maxDiracs);
+    let maxTicks = maxDiracs; //min(gMaxDiracs, maxDiracs);
     const numTicks = new PositiveValue();
     allAssets.forEach((asset) => {
       const maxTicks_ = Opening.maxTicks(
@@ -225,7 +238,7 @@ export class Opening {
     console.log(`anchorLog: ${anchorLog}`);
     console.log(`${jumpLog / anchorLog}`);
     const maxTicks = Math.floor(jumpLog / anchorLog);
-    assert(maxTicks > 0, `maxTicks must be > 0, but got ${maxTicks}`)
+    assert(maxTicks > 0, `maxTicks must be > 0, but got ${maxTicks}`);
     if (isFinite(maxTicks)) return BigInt(maxTicks);
     else return maxInteger;
   };
