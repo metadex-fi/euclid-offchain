@@ -352,7 +352,7 @@ export class DiracUtxo {
         let maxSellingA0 = maxSelling * spotBuying;
         let maxSwapA0 = min(maxSellingA0, maxBuyingA0);
 
-        if (maxSwapA0 < spotSelling) return; // TODO comment out again
+        // if (maxSwapA0 < spotSelling) return; // TODO comment out again
         if (maxSwapA0 < spotSelling) {
           // TODO marginal efficiency gains possible here by initialzing only JIT
           const sellingAnchor = this.dirac.anchorPrices.amountOf(sellingAsset);
@@ -411,7 +411,18 @@ export class DiracUtxo {
         }
 
         const buyingAmount = maxSwapA0 / spotSelling;
-        const sellingAmount = ceilDiv(maxSwapA0, spotBuying);
+        const sellingAmount = ceilDiv(buyingAmount * spotSelling, spotBuying);
+        console.log(`
+          maxBuying: ${maxBuying}
+          maxSelling: ${maxSelling}
+          maxBuyingA0: ${maxBuyingA0}
+          maxSellingA0: ${maxSellingA0}
+          maxSwapA0: ${maxSwapA0}
+          spotBuying: ${spotBuying}
+          spotSelling: ${spotSelling}
+          buyingAmount: ${buyingAmount}
+          sellingAmount: ${sellingAmount}
+        `)
         // const sellingAmount = maxSellingA0 <= maxBuyingA0 ? maxSelling : BigInt(sellingAmount_);
 
         // /// logging/debugging

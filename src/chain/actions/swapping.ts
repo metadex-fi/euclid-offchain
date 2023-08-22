@@ -511,13 +511,8 @@ export class Swapping {
   // try to make it wrong with minimal changes
   public corruptionTests = () => {
     try{
-      if (Math.random() < 0.5) {
-        this.testSellTooLittle();
-        this.testBuyTooMuch();
-      } else {
-        this.testBuyTooMuch();
-        this.testSellTooLittle();
-      }
+      this.testBuyTooMuch();
+      this.testSellTooLittle();
     } catch (e) {
       throw(e);
     }
