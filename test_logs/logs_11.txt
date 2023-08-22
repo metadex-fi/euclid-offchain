@@ -5,18 +5,88 @@
 emulator ...
 [0m[38;5;245m------- output -------[0m
 trials left: 1
-accounts: 10
+accounts: 1
 
 trials left: 1 - iteration: 0 - block: 0
-virtual: 1
-weight: 100
-jumpSize: 1
-minAnchorPrice: 50
-jumpLog: 0.6931471805599453
-anchorLog: 0.01980262729617973
-35.0027887811465
+virtual: 6530
+weight: 1
+jumpSize: 100
+minAnchorPrice: 6465
+jumpLog: 0.009950330853168092
+anchorLog: 0.00015466707942046179
+64.33386400294118
 maxTicks: 1
-maxTicks_: 35
+maxTicks_: 64
+1
+virtual: 1
+weight: 28
+jumpSize: 16
+minAnchorPrice: 26
+jumpLog: 0.06062462181643484
+anchorLog: 0.03774032798284711
+1.6063618165689653
+maxTicks: 1
+maxTicks_: 1
+1
+virtual: 2
+weight: 51
+jumpSize: 100
+minAnchorPrice: 100
+jumpLog: 0.009950330853168092
+anchorLog: 0.009950330853168092
+1
+maxTicks: 1
+maxTicks_: 1
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 1 - block: 625
+
+trials left: 1 - iteration: 2 - block: 1625
+virtual: 9000
+weight: 1
+jumpSize: 5
+minAnchorPrice: 7500
+jumpLog: 0.1823215567939546
+anchorLog: 0.00013332444523447422
+1367.502834707547
+maxTicks: 1
+maxTicks_: 1367
+1
+virtual: 2
+weight: 62
+jumpSize: 100
+minAnchorPrice: 122
+jumpLog: 0.009950330853168092
+anchorLog: 0.008163310639160835
+1.2189087605504814
+maxTicks: 1
+maxTicks_: 1
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 3 - block: 2141
+
+trials left: 1 - iteration: 4 - block: 3141
+virtual: 6943
+weight: 1
+jumpSize: 100
+minAnchorPrice: 6874
+jumpLog: 0.009950330853168092
+anchorLog: 0.00014546512499290703
+68.40354932945802
+maxTicks: 1
+maxTicks_: 68
+1
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+maxTicks: 1
+maxTicks_: 3119
 1
 virtual: 9000
 weight: 1
@@ -28,1410 +98,36 @@ anchorLog: 0.00011222714786481952
 maxTicks: 1
 maxTicks_: 88
 1
-virtual: 2
-weight: 94
-jumpSize: 100
-minAnchorPrice: 186
-jumpLog: 0.009950330853168092
-anchorLog: 0.005361943141385373
-1.855732258025625
-maxTicks: 1
-maxTicks_: 1
-1
 Opening pool with 1 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 1 - block: 1000
-virtual: 5956
-weight: 1
-jumpSize: 100
-minAnchorPrice: 5897
-jumpLog: 0.009950330853168092
-anchorLog: 0.0001695633747174329
-58.68207606595301
-maxTicks: 8239
-maxTicks_: 58
-3
-virtual: 6938
-weight: 1
-jumpSize: 100
-minAnchorPrice: 6869
-jumpLog: 0.009950330853168092
-anchorLog: 0.00014557100251334212
-68.35379767516616
-maxTicks: 8239
-maxTicks_: 68
-3
-virtual: 6938
-weight: 1
-jumpSize: 100
-minAnchorPrice: 6869
-jumpLog: 0.009950330853168092
-anchorLog: 0.00014557100251334212
-68.35379767516616
-virtual: 6938
-weight: 1
-jumpSize: 100
-minAnchorPrice: 6869
-jumpLog: 0.009950330853168092
-anchorLog: 0.00014557100251334212
-68.35379767516616
-Opening pool with 3 dirac utxos and 1 param utxos
+trials left: 1 - iteration: 5 - block: 3563
 
-trials left: 1 - iteration: 2 - block: 2000
-
-          maxBuying: 85
-          maxSelling: 88
-          maxBuyingA0: 772565
-          maxSellingA0: 1126400
-          maxSwapA0: 772565
-          spotBuying: 12800
-          spotSelling: 9089
-          buyingAmount: 85
-          sellingAmount: 61
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  12700 > 
-        spotBuying 12800
-valueEquation: 
-        addedBuyingA0  772565 > 
-        addedSellingA0 768000
-
-          maxBuying: 1
-          maxSelling: 88
-          maxBuyingA0: 9089
-          maxSellingA0: 16456
-          maxSwapA0: 9089
-          spotBuying: 187
-          spotSelling: 9089
-          buyingAmount: 1
-          sellingAmount: 49
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  9089 > 
-        addedSellingA0 8976
-
-          maxBuying: 20248
-          maxSelling: 77
-          maxBuyingA0: 177757192
-          maxSellingA0: 195110300
-          maxSwapA0: 177757192
-          spotBuying: 2533900
-          spotSelling: 8779
-          buyingAmount: 20248
-          sellingAmount: 71
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2533899 > 
-        spotBuying 2533900
-valueEquation: 
-        addedBuyingA0  177757192 > 
-        addedSellingA0 177373000
-
-          maxBuying: 12133
-          maxSelling: 77
-          maxBuyingA0: 106515607
-          maxSellingA0: 195735155
-          maxSwapA0: 106515607
-          spotBuying: 2542015
-          spotSelling: 8779
-          buyingAmount: 12133
-          sellingAmount: 42
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2542014 > 
-        spotBuying 2542015
-valueEquation: 
-        addedBuyingA0  106515607 > 
-        addedSellingA0 104222615
-
-          maxBuying: 3648
-          maxSelling: 77
-          maxBuyingA0: 32025792
-          maxSellingA0: 196388500
-          maxSwapA0: 32025792
-          spotBuying: 2550500
-          spotSelling: 8779
-          buyingAmount: 3648
-          sellingAmount: 13
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2550499 > 
-        spotBuying 2550500
-valueEquation: 
-        addedBuyingA0  32025792 > 
-        addedSellingA0 30606000
-subSwap: 1 bought
-valueEquation: 
-        addedBuyingA0  9089 > 
-        addedSellingA0 8976
-Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: cc45eb296fd0443016dd4e1f1ca60dae1d1ba0ebdcb693385181d802, 
-   +     +  virtual: +[
-   +     +  +  a63888874c9626929d040d682872f308eeccea76deb50cc32f348315_: 1,
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 9000,
-   +     +  +  a494802128fcdf82ed279b1daf596e6620027a20aba90bfa3c2fa3e6_cKyeXLoWDdf0vR1taF: 2
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  a63888874c9626929d040d682872f308eeccea76deb50cc32f348315_: 100,
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 1,
-   +     +  +  a494802128fcdf82ed279b1daf596e6620027a20aba90bfa3c2fa3e6_cKyeXLoWDdf0vR1taF: 94
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  a63888874c9626929d040d682872f308eeccea76deb50cc32f348315_: 1,
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 100,
-   +     +  +  a494802128fcdf82ed279b1daf596e6620027a20aba90bfa3c2fa3e6_cKyeXLoWDdf0vR1taF: 100
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: cc45eb296fd0443016dd4e1f1ca60dae1d1ba0ebdcb693385181d802,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: e6abafcc6d969e0d2c183bdcb7538d231e7861a18940bad02e89577fac12b426),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: cbe5d5a718adb8e547ab86385a3c9d4016c5b2a5c07855f560a047a8c6504065),
-   +     +  anchorPrices: +[
-   +     +  +  a63888874c9626929d040d682872f308eeccea76deb50cc32f348315_: 50,
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 8910,
-   +     +  +  a494802128fcdf82ed279b1daf596e6620027a20aba90bfa3c2fa3e6_cKyeXLoWDdf0vR1taF: 186
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 3254050,
-   +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 1,
-   +  +  a494802128fcdf82ed279b1daf596e6620027a20aba90bfa3c2fa3e6_cKyeXLoWDdf0vR1taF: 1,
-   +  +  a63888874c9626929d040d682872f308eeccea76deb50cc32f348315_: 212
-   +  ]
-     )
-  boughtAsset:  Asset(a494802128fcdf82ed279b1daf596e6620027a20aba90bfa3c2fa3e6, cKyeXLoWDdf0vR1taF)
-  soldAsset:    Asset(2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59, bFgRIPDVs98kAqotexF1L2cr2z4GA9e6)
-  boughtAmount: 1
-  soldAmount:   49
-  boughtSpot:   187
-  soldSpot:     9089
-  (boughtA0:    9089)
-  (soldA0:      9163)
-  boughtExp:    1
-  soldExp:      2
-  spotPrice:    48.60427807486631
-  eff.Price:    49
-  maxBuying:    1
-  (maxBuyingA0: 9089)
-)
-
-trials left: 1 - iteration: 3 - block: 2001
-
-          maxBuying: 85
-          maxSelling: 1
-          maxBuyingA0: 23970
-          maxSellingA0: 12800
-          maxSwapA0: 12800
-          spotBuying: 12800
-          spotSelling: 282
-          buyingAmount: 45
-          sellingAmount: 1
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  12972 > 
-        addedSellingA0 12800
-
-          maxBuying: 50
-          maxSelling: 1
-          maxBuyingA0: 14100
-          maxSellingA0: 8999
-          maxSwapA0: 8999
-          spotBuying: 8999
-          spotSelling: 282
-          buyingAmount: 31
-          sellingAmount: 1
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  9024 > 
-        addedSellingA0 8999
-subSwap: 45 bought
-Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: cc45eb296fd0443016dd4e1f1ca60dae1d1ba0ebdcb693385181d802, 
-   +     +  virtual: +[
-   +     +  +  a63888874c9626929d040d682872f308eeccea76deb50cc32f348315_: 1,
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 9000,
-   +     +  +  a494802128fcdf82ed279b1daf596e6620027a20aba90bfa3c2fa3e6_cKyeXLoWDdf0vR1taF: 2
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  a63888874c9626929d040d682872f308eeccea76deb50cc32f348315_: 100,
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 1,
-   +     +  +  a494802128fcdf82ed279b1daf596e6620027a20aba90bfa3c2fa3e6_cKyeXLoWDdf0vR1taF: 94
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  a63888874c9626929d040d682872f308eeccea76deb50cc32f348315_: 1,
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 100,
-   +     +  +  a494802128fcdf82ed279b1daf596e6620027a20aba90bfa3c2fa3e6_cKyeXLoWDdf0vR1taF: 100
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: cc45eb296fd0443016dd4e1f1ca60dae1d1ba0ebdcb693385181d802,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: e6abafcc6d969e0d2c183bdcb7538d231e7861a18940bad02e89577fac12b426),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: cbe5d5a718adb8e547ab86385a3c9d4016c5b2a5c07855f560a047a8c6504065),
-   +     +  anchorPrices: +[
-   +     +  +  a63888874c9626929d040d682872f308eeccea76deb50cc32f348315_: 50,
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 8910,
-   +     +  +  a494802128fcdf82ed279b1daf596e6620027a20aba90bfa3c2fa3e6_cKyeXLoWDdf0vR1taF: 186
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 3254050,
-   +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 50,
-   +  +  a63888874c9626929d040d682872f308eeccea76deb50cc32f348315_: 212
-   +  ]
-     )
-  boughtAsset:  Asset(a63888874c9626929d040d682872f308eeccea76deb50cc32f348315, )
-  soldAsset:    Asset(a494802128fcdf82ed279b1daf596e6620027a20aba90bfa3c2fa3e6, cKyeXLoWDdf0vR1taF)
-  boughtAmount: 45
-  soldAmount:   1
-  boughtSpot:   12800
-  soldSpot:     282
-  (boughtA0:    12690)
-  (soldA0:      12800)
-  boughtExp:    8
-  soldExp:      42
-  spotPrice:    0.02203125
-  eff.Price:    0.022222222222222223
-  maxBuying:    45
-  (maxBuyingA0: 12690)
-)
-
-trials left: 1 - iteration: 4 - block: 2108
-
-          maxBuying: 40
-          maxSelling: 39
-          maxBuyingA0: 363560
-          maxSellingA0: 499200
-          maxSwapA0: 363560
-          spotBuying: 12800
-          spotSelling: 9089
-          buyingAmount: 40
-          sellingAmount: 29
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  12700 > 
-        spotBuying 12800
-valueEquation: 
-        addedBuyingA0  363560 > 
-        addedSellingA0 358400
-
-          maxBuying: 1
-          maxSelling: 129
-          maxBuyingA0: 9179
-          maxSellingA0: 24123
-          maxSwapA0: 9179
-          spotBuying: 187
-          spotSelling: 9179
-          buyingAmount: 1
-          sellingAmount: 50
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  9179 > 
-        addedSellingA0 9163
-
-          maxBuying: 40
-          maxSelling: 1
-          maxBuyingA0: 15040
-          maxSellingA0: 12800
-          maxSwapA0: 12800
-          spotBuying: 12800
-          spotSelling: 376
-          buyingAmount: 34
-          sellingAmount: 1
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  13160 > 
-        addedSellingA0 12800
-
-          maxBuying: 50
-          maxSelling: 1
-          maxBuyingA0: 18800
-          maxSellingA0: 8999
-          maxSwapA0: 8999
-          spotBuying: 8999
-          spotSelling: 376
-          buyingAmount: 23
-          sellingAmount: 1
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  9024 > 
-        addedSellingA0 8999
-
-          maxBuying: 20248
-          maxSelling: 77
-          maxBuyingA0: 177757192
-          maxSellingA0: 195110300
-          maxSwapA0: 177757192
-          spotBuying: 2533900
-          spotSelling: 8779
-          buyingAmount: 20248
-          sellingAmount: 71
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2533899 > 
-        spotBuying 2533900
-valueEquation: 
-        addedBuyingA0  177757192 > 
-        addedSellingA0 177373000
-
-          maxBuying: 12133
-          maxSelling: 77
-          maxBuyingA0: 106515607
-          maxSellingA0: 195735155
-          maxSwapA0: 106515607
-          spotBuying: 2542015
-          spotSelling: 8779
-          buyingAmount: 12133
-          sellingAmount: 42
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2542014 > 
-        spotBuying 2542015
-valueEquation: 
-        addedBuyingA0  106515607 > 
-        addedSellingA0 104222615
-
-          maxBuying: 3648
-          maxSelling: 77
-          maxBuyingA0: 32025792
-          maxSellingA0: 196388500
-          maxSwapA0: 32025792
-          spotBuying: 2550500
-          spotSelling: 8779
-          buyingAmount: 3648
-          sellingAmount: 13
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2550499 > 
-        spotBuying 2550500
-valueEquation: 
-        addedBuyingA0  32025792 > 
-        addedSellingA0 30606000
-subSwap: 42 sold
-boughtAssetForSale (new): 
-        buyingAmm  2542014 > 
-        spotBuying 2542015
-valueEquation: 
-        addedBuyingA0  106515607 > 
-        addedSellingA0 104222615
-Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: 1b529ac3ca04e759c5dfb3d672481ba2b197bf7c989fc65517c3f5c5, 
-   +     +  virtual: +[
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 5956,
-   +     +  +  _: 6938
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 1,
-   +     +  +  _: 1
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 100,
-   +     +  +  _: 100
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: 1b529ac3ca04e759c5dfb3d672481ba2b197bf7c989fc65517c3f5c5,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: a8fd7ff8569879130f9dbad2b2bbbe5492982511fb08bdbca0673e94cb5c2a93),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: f8073ab338fabdc1ebbf0d2c481c78de40f892a70635bbb97888e62e201f0493),
-   +     +  anchorPrices: +[
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 5897,
-   +     +  +  _: 6891
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 2547210,
-   +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 2746
-   +  ]
-     )
-  boughtAsset:  Asset(, )
-  soldAsset:    Asset(2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59, bFgRIPDVs98kAqotexF1L2cr2z4GA9e6)
-  boughtAmount: 12133
-  soldAmount:   42
-  boughtSpot:   2542015
-  soldSpot:     8779
-  (boughtA0:    106515607)
-  (soldA0:      106764630)
-  boughtExp:    594
-  soldExp:      40
-  spotPrice:    0.003453559479389382
-  eff.Price:    0.0034616335613615757
-  maxBuying:    2547210
-  (maxBuyingA0: 22361956590)
-)
-
-trials left: 1 - iteration: 5 - block: 3108
+trials left: 1 - iteration: 6 - block: 4563
 virtual: 1
-weight: 100
-jumpSize: 29
-minAnchorPrice: 96
-jumpLog: 0.033901551675681416
-anchorLog: 0.010362787035546658
-3.2714704605422824
-maxTicks: 1714
-maxTicks_: 3
-3
-virtual: 3095
-weight: 1
-jumpSize: 78
-minAnchorPrice: 3055
-jumpLog: 0.012739025777429712
-anchorLog: 0.00032727868071547327
-38.924092915495024
-maxTicks: 1714
-maxTicks_: 38
-3
-virtual: 3095
-weight: 1
-jumpSize: 78
-minAnchorPrice: 3055
-jumpLog: 0.012739025777429712
-anchorLog: 0.00032727868071547327
-38.924092915495024
-Opening pool with 2 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 6 - block: 3384
-virtual: 9000
-weight: 1
+weight: 37
 jumpSize: 1
-minAnchorPrice: 4500
+minAnchorPrice: 18
 jumpLog: 0.6931471805599453
-anchorLog: 0.00022219753452146847
-3119.5088732767836
-maxTicks: 5181
-maxTicks_: 3119
-3
-virtual: 1
-weight: 19
-jumpSize: 1
-minAnchorPrice: 9
-jumpLog: 0.6931471805599453
-anchorLog: 0.10536051565782635
-6.578813478960581
-maxTicks: 5181
-maxTicks_: 6
-3
-Opening pool with 1 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 7 - block: 4384
-virtual: 6305
-weight: 1
-jumpSize: 40
-minAnchorPrice: 6151
-jumpLog: 0.024692612590371414
-anchorLog: 0.00016256197711169725
-151.89660601510144
-maxTicks: 1
-maxTicks_: 151
-1
-virtual: 9000
-weight: 1
-jumpSize: 21
-minAnchorPrice: 8590
-jumpLog: 0.04652001563489291
-anchorLog: 0.0001164076597554767
-399.63019386019613
-maxTicks: 1
-maxTicks_: 399
-1
-virtual: 9000
-weight: 1
-jumpSize: 1
-minAnchorPrice: 4500
-jumpLog: 0.6931471805599453
-anchorLog: 0.00022219753452146847
-3119.5088732767836
-maxTicks: 1
-maxTicks_: 3119
-1
-Opening pool with 1 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 8 - block: 4936
-virtual: 3994
-weight: 1
-jumpSize: 30
-minAnchorPrice: 3865
-jumpLog: 0.03278982282299097
-anchorLog: 0.00025869874675378524
-126.7490594154229
-maxTicks: 1
-maxTicks_: 126
-1
-virtual: 2
-weight: 100
-jumpSize: 100
-minAnchorPrice: 198
-jumpLog: 0.009950330853168092
-anchorLog: 0.005037794029957081
-1.9751364970458831
-maxTicks: 1
-maxTicks_: 1
-1
-virtual: 1
-weight: 35
-jumpSize: 1
-minAnchorPrice: 17
-jumpLog: 0.6931471805599453
-anchorLog: 0.05715841383994862
-12.126774240111914
+anchorLog: 0.05406722127027579
+12.820099947341156
 maxTicks: 1
 maxTicks_: 12
 1
-Opening pool with 1 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 9 - block: 5936
-
-trials left: 1 - iteration: 10 - block: 5937
-
-          maxBuying: 20248
-          maxSelling: 77
-          maxBuyingA0: 177757192
-          maxSellingA0: 195110300
-          maxSwapA0: 177757192
-          spotBuying: 2533900
-          spotSelling: 8779
-          buyingAmount: 20248
-          sellingAmount: 71
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2533899 > 
-        spotBuying 2533900
-valueEquation: 
-        addedBuyingA0  177757192 > 
-        addedSellingA0 177373000
-
-          maxBuying: 12133
-          maxSelling: 35
-          maxBuyingA0: 106515607
-          maxSellingA0: 88970525
-          maxSwapA0: 88970525
-          spotBuying: 2542015
-          spotSelling: 8779
-          buyingAmount: 10134
-          sellingAmount: 35
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  88975165 > 
-        addedSellingA0 88970525
-valueEquation: 
-        addedBuyingA0  88966386 > 
-        addedSellingA0 86428510
-
-          maxBuying: 3648
-          maxSelling: 77
-          maxBuyingA0: 32025792
-          maxSellingA0: 196388500
-          maxSwapA0: 32025792
-          spotBuying: 2550500
-          spotSelling: 8779
-          buyingAmount: 3648
-          sellingAmount: 13
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2550499 > 
-        spotBuying 2550500
-valueEquation: 
-        addedBuyingA0  32025792 > 
-        addedSellingA0 30606000
-
-          maxBuying: 18479
-          maxSelling: 1
-          maxBuyingA0: 1615563533
-          maxSellingA0: 2243056
-          maxSwapA0: 2243056
-          spotBuying: 2243056
-          spotSelling: 87427
-          buyingAmount: 25
-          sellingAmount: 1
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  2273102 > 
-        addedSellingA0 2243056
-
-          maxBuying: 4528
-          maxSelling: 1
-          maxBuyingA0: 395869456
-          maxSellingA0: 2257007
-          maxSwapA0: 2257007
-          spotBuying: 2257007
-          spotSelling: 87427
-          buyingAmount: 25
-          sellingAmount: 1
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  2273102 > 
-        addedSellingA0 2257007
-
-          maxBuying: 267355
-          maxSelling: 3819
-          maxBuyingA0: 4812390000
-          maxSellingA0: 144162422784
-          maxSwapA0: 4812390000
-          spotBuying: 37748736
-          spotSelling: 18000
-          buyingAmount: 267355
-          sellingAmount: 128
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  37748725 > 
-        spotBuying 37748736
-valueEquation: 
-        addedBuyingA0  4812390000 > 
-        addedSellingA0 4794089472
-
-          maxBuying: 740
-          maxSelling: 156
-          maxBuyingA0: 4781880
-          maxSellingA0: 2692560
-          maxSwapA0: 2692560
-          spotBuying: 17260
-          spotSelling: 6462
-          buyingAmount: 416
-          sellingAmount: 156
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  2694654 > 
-        addedSellingA0 2692560
-valueEquation: 
-        addedBuyingA0  2688192 > 
-        addedSellingA0 2675300
-
-          maxBuying: 549600
-          maxSelling: 156
-          maxBuyingA0: 3551515200
-          maxSellingA0: 359424000
-          maxSwapA0: 359424000
-          spotBuying: 2304000
-          spotSelling: 6462
-          buyingAmount: 55621
-          sellingAmount: 156
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  359429364 > 
-        addedSellingA0 359424000
-valueEquation: 
-        addedBuyingA0  359422902 > 
-        addedSellingA0 357120000
-
-          maxBuying: 1
-          maxSelling: 82
-          maxBuyingA0: 18082
-          maxSellingA0: 516928
-          maxSwapA0: 18082
-          spotBuying: 6304
-          spotSelling: 18082
-          buyingAmount: 1
-          sellingAmount: 3
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  18082 > 
-        addedSellingA0 12608
-
-          maxBuying: 549600
-          maxSelling: 82
-          maxBuyingA0: 9937867200
-          maxSellingA0: 188928000
-          maxSwapA0: 188928000
-          spotBuying: 2304000
-          spotSelling: 18082
-          buyingAmount: 10448
-          sellingAmount: 82
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  188938818 > 
-        addedSellingA0 188928000
-valueEquation: 
-        addedBuyingA0  188920736 > 
-        addedSellingA0 186624000
-
-          maxBuying: 1
-          maxSelling: 442
-          maxBuyingA0: 13436
-          maxSellingA0: 87958
-          maxSwapA0: 13436
-          spotBuying: 199
-          spotSelling: 13436
-          buyingAmount: 1
-          sellingAmount: 68
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  13436 > 
-        addedSellingA0 13333
-
-          maxBuying: 51
-          maxSelling: 442
-          maxBuyingA0: 685236
-          maxSellingA0: 123109376
-          maxSwapA0: 685236
-          spotBuying: 278528
-          spotSelling: 13436
-          buyingAmount: 51
-          sellingAmount: 3
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  278495 > 
-        spotBuying 278528
-valueEquation: 
-        addedBuyingA0  685236 > 
-        addedSellingA0 557056
-
-          maxBuying: 411
-          maxSelling: 1
-          maxBuyingA0: 164811
-          maxSellingA0: 12583
-          maxSwapA0: 12583
-          spotBuying: 12583
-          spotSelling: 401
-          buyingAmount: 31
-          sellingAmount: 1
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  12832 > 
-        addedSellingA0 12583
-
-          maxBuying: 51
-          maxSelling: 1
-          maxBuyingA0: 20451
-          maxSellingA0: 278528
-          maxSwapA0: 20451
-          spotBuying: 278528
-          spotSelling: 401
-          buyingAmount: 51
-          sellingAmount: 1
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  278495 > 
-        spotBuying 278528
-subSwap: 128 sold
-boughtAssetForSale (new): 
-        buyingAmm  37748725 > 
-        spotBuying 37748736
-valueEquation: 
-        addedBuyingA0  4812390000 > 
-        addedSellingA0 4794089472
-Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: 02c460ead885a77ba3d392e543731f1b228e7713651c1efa793c5969, 
-   +     +  virtual: +[
-   +     +  +  8239415dd75483f4c29f46ad519ab97150a670dba5738676e7c41158_: 9000,
-   +     +  +  _: 1
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  8239415dd75483f4c29f46ad519ab97150a670dba5738676e7c41158_: 1,
-   +     +  +  _: 19
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  8239415dd75483f4c29f46ad519ab97150a670dba5738676e7c41158_: 1,
-   +     +  +  _: 1
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: 02c460ead885a77ba3d392e543731f1b228e7713651c1efa793c5969,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: c58e0a6b994a8013366d0902541f8c6d93dd568baedac3b2842f6b17b9c32f7e),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: f5610c52a7506f0b2ce0b2094f1a3c4d85466b08ebfdd33466c87d8caf978d08),
-   +     +  anchorPrices: +[
-   +     +  +  8239415dd75483f4c29f46ad519ab97150a670dba5738676e7c41158_: 4500,
-   +     +  +  _: 9
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 2254130,
-   +  +  8239415dd75483f4c29f46ad519ab97150a670dba5738676e7c41158_: 5181
-   +  ]
-     )
-  boughtAsset:  Asset(, )
-  soldAsset:    Asset(8239415dd75483f4c29f46ad519ab97150a670dba5738676e7c41158, )
-  boughtAmount: 267355
-  soldAmount:   128
-  boughtSpot:   37748736
-  soldSpot:     18000
-  (boughtA0:    4812390000)
-  (soldA0:      4831838208)
-  boughtExp:    22
-  soldExp:      2
-  spotPrice:    0.000476837158203125
-  eff.Price:    0.000478764189934731
-  maxBuying:    2254130
-  (maxBuyingA0: 40574340000)
-)
-
-trials left: 1 - iteration: 11 - block: 6409
-
-          maxBuying: 20248
-          maxSelling: 77
-          maxBuyingA0: 177757192
-          maxSellingA0: 195110300
-          maxSwapA0: 177757192
-          spotBuying: 2533900
-          spotSelling: 8779
-          buyingAmount: 20248
-          sellingAmount: 71
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2533899 > 
-        spotBuying 2533900
-valueEquation: 
-        addedBuyingA0  177757192 > 
-        addedSellingA0 177373000
-
-          maxBuying: 12133
-          maxSelling: 35
-          maxBuyingA0: 106515607
-          maxSellingA0: 88970525
-          maxSwapA0: 88970525
-          spotBuying: 2542015
-          spotSelling: 8779
-          buyingAmount: 10134
-          sellingAmount: 35
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  88975165 > 
-        addedSellingA0 88970525
-valueEquation: 
-        addedBuyingA0  88966386 > 
-        addedSellingA0 86428510
-
-          maxBuying: 3648
-          maxSelling: 77
-          maxBuyingA0: 32025792
-          maxSellingA0: 196388500
-          maxSwapA0: 32025792
-          spotBuying: 2550500
-          spotSelling: 8779
-          buyingAmount: 3648
-          sellingAmount: 13
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2550499 > 
-        spotBuying 2550500
-valueEquation: 
-        addedBuyingA0  32025792 > 
-        addedSellingA0 30606000
-
-          maxBuying: 18479
-          maxSelling: 1
-          maxBuyingA0: 1615563533
-          maxSellingA0: 2243056
-          maxSwapA0: 2243056
-          spotBuying: 2243056
-          spotSelling: 87427
-          buyingAmount: 25
-          sellingAmount: 1
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  2273102 > 
-        addedSellingA0 2243056
-
-          maxBuying: 4528
-          maxSelling: 1
-          maxBuyingA0: 395869456
-          maxSellingA0: 2257007
-          maxSwapA0: 2257007
-          spotBuying: 2257007
-          spotSelling: 87427
-          buyingAmount: 25
-          sellingAmount: 1
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  2273102 > 
-        addedSellingA0 2257007
-
-          maxBuying: 267355
-          maxSelling: 3691
-          maxBuyingA0: 4812390000
-          maxSellingA0: 139330584576
-          maxSwapA0: 4812390000
-          spotBuying: 37748736
-          spotSelling: 18000
-          buyingAmount: 267355
-          sellingAmount: 128
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  37748725 > 
-        spotBuying 37748736
-valueEquation: 
-        addedBuyingA0  4812390000 > 
-        addedSellingA0 4794089472
-
-          maxBuying: 740
-          maxSelling: 156
-          maxBuyingA0: 4781880
-          maxSellingA0: 2692560
-          maxSwapA0: 2692560
-          spotBuying: 17260
-          spotSelling: 6462
-          buyingAmount: 416
-          sellingAmount: 156
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  2694654 > 
-        addedSellingA0 2692560
-valueEquation: 
-        addedBuyingA0  2688192 > 
-        addedSellingA0 2675300
-
-          maxBuying: 549600
-          maxSelling: 156
-          maxBuyingA0: 3551515200
-          maxSellingA0: 359424000
-          maxSwapA0: 359424000
-          spotBuying: 2304000
-          spotSelling: 6462
-          buyingAmount: 55621
-          sellingAmount: 156
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  359429364 > 
-        addedSellingA0 359424000
-valueEquation: 
-        addedBuyingA0  359422902 > 
-        addedSellingA0 357120000
-
-          maxBuying: 1
-          maxSelling: 82
-          maxBuyingA0: 18082
-          maxSellingA0: 516928
-          maxSwapA0: 18082
-          spotBuying: 6304
-          spotSelling: 18082
-          buyingAmount: 1
-          sellingAmount: 3
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  18082 > 
-        addedSellingA0 12608
-
-          maxBuying: 549600
-          maxSelling: 82
-          maxBuyingA0: 9937867200
-          maxSellingA0: 188928000
-          maxSwapA0: 188928000
-          spotBuying: 2304000
-          spotSelling: 18082
-          buyingAmount: 10448
-          sellingAmount: 82
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  188938818 > 
-        addedSellingA0 188928000
-valueEquation: 
-        addedBuyingA0  188920736 > 
-        addedSellingA0 186624000
-
-          maxBuying: 1
-          maxSelling: 442
-          maxBuyingA0: 13436
-          maxSellingA0: 87958
-          maxSwapA0: 13436
-          spotBuying: 199
-          spotSelling: 13436
-          buyingAmount: 1
-          sellingAmount: 68
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  13436 > 
-        addedSellingA0 13333
-
-          maxBuying: 51
-          maxSelling: 442
-          maxBuyingA0: 685236
-          maxSellingA0: 123109376
-          maxSwapA0: 685236
-          spotBuying: 278528
-          spotSelling: 13436
-          buyingAmount: 51
-          sellingAmount: 3
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  278495 > 
-        spotBuying 278528
-valueEquation: 
-        addedBuyingA0  685236 > 
-        addedSellingA0 557056
-
-          maxBuying: 411
-          maxSelling: 1
-          maxBuyingA0: 164811
-          maxSellingA0: 12583
-          maxSwapA0: 12583
-          spotBuying: 12583
-          spotSelling: 401
-          buyingAmount: 31
-          sellingAmount: 1
-        
-Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  12832 > 
-        addedSellingA0 12583
-
-          maxBuying: 51
-          maxSelling: 1
-          maxBuyingA0: 20451
-          maxSellingA0: 278528
-          maxSwapA0: 20451
-          spotBuying: 278528
-          spotSelling: 401
-          buyingAmount: 51
-          sellingAmount: 1
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  278495 > 
-        spotBuying 278528
-subSwap: 35 sold
-valueEquation: 
-        addedBuyingA0  88975165 > 
-        addedSellingA0 88970525
-valueEquation: 
-        addedBuyingA0  88966386 > 
-        addedSellingA0 86428510
-Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: 1b529ac3ca04e759c5dfb3d672481ba2b197bf7c989fc65517c3f5c5, 
-   +     +  virtual: +[
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 5956,
-   +     +  +  _: 6938
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 1,
-   +     +  +  _: 1
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 100,
-   +     +  +  _: 100
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: 1b529ac3ca04e759c5dfb3d672481ba2b197bf7c989fc65517c3f5c5,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: a8fd7ff8569879130f9dbad2b2bbbe5492982511fb08bdbca0673e94cb5c2a93),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: f8073ab338fabdc1ebbf0d2c481c78de40f892a70635bbb97888e62e201f0493),
-   +     +  anchorPrices: +[
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 5897,
-   +     +  +  _: 6891
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 2547210,
-   +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 2788
-   +  ]
-     )
-  boughtAsset:  Asset(, )
-  soldAsset:    Asset(2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59, bFgRIPDVs98kAqotexF1L2cr2z4GA9e6)
-  boughtAmount: 10134
-  soldAmount:   35
-  boughtSpot:   2542015
-  soldSpot:     8779
-  (boughtA0:    88966386)
-  (soldA0:      88970525)
-  boughtExp:    594
-  soldExp:      40
-  spotPrice:    0.003453559479389382
-  eff.Price:    0.0034537201499901323
-  maxBuying:    2547210
-  (maxBuyingA0: 22361956590)
-)
-
-trials left: 1 - iteration: 12 - block: 6410
-virtual: 3542
-weight: 1
+virtual: 3107
+weight: 5
 jumpSize: 1
-minAnchorPrice: 1771
+minAnchorPrice: 7767
 jumpLog: 0.6931471805599453
-anchorLog: 0.0005644933821928088
-1227.910197755327
-maxTicks: 762
-maxTicks_: 1227
-3
-virtual: 5627
-weight: 1
-jumpSize: 20
-minAnchorPrice: 5359
-jumpLog: 0.04879016416943205
-anchorLog: 0.00018658456999748717
-261.49088410734674
-maxTicks: 254
-maxTicks_: 261
-3
-virtual: 63
-weight: 100
-jumpSize: 100
-minAnchorPrice: 6237
-jumpLog: 0.009950330853168092
-anchorLog: 0.0001603206416259698
-62.06518856369316
-maxTicks: 254
-maxTicks_: 62
-3
-virtual: 3542
-weight: 1
-jumpSize: 1
-minAnchorPrice: 1771
-jumpLog: 0.6931471805599453
-anchorLog: 0.0005644933821928088
-1227.910197755327
-virtual: 3542
-weight: 1
-jumpSize: 1
-minAnchorPrice: 1771
-jumpLog: 0.6931471805599453
-anchorLog: 0.0005644933821928088
-1227.910197755327
-Opening pool with 3 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 13 - block: 7410
-
-trials left: 1 - iteration: 14 - block: 7491
-virtual: 9000
-weight: 1
-jumpSize: 52
-minAnchorPrice: 8830
-jumpLog: 0.01904819497069441
-anchorLog: 0.00011324387079662322
-168.20508550880797
+anchorLog: 0.0001287415515135574
+5384.020717561043
 maxTicks: 1
-maxTicks_: 168
-1
-virtual: 1
-weight: 2
-jumpSize: 1
-minAnchorPrice: 1
-jumpLog: 0.6931471805599453
-anchorLog: 0.6931471805599453
-1
-maxTicks: 1
-maxTicks_: 1
+maxTicks_: 5384
 1
 Opening pool with 1 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 15 - block: 7492
+trials left: 1 - iteration: 7 - block: 4564
 
-          maxBuying: 20248
-          maxSelling: 77
-          maxBuyingA0: 177757192
-          maxSellingA0: 195110300
-          maxSwapA0: 177757192
-          spotBuying: 2533900
-          spotSelling: 8779
-          buyingAmount: 20248
-          sellingAmount: 71
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2533899 > 
-        spotBuying 2533900
-valueEquation: 
-        addedBuyingA0  177757192 > 
-        addedSellingA0 177373000
-
-          maxBuying: 12133
-          maxSelling: 88
-          maxBuyingA0: 107583311
-          maxSellingA0: 223697320
-          maxSwapA0: 107583311
-          spotBuying: 2542015
-          spotSelling: 8867
-          buyingAmount: 12133
-          sellingAmount: 43
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2542014 > 
-        spotBuying 2542015
-valueEquation: 
-        addedBuyingA0  107583311 > 
-        addedSellingA0 106764630
-
-          maxBuying: 3648
-          maxSelling: 77
-          maxBuyingA0: 32025792
-          maxSellingA0: 196388500
-          maxSwapA0: 32025792
-          spotBuying: 2550500
-          spotSelling: 8779
-          buyingAmount: 3648
-          sellingAmount: 13
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2550499 > 
-        spotBuying 2550500
-valueEquation: 
-        addedBuyingA0  32025792 > 
-        addedSellingA0 30606000
-
-          maxBuying: 79033
-          maxSelling: 3288
-          maxBuyingA0: 559869772
-          maxSellingA0: 9083343312
-          maxSwapA0: 559869772
-          spotBuying: 2762574
-          spotSelling: 7084
-          buyingAmount: 79033
-          sellingAmount: 203
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2762573 > 
-        spotBuying 2762574
-valueEquation: 
-        addedBuyingA0  559869772 > 
-        addedSellingA0 558039948
-
-          maxBuying: 79033
-          maxSelling: 666
-          maxBuyingA0: 352645246
-          maxSellingA0: 1839874284
-          maxSwapA0: 352645246
-          spotBuying: 2762574
-          spotSelling: 4462
-          buyingAmount: 79033
-          sellingAmount: 128
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2762573 > 
-        spotBuying 2762574
-valueEquation: 
-        addedBuyingA0  352645246 > 
-        addedSellingA0 350846898
-
-          maxBuying: 79033
-          maxSelling: 1826
-          maxBuyingA0: 444323526
-          maxSellingA0: 5044460124
-          maxSwapA0: 444323526
-          spotBuying: 2762574
-          spotSelling: 5622
-          buyingAmount: 79033
-          sellingAmount: 161
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2762573 > 
-        spotBuying 2762574
-valueEquation: 
-        addedBuyingA0  444323526 > 
-        addedSellingA0 442011840
-subSwap: 79033 bought
-valueEquation: 
-        addedBuyingA0  444323526 > 
-        addedSellingA0 442011840
-Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: 1b529ac3ca04e759c5dfb3d672481ba2b197bf7c989fc65517c3f5c5, 
-   +     +  virtual: +[
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 3542,
-   +     +  +  _: 5627,
-   +     +  +  624e81ea37a21baa7670f54f99b212e41c40869f8350e9d5c33d095b_EZ1sTCCZ7C8H8N32Es8k16wUiGVPHxE: 63
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 1,
-   +     +  +  _: 1,
-   +     +  +  624e81ea37a21baa7670f54f99b212e41c40869f8350e9d5c33d095b_EZ1sTCCZ7C8H8N32Es8k16wUiGVPHxE: 100
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 1,
-   +     +  +  _: 20,
-   +     +  +  624e81ea37a21baa7670f54f99b212e41c40869f8350e9d5c33d095b_EZ1sTCCZ7C8H8N32Es8k16wUiGVPHxE: 100
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: 1b529ac3ca04e759c5dfb3d672481ba2b197bf7c989fc65517c3f5c5,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 4e594c46b3fcc9aaa0b9475647ea087329ae1bfda73c5d5ecaca10e21d0a080e),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 20eba5974aef6101cebd69146a488d56416713c6fffcc640cd82a284afebcc4a),
-   +     +  anchorPrices: +[
-   +     +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 2811,
-   +     +  +  _: 5359,
-   +     +  +  624e81ea37a21baa7670f54f99b212e41c40869f8350e9d5c33d095b_EZ1sTCCZ7C8H8N32Es8k16wUiGVPHxE: 6237
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 2835980,
-   +  +  2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59_bFgRIPDVs98kAqotexF1L2cr2z4GA9e6: 254
-   +  ]
-     )
-  boughtAsset:  Asset(, )
-  soldAsset:    Asset(2fa94a3abfa1783c5733f23e753339d77c5b48925ee5ee7b226c9a59, bFgRIPDVs98kAqotexF1L2cr2z4GA9e6)
-  boughtAmount: 79033
-  soldAmount:   161
-  boughtSpot:   2762574
-  soldSpot:     5622
-  (boughtA0:    444323526)
-  (soldA0:      444774414)
-  boughtExp:    128
-  soldExp:      1
-  spotPrice:    0.002035058608384789
-  eff.Price:    0.002037123733124138
-  maxBuying:    79033
-  (maxBuyingA0: 444323526)
-)
-
-trials left: 1 - iteration: 16 - block: 7493
+trials left: 1 - iteration: 8 - block: 5178
 virtual: 9000
 weight: 1
 jumpSize: 100
@@ -1442,21 +138,116 @@ anchorLog: 0.00011222714786481952
 maxTicks: 1
 maxTicks_: 88
 1
-virtual: 4386
+virtual: 9000
 weight: 1
-jumpSize: 1
-minAnchorPrice: 2193
-jumpLog: 0.6931471805599453
-anchorLog: 0.0004558924172873741
-1520.418314224815
+jumpSize: 29
+minAnchorPrice: 8700
+jumpLog: 0.033901551675681416
+anchorLog: 0.00011493592334937207
+294.96045002945226
 maxTicks: 1
-maxTicks_: 1520
+maxTicks_: 294
 1
 Opening pool with 1 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 17 - block: 8493
+trials left: 1 - iteration: 9 - block: 6178
 
-trials left: 1 - iteration: 18 - block: 8494
+trials left: 1 - iteration: 10 - block: 7178
+virtual: 1148
+weight: 1
+jumpSize: 100
+minAnchorPrice: 1136
+jumpLog: 0.009950330853168092
+anchorLog: 0.0008798944694392958
+11.308550285023207
+maxTicks: 1
+maxTicks_: 11
+1
+virtual: 5240
+weight: 1
+jumpSize: 100
+minAnchorPrice: 5188
+jumpLog: 0.009950330853168092
+anchorLog: 0.00019273393140510267
+51.62729147185681
+maxTicks: 1
+maxTicks_: 51
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 11 - block: 8178
+
+trials left: 1 - iteration: 12 - block: 8179
+virtual: 9000
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8910
+jumpLog: 0.009950330853168092
+anchorLog: 0.00011222714786481952
+88.66242297410535
+maxTicks: 1
+maxTicks_: 88
+1
+virtual: 8665
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4332
+jumpLog: 0.6931471805599453
+anchorLog: 0.00023081361902823038
+3003.060146442952
+maxTicks: 1
+maxTicks_: 3003
+1
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+maxTicks: 1
+maxTicks_: 3119
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 13 - block: 9179
+
+trials left: 1 - iteration: 14 - block: 10179
+virtual: 3754
+weight: 1
+jumpSize: 1
+minAnchorPrice: 1877
+jumpLog: 0.6931471805599453
+anchorLog: 0.0005326231816993347
+1301.3838007359325
+maxTicks: 1
+maxTicks_: 1301
+1
+virtual: 1
+weight: 78
+jumpSize: 77
+minAnchorPrice: 77
+jumpLog: 0.012903404835907782
+anchorLog: 0.012903404835907782
+1
+maxTicks: 1
+maxTicks_: 1
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 15 - block: 10313
+
+trials left: 1 - iteration: 16 - block: 10732
+virtual: 4368
+weight: 1
+jumpSize: 1
+minAnchorPrice: 2184
+jumpLog: 0.6931471805599453
+anchorLog: 0.000457770664894863
+1514.1799894913354
+maxTicks: 1
+maxTicks_: 1514
+1
 virtual: 2
 weight: 100
 jumpSize: 100
@@ -1467,234 +258,4570 @@ anchorLog: 0.005037794029957081
 maxTicks: 1
 maxTicks_: 1
 1
-virtual: 1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 17 - block: 10733
+
+trials left: 1 - iteration: 18 - block: 10885
+virtual: 8103
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4051
+jumpLog: 0.6931471805599453
+anchorLog: 0.00024682216588344175
+2808.2857877816136
+maxTicks: 1
+maxTicks_: 2808
+1
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+maxTicks: 1
+maxTicks_: 3119
+1
+virtual: 5886
+weight: 1
+jumpSize: 71
+minAnchorPrice: 5804
+jumpLog: 0.01398624197473987
+anchorLog: 0.0001722801279133538
+81.18314134160663
+maxTicks: 1
+maxTicks_: 81
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 19 - block: 11160
+traces.length: 20
+Opening: 10
+Closing: 10
+trials left: 1
+accounts: 10
+
+trials left: 1 - iteration: 0 - block: 0
+virtual: 9000
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8910
+jumpLog: 0.009950330853168092
+anchorLog: 0.00011222714786481952
+88.66242297410535
+maxTicks: 1
+maxTicks_: 88
+1
+virtual: 4113
 weight: 2
 jumpSize: 1
-minAnchorPrice: 1
+minAnchorPrice: 4113
 jumpLog: 0.6931471805599453
-anchorLog: 0.6931471805599453
-1
+anchorLog: 0.0002431019824784168
+2851.2609131909676
 maxTicks: 1
-maxTicks_: 1
+maxTicks_: 2851
+1
+virtual: 9000
+weight: 1
+jumpSize: 94
+minAnchorPrice: 8905
+jumpLog: 0.010582109330537008
+anchorLog: 0.00011229015788565603
+94.23897454407951
+maxTicks: 1
+maxTicks_: 94
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 1 - block: 179
+virtual: 9000
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8910
+jumpLog: 0.009950330853168092
+anchorLog: 0.00011222714786481952
+88.66242297410535
+maxTicks: 1
+maxTicks_: 88
+1
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+maxTicks: 1
+maxTicks_: 3119
 1
 virtual: 1
 weight: 100
-jumpSize: 53
-minAnchorPrice: 98
-jumpLog: 0.018692133012152546
-anchorLog: 0.010152371464017908
-1.8411592876010605
+jumpSize: 99
+minAnchorPrice: 99
+jumpLog: 0.010050335853501506
+anchorLog: 0.010050335853501506
+1
 maxTicks: 1
 maxTicks_: 1
 1
 Opening pool with 1 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 19 - block: 8495
+trials left: 1 - iteration: 2 - block: 1179
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+maxTicks: 9000
+maxTicks_: 3119
+3
+virtual: 9000
+weight: 1
+jumpSize: 93
+minAnchorPrice: 8904
+jumpLog: 0.01069528911674795
+anchorLog: 0.00011230276838119965
+95.23620184004675
+maxTicks: 3000
+maxTicks_: 95
+3
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+Opening pool with 3 dirac utxos and 1 param utxos
 
-          maxBuying: 20248
-          maxSelling: 77
-          maxBuyingA0: 177757192
-          maxSellingA0: 195110300
-          maxSwapA0: 177757192
-          spotBuying: 2533900
-          spotSelling: 8779
-          buyingAmount: 20248
-          sellingAmount: 71
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2533899 > 
-        spotBuying 2533900
-valueEquation: 
-        addedBuyingA0  177757192 > 
-        addedSellingA0 177373000
+trials left: 1 - iteration: 3 - block: 1409
+virtual: 2
+weight: 100
+jumpSize: 100
+minAnchorPrice: 198
+jumpLog: 0.009950330853168092
+anchorLog: 0.005037794029957081
+1.9751364970458831
+maxTicks: 2114
+maxTicks_: 1
+1
+virtual: 9000
+weight: 1
+jumpSize: 59
+minAnchorPrice: 8850
+jumpLog: 0.01680711831638119
+anchorLog: 0.000112987966901702
+148.75140050093262
+maxTicks: 2114
+maxTicks_: 148
+3
+virtual: 9000
+weight: 1
+jumpSize: 59
+minAnchorPrice: 8850
+jumpLog: 0.01680711831638119
+anchorLog: 0.000112987966901702
+148.75140050093262
+Opening pool with 2 dirac utxos and 1 param utxos
 
-          maxBuying: 12133
+trials left: 1 - iteration: 4 - block: 1410
+
+trials left: 1 - iteration: 5 - block: 1846
+virtual: 9000
+weight: 1
+jumpSize: 71
+minAnchorPrice: 8875
+jumpLog: 0.01398624197473987
+anchorLog: 0.00011266970886809942
+124.13489051536766
+maxTicks: 6628
+maxTicks_: 124
+3
+virtual: 7623
+weight: 1
+jumpSize: 1
+minAnchorPrice: 3811
+jumpLog: 0.6931471805599453
+anchorLog: 0.00026236390023243785
+2641.930463550285
+maxTicks: 2209
+maxTicks_: 2641
+3
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+maxTicks: 2209
+maxTicks_: 3119
+3
+virtual: 9000
+weight: 1
+jumpSize: 71
+minAnchorPrice: 8875
+jumpLog: 0.01398624197473987
+anchorLog: 0.00011266970886809942
+124.13489051536766
+virtual: 9000
+weight: 1
+jumpSize: 71
+minAnchorPrice: 8875
+jumpLog: 0.01398624197473987
+anchorLog: 0.00011266970886809942
+124.13489051536766
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+Opening pool with 9 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 6 - block: 1847
+virtual: 9000
+weight: 1
+jumpSize: 86
+minAnchorPrice: 8896
+jumpLog: 0.011560822401076006
+anchorLog: 0.00011240375440380989
+102.85085638281986
+maxTicks: 1
+maxTicks_: 102
+1
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+maxTicks: 1
+maxTicks_: 3119
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 7 - block: 1848
+
+trials left: 1 - iteration: 8 - block: 2848
+
+          maxBuying: 21580
           maxSelling: 88
-          maxBuyingA0: 107583311
-          maxSellingA0: 223697320
-          maxSwapA0: 107583311
-          spotBuying: 2542015
-          spotSelling: 8867
-          buyingAmount: 12133
-          sellingAmount: 43
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2542014 > 
-        spotBuying 2542015
-valueEquation: 
-        addedBuyingA0  107583311 > 
-        addedSellingA0 106764630
-
-          maxBuying: 3648
-          maxSelling: 77
-          maxBuyingA0: 32025792
-          maxSellingA0: 196388500
-          maxSwapA0: 32025792
-          spotBuying: 2550500
-          spotSelling: 8779
-          buyingAmount: 3648
-          sellingAmount: 13
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2550499 > 
-        spotBuying 2550500
-valueEquation: 
-        addedBuyingA0  32025792 > 
-        addedSellingA0 30606000
-
-          maxBuying: 79033
-          maxSelling: 3171
-          maxBuyingA0: 559869772
-          maxSellingA0: 8760122154
-          maxSwapA0: 559869772
-          spotBuying: 2762574
-          spotSelling: 7084
-          buyingAmount: 79033
-          sellingAmount: 203
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2762573 > 
-        spotBuying 2762574
-valueEquation: 
-        addedBuyingA0  559869772 > 
-        addedSellingA0 558039948
-
-          maxBuying: 79033
-          maxSelling: 666
-          maxBuyingA0: 352645246
-          maxSellingA0: 1839874284
-          maxSwapA0: 352645246
-          spotBuying: 2762574
-          spotSelling: 4462
-          buyingAmount: 79033
-          sellingAmount: 128
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2762573 > 
-        spotBuying 2762574
-valueEquation: 
-        addedBuyingA0  352645246 > 
-        addedSellingA0 350846898
-
-          maxBuying: 83343
-          maxSelling: 1665
-          maxBuyingA0: 468554346
-          maxSellingA0: 4599685710
-          maxSwapA0: 468554346
-          spotBuying: 2762574
-          spotSelling: 5622
-          buyingAmount: 83343
-          sellingAmount: 170
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2762573 > 
-        spotBuying 2762574
-valueEquation: 
-        addedBuyingA0  468554346 > 
-        addedSellingA0 466875006
-
-          maxBuying: 12884
-          maxSelling: 88
-          maxBuyingA0: 117102676
-          maxSellingA0: 197615616
-          maxSwapA0: 117102676
-          spotBuying: 2245632
+          maxBuyingA0: 196140620
+          maxSellingA0: 22718612664
+          maxSwapA0: 196140620
+          spotBuying: 258166053
           spotSelling: 9089
-          buyingAmount: 12884
-          sellingAmount: 53
-        
-Swapping.boundary()
-boughtAssetForSale (new): 
-        buyingAmm  2245631 > 
-        spotBuying 2245632
-valueEquation: 
-        addedBuyingA0  117102676 > 
-        addedSellingA0 116772864
-
-          maxBuying: 450059
-          maxSelling: 1
-          maxBuyingA0: 180473659
-          maxSellingA0: 4194304
-          maxSwapA0: 4194304
-          spotBuying: 4194304
-          spotSelling: 401
-          buyingAmount: 10459
+          buyingAmount: 21580
           sellingAmount: 1
         
 Swapping.boundary()
-valueEquation: 
-        addedBuyingA0  4194460 > 
-        addedSellingA0 4194304
-subSwap: 12884 bought
-valueEquation: 
-        addedBuyingA0  117102676 > 
-        addedSellingA0 116772864
+boughtAssetForSale (old): 
+        buyingAmm  260324100 > 
+        spotBuying 260773791
+boughtAssetForSale (old):
+        sellingAmm  9001 > 
+        spotSelling 8999
+
+          maxBuying: 1000
+          maxSelling: 51
+          maxBuyingA0: 9787000
+          maxSellingA0: 388722
+          maxSwapA0: 388722
+          spotBuying: 7622
+          spotSelling: 9787
+          buyingAmount: 39
+          sellingAmount: 51
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 913
+          maxSelling: 51
+          maxBuyingA0: 8935531
+          maxSellingA0: 459000
+          maxSwapA0: 459000
+          spotBuying: 9000
+          spotSelling: 9787
+          buyingAmount: 46
+          sellingAmount: 51
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 85
+          maxSelling: 6621
+          maxBuyingA0: 1295740
+          maxSellingA0: 63899271
+          maxSwapA0: 1295740
+          spotBuying: 9651
+          spotSelling: 15244
+          buyingAmount: 85
+          sellingAmount: 135
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 6621
+          maxBuyingA0: 13917772
+          maxSellingA0: 59589000
+          maxSwapA0: 13917772
+          spotBuying: 9000
+          spotSelling: 15244
+          buyingAmount: 913
+          sellingAmount: 1547
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 1000
+          maxSelling: 97
+          maxBuyingA0: 9833000
+          maxSellingA0: 739334
+          maxSwapA0: 739334
+          spotBuying: 7622
+          spotSelling: 9833
+          buyingAmount: 75
+          sellingAmount: 97
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 913
+          maxSelling: 97
+          maxBuyingA0: 8977529
+          maxSellingA0: 873000
+          maxSwapA0: 873000
+          spotBuying: 9000
+          spotSelling: 9833
+          buyingAmount: 88
+          sellingAmount: 97
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 40
+          maxSelling: 6621
+          maxBuyingA0: 609760
+          maxSellingA0: 64197216
+          maxSwapA0: 609760
+          spotBuying: 9696
+          spotSelling: 15244
+          buyingAmount: 40
+          sellingAmount: 63
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 6621
+          maxBuyingA0: 13917772
+          maxSellingA0: 59589000
+          maxSwapA0: 13917772
+          spotBuying: 9000
+          spotSelling: 15244
+          buyingAmount: 913
+          sellingAmount: 1547
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 1000
+          maxSelling: 6
+          maxBuyingA0: 9742000
+          maxSellingA0: 45732
+          maxSwapA0: 45732
+          spotBuying: 7622
+          spotSelling: 9742
+          buyingAmount: 4
+          sellingAmount: 6
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 913
+          maxSelling: 6
+          maxBuyingA0: 8894446
+          maxSellingA0: 54000
+          maxSwapA0: 54000
+          spotBuying: 9000
+          spotSelling: 9742
+          buyingAmount: 5
+          sellingAmount: 6
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 130
+          maxSelling: 6621
+          maxBuyingA0: 1981720
+          maxSellingA0: 63601326
+          maxSwapA0: 1981720
+          spotBuying: 9606
+          spotSelling: 15244
+          buyingAmount: 130
+          sellingAmount: 207
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 6621
+          maxBuyingA0: 13917772
+          maxSellingA0: 59589000
+          maxSwapA0: 13917772
+          spotBuying: 9000
+          spotSelling: 15244
+          buyingAmount: 913
+          sellingAmount: 1547
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 1000
+          maxSelling: 51
+          maxBuyingA0: 9787000
+          maxSellingA0: 388722
+          maxSwapA0: 388722
+          spotBuying: 7622
+          spotSelling: 9787
+          buyingAmount: 39
+          sellingAmount: 51
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 913
+          maxSelling: 51
+          maxBuyingA0: 8935531
+          maxSellingA0: 289119
+          maxSwapA0: 289119
+          spotBuying: 5669
+          spotSelling: 9787
+          buyingAmount: 29
+          sellingAmount: 51
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 85
+          maxSelling: 6621
+          maxBuyingA0: 1295740
+          maxSellingA0: 63899271
+          maxSwapA0: 1295740
+          spotBuying: 9651
+          spotSelling: 15244
+          buyingAmount: 85
+          sellingAmount: 135
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+
+          maxBuying: 913
+          maxSelling: 6621
+          maxBuyingA0: 13917772
+          maxSellingA0: 37534449
+          maxSwapA0: 13917772
+          spotBuying: 5669
+          spotSelling: 15244
+          buyingAmount: 913
+          sellingAmount: 2456
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 1000
+          maxSelling: 51
+          maxBuyingA0: 9787000
+          maxSellingA0: 388722
+          maxSwapA0: 388722
+          spotBuying: 7622
+          spotSelling: 9787
+          buyingAmount: 39
+          sellingAmount: 51
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 913
+          maxSelling: 51
+          maxBuyingA0: 8935531
+          maxSellingA0: 364293
+          maxSwapA0: 364293
+          spotBuying: 7143
+          spotSelling: 9787
+          buyingAmount: 37
+          sellingAmount: 51
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 85
+          maxSelling: 6621
+          maxBuyingA0: 1295740
+          maxSellingA0: 63899271
+          maxSwapA0: 1295740
+          spotBuying: 9651
+          spotSelling: 15244
+          buyingAmount: 85
+          sellingAmount: 135
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 6621
+          maxBuyingA0: 13917772
+          maxSellingA0: 47293803
+          maxSwapA0: 13917772
+          spotBuying: 7143
+          spotSelling: 15244
+          buyingAmount: 913
+          sellingAmount: 1949
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 1000
+          maxSelling: 97
+          maxBuyingA0: 9833000
+          maxSellingA0: 739334
+          maxSwapA0: 739334
+          spotBuying: 7622
+          spotSelling: 9833
+          buyingAmount: 75
+          sellingAmount: 97
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 913
+          maxSelling: 97
+          maxBuyingA0: 8977529
+          maxSellingA0: 549893
+          maxSwapA0: 549893
+          spotBuying: 5669
+          spotSelling: 9833
+          buyingAmount: 55
+          sellingAmount: 96
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 40
+          maxSelling: 6621
+          maxBuyingA0: 609760
+          maxSellingA0: 64197216
+          maxSwapA0: 609760
+          spotBuying: 9696
+          spotSelling: 15244
+          buyingAmount: 40
+          sellingAmount: 63
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 6621
+          maxBuyingA0: 13917772
+          maxSellingA0: 37534449
+          maxSwapA0: 13917772
+          spotBuying: 5669
+          spotSelling: 15244
+          buyingAmount: 913
+          sellingAmount: 2456
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 1000
+          maxSelling: 97
+          maxBuyingA0: 9833000
+          maxSellingA0: 739334
+          maxSwapA0: 739334
+          spotBuying: 7622
+          spotSelling: 9833
+          buyingAmount: 75
+          sellingAmount: 97
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 913
+          maxSelling: 97
+          maxBuyingA0: 8977529
+          maxSellingA0: 692871
+          maxSwapA0: 692871
+          spotBuying: 7143
+          spotSelling: 9833
+          buyingAmount: 70
+          sellingAmount: 97
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 40
+          maxSelling: 6621
+          maxBuyingA0: 609760
+          maxSellingA0: 64197216
+          maxSwapA0: 609760
+          spotBuying: 9696
+          spotSelling: 15244
+          buyingAmount: 40
+          sellingAmount: 63
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 6621
+          maxBuyingA0: 13917772
+          maxSellingA0: 47293803
+          maxSwapA0: 13917772
+          spotBuying: 7143
+          spotSelling: 15244
+          buyingAmount: 913
+          sellingAmount: 1949
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 1000
+          maxSelling: 6
+          maxBuyingA0: 9742000
+          maxSellingA0: 45732
+          maxSwapA0: 45732
+          spotBuying: 7622
+          spotSelling: 9742
+          buyingAmount: 4
+          sellingAmount: 6
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 913
+          maxSelling: 6
+          maxBuyingA0: 8894446
+          maxSellingA0: 34014
+          maxSwapA0: 34014
+          spotBuying: 5669
+          spotSelling: 9742
+          buyingAmount: 3
+          sellingAmount: 6
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 130
+          maxSelling: 6621
+          maxBuyingA0: 1981720
+          maxSellingA0: 63601326
+          maxSwapA0: 1981720
+          spotBuying: 9606
+          spotSelling: 15244
+          buyingAmount: 130
+          sellingAmount: 207
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 6621
+          maxBuyingA0: 13917772
+          maxSellingA0: 37534449
+          maxSwapA0: 13917772
+          spotBuying: 5669
+          spotSelling: 15244
+          buyingAmount: 913
+          sellingAmount: 2456
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 1000
+          maxSelling: 6
+          maxBuyingA0: 9742000
+          maxSellingA0: 45732
+          maxSwapA0: 45732
+          spotBuying: 7622
+          spotSelling: 9742
+          buyingAmount: 4
+          sellingAmount: 6
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 913
+          maxSelling: 6
+          maxBuyingA0: 8894446
+          maxSellingA0: 42858
+          maxSwapA0: 42858
+          spotBuying: 7143
+          spotSelling: 9742
+          buyingAmount: 4
+          sellingAmount: 6
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 130
+          maxSelling: 6621
+          maxBuyingA0: 1981720
+          maxSellingA0: 63601326
+          maxSwapA0: 1981720
+          spotBuying: 9606
+          spotSelling: 15244
+          buyingAmount: 130
+          sellingAmount: 207
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 6621
+          maxBuyingA0: 13917772
+          maxSellingA0: 47293803
+          maxSwapA0: 13917772
+          spotBuying: 7143
+          spotSelling: 15244
+          buyingAmount: 913
+          sellingAmount: 1949
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 6467
+          maxSelling: 103
+          maxBuyingA0: 58875568
+          maxSellingA0: 927000
+          maxSwapA0: 927000
+          spotBuying: 9000
+          spotSelling: 9104
+          buyingAmount: 101
+          sellingAmount: 103
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  15467 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9001 > 
+        spotSelling 8999
+
+          maxBuying: 1
+          maxSelling: 2533
+          maxBuyingA0: 18000
+          maxSellingA0: 22794467
+          maxSwapA0: 18000
+          spotBuying: 8999
+          spotSelling: 18000
+          buyingAmount: 1
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9001 > 
+        spotBuying 9104
+boughtAssetForSale (old):
+        sellingAmm  15467 > 
+        spotSelling 9000
+subSwap: 158 sold
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
 Swapping (
   paramUtxo: ParamUtxo (
      +  param: Param (
-   +     +  owner: 0597a08312c429b95e245cb48c0301ca83a7a3779b2544d094b690aa, 
+   +     +  owner: c573afbf35e0c454e346542e496f0a2c8c6786ced0d1a23c5ac22ddd, 
    +     +  virtual: +[
-   +     +  +  f23eb6b71e04261ac47a375c2c063f7fb51cc83dd0f7f5968cd1d0f7_: 9000,
-   +     +  +  _: 4386
+   +     +  +  b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2_: 9000,
+   +     +  +  228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac_X6V2a0yYWu0tEOFXoUpq7lI: 7623,
+   +     +  +  fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72_pksm7Aa9xg6xtAaY5Fjmsh: 9000
    +     +  ], 
    +     +  weights: +[
-   +     +  +  f23eb6b71e04261ac47a375c2c063f7fb51cc83dd0f7f5968cd1d0f7_: 1,
-   +     +  +  _: 1
+   +     +  +  b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2_: 1,
+   +     +  +  228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac_X6V2a0yYWu0tEOFXoUpq7lI: 1,
+   +     +  +  fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72_pksm7Aa9xg6xtAaY5Fjmsh: 1
    +     +  ]
    +     +  jumpSizes: +[
-   +     +  +  f23eb6b71e04261ac47a375c2c063f7fb51cc83dd0f7f5968cd1d0f7_: 100,
-   +     +  +  _: 1
+   +     +  +  b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2_: 71,
+   +     +  +  228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac_X6V2a0yYWu0tEOFXoUpq7lI: 1,
+   +     +  +  fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72_pksm7Aa9xg6xtAaY5Fjmsh: 1
    +     +  ], 
    +     +  active: 1
    +     )
      )
   diracUtxo: DiracUtxo (
      +  dirac: Dirac(
-   +     +  owner: 0597a08312c429b95e245cb48c0301ca83a7a3779b2544d094b690aa,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 233e0832cfd7673395c06720dc16026434f1e2e251f256df30b0d2ebb96887ee),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 798809cac74f5b2b8f5cc1e4faebce34d7423a0731c12505657ad25d44b11b06),
+   +     +  owner: c573afbf35e0c454e346542e496f0a2c8c6786ced0d1a23c5ac22ddd,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 5bb936d3cbf9cd7024aeb75e85c040959d48e09a27a1a82d3710b0c4691bd5f8),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 2cdce34768b158d3c567a6ade47955c7002bf7a886396926a055a8b1ef261585),
    +     +  anchorPrices: +[
-   +     +  +  f23eb6b71e04261ac47a375c2c063f7fb51cc83dd0f7f5968cd1d0f7_: 8910,
-   +     +  +  _: 2193
+   +     +  +  b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2_: 8958,
+   +     +  +  228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac_X6V2a0yYWu0tEOFXoUpq7lI: 3811,
+   +     +  +  fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72_pksm7Aa9xg6xtAaY5Fjmsh: 5669
    +     +  ],
    +     ),
      +  balance: +[
-   +  +  _: 2254130,
-   +  +  f23eb6b71e04261ac47a375c2c063f7fb51cc83dd0f7f5968cd1d0f7_: 1
+   +  +  _: 3232500,
+   +  +  228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac_X6V2a0yYWu0tEOFXoUpq7lI: 1000,
+   +  +  b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2_: 736,
+   +  +  fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72_pksm7Aa9xg6xtAaY5Fjmsh: 913
+   +  ]
+     )
+  boughtAsset:  Asset(b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2, )
+  soldAsset:    Asset(228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac, X6V2a0yYWu0tEOFXoUpq7lI)
+  boughtAmount: 99
+  soldAmount:   158
+  boughtSpot:   9606
+  soldSpot:     15244
+  (boughtA0:    1509156)
+  (soldA0:      1517748)
+  boughtExp:    5
+  soldExp:      2
+  spotPrice:    1.586924838642515
+  eff.Price:    1.595959595959596
+  maxBuying:    736
+  (maxBuyingA0: 11219584)
+)
+
+trials left: 1 - iteration: 9 - block: 2849
+virtual: 8892
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8803
+jumpLog: 0.009950330853168092
+anchorLog: 0.00011359118544612658
+87.59773757169988
+maxTicks: 1
+maxTicks_: 87
+1
+virtual: 5859
+weight: 1
+jumpSize: 100
+minAnchorPrice: 5800
+jumpLog: 0.009950330853168092
+anchorLog: 0.00017239893155357209
+57.716893970865925
+maxTicks: 1
+maxTicks_: 57
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 10 - block: 3849
+virtual: 5706
+weight: 1
+jumpSize: 69
+minAnchorPrice: 5624
+jumpLog: 0.01438873745209967
+anchorLog: 0.00017779358212012563
+80.9294535861141
+maxTicks: 1
+maxTicks_: 80
+1
+virtual: 1
+weight: 100
+jumpSize: 2
+minAnchorPrice: 66
+jumpLog: 0.4054651081081644
+anchorLog: 0.015037877364540502
+26.96292157989372
+maxTicks: 1
+maxTicks_: 26
+1
+virtual: 1
+weight: 28
+jumpSize: 2
+minAnchorPrice: 18
+jumpLog: 0.4054651081081644
+anchorLog: 0.05406722127027579
+7.499277724691845
+maxTicks: 1
+maxTicks_: 7
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 11 - block: 4849
+
+trials left: 1 - iteration: 12 - block: 5849
+virtual: 2
+weight: 51
+jumpSize: 100
+minAnchorPrice: 100
+jumpLog: 0.009950330853168092
+anchorLog: 0.009950330853168092
+1
+maxTicks: 1
+maxTicks_: 1
+1
+virtual: 9000
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8910
+jumpLog: 0.009950330853168092
+anchorLog: 0.00011222714786481952
+88.66242297410535
+maxTicks: 1
+maxTicks_: 88
+1
+virtual: 2
+weight: 100
+jumpSize: 100
+minAnchorPrice: 198
+jumpLog: 0.009950330853168092
+anchorLog: 0.005037794029957081
+1.9751364970458831
+maxTicks: 1
+maxTicks_: 1
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 13 - block: 6630
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+maxTicks: 1
+maxTicks_: 3119
+1
+virtual: 6019
+weight: 1
+jumpSize: 100
+minAnchorPrice: 5959
+jumpLog: 0.009950330853168092
+anchorLog: 0.00016779931241651992
+59.298996580324946
+maxTicks: 1
+maxTicks_: 59
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 14 - block: 6631
+
+trials left: 1 - iteration: 15 - block: 7631
+virtual: 9000
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4500
+jumpLog: 0.6931471805599453
+anchorLog: 0.00022219753452146847
+3119.5088732767836
+maxTicks: 1
+maxTicks_: 3119
+1
+virtual: 9000
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8910
+jumpLog: 0.009950330853168092
+anchorLog: 0.00011222714786481952
+88.66242297410535
+maxTicks: 1
+maxTicks_: 88
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 16 - block: 8631
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9787000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9787
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8935531
+          maxSellingA0: 36000
+          maxSwapA0: 36000
+          spotBuying: 9000
+          spotSelling: 9787
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 85
+          maxSelling: 783
+          maxBuyingA0: 1530000
+          maxSellingA0: 7556733
+          maxSwapA0: 1530000
+          spotBuying: 9651
+          spotSelling: 18000
+          buyingAmount: 85
+          sellingAmount: 159
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 783
+          maxBuyingA0: 18000000
+          maxSellingA0: 5968026
+          maxSwapA0: 5968026
+          spotBuying: 7622
+          spotSelling: 18000
+          buyingAmount: 331
+          sellingAmount: 782
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9833000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9833
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8977529
+          maxSellingA0: 36000
+          maxSwapA0: 36000
+          spotBuying: 9000
+          spotSelling: 9833
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 40
+          maxSelling: 783
+          maxBuyingA0: 720000
+          maxSellingA0: 7591968
+          maxSwapA0: 720000
+          spotBuying: 9696
+          spotSelling: 18000
+          buyingAmount: 40
+          sellingAmount: 75
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 783
+          maxBuyingA0: 18000000
+          maxSellingA0: 5968026
+          maxSwapA0: 5968026
+          spotBuying: 7622
+          spotSelling: 18000
+          buyingAmount: 331
+          sellingAmount: 782
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9742000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9742
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8894446
+          maxSellingA0: 36000
+          maxSwapA0: 36000
+          spotBuying: 9000
+          spotSelling: 9742
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 130
+          maxSelling: 783
+          maxBuyingA0: 2340000
+          maxSellingA0: 7521498
+          maxSwapA0: 2340000
+          spotBuying: 9606
+          spotSelling: 18000
+          buyingAmount: 130
+          sellingAmount: 244
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 783
+          maxBuyingA0: 18000000
+          maxSellingA0: 5968026
+          maxSwapA0: 5968026
+          spotBuying: 7622
+          spotSelling: 18000
+          buyingAmount: 331
+          sellingAmount: 782
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9787000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9787
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8935531
+          maxSellingA0: 22676
+          maxSwapA0: 22676
+          spotBuying: 5669
+          spotSelling: 9787
+          buyingAmount: 2
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 85
+          maxSelling: 783
+          maxBuyingA0: 963730
+          maxSellingA0: 7556733
+          maxSwapA0: 963730
+          spotBuying: 9651
+          spotSelling: 11338
+          buyingAmount: 85
+          sellingAmount: 100
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 5669
+
+          maxBuying: 1000
+          maxSelling: 783
+          maxBuyingA0: 11338000
+          maxSellingA0: 5968026
+          maxSwapA0: 5968026
+          spotBuying: 7622
+          spotSelling: 11338
+          buyingAmount: 526
+          sellingAmount: 783
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 5669
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9787000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9787
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8935531
+          maxSellingA0: 28572
+          maxSwapA0: 28572
+          spotBuying: 7143
+          spotSelling: 9787
+          buyingAmount: 2
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 85
+          maxSelling: 783
+          maxBuyingA0: 1214310
+          maxSellingA0: 7556733
+          maxSwapA0: 1214310
+          spotBuying: 9651
+          spotSelling: 14286
+          buyingAmount: 85
+          sellingAmount: 126
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 1000
+          maxSelling: 783
+          maxBuyingA0: 14286000
+          maxSellingA0: 5968026
+          maxSwapA0: 5968026
+          spotBuying: 7622
+          spotSelling: 14286
+          buyingAmount: 417
+          sellingAmount: 782
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9833000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9833
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8977529
+          maxSellingA0: 22676
+          maxSwapA0: 22676
+          spotBuying: 5669
+          spotSelling: 9833
+          buyingAmount: 2
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 40
+          maxSelling: 783
+          maxBuyingA0: 453520
+          maxSellingA0: 7591968
+          maxSwapA0: 453520
+          spotBuying: 9696
+          spotSelling: 11338
+          buyingAmount: 40
+          sellingAmount: 47
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 5669
+
+          maxBuying: 1000
+          maxSelling: 783
+          maxBuyingA0: 11338000
+          maxSellingA0: 5968026
+          maxSwapA0: 5968026
+          spotBuying: 7622
+          spotSelling: 11338
+          buyingAmount: 526
+          sellingAmount: 783
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 5669
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9833000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9833
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8977529
+          maxSellingA0: 28572
+          maxSwapA0: 28572
+          spotBuying: 7143
+          spotSelling: 9833
+          buyingAmount: 2
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 40
+          maxSelling: 783
+          maxBuyingA0: 571440
+          maxSellingA0: 7591968
+          maxSwapA0: 571440
+          spotBuying: 9696
+          spotSelling: 14286
+          buyingAmount: 40
+          sellingAmount: 59
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 1000
+          maxSelling: 783
+          maxBuyingA0: 14286000
+          maxSellingA0: 5968026
+          maxSwapA0: 5968026
+          spotBuying: 7622
+          spotSelling: 14286
+          buyingAmount: 417
+          sellingAmount: 782
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 1158
+          maxSelling: 4
+          maxBuyingA0: 11281236
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9742
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8781 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9637 > 
+        spotSelling 9606
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8894446
+          maxSellingA0: 22676
+          maxSwapA0: 22676
+          spotBuying: 5669
+          spotSelling: 9742
+          buyingAmount: 2
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  9637 > 
+        spotSelling 9606
+
+          maxBuying: 31
+          maxSelling: 783
+          maxBuyingA0: 351478
+          maxSellingA0: 7521498
+          maxSwapA0: 351478
+          spotBuying: 9606
+          spotSelling: 11338
+          buyingAmount: 31
+          sellingAmount: 37
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9637 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 5669
+
+          maxBuying: 1158
+          maxSelling: 783
+          maxBuyingA0: 13129404
+          maxSellingA0: 5968026
+          maxSwapA0: 5968026
+          spotBuying: 7622
+          spotSelling: 11338
+          buyingAmount: 526
+          sellingAmount: 783
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8781 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 5669
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9742000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9742
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8894446
+          maxSellingA0: 28572
+          maxSwapA0: 28572
+          spotBuying: 7143
+          spotSelling: 9742
+          buyingAmount: 2
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 130
+          maxSelling: 783
+          maxBuyingA0: 1857180
+          maxSellingA0: 7521498
+          maxSwapA0: 1857180
+          spotBuying: 9606
+          spotSelling: 14286
+          buyingAmount: 130
+          sellingAmount: 194
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 1000
+          maxSelling: 783
+          maxBuyingA0: 14286000
+          maxSellingA0: 5968026
+          maxSwapA0: 5968026
+          spotBuying: 7622
+          spotSelling: 14286
+          buyingAmount: 417
+          sellingAmount: 782
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 6467
+          maxSelling: 103
+          maxBuyingA0: 58875568
+          maxSellingA0: 927000
+          maxSwapA0: 927000
+          spotBuying: 9000
+          spotSelling: 9104
+          buyingAmount: 101
+          sellingAmount: 103
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  15467 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9001 > 
+        spotSelling 8999
+
+          maxBuying: 1
+          maxSelling: 2533
+          maxBuyingA0: 18000
+          maxSellingA0: 22794467
+          maxSwapA0: 18000
+          spotBuying: 8999
+          spotSelling: 18000
+          buyingAmount: 1
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9001 > 
+        spotBuying 9104
+boughtAssetForSale (old):
+        sellingAmm  15467 > 
+        spotSelling 9000
+
+          maxBuying: 81
+          maxSelling: 86
+          maxBuyingA0: 727299
+          maxSellingA0: 1270908
+          maxSwapA0: 727299
+          spotBuying: 14778
+          spotSelling: 8979
+          buyingAmount: 81
+          sellingAmount: 50
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  14859 > 
+        spotBuying 14926
+boughtAssetForSale (old):
+        sellingAmm  8893 > 
+        spotSelling 8891
+
+          maxBuying: 1
+          maxSelling: 67
+          maxBuyingA0: 14926
+          maxSellingA0: 595697
+          maxSwapA0: 14926
+          spotBuying: 8891
+          spotSelling: 14926
+          buyingAmount: 1
+          sellingAmount: 2
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8893 > 
+        spotBuying 8979
+boughtAssetForSale (old):
+        sellingAmm  14859 > 
+        spotSelling 14778
+
+          maxBuying: 518498
+          maxSelling: 81
+          maxBuyingA0: 3001066424
+          maxSellingA0: 17514814356
+          maxSwapA0: 3001066424
+          spotBuying: 216232276
+          spotSelling: 5788
+          buyingAmount: 518498
+          sellingAmount: 14
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  268082100 > 
+        spotBuying 324348414
+boughtAssetForSale (old):
+        sellingAmm  5707 > 
+        spotSelling 5705
+
+          maxBuying: 19
+          maxSelling: 1
+          maxBuyingA0: 7619
+          maxSellingA0: 127958
+          maxSwapA0: 7619
+          spotBuying: 127958
+          spotSelling: 401
+          buyingAmount: 19
+          sellingAmount: 1
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  128928 > 
+        spotBuying 129237
+boughtAssetForSale (new):
+        sellingAmm  400 > 
+        spotSelling 397
+
+          maxBuying: 120
+          maxSelling: 1
+          maxBuyingA0: 48120
+          maxSellingA0: 17880
+          maxSwapA0: 17880
+          spotBuying: 17880
+          spotSelling: 401
+          buyingAmount: 44
+          sellingAmount: 1
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  18000 > 
+        spotBuying 18059
+boughtAssetForSale (new):
+        sellingAmm  400 > 
+        spotSelling 397
+
+          maxBuying: 1
+          maxSelling: 1463
+          maxBuyingA0: 18000
+          maxSellingA0: 8804334
+          maxSwapA0: 18000
+          spotBuying: 6018
+          spotSelling: 18000
+          buyingAmount: 1
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  6020 > 
+        spotBuying 6078
+boughtAssetForSale (old):
+        sellingAmm  16042 > 
+        spotSelling 9000
+
+          maxBuying: 7042
+          maxSelling: 58
+          maxBuyingA0: 42801276
+          maxSellingA0: 522000
+          maxSwapA0: 522000
+          spotBuying: 9000
+          spotSelling: 6078
+          buyingAmount: 85
+          sellingAmount: 58
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  16042 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  6020 > 
+        spotSelling 6018
+
+          maxBuying: 10021
+          maxSelling: 8999
+          maxBuyingA0: 180378000
+          maxSellingA0: 22835583431
+          maxSwapA0: 180378000
+          spotBuying: 2537569
+          spotSelling: 18000
+          buyingAmount: 10021
+          sellingAmount: 72
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  2547590 > 
+        spotBuying 2562945
+boughtAssetForSale (old):
+        sellingAmm  9001 > 
+        spotSelling 9000
+subSwap: 190 bought
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 5669
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: c573afbf35e0c454e346542e496f0a2c8c6786ced0d1a23c5ac22ddd, 
+   +     +  virtual: +[
+   +     +  +  b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2_: 9000,
+   +     +  +  228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac_X6V2a0yYWu0tEOFXoUpq7lI: 7623,
+   +     +  +  fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72_pksm7Aa9xg6xtAaY5Fjmsh: 9000
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2_: 1,
+   +     +  +  228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac_X6V2a0yYWu0tEOFXoUpq7lI: 1,
+   +     +  +  fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72_pksm7Aa9xg6xtAaY5Fjmsh: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2_: 71,
+   +     +  +  228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac_X6V2a0yYWu0tEOFXoUpq7lI: 1,
+   +     +  +  fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72_pksm7Aa9xg6xtAaY5Fjmsh: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: c573afbf35e0c454e346542e496f0a2c8c6786ced0d1a23c5ac22ddd,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: eb5736675c6553d3161dfd55413f828310e74f0842655d4eb9acdc44a6b73a13),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 2cdce34768b158d3c567a6ade47955c7002bf7a886396926a055a8b1ef261585),
+   +     +  anchorPrices: +[
+   +     +  +  b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2_: 8875,
+   +     +  +  228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac_X6V2a0yYWu0tEOFXoUpq7lI: 3811,
+   +     +  +  fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72_pksm7Aa9xg6xtAaY5Fjmsh: 5669
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 3232500,
+   +  +  228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac_X6V2a0yYWu0tEOFXoUpq7lI: 1000,
+   +  +  b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2_: 736,
+   +  +  fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72_pksm7Aa9xg6xtAaY5Fjmsh: 913
+   +  ]
+     )
+  boughtAsset:  Asset(228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac, X6V2a0yYWu0tEOFXoUpq7lI)
+  soldAsset:    Asset(fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72, pksm7Aa9xg6xtAaY5Fjmsh)
+  boughtAmount: 190
+  soldAmount:   283
+  boughtSpot:   7622
+  soldSpot:     11338
+  (boughtA0:    2154220)
+  (soldA0:      2157026)
+  boughtExp:    1
+  soldExp:      1
+  spotPrice:    1.4875360797690895
+  eff.Price:    1.4894736842105263
+  maxBuying:    190
+  (maxBuyingA0: 2154220)
+)
+
+trials left: 1 - iteration: 17 - block: 8632
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9787000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9787
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8935531
+          maxSellingA0: 36000
+          maxSwapA0: 36000
+          spotBuying: 9000
+          spotSelling: 9787
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 85
+          maxSelling: 190
+          maxBuyingA0: 1295740
+          maxSellingA0: 1833690
+          maxSwapA0: 1295740
+          spotBuying: 9651
+          spotSelling: 15244
+          buyingAmount: 85
+          sellingAmount: 135
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1710000
+          maxSwapA0: 1710000
+          spotBuying: 9000
+          spotSelling: 15244
+          buyingAmount: 112
+          sellingAmount: 190
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 85
+          maxSelling: 500
+          maxBuyingA0: 1530000
+          maxSellingA0: 4825500
+          maxSwapA0: 1530000
+          spotBuying: 9651
+          spotSelling: 18000
+          buyingAmount: 85
+          sellingAmount: 159
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 500
+          maxBuyingA0: 18000000
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 18000
+          buyingAmount: 211
+          sellingAmount: 499
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9833000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9833
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8977529
+          maxSellingA0: 36000
+          maxSwapA0: 36000
+          spotBuying: 9000
+          spotSelling: 9833
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 40
+          maxSelling: 190
+          maxBuyingA0: 609760
+          maxSellingA0: 1842240
+          maxSwapA0: 609760
+          spotBuying: 9696
+          spotSelling: 15244
+          buyingAmount: 40
+          sellingAmount: 63
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1710000
+          maxSwapA0: 1710000
+          spotBuying: 9000
+          spotSelling: 15244
+          buyingAmount: 112
+          sellingAmount: 190
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 40
+          maxSelling: 500
+          maxBuyingA0: 720000
+          maxSellingA0: 4848000
+          maxSwapA0: 720000
+          spotBuying: 9696
+          spotSelling: 18000
+          buyingAmount: 40
+          sellingAmount: 75
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 500
+          maxBuyingA0: 18000000
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 18000
+          buyingAmount: 211
+          sellingAmount: 499
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9742000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9742
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8894446
+          maxSellingA0: 36000
+          maxSwapA0: 36000
+          spotBuying: 9000
+          spotSelling: 9742
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 130
+          maxSelling: 190
+          maxBuyingA0: 1981720
+          maxSellingA0: 1825140
+          maxSwapA0: 1825140
+          spotBuying: 9606
+          spotSelling: 15244
+          buyingAmount: 119
+          sellingAmount: 189
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1710000
+          maxSwapA0: 1710000
+          spotBuying: 9000
+          spotSelling: 15244
+          buyingAmount: 112
+          sellingAmount: 190
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 130
+          maxSelling: 500
+          maxBuyingA0: 2340000
+          maxSellingA0: 4803000
+          maxSwapA0: 2340000
+          spotBuying: 9606
+          spotSelling: 18000
+          buyingAmount: 130
+          sellingAmount: 244
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 500
+          maxBuyingA0: 18000000
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 18000
+          buyingAmount: 211
+          sellingAmount: 499
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 810
+          maxSelling: 4
+          maxBuyingA0: 7927470
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9787
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8433 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 1196
+          maxSelling: 4
+          maxBuyingA0: 11705252
+          maxSellingA0: 22676
+          maxSwapA0: 22676
+          spotBuying: 5669
+          spotSelling: 9787
+          buyingAmount: 2
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  10196 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 85
+          maxSelling: 190
+          maxBuyingA0: 1295740
+          maxSellingA0: 1833690
+          maxSwapA0: 1295740
+          spotBuying: 9651
+          spotSelling: 15244
+          buyingAmount: 85
+          sellingAmount: 135
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  8433 > 
+        spotSelling 7622
+
+          maxBuying: 1196
+          maxSelling: 190
+          maxBuyingA0: 18231824
+          maxSellingA0: 1077110
+          maxSwapA0: 1077110
+          spotBuying: 5669
+          spotSelling: 15244
+          buyingAmount: 70
+          sellingAmount: 189
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  10196 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  8433 > 
+        spotSelling 7622
+
+          maxBuying: 85
+          maxSelling: 500
+          maxBuyingA0: 963730
+          maxSellingA0: 4825500
+          maxSwapA0: 963730
+          spotBuying: 9651
+          spotSelling: 11338
+          buyingAmount: 85
+          sellingAmount: 100
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  10196 > 
+        spotSelling 5669
+
+          maxBuying: 810
+          maxSelling: 500
+          maxBuyingA0: 9183780
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 11338
+          buyingAmount: 336
+          sellingAmount: 500
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8433 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  10196 > 
+        spotSelling 5669
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9787000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9787
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8935531
+          maxSellingA0: 28572
+          maxSwapA0: 28572
+          spotBuying: 7143
+          spotSelling: 9787
+          buyingAmount: 2
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 85
+          maxSelling: 190
+          maxBuyingA0: 1295740
+          maxSellingA0: 1833690
+          maxSwapA0: 1295740
+          spotBuying: 9651
+          spotSelling: 15244
+          buyingAmount: 85
+          sellingAmount: 135
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1357170
+          maxSwapA0: 1357170
+          spotBuying: 7143
+          spotSelling: 15244
+          buyingAmount: 89
+          sellingAmount: 190
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 85
+          maxSelling: 500
+          maxBuyingA0: 1214310
+          maxSellingA0: 4825500
+          maxSwapA0: 1214310
+          spotBuying: 9651
+          spotSelling: 14286
+          buyingAmount: 85
+          sellingAmount: 126
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 1000
+          maxSelling: 500
+          maxBuyingA0: 14286000
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 14286
+          buyingAmount: 266
+          sellingAmount: 499
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9833000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9833
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8977529
+          maxSellingA0: 22676
+          maxSwapA0: 22676
+          spotBuying: 5669
+          spotSelling: 9833
+          buyingAmount: 2
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 40
+          maxSelling: 190
+          maxBuyingA0: 609760
+          maxSellingA0: 1842240
+          maxSwapA0: 609760
+          spotBuying: 9696
+          spotSelling: 15244
+          buyingAmount: 40
+          sellingAmount: 63
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1077110
+          maxSwapA0: 1077110
+          spotBuying: 5669
+          spotSelling: 15244
+          buyingAmount: 70
+          sellingAmount: 189
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 40
+          maxSelling: 500
+          maxBuyingA0: 453520
+          maxSellingA0: 4848000
+          maxSwapA0: 453520
+          spotBuying: 9696
+          spotSelling: 11338
+          buyingAmount: 40
+          sellingAmount: 47
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 5669
+
+          maxBuying: 1000
+          maxSelling: 500
+          maxBuyingA0: 11338000
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 11338
+          buyingAmount: 336
+          sellingAmount: 500
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 5669
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9833000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9833
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8977529
+          maxSellingA0: 28572
+          maxSwapA0: 28572
+          spotBuying: 7143
+          spotSelling: 9833
+          buyingAmount: 2
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 40
+          maxSelling: 190
+          maxBuyingA0: 609760
+          maxSellingA0: 1842240
+          maxSwapA0: 609760
+          spotBuying: 9696
+          spotSelling: 15244
+          buyingAmount: 40
+          sellingAmount: 63
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1357170
+          maxSwapA0: 1357170
+          spotBuying: 7143
+          spotSelling: 15244
+          buyingAmount: 89
+          sellingAmount: 190
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 40
+          maxSelling: 500
+          maxBuyingA0: 571440
+          maxSellingA0: 4848000
+          maxSwapA0: 571440
+          spotBuying: 9696
+          spotSelling: 14286
+          buyingAmount: 40
+          sellingAmount: 59
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 1000
+          maxSelling: 500
+          maxBuyingA0: 14286000
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 14286
+          buyingAmount: 266
+          sellingAmount: 499
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 1158
+          maxSelling: 4
+          maxBuyingA0: 11281236
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9742
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8781 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9637 > 
+        spotSelling 9606
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8894446
+          maxSellingA0: 22676
+          maxSwapA0: 22676
+          spotBuying: 5669
+          spotSelling: 9742
+          buyingAmount: 2
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  9637 > 
+        spotSelling 9606
+
+          maxBuying: 31
+          maxSelling: 190
+          maxBuyingA0: 472564
+          maxSellingA0: 1825140
+          maxSwapA0: 472564
+          spotBuying: 9606
+          spotSelling: 15244
+          buyingAmount: 31
+          sellingAmount: 50
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9637 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  8781 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1077110
+          maxSwapA0: 1077110
+          spotBuying: 5669
+          spotSelling: 15244
+          buyingAmount: 70
+          sellingAmount: 189
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  8781 > 
+        spotSelling 7622
+
+          maxBuying: 31
+          maxSelling: 500
+          maxBuyingA0: 351478
+          maxSellingA0: 4803000
+          maxSwapA0: 351478
+          spotBuying: 9606
+          spotSelling: 11338
+          buyingAmount: 31
+          sellingAmount: 37
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9637 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 5669
+
+          maxBuying: 1158
+          maxSelling: 500
+          maxBuyingA0: 13129404
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 11338
+          buyingAmount: 336
+          sellingAmount: 500
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8781 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 5669
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9742000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9742
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8894446
+          maxSellingA0: 28572
+          maxSwapA0: 28572
+          spotBuying: 7143
+          spotSelling: 9742
+          buyingAmount: 2
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 130
+          maxSelling: 190
+          maxBuyingA0: 1981720
+          maxSellingA0: 1825140
+          maxSwapA0: 1825140
+          spotBuying: 9606
+          spotSelling: 15244
+          buyingAmount: 119
+          sellingAmount: 189
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1357170
+          maxSwapA0: 1357170
+          spotBuying: 7143
+          spotSelling: 15244
+          buyingAmount: 89
+          sellingAmount: 190
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 130
+          maxSelling: 500
+          maxBuyingA0: 1857180
+          maxSellingA0: 4803000
+          maxSwapA0: 1857180
+          spotBuying: 9606
+          spotSelling: 14286
+          buyingAmount: 130
+          sellingAmount: 194
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 1000
+          maxSelling: 500
+          maxBuyingA0: 14286000
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 14286
+          buyingAmount: 266
+          sellingAmount: 499
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 6467
+          maxSelling: 103
+          maxBuyingA0: 58875568
+          maxSellingA0: 927000
+          maxSwapA0: 927000
+          spotBuying: 9000
+          spotSelling: 9104
+          buyingAmount: 101
+          sellingAmount: 103
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  15467 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9001 > 
+        spotSelling 8999
+
+          maxBuying: 1
+          maxSelling: 2533
+          maxBuyingA0: 18000
+          maxSellingA0: 22794467
+          maxSwapA0: 18000
+          spotBuying: 8999
+          spotSelling: 18000
+          buyingAmount: 1
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9001 > 
+        spotBuying 9104
+boughtAssetForSale (old):
+        sellingAmm  15467 > 
+        spotSelling 9000
+
+          maxBuying: 81
+          maxSelling: 86
+          maxBuyingA0: 727299
+          maxSellingA0: 1270908
+          maxSwapA0: 727299
+          spotBuying: 14778
+          spotSelling: 8979
+          buyingAmount: 81
+          sellingAmount: 50
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  14859 > 
+        spotBuying 14926
+boughtAssetForSale (old):
+        sellingAmm  8893 > 
+        spotSelling 8891
+
+          maxBuying: 1
+          maxSelling: 67
+          maxBuyingA0: 14926
+          maxSellingA0: 595697
+          maxSwapA0: 14926
+          spotBuying: 8891
+          spotSelling: 14926
+          buyingAmount: 1
+          sellingAmount: 2
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8893 > 
+        spotBuying 8979
+boughtAssetForSale (old):
+        sellingAmm  14859 > 
+        spotSelling 14778
+
+          maxBuying: 518498
+          maxSelling: 81
+          maxBuyingA0: 3001066424
+          maxSellingA0: 17514814356
+          maxSwapA0: 3001066424
+          spotBuying: 216232276
+          spotSelling: 5788
+          buyingAmount: 518498
+          sellingAmount: 14
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  268082100 > 
+        spotBuying 324348414
+boughtAssetForSale (old):
+        sellingAmm  5707 > 
+        spotSelling 5705
+
+          maxBuying: 19
+          maxSelling: 59
+          maxBuyingA0: 343121
+          maxSellingA0: 7549522
+          maxSwapA0: 343121
+          spotBuying: 127958
+          spotSelling: 18059
+          buyingAmount: 19
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  128928 > 
+        spotBuying 129237
+boughtAssetForSale (old):
+        sellingAmm  18000 > 
+        spotSelling 17880
+
+          maxBuying: 19
+          maxSelling: 1
+          maxBuyingA0: 7619
+          maxSellingA0: 127958
+          maxSwapA0: 7619
+          spotBuying: 127958
+          spotSelling: 401
+          buyingAmount: 19
+          sellingAmount: 1
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  128928 > 
+        spotBuying 129237
+boughtAssetForSale (new):
+        sellingAmm  400 > 
+        spotSelling 397
+
+          maxBuying: 120
+          maxSelling: 1
+          maxBuyingA0: 48120
+          maxSellingA0: 17880
+          maxSwapA0: 17880
+          spotBuying: 17880
+          spotSelling: 401
+          buyingAmount: 44
+          sellingAmount: 1
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  18000 > 
+        spotBuying 18059
+boughtAssetForSale (new):
+        sellingAmm  400 > 
+        spotSelling 397
+
+          maxBuying: 1
+          maxSelling: 1463
+          maxBuyingA0: 18000
+          maxSellingA0: 8804334
+          maxSwapA0: 18000
+          spotBuying: 6018
+          spotSelling: 18000
+          buyingAmount: 1
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  6020 > 
+        spotBuying 6078
+boughtAssetForSale (old):
+        sellingAmm  16042 > 
+        spotSelling 9000
+
+          maxBuying: 7042
+          maxSelling: 58
+          maxBuyingA0: 42801276
+          maxSellingA0: 522000
+          maxSwapA0: 522000
+          spotBuying: 9000
+          spotSelling: 6078
+          buyingAmount: 85
+          sellingAmount: 58
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  16042 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  6020 > 
+        spotSelling 6018
+
+          maxBuying: 10021
+          maxSelling: 8999
+          maxBuyingA0: 180378000
+          maxSellingA0: 22835583431
+          maxSwapA0: 180378000
+          spotBuying: 2537569
+          spotSelling: 18000
+          buyingAmount: 10021
+          sellingAmount: 72
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  2547590 > 
+        spotBuying 2562945
+boughtAssetForSale (old):
+        sellingAmm  9001 > 
+        spotSelling 9000
+subSwap: 5599 bought
+boughtAssetForSale (old): 
+        buyingAmm  2547590 > 
+        spotBuying 2562945
+boughtAssetForSale (old):
+        sellingAmm  9001 > 
+        spotSelling 9000
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 96b95533e41668d54fb800df240addb2ba05180faa504b8f4b1ef156, 
+   +     +  virtual: +[
+   +     +  +  6614d2a01dba986c4be045a49bef5bb3f2bd26eba05de7693a2d4c83_EOmxGAFwFwN7mPpaIq7mQ9PyANuPgqQX: 9000,
+   +     +  +  _: 9000
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  6614d2a01dba986c4be045a49bef5bb3f2bd26eba05de7693a2d4c83_EOmxGAFwFwN7mPpaIq7mQ9PyANuPgqQX: 1,
+   +     +  +  _: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  6614d2a01dba986c4be045a49bef5bb3f2bd26eba05de7693a2d4c83_EOmxGAFwFwN7mPpaIq7mQ9PyANuPgqQX: 1,
+   +     +  +  _: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 96b95533e41668d54fb800df240addb2ba05180faa504b8f4b1ef156,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 6233364fc293a26043e725a3d8df446d33884fb783d215df70243cfefee09fa1),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 996886b0d55e48ce2b4155ad4afe16dde61ad9836cc4451684dbe309c2e37bbe),
+   +     +  anchorPrices: +[
+   +     +  +  6614d2a01dba986c4be045a49bef5bb3f2bd26eba05de7693a2d4c83_EOmxGAFwFwN7mPpaIq7mQ9PyANuPgqQX: 4500,
+   +     +  +  _: 8910
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2538590,
+   +  +  6614d2a01dba986c4be045a49bef5bb3f2bd26eba05de7693a2d4c83_EOmxGAFwFwN7mPpaIq7mQ9PyANuPgqQX: 1
    +  ]
      )
   boughtAsset:  Asset(, )
-  soldAsset:    Asset(f23eb6b71e04261ac47a375c2c063f7fb51cc83dd0f7f5968cd1d0f7, )
-  boughtAmount: 12884
-  soldAmount:   53
-  boughtSpot:   2245632
-  soldSpot:     9089
-  (boughtA0:    117102676)
-  (soldA0:      119018496)
-  boughtExp:    10
+  soldAsset:    Asset(6614d2a01dba986c4be045a49bef5bb3f2bd26eba05de7693a2d4c83, EOmxGAFwFwN7mPpaIq7mQ9PyANuPgqQX)
+  boughtAmount: 5599
+  soldAmount:   40
+  boughtSpot:   2537569
+  soldSpot:     18000
+  (boughtA0:    100782000)
+  (soldA0:      101502760)
+  boughtExp:    568
   soldExp:      2
-  spotPrice:    0.004047412933196534
-  eff.Price:    0.004113629307668426
-  maxBuying:    12884
-  (maxBuyingA0: 117102676)
+  spotPrice:    0.007093403174455551
+  eff.Price:    0.007144132880871584
+  maxBuying:    5599
+  (maxBuyingA0: 100782000)
 )
+
+trials left: 1 - iteration: 18 - block: 9632
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9787000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9787
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8935531
+          maxSellingA0: 36000
+          maxSwapA0: 36000
+          spotBuying: 9000
+          spotSelling: 9787
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 85
+          maxSelling: 190
+          maxBuyingA0: 1295740
+          maxSellingA0: 1833690
+          maxSwapA0: 1295740
+          spotBuying: 9651
+          spotSelling: 15244
+          buyingAmount: 85
+          sellingAmount: 135
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1710000
+          maxSwapA0: 1710000
+          spotBuying: 9000
+          spotSelling: 15244
+          buyingAmount: 112
+          sellingAmount: 190
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 85
+          maxSelling: 500
+          maxBuyingA0: 1530000
+          maxSellingA0: 4825500
+          maxSwapA0: 1530000
+          spotBuying: 9651
+          spotSelling: 18000
+          buyingAmount: 85
+          sellingAmount: 159
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 500
+          maxBuyingA0: 18000000
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 18000
+          buyingAmount: 211
+          sellingAmount: 499
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9833000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9833
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8977529
+          maxSellingA0: 36000
+          maxSwapA0: 36000
+          spotBuying: 9000
+          spotSelling: 9833
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 40
+          maxSelling: 190
+          maxBuyingA0: 609760
+          maxSellingA0: 1842240
+          maxSwapA0: 609760
+          spotBuying: 9696
+          spotSelling: 15244
+          buyingAmount: 40
+          sellingAmount: 63
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1710000
+          maxSwapA0: 1710000
+          spotBuying: 9000
+          spotSelling: 15244
+          buyingAmount: 112
+          sellingAmount: 190
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 40
+          maxSelling: 500
+          maxBuyingA0: 720000
+          maxSellingA0: 4848000
+          maxSwapA0: 720000
+          spotBuying: 9696
+          spotSelling: 18000
+          buyingAmount: 40
+          sellingAmount: 75
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 500
+          maxBuyingA0: 18000000
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 18000
+          buyingAmount: 211
+          sellingAmount: 499
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9742000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9742
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8894446
+          maxSellingA0: 36000
+          maxSwapA0: 36000
+          spotBuying: 9000
+          spotSelling: 9742
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 130
+          maxSelling: 190
+          maxBuyingA0: 1981720
+          maxSellingA0: 1825140
+          maxSwapA0: 1825140
+          spotBuying: 9606
+          spotSelling: 15244
+          buyingAmount: 119
+          sellingAmount: 189
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1710000
+          maxSwapA0: 1710000
+          spotBuying: 9000
+          spotSelling: 15244
+          buyingAmount: 112
+          sellingAmount: 190
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 130
+          maxSelling: 500
+          maxBuyingA0: 2340000
+          maxSellingA0: 4803000
+          maxSwapA0: 2340000
+          spotBuying: 9606
+          spotSelling: 18000
+          buyingAmount: 130
+          sellingAmount: 244
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 1000
+          maxSelling: 500
+          maxBuyingA0: 18000000
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 18000
+          buyingAmount: 211
+          sellingAmount: 499
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 9000
+
+          maxBuying: 810
+          maxSelling: 4
+          maxBuyingA0: 7927470
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9787
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8433 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 1196
+          maxSelling: 4
+          maxBuyingA0: 11705252
+          maxSellingA0: 22676
+          maxSwapA0: 22676
+          spotBuying: 5669
+          spotSelling: 9787
+          buyingAmount: 2
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  10196 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 85
+          maxSelling: 190
+          maxBuyingA0: 1295740
+          maxSellingA0: 1833690
+          maxSwapA0: 1295740
+          spotBuying: 9651
+          spotSelling: 15244
+          buyingAmount: 85
+          sellingAmount: 135
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  8433 > 
+        spotSelling 7622
+
+          maxBuying: 1196
+          maxSelling: 190
+          maxBuyingA0: 18231824
+          maxSellingA0: 1077110
+          maxSwapA0: 1077110
+          spotBuying: 5669
+          spotSelling: 15244
+          buyingAmount: 70
+          sellingAmount: 189
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  10196 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  8433 > 
+        spotSelling 7622
+
+          maxBuying: 85
+          maxSelling: 500
+          maxBuyingA0: 963730
+          maxSellingA0: 4825500
+          maxSwapA0: 963730
+          spotBuying: 9651
+          spotSelling: 11338
+          buyingAmount: 85
+          sellingAmount: 100
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  10196 > 
+        spotSelling 5669
+
+          maxBuying: 810
+          maxSelling: 500
+          maxBuyingA0: 9183780
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 11338
+          buyingAmount: 336
+          sellingAmount: 500
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8433 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  10196 > 
+        spotSelling 5669
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9787000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9787
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8935531
+          maxSellingA0: 28572
+          maxSwapA0: 28572
+          spotBuying: 7143
+          spotSelling: 9787
+          buyingAmount: 2
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9651
+
+          maxBuying: 85
+          maxSelling: 190
+          maxBuyingA0: 1295740
+          maxSellingA0: 1833690
+          maxSwapA0: 1295740
+          spotBuying: 9651
+          spotSelling: 15244
+          buyingAmount: 85
+          sellingAmount: 135
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1357170
+          maxSwapA0: 1357170
+          spotBuying: 7143
+          spotSelling: 15244
+          buyingAmount: 89
+          sellingAmount: 190
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 85
+          maxSelling: 500
+          maxBuyingA0: 1214310
+          maxSellingA0: 4825500
+          maxSwapA0: 1214310
+          spotBuying: 9651
+          spotSelling: 14286
+          buyingAmount: 85
+          sellingAmount: 126
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9787
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 1000
+          maxSelling: 500
+          maxBuyingA0: 14286000
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 14286
+          buyingAmount: 266
+          sellingAmount: 499
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9833000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9833
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8977529
+          maxSellingA0: 22676
+          maxSwapA0: 22676
+          spotBuying: 5669
+          spotSelling: 9833
+          buyingAmount: 2
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 40
+          maxSelling: 190
+          maxBuyingA0: 609760
+          maxSellingA0: 1842240
+          maxSwapA0: 609760
+          spotBuying: 9696
+          spotSelling: 15244
+          buyingAmount: 40
+          sellingAmount: 63
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1077110
+          maxSwapA0: 1077110
+          spotBuying: 5669
+          spotSelling: 15244
+          buyingAmount: 70
+          sellingAmount: 189
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 40
+          maxSelling: 500
+          maxBuyingA0: 453520
+          maxSellingA0: 4848000
+          maxSwapA0: 453520
+          spotBuying: 9696
+          spotSelling: 11338
+          buyingAmount: 40
+          sellingAmount: 47
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 5669
+
+          maxBuying: 1000
+          maxSelling: 500
+          maxBuyingA0: 11338000
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 11338
+          buyingAmount: 336
+          sellingAmount: 500
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 5669
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9833000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9833
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8977529
+          maxSellingA0: 28572
+          maxSwapA0: 28572
+          spotBuying: 7143
+          spotSelling: 9833
+          buyingAmount: 2
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+
+          maxBuying: 40
+          maxSelling: 190
+          maxBuyingA0: 609760
+          maxSellingA0: 1842240
+          maxSwapA0: 609760
+          spotBuying: 9696
+          spotSelling: 15244
+          buyingAmount: 40
+          sellingAmount: 63
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1357170
+          maxSwapA0: 1357170
+          spotBuying: 7143
+          spotSelling: 15244
+          buyingAmount: 89
+          sellingAmount: 190
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 40
+          maxSelling: 500
+          maxBuyingA0: 571440
+          maxSellingA0: 4848000
+          maxSwapA0: 571440
+          spotBuying: 9696
+          spotSelling: 14286
+          buyingAmount: 40
+          sellingAmount: 59
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9833
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 1000
+          maxSelling: 500
+          maxBuyingA0: 14286000
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 14286
+          buyingAmount: 266
+          sellingAmount: 499
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 1158
+          maxSelling: 4
+          maxBuyingA0: 11281236
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9742
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8781 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9637 > 
+        spotSelling 9606
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8894446
+          maxSellingA0: 22676
+          maxSwapA0: 22676
+          spotBuying: 5669
+          spotSelling: 9742
+          buyingAmount: 2
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  9637 > 
+        spotSelling 9606
+
+          maxBuying: 31
+          maxSelling: 190
+          maxBuyingA0: 472564
+          maxSellingA0: 1825140
+          maxSwapA0: 472564
+          spotBuying: 9606
+          spotSelling: 15244
+          buyingAmount: 31
+          sellingAmount: 50
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9637 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  8781 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1077110
+          maxSwapA0: 1077110
+          spotBuying: 5669
+          spotSelling: 15244
+          buyingAmount: 70
+          sellingAmount: 189
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 11338
+boughtAssetForSale (old):
+        sellingAmm  8781 > 
+        spotSelling 7622
+
+          maxBuying: 31
+          maxSelling: 500
+          maxBuyingA0: 351478
+          maxSellingA0: 4803000
+          maxSwapA0: 351478
+          spotBuying: 9606
+          spotSelling: 11338
+          buyingAmount: 31
+          sellingAmount: 37
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9637 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 5669
+
+          maxBuying: 1158
+          maxSelling: 500
+          maxBuyingA0: 13129404
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 11338
+          buyingAmount: 336
+          sellingAmount: 500
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8781 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 5669
+
+          maxBuying: 1000
+          maxSelling: 4
+          maxBuyingA0: 9742000
+          maxSellingA0: 30488
+          maxSwapA0: 30488
+          spotBuying: 7622
+          spotSelling: 9742
+          buyingAmount: 3
+          sellingAmount: 4
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 913
+          maxSelling: 4
+          maxBuyingA0: 8894446
+          maxSellingA0: 28572
+          maxSwapA0: 28572
+          spotBuying: 7143
+          spotSelling: 9742
+          buyingAmount: 2
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9606
+
+          maxBuying: 130
+          maxSelling: 190
+          maxBuyingA0: 1981720
+          maxSellingA0: 1825140
+          maxSwapA0: 1825140
+          spotBuying: 9606
+          spotSelling: 15244
+          buyingAmount: 119
+          sellingAmount: 189
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 913
+          maxSelling: 190
+          maxBuyingA0: 13917772
+          maxSellingA0: 1357170
+          maxSwapA0: 1357170
+          spotBuying: 7143
+          spotSelling: 15244
+          buyingAmount: 89
+          sellingAmount: 190
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  8623 > 
+        spotSelling 7622
+
+          maxBuying: 130
+          maxSelling: 500
+          maxBuyingA0: 1857180
+          maxSellingA0: 4803000
+          maxSwapA0: 1857180
+          spotBuying: 9606
+          spotSelling: 14286
+          buyingAmount: 130
+          sellingAmount: 194
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9736 > 
+        spotBuying 9742
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 1000
+          maxSelling: 500
+          maxBuyingA0: 14286000
+          maxSellingA0: 3811000
+          maxSwapA0: 3811000
+          spotBuying: 7622
+          spotSelling: 14286
+          buyingAmount: 266
+          sellingAmount: 499
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8623 > 
+        spotBuying 15244
+boughtAssetForSale (old):
+        sellingAmm  9913 > 
+        spotSelling 7143
+
+          maxBuying: 6467
+          maxSelling: 103
+          maxBuyingA0: 58875568
+          maxSellingA0: 927000
+          maxSwapA0: 927000
+          spotBuying: 9000
+          spotSelling: 9104
+          buyingAmount: 101
+          sellingAmount: 103
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  15467 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  9001 > 
+        spotSelling 8999
+
+          maxBuying: 1
+          maxSelling: 2533
+          maxBuyingA0: 18000
+          maxSellingA0: 22794467
+          maxSwapA0: 18000
+          spotBuying: 8999
+          spotSelling: 18000
+          buyingAmount: 1
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  9001 > 
+        spotBuying 9104
+boughtAssetForSale (old):
+        sellingAmm  15467 > 
+        spotSelling 9000
+
+          maxBuying: 81
+          maxSelling: 86
+          maxBuyingA0: 727299
+          maxSellingA0: 1270908
+          maxSwapA0: 727299
+          spotBuying: 14778
+          spotSelling: 8979
+          buyingAmount: 81
+          sellingAmount: 50
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  14859 > 
+        spotBuying 14926
+boughtAssetForSale (old):
+        sellingAmm  8893 > 
+        spotSelling 8891
+
+          maxBuying: 1
+          maxSelling: 67
+          maxBuyingA0: 14926
+          maxSellingA0: 595697
+          maxSwapA0: 14926
+          spotBuying: 8891
+          spotSelling: 14926
+          buyingAmount: 1
+          sellingAmount: 2
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  8893 > 
+        spotBuying 8979
+boughtAssetForSale (old):
+        sellingAmm  14859 > 
+        spotSelling 14778
+
+          maxBuying: 518498
+          maxSelling: 81
+          maxBuyingA0: 3001066424
+          maxSellingA0: 17514814356
+          maxSwapA0: 3001066424
+          spotBuying: 216232276
+          spotSelling: 5788
+          buyingAmount: 518498
+          sellingAmount: 14
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  268082100 > 
+        spotBuying 324348414
+boughtAssetForSale (old):
+        sellingAmm  5707 > 
+        spotSelling 5705
+
+          maxBuying: 19
+          maxSelling: 59
+          maxBuyingA0: 343121
+          maxSellingA0: 7549522
+          maxSwapA0: 343121
+          spotBuying: 127958
+          spotSelling: 18059
+          buyingAmount: 19
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  128928 > 
+        spotBuying 129237
+boughtAssetForSale (old):
+        sellingAmm  18000 > 
+        spotSelling 17880
+
+          maxBuying: 19
+          maxSelling: 1
+          maxBuyingA0: 7619
+          maxSellingA0: 127958
+          maxSwapA0: 7619
+          spotBuying: 127958
+          spotSelling: 401
+          buyingAmount: 19
+          sellingAmount: 1
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  128928 > 
+        spotBuying 129237
+boughtAssetForSale (new):
+        sellingAmm  400 > 
+        spotSelling 397
+
+          maxBuying: 120
+          maxSelling: 1
+          maxBuyingA0: 48120
+          maxSellingA0: 17880
+          maxSwapA0: 17880
+          spotBuying: 17880
+          spotSelling: 401
+          buyingAmount: 44
+          sellingAmount: 1
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  18000 > 
+        spotBuying 18059
+boughtAssetForSale (new):
+        sellingAmm  400 > 
+        spotSelling 397
+
+          maxBuying: 1
+          maxSelling: 1463
+          maxBuyingA0: 18000
+          maxSellingA0: 8804334
+          maxSwapA0: 18000
+          spotBuying: 6018
+          spotSelling: 18000
+          buyingAmount: 1
+          sellingAmount: 3
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  6020 > 
+        spotBuying 6078
+boughtAssetForSale (old):
+        sellingAmm  16042 > 
+        spotSelling 9000
+
+          maxBuying: 7042
+          maxSelling: 58
+          maxBuyingA0: 42801276
+          maxSellingA0: 522000
+          maxSwapA0: 522000
+          spotBuying: 9000
+          spotSelling: 6078
+          buyingAmount: 85
+          sellingAmount: 58
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  16042 > 
+        spotBuying 18000
+boughtAssetForSale (old):
+        sellingAmm  6020 > 
+        spotSelling 6018
+
+          maxBuying: 14331
+          maxSelling: 8959
+          maxBuyingA0: 257958000
+          maxSellingA0: 22734080671
+          maxSwapA0: 257958000
+          spotBuying: 2537569
+          spotSelling: 18000
+          buyingAmount: 14331
+          sellingAmount: 102
+        
+Swapping.boundary()
+boughtAssetForSale (old): 
+        buyingAmm  2551900 > 
+        spotBuying 2562945
+boughtAssetForSale (old):
+        sellingAmm  9041 > 
+        spotSelling 9000
+subSwap: 1 bought
+boughtAssetForSale (old): 
+        buyingAmm  9913 > 
+        spotBuying 14286
+boughtAssetForSale (old):
+        sellingAmm  9736 > 
+        spotSelling 9696
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: c573afbf35e0c454e346542e496f0a2c8c6786ced0d1a23c5ac22ddd, 
+   +     +  virtual: +[
+   +     +  +  b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2_: 9000,
+   +     +  +  228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac_X6V2a0yYWu0tEOFXoUpq7lI: 7623,
+   +     +  +  fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72_pksm7Aa9xg6xtAaY5Fjmsh: 9000
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2_: 1,
+   +     +  +  228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac_X6V2a0yYWu0tEOFXoUpq7lI: 1,
+   +     +  +  fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72_pksm7Aa9xg6xtAaY5Fjmsh: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2_: 71,
+   +     +  +  228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac_X6V2a0yYWu0tEOFXoUpq7lI: 1,
+   +     +  +  fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72_pksm7Aa9xg6xtAaY5Fjmsh: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: c573afbf35e0c454e346542e496f0a2c8c6786ced0d1a23c5ac22ddd,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: b961cad7942d6cd8991cdcab54efcf8086567f0b7855ac08e31c1cda678eeb34),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 2cdce34768b158d3c567a6ade47955c7002bf7a886396926a055a8b1ef261585),
+   +     +  anchorPrices: +[
+   +     +  +  b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2_: 8916,
+   +     +  +  228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac_X6V2a0yYWu0tEOFXoUpq7lI: 3811,
+   +     +  +  fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72_pksm7Aa9xg6xtAaY5Fjmsh: 7143
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 3232500,
+   +  +  228576645ba31aad5558de45d173edf317fedc20b754abc63a72f8ac_X6V2a0yYWu0tEOFXoUpq7lI: 1000,
+   +  +  b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2_: 736,
+   +  +  fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72_pksm7Aa9xg6xtAaY5Fjmsh: 913
+   +  ]
+     )
+  boughtAsset:  Asset(fdaf44026085fe032f638f892aab2d975236f2f7e701da6ebb7b7f72, pksm7Aa9xg6xtAaY5Fjmsh)
+  soldAsset:    Asset(b05c316ebcec09b5e56772de3c953663740b60474ddc97a3a5c5e5d2, )
+  boughtAmount: 1
+  soldAmount:   2
+  boughtSpot:   7143
+  soldSpot:     9833
+  (boughtA0:    9833)
+  (soldA0:      14286)
+  boughtExp:    0
+  soldExp:      7
+  spotPrice:    1.376592468150637
+  eff.Price:    2
+  maxBuying:    1
+  (maxBuyingA0: 9833)
+)
+
+trials left: 1 - iteration: 19 - block: 9633
 traces.length: 20
-Opening: 10
-Swapping: 7
-Closing: 3
+Opening: 11
+Closing: 5
+Swapping: 4
 --- DONE ---
-Opening: 10
-Swapping: 7
-Closing: 3
+Opening: 21
+Closing: 15
+Swapping: 4
 [0m[38;5;245m----- output end -----[0m
-emulator ... [0m[32mok[0m [0m[38;5;245m(5s)[0m
+emulator ... [0m[32mok[0m [0m[38;5;245m(9s)[0m
 [0m[38;5;245mrunning 0 tests from ./tests/types.test.ts[0m
 
-[0m[32mok[0m | 1 passed | 0 failed [0m[38;5;245m(34s)[0m
+[0m[32mok[0m | 1 passed | 0 failed [0m[38;5;245m(38s)[0m
 

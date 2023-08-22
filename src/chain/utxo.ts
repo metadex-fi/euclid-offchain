@@ -352,7 +352,7 @@ export class DiracUtxo {
         let maxSellingA0 = maxSelling * spotBuying;
         let maxSwapA0 = min(maxSellingA0, maxBuyingA0);
 
-        // if (maxSwapA0 < spotSelling) return; // TODO comment out again
+        if (maxSwapA0 < spotSelling) return; // TODO comment out again
         if (maxSwapA0 < spotSelling) {
           // TODO marginal efficiency gains possible here by initialzing only JIT
           const sellingAnchor = this.dirac.anchorPrices.amountOf(sellingAsset);
