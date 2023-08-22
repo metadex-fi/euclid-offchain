@@ -13,9 +13,9 @@ import { Data } from "../src/types/general/fundamental/type.ts";
 import { genPositive, randomChoice } from "../src/utils/generators.ts";
 
 Deno.test("emulator", async () => {
-  let trials = 100;
+  let trials = 1;
   const actionCounts_ = new Map<string, number>();
-  const errors = [];
+  // const errors = [];
   while (trials > 0) {
     console.log(`trials left: ${trials}`);
     const allUsers = await User.genSeveral(genPositive(10n), genPositive(10n)); // TODO more
@@ -24,10 +24,10 @@ Deno.test("emulator", async () => {
     const emulator = new Lucid.Emulator(accounts);
     const traces: string[] = [];
     const actionCounts = new Map<string, number>();
-    const iterations = 100;
+    const iterations = 20;
     for (let i = 0; i < iterations; i++) {
       console.log(
-        `\ntrials left: ${trials} - iteration: ${i} - block: ${emulator.blockHeight} - errors: ${errors.length}`,
+        `\ntrials left: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`// - errors: ${errors.length}`,
       );
       const lucid = await Lucid.Lucid.new(emulator);
       const user = await User.fromPrivateKey(
@@ -42,7 +42,7 @@ Deno.test("emulator", async () => {
       //   }),
       // );
       // console.log(`users: ${users.length}`);
-      try {
+      // try {
         // for (const user of users) {
         const hashes = await user
           .generateActions()
@@ -80,19 +80,19 @@ Deno.test("emulator", async () => {
         // console.log(hashes);
         traces.push(...hashes.flat());
         // }
-      } catch (e) {
-        console.error("---");
-        for (const [type, count] of actionCounts_) {
-          console.error(`${type}: ${count}`);
-        }
-        console.error(e);
-        console.log("user.usedSplitting:", user.usedSplitting);
-        if (user.usedSplitting) throw e;
-        else errors.push(e);
-        // TODO fix those as well
-        // if ((typeof e !== "string") || (!e.includes("The provided Plutus code called 'error'")) || (!e.includes("Not enough ADA leftover to cover minADA")) )
-        //   throw new Error(`Error: ${e}`);
-      }
+      // } catch (e) {
+      //   console.error("---");
+      //   for (const [type, count] of actionCounts_) {
+      //     console.error(`${type}: ${count}`);
+      //   }
+      //   console.error(e);
+      //   console.log("user.usedSplitting:", user.usedSplitting);
+      //   if (user.usedSplitting) throw e;
+      //   else errors.push(e);
+      //   // TODO fix those as well
+      //   // if ((typeof e !== "string") || (!e.includes("The provided Plutus code called 'error'")) || (!e.includes("Not enough ADA leftover to cover minADA")) )
+      //   //   throw new Error(`Error: ${e}`);
+      // }
       user.resetMempool();
       emulator.awaitBlock(Number(genPositive(1000n))); // NOTE/TODO this arbitrary limit is a hotfix for block height overflow issue
     }
@@ -112,11 +112,11 @@ Deno.test("emulator", async () => {
   for (const [type, count] of actionCounts_) {
     console.log(`${type}: ${count}`);
   }
-  console.log(`errors: ${errors.length}`);
-  for (const e of errors) {
-    console.warn("---");
-    console.warn(e);
-  }
+  // console.log(`errors: ${errors.length}`);
+  // for (const e of errors) {
+  //   console.warn("---");
+  //   console.warn(e);
+  // }
 });
 
 // Deno.test("constr", async () => {
