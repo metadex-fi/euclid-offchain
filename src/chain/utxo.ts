@@ -402,7 +402,11 @@ export class DiracUtxo {
 
             maxBuyingA0 = maxBuying * spotSelling;
             maxSellingA0 = maxSelling * spotBuying;
-            maxSwapA0 = min(maxSellingA0, maxBuyingA0);
+            const maxSwapA0_ = min(maxSellingA0, maxBuyingA0);
+            // TODO is this true?
+            // assert(maxSwapA0_ <= maxSwapA0, `maxSwapA0 should be decreasing`);
+            // assert(maxSwapA0_ < maxSwapA0, `maxSwapA0 should be strictly decreasing`);
+            maxSwapA0 = maxSwapA0_;
           }
         }
 

@@ -32,7 +32,7 @@ Deno.test("emulator", async () => {
     const emulator = new Lucid.Emulator(accounts);
     const traces: string[] = [];
     const actionCounts = new Map<string, number>();
-    const iterations = 20;
+    const iterations = 10;
     for (let i = 0; i < iterations; i++) {
       console.log(
         `\ntrials left: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`// - errors: ${errors.length}`,

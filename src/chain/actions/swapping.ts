@@ -14,6 +14,8 @@ import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
 
+const runCorruptionTests = true;
+
 export class Swapping {
   public readonly spotPrice: number; // uninverted
   public readonly effectivePrice: number; // uninverted
@@ -21,7 +23,7 @@ export class Swapping {
   public subsequent?: Swapping;
 
   private constructor(
-    public readonly user: User | undefined, // TODO why can this be undefined again?
+    public readonly user: User | undefined, // webapp needs undefined iirc
     public readonly paramUtxo: ParamUtxo,
     public readonly diracUtxo: DiracUtxo,
     public readonly boughtAsset: Asset,
@@ -32,28 +34,27 @@ export class Swapping {
     public readonly soldSpot: bigint, // inverted
     public readonly boughtExp: bigint,
     public readonly soldExp: bigint,
-    runTests = true,
+    runTests: boolean, // corruption-test-swappings don't run tests
+    private readonly maxBuying: bigint, // for corruption-tests
   ) {
     assert(boughtAmount > 0n, `boughtAmount must be positive`);
     assert(soldAmount > 0n, `soldAmount must be positive`);
-    // assert(boughtAmount >= 0n, `boughtAmount must be nonnegative`);
-    // assert(soldAmount >= 0n, `soldAmount must be nonnegative`);
     assert(boughtSpot > 0n, `boughtSpot must be positive`);
     assert(soldSpot > 0n, `soldSpot must be positive`);
+    assert(boughtAmount <= diracUtxo.balance.amountOf(boughtAsset), `boughtAmount must be less than or equal to the balance`);
+    if (user) assert(soldAmount <= user.balance!.amountOf(soldAsset), `soldAmount must be less than or equal to the balance`);
 
     this.spotPrice = Number(soldSpot) / Number(boughtSpot);
     this.effectivePrice = Number(soldAmount) / Number(boughtAmount);
 
     if (runTests) {
-      // TODO deactivate for prod
-      this.corruptionTests();
-  
       // TODO ensure this does not fail when in fact the onchain-code would validate it
       // TODO hard assert again, once the above above is ensured. Or alternatively none at all, call it manually, for performance
       if (!this.validates()) console.error(`Swapping does not validate: ${this.show()}`);
       // assert(this.validates(), `Swapping does not validate:: ${this.show()}`);
+      
+      if (runCorruptionTests) this.corruptionTests();
     }
-
   }
 
   public get type(): string {
@@ -64,16 +65,20 @@ export class Swapping {
     return `Swapping (
   paramUtxo: ${this.paramUtxo.show()}
   diracUtxo: ${this.diracUtxo.show()}
-  boughtAsset: ${this.boughtAsset.show()}
-  soldAsset: ${this.soldAsset.show()}
+  boughtAsset:  ${this.boughtAsset.show()}
+  soldAsset:    ${this.soldAsset.show()}
   boughtAmount: ${this.boughtAmount}
-  soldAmount: ${this.soldAmount}
-  boughtSpot: ${this.boughtSpot}
-  soldSpot: ${this.soldSpot}
-  boughtExp: ${this.boughtExp}
-  soldExp: ${this.soldExp}
-  spotPrice: ${this.spotPrice}
-  effectivePrice: ${this.effectivePrice}
+  soldAmount:   ${this.soldAmount}
+  boughtSpot:   ${this.boughtSpot}
+  soldSpot:     ${this.soldSpot}
+  (boughtA0:    ${this.boughtAmount * this.soldSpot})
+  (soldA0:      ${this.soldAmount * this.boughtSpot})
+  boughtExp:    ${this.boughtExp}
+  soldExp:      ${this.soldExp}
+  spotPrice:    ${this.spotPrice}
+  eff.Price:    ${this.effectivePrice}
+  maxBuying:    ${this.maxBuying}
+  (maxBuyingA0: ${this.maxBuying * this.soldSpot})
 )`;
   };
 
@@ -232,6 +237,8 @@ export class Swapping {
       this.soldSpot,
       this.boughtExp,
       this.soldExp,
+      true,
+      amntIsSold ? this.maxBuying : amount, // per definition of a subSwap
     );
   };
 
@@ -305,6 +312,8 @@ export class Swapping {
       soldSpot,
       boughtExp,
       soldExp,
+      true,
+      diracUtxo.balance.amountOf(boughtAsset),
     );
   }
 
@@ -361,8 +370,9 @@ export class Swapping {
         spot ${spot} != ${spot_} 
         for anchor ${anchor}, js ${js}, exp ${exp}`,
       );
+      return false;
     }
-    return spot === spot_;
+    return true;
   }
 
   static boughtAssetForSale(
@@ -380,6 +390,7 @@ export class Swapping {
         buyingAmm  ${buyingAmm} > 
         spotBuying ${spotBuying}`,
       );
+      return false;
     }
     if (!fitsSelling) {
       console.error(
@@ -387,8 +398,9 @@ export class Swapping {
         sellingAmm  ${sellingAmm} > 
         spotSelling ${spotSelling}`,
       );
+      return false;
     }
-    return fitsBuying && fitsSelling;
+    return true;
   }
 
   static valueEquation(
@@ -406,8 +418,9 @@ export class Swapping {
         addedBuyingA0  ${addedBuyingA0} > 
         addedSellingA0 ${addedSellingA0}`,
       );
+      return false;
     }
-    return addedBuyingA0 <= addedSellingA0;
+    return true;
   }
 
   // TODO fixme
@@ -497,114 +510,171 @@ export class Swapping {
 
   // try to make it wrong with minimal changes
   public corruptionTests = () => {
-    // TODO amounts might be a bit more complicated, check out the subswap minSwapA0 thing to understand
-    // const boughtTooMuch = new Swapping(
-    //   this.user,
-    //   this.paramUtxo,
-    //   this.diracUtxo,
-    //   this.boughtAsset,
-    //   this.soldAsset,
-    //   this.boughtAmount + 1n,
-    //   this.soldAmount,
-    //   this.boughtSpot,
-    //   this.soldSpot,
-    //   this.boughtExp,
-    //   this.soldExp,
-    //   false,
-    // );
-    // assert(!boughtTooMuch.validates(), `boughtTooMuch should not validate: ${boughtTooMuch.show()}\nfrom: ${this.show()}`);
-
-    // if (this.soldAmount > 1n) {
-    //   const soldTooLittle = new Swapping(
-    //     this.user,
-    //     this.paramUtxo,
-    //     this.diracUtxo,
-    //     this.boughtAsset,
-    //     this.soldAsset,
-    //     this.boughtAmount,
-    //     this.soldAmount - 1n,
-    //     this.boughtSpot,
-    //     this.soldSpot,
-    //     this.boughtExp,
-    //     this.soldExp,
-    //     false,
-    //   );
-    //   assert(!soldTooLittle.validates(), `soldTooMuch should not validate: ${soldTooLittle.show()}\nfrom: ${this.show()}`);
-    // }
-
-    const param = this.paramUtxo.param;
-    const dirac = this.diracUtxo.dirac;
-
-    const jsBuying = param.jumpSizes.amountOf(this.boughtAsset);
-    const anchorBuying = dirac.anchorPrices.amountOf(this.boughtAsset);
-    let boughtExp_ = this.boughtExp;
-    let boughtSpot_ = this.boughtSpot;
-    while (boughtSpot_ === this.boughtSpot) {
-      boughtExp_ += 1n;
-      boughtSpot_ = (anchorBuying * ((jsBuying + 1n) ** boughtExp_)) / (jsBuying ** boughtExp_);
-    }
-    // NOTE prices are inverted
-    assert(boughtSpot_ > this.boughtSpot, `seems like boughtExp is being changed in the wrong direction`);
-   
-    if (boughtSpot_ > 0n) {
-      const boughtSpotTooLow = new Swapping(
-        this.user,
-        this.paramUtxo,
-        this.diracUtxo,
-        this.boughtAsset,
-        this.soldAsset,
-        this.boughtAmount,
-        this.soldAmount,
-        boughtSpot_,
-        this.soldSpot,
-        boughtExp_,
-        this.soldExp,
-        false,
-      );
-      assert(!boughtSpotTooLow.validates(), `boughtSpotTooLow should not validate: ${boughtSpotTooLow.show()}\nfrom: ${this.show()}`);
-      assert(Swapping.exponentsYieldPrice(
-        anchorBuying,
-        jsBuying,
-        boughtExp_,
-        boughtSpot_,
-        "buying",
-      ), `boughtSpotTooLow should still yield the correct price: ${boughtSpotTooLow.show()}`);
-    }
-    
-    const jsSelling = param.jumpSizes.amountOf(this.soldAsset);
-    const anchorSelling = dirac.anchorPrices.amountOf(this.soldAsset);
-    let soldExp_ = this.soldExp;
-    let soldSpot_ = this.soldSpot;
-    while (soldSpot_ === this.soldSpot) {
-      soldExp_ -= 1n;
-      soldSpot_ = (anchorSelling * ((jsSelling + 1n) ** soldExp_)) / (jsSelling ** soldExp_);
-    }
-    // NOTE prices are inverted
-    assert(soldSpot_ < this.soldSpot, `seems like soldExp is being changed in the wrong direction`);
-    
-    if (soldSpot_ > 0n) {
-      const soldSpotTooHigh = new Swapping(
-        this.user,
-        this.paramUtxo,
-        this.diracUtxo,
-        this.boughtAsset,
-        this.soldAsset,
-        this.boughtAmount,
-        this.soldAmount,
-        this.boughtSpot,
-        soldSpot_,
-        this.boughtExp,
-        soldExp_,
-        false,
-      );
-      assert(!soldSpotTooHigh.validates(), `soldSpotTooHigh should not validate: ${soldSpotTooHigh.show()}\nfrom: ${this.show()}`);
-      assert(Swapping.exponentsYieldPrice(
-        anchorSelling,
-        jsSelling,
-        soldExp_,
-        soldSpot_,
-        "selling",
-      ), `soldSpotTooHigh should still yield the correct price: ${soldSpotTooHigh.show()}`);
+    try{
+      if (Math.random() < 0.5) {
+        this.testSellTooLittle();
+        this.testBuyTooMuch();
+      } else {
+        this.testBuyTooMuch();
+        this.testSellTooLittle();
+      }
+    } catch (e) {
+      throw(e);
     }
   }
+
+  public testBuyTooMuch = () => {
+    if (this.boughtAmount === this.maxBuying) return;
+    const boughtTooMuch = new Swapping(
+      this.user,
+      this.paramUtxo,
+      this.diracUtxo,
+      this.boughtAsset,
+      this.soldAsset,
+      this.boughtAmount + 1n,
+      this.soldAmount,
+      this.boughtSpot,
+      this.soldSpot,
+      this.boughtExp,
+      this.soldExp,
+      false,
+      this.maxBuying,
+    );
+    assert(!boughtTooMuch.validates(), `buying one more should fail: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`);
+    // TODO next try fiddling with the prices
+  }
+
+  public testSellTooLittle = () => {
+    if (this.soldAmount === 1n) return;
+    const soldTooLittle = new Swapping(
+      this.user,
+      this.paramUtxo,
+      this.diracUtxo,
+      this.boughtAsset,
+      this.soldAsset,
+      this.boughtAmount,
+      this.soldAmount - 1n,
+      this.boughtSpot,
+      this.soldSpot,
+      this.boughtExp,
+      this.soldExp,
+      false,
+      this.maxBuying,
+    );
+    assert(!soldTooLittle.validates(), `selling one less should fail: ${this.show()}\n~~~>\n${soldTooLittle.show()}`);
+    // TODO next try fiddling with the prices
+  }
+
+
+//   public corruptionTests_ = () => {
+//     // TODO amounts might be a bit more complicated, check out the subswap minSwapA0 thing to understand
+//     const boughtTooMuch = new Swapping(
+//       this.user,
+//       this.paramUtxo,
+//       this.diracUtxo,
+//       this.boughtAsset,
+//       this.soldAsset,
+//       this.boughtAmount + 1n,
+//       this.soldAmount,
+//       this.boughtSpot,
+//       this.soldSpot,
+//       this.boughtExp,
+//       this.soldExp,
+//       false,
+//     );
+//     assert(!boughtTooMuch.validates(), `boughtTooMuch should not validate: ${boughtTooMuch.show()}\nfrom: ${this.show()}`);
+
+//     if (this.soldAmount > 1n) {
+//       const soldTooLittle = new Swapping(
+//         this.user,
+//         this.paramUtxo,
+//         this.diracUtxo,
+//         this.boughtAsset,
+//         this.soldAsset,
+//         this.boughtAmount,
+//         this.soldAmount - 1n,
+//         this.boughtSpot,
+//         this.soldSpot,
+//         this.boughtExp,
+//         this.soldExp,
+//         false,
+//       );
+//       assert(!soldTooLittle.validates(), `soldTooLittle should not validate: ${soldTooLittle.show()}\nfrom: ${this.show()}`);
+//     }
+
+//     const param = this.paramUtxo.param;
+//     const dirac = this.diracUtxo.dirac;
+
+//     const jsBuying = param.jumpSizes.amountOf(this.boughtAsset);
+//     const anchorBuying = dirac.anchorPrices.amountOf(this.boughtAsset);
+//     let boughtExp_ = this.boughtExp;
+//     let boughtSpot_ = this.boughtSpot;
+//     while (boughtSpot_ === this.boughtSpot) {
+//       boughtExp_++;
+//       boughtSpot_ = (anchorBuying * ((jsBuying + 1n) ** boughtExp_)) / (jsBuying ** boughtExp_);
+//     }
+//     // NOTE prices are inverted
+//     assert(boughtSpot_ > this.boughtSpot, `seems like boughtExp is being changed in the wrong direction`);
+   
+//     if (boughtSpot_ > 0n) {
+//       const boughtSpotTooLow = new Swapping(
+//         this.user,
+//         this.paramUtxo,
+//         this.diracUtxo,
+//         this.boughtAsset,
+//         this.soldAsset,
+//         this.boughtAmount,
+//         this.soldAmount,
+//         boughtSpot_,
+//         this.soldSpot,
+//         boughtExp_,
+//         this.soldExp,
+//         false,
+//       );
+//       assert(!boughtSpotTooLow.validates(), `boughtSpotTooLow should not validate: ${boughtSpotTooLow.show()}\nfrom: ${this.show()}`);
+//       assert(Swapping.exponentsYieldPrice(
+//         anchorBuying,
+//         jsBuying,
+//         boughtExp_,
+//         boughtSpot_,
+//         "buying",
+//       ), `boughtSpotTooLow should still yield the correct price: ${boughtSpotTooLow.show()}`);
+//     }
+    
+//     const jsSelling = param.jumpSizes.amountOf(this.soldAsset);
+//     const anchorSelling = dirac.anchorPrices.amountOf(this.soldAsset);
+//     let soldExp_ = this.soldExp;
+//     let soldSpot_ = this.soldSpot;
+//     while (soldSpot_ === this.soldSpot) {
+//       soldExp_--;
+//       soldSpot_ = (anchorSelling * ((jsSelling + 1n) ** soldExp_)) / (jsSelling ** soldExp_);
+//     }
+//     // NOTE prices are inverted
+//     assert(soldSpot_ < this.soldSpot, `seems like soldExp is being changed in the wrong direction`);
+    
+//     if (soldSpot_ > 0n) {
+//       const soldSpotTooHigh = new Swapping(
+//         this.user,
+//         this.paramUtxo,
+//         this.diracUtxo,
+//         this.boughtAsset,
+//         this.soldAsset,
+//         this.boughtAmount,
+//         this.soldAmount,
+//         this.boughtSpot,
+//         soldSpot_,
+//         this.boughtExp,
+//         soldExp_,
+//         false,
+//       );
+//       assert(!soldSpotTooHigh.validates(), `soldSpotTooHigh should not validate: ${soldSpotTooHigh.show()}\nfrom: ${this.show()}`);
+//       assert(Swapping.exponentsYieldPrice(
+//         anchorSelling,
+//         jsSelling,
+//         soldExp_,
+//         soldSpot_,
+//         "selling",
+//       ), `soldSpotTooHigh should still yield the correct price: ${soldSpotTooHigh.show()}`);
+//     }
+//   }
 }
