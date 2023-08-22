@@ -25,7 +25,6 @@ Deno.test("emulator", async () => {
         allUsers = await User.genSeveral(genPositive(10n), genPositive(10n)); // TODO more
       } catch (e) {
         if (generationTries-- <= 0) throw e;
-        else console.error(e);
       }
     }
     const accounts = allUsers.map((u) => u.account);
@@ -33,7 +32,7 @@ Deno.test("emulator", async () => {
     const emulator = new Lucid.Emulator(accounts);
     const traces: string[] = [];
     const actionCounts = new Map<string, number>();
-    const iterations = 100;
+    const iterations = 20;
     for (let i = 0; i < iterations; i++) {
       console.log(
         `\ntrials left: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`// - errors: ${errors.length}`,

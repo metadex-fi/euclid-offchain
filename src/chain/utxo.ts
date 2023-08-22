@@ -274,9 +274,11 @@ export class DiracUtxo {
       let spotBuying = spot(anchor, jumpSize, expBuying);
       let spotSelling = spot(anchor, jumpSize, expSelling);
 
-      // let spotBuying = ((amm - anchor) / jumpSize) * jumpSize + anchor; // NOTE: inverted
+      // TODO what about this?
+      // NOTE: inverted
+      // assert(spot(anchor, jumpSize, expBuying + 1n) >= amm, `expBuying could be higher`);
+      // assert(spot(anchor, jumpSize, expSelling - 1n) <= amm, `spotSelling could be lower`);
       // assert(spotBuying >= anchor, `spotBuying < anchor`); // TODO do we want that in the loop below? Do we want it at all?
-      // let spotSelling = spotBuying + jumpSize; // NOTE: inverted aka "price when selling for A0"
 
       const delta_ = delta(weight, liquidity);
 
@@ -287,7 +289,7 @@ export class DiracUtxo {
 
           if (maxBuying > 0n) {
             spotBuying_.initAmountOf(asset, spotBuying);
-            expBuying_.initAmountOf(asset, expBuying + 1n); // NOTE/TODO +1n is a hack to fit it into PositiveValue
+            expBuying_.initAmountOf(asset, expBuying + 1n); // NOTE/TODO +1n is a hack to fit zeroes into PositiveValue
             maxBuying_.initAmountOf(asset, maxBuying);
             break;
           } else {
@@ -337,7 +339,7 @@ export class DiracUtxo {
         if (sellingAsset.equals(buyingAsset)) return;
 
         const spotBuying = spotBuying_.amountOf(buyingAsset); // NOTE: inverted
-        const expBuying = expBuying_.amountOf(buyingAsset) - 1n; // NOTE/TODO +1n is a hack to fit it into PositiveValue
+        const expBuying = expBuying_.amountOf(buyingAsset) - 1n; // NOTE the -1 is part of the hack to fit zeroes into PositiveValue (see above)
         const maxBuying = maxBuying_.amountOf(buyingAsset);
 
         // NOTE: below not strictly A0, but want to avoid divisions.
@@ -350,8 +352,7 @@ export class DiracUtxo {
         let maxSellingA0 = maxSelling * spotBuying;
         let maxSwapA0 = min(maxSellingA0, maxBuyingA0);
 
-        // if (maxSwapA0 < spotSelling) return; // to avoid zero buying amount TODO this is somewhat wrong, correct would be to instead relax the prices further instead
-
+        if (maxSwapA0 < spotSelling) return; // TODO comment out again
         if (maxSwapA0 < spotSelling) {
           // TODO marginal efficiency gains possible here by initialzing only JIT
           const sellingAnchor = this.dirac.anchorPrices.amountOf(sellingAsset);

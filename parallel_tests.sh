@@ -1,6 +1,7 @@
 #!/bin/bash
 
 mkdir -p test_logs
+rm test_logs/logs_*.txt
 N=100
 pipe=$(mktemp -u)
 mkfifo $pipe

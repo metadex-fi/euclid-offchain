@@ -32,6 +32,7 @@ export class Swapping {
     public readonly soldSpot: bigint, // inverted
     public readonly boughtExp: bigint,
     public readonly soldExp: bigint,
+    runTests = true,
   ) {
     assert(boughtAmount > 0n, `boughtAmount must be positive`);
     assert(soldAmount > 0n, `soldAmount must be positive`);
@@ -43,10 +44,16 @@ export class Swapping {
     this.spotPrice = Number(soldSpot) / Number(boughtSpot);
     this.effectivePrice = Number(soldAmount) / Number(boughtAmount);
 
-    // TODO ensure this does not fail when in fact the onchain-code would validate it
-    // TODO hard assert again, once the above above is ensured
-    if (!this.validates()) console.error(`Swapping does not validate: ${this.show()}`);
-    // assert(this.validates(), `Swapping does not validate:: ${this.show()}`);
+    if (runTests) {
+      // TODO deactivate for prod
+      this.corruptionTests();
+  
+      // TODO ensure this does not fail when in fact the onchain-code would validate it
+      // TODO hard assert again, once the above above is ensured. Or alternatively none at all, call it manually, for performance
+      if (!this.validates()) console.error(`Swapping does not validate: ${this.show()}`);
+      // assert(this.validates(), `Swapping does not validate:: ${this.show()}`);
+    }
+
   }
 
   public get type(): string {
@@ -340,7 +347,7 @@ export class Swapping {
   //   return fitBuying && fitSelling;
   // }
 
-  private static exponentsYieldPrice(
+  static exponentsYieldPrice(
     anchor: bigint,
     js: bigint,
     exp: bigint,
@@ -358,7 +365,7 @@ export class Swapping {
     return spot === spot_;
   }
 
-  private static boughtAssetForSale(
+  static boughtAssetForSale(
     spotBuying: bigint,
     spotSelling: bigint,
     buyingAmm: bigint,
@@ -384,7 +391,7 @@ export class Swapping {
     return fitsBuying && fitsSelling;
   }
 
-  private static valueEquation(
+  static valueEquation(
     spotBuying: bigint,
     spotSelling: bigint,
     buyingAmount: bigint,
@@ -392,9 +399,7 @@ export class Swapping {
   ): boolean {
     const addedBuyingA0 = buyingAmount * spotSelling;
     const addedSellingA0 = sellingAmount * spotBuying;
-    console.log(`addedBuyingA0: ${addedBuyingA0}`);
-    console.log(`addedSellingA0: ${addedSellingA0}`);
-    console.log(`diff: ${addedBuyingA0 - addedSellingA0}`)
+
     if (addedBuyingA0 > addedSellingA0) {
       console.error(
         `valueEquation: 
@@ -488,5 +493,118 @@ export class Swapping {
         this.soldAmount,
       );
     // TODO othersUnchanged - con: this is implicit
+  }
+
+  // try to make it wrong with minimal changes
+  public corruptionTests = () => {
+    // TODO amounts might be a bit more complicated, check out the subswap minSwapA0 thing to understand
+    // const boughtTooMuch = new Swapping(
+    //   this.user,
+    //   this.paramUtxo,
+    //   this.diracUtxo,
+    //   this.boughtAsset,
+    //   this.soldAsset,
+    //   this.boughtAmount + 1n,
+    //   this.soldAmount,
+    //   this.boughtSpot,
+    //   this.soldSpot,
+    //   this.boughtExp,
+    //   this.soldExp,
+    //   false,
+    // );
+    // assert(!boughtTooMuch.validates(), `boughtTooMuch should not validate: ${boughtTooMuch.show()}\nfrom: ${this.show()}`);
+
+    // if (this.soldAmount > 1n) {
+    //   const soldTooLittle = new Swapping(
+    //     this.user,
+    //     this.paramUtxo,
+    //     this.diracUtxo,
+    //     this.boughtAsset,
+    //     this.soldAsset,
+    //     this.boughtAmount,
+    //     this.soldAmount - 1n,
+    //     this.boughtSpot,
+    //     this.soldSpot,
+    //     this.boughtExp,
+    //     this.soldExp,
+    //     false,
+    //   );
+    //   assert(!soldTooLittle.validates(), `soldTooMuch should not validate: ${soldTooLittle.show()}\nfrom: ${this.show()}`);
+    // }
+
+    const param = this.paramUtxo.param;
+    const dirac = this.diracUtxo.dirac;
+
+    const jsBuying = param.jumpSizes.amountOf(this.boughtAsset);
+    const anchorBuying = dirac.anchorPrices.amountOf(this.boughtAsset);
+    let boughtExp_ = this.boughtExp;
+    let boughtSpot_ = this.boughtSpot;
+    while (boughtSpot_ === this.boughtSpot) {
+      boughtExp_ += 1n;
+      boughtSpot_ = (anchorBuying * ((jsBuying + 1n) ** boughtExp_)) / (jsBuying ** boughtExp_);
+    }
+    // NOTE prices are inverted
+    assert(boughtSpot_ > this.boughtSpot, `seems like boughtExp is being changed in the wrong direction`);
+   
+    if (boughtSpot_ > 0n) {
+      const boughtSpotTooLow = new Swapping(
+        this.user,
+        this.paramUtxo,
+        this.diracUtxo,
+        this.boughtAsset,
+        this.soldAsset,
+        this.boughtAmount,
+        this.soldAmount,
+        boughtSpot_,
+        this.soldSpot,
+        boughtExp_,
+        this.soldExp,
+        false,
+      );
+      assert(!boughtSpotTooLow.validates(), `boughtSpotTooLow should not validate: ${boughtSpotTooLow.show()}\nfrom: ${this.show()}`);
+      assert(Swapping.exponentsYieldPrice(
+        anchorBuying,
+        jsBuying,
+        boughtExp_,
+        boughtSpot_,
+        "buying",
+      ), `boughtSpotTooLow should still yield the correct price: ${boughtSpotTooLow.show()}`);
+    }
+    
+    const jsSelling = param.jumpSizes.amountOf(this.soldAsset);
+    const anchorSelling = dirac.anchorPrices.amountOf(this.soldAsset);
+    let soldExp_ = this.soldExp;
+    let soldSpot_ = this.soldSpot;
+    while (soldSpot_ === this.soldSpot) {
+      soldExp_ -= 1n;
+      soldSpot_ = (anchorSelling * ((jsSelling + 1n) ** soldExp_)) / (jsSelling ** soldExp_);
+    }
+    // NOTE prices are inverted
+    assert(soldSpot_ < this.soldSpot, `seems like soldExp is being changed in the wrong direction`);
+    
+    if (soldSpot_ > 0n) {
+      const soldSpotTooHigh = new Swapping(
+        this.user,
+        this.paramUtxo,
+        this.diracUtxo,
+        this.boughtAsset,
+        this.soldAsset,
+        this.boughtAmount,
+        this.soldAmount,
+        this.boughtSpot,
+        soldSpot_,
+        this.boughtExp,
+        soldExp_,
+        false,
+      );
+      assert(!soldSpotTooHigh.validates(), `soldSpotTooHigh should not validate: ${soldSpotTooHigh.show()}\nfrom: ${this.show()}`);
+      assert(Swapping.exponentsYieldPrice(
+        anchorSelling,
+        jsSelling,
+        soldExp_,
+        soldSpot_,
+        "selling",
+      ), `soldSpotTooHigh should still yield the correct price: ${soldSpotTooHigh.show()}`);
+    }
   }
 }
