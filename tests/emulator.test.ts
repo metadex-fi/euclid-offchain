@@ -18,13 +18,22 @@ Deno.test("emulator", async () => {
   // const errors = [];
   while (trials > 0) {
     console.log(`trials left: ${trials}`);
-    const allUsers = await User.genSeveral(genPositive(10n), genPositive(10n)); // TODO more
+    let allUsers;
+    let generationTries = 100; // TODO consider fixing this
+    while (!allUsers) {
+      try {
+        allUsers = await User.genSeveral(genPositive(10n), genPositive(10n)); // TODO more
+      } catch (e) {
+        if (generationTries-- <= 0) throw e;
+        else console.error(e);
+      }
+    }
     const accounts = allUsers.map((u) => u.account);
     console.log(`accounts: ${accounts.length}`);
     const emulator = new Lucid.Emulator(accounts);
     const traces: string[] = [];
     const actionCounts = new Map<string, number>();
-    const iterations = 20;
+    const iterations = 100;
     for (let i = 0; i < iterations; i++) {
       console.log(
         `\ntrials left: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`// - errors: ${errors.length}`,
@@ -81,17 +90,11 @@ Deno.test("emulator", async () => {
         traces.push(...hashes.flat());
         // }
       // } catch (e) {
-      //   console.error("---");
-      //   for (const [type, count] of actionCounts_) {
-      //     console.error(`${type}: ${count}`);
+      //   if (e.toString().includes("TypeError: Cannot read properties of undefined (reading '__wbindgen_add_to_stack_pointer')")) {
+      //     console.error("caught:", e);
+      //   } else {
+      //     throw e;
       //   }
-      //   console.error(e);
-      //   console.log("user.usedSplitting:", user.usedSplitting);
-      //   if (user.usedSplitting) throw e;
-      //   else errors.push(e);
-      //   // TODO fix those as well
-      //   // if ((typeof e !== "string") || (!e.includes("The provided Plutus code called 'error'")) || (!e.includes("Not enough ADA leftover to cover minADA")) )
-      //   //   throw new Error(`Error: ${e}`);
       // }
       user.resetMempool();
       emulator.awaitBlock(Number(genPositive(1000n))); // NOTE/TODO this arbitrary limit is a hotfix for block height overflow issue

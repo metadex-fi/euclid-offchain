@@ -46,3 +46,5 @@ failed_indices=$(grep -lE '([1-9][0-9]*) failed' test_logs/*.txt 2>/dev/null | s
 if [ ! -z "$failed_indices" ]; then
     echo "Failed test indices: $failed_indices"
 fi
+
+grep "does not validate" test_logs/*.txt

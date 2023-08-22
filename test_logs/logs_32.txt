@@ -4,2042 +4,498 @@
 [0m[38;5;245mrunning 1 test from ./tests/emulator.test.ts[0m
 emulator ...
 [0m[38;5;245m------- output -------[0m
-trials left: 10
+trials left: 1
 accounts: 1
 
-trials left: 10 - iteration: 0 - block: 0
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 1 - block: 98
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 2 - block: 132
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 3 - block: 133
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 4 - block: 1133
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 5 - block: 2115
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 6 - block: 3115
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 7 - block: 3116
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 8 - block: 4116
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 9 - block: 5116
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 10 - block: 5117
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 11 - block: 5118
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 12 - block: 5119
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 13 - block: 5367
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 14 - block: 6171
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 15 - block: 6196
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 16 - block: 7016
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 17 - block: 7017
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 18 - block: 7018
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-
-trials left: 10 - iteration: 19 - block: 7864
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vzv46d3mdq94h8s4fdusfu26q2un0m9tch0404leku480mc8fmdw0",
-    assets: { lovelace: 823983611593002n }
-  }
-]
-resetting:
-
-spent utxos: 
-
-pending utxos:
-traces.length: 0
-trials left: 10
-accounts: 1
-
-trials left: 10 - iteration: 0 - block: 0
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    assets: {
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 9007199254740991n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9007199254740991n,
-      "571d71f3d11c366ab4c400130b5ea207c127546cd371eef18d5f034d": 1n,
-      c9cdbbf0b563e13185c705ce384ac7ae14eba9644979832c2a00d6d7: 1n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 1509138703790278n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n,
-      lovelace: 8592725092356035n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n
-    }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    assets: {
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 9007199254740991n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9007199254740991n,
-      "571d71f3d11c366ab4c400130b5ea207c127546cd371eef18d5f034d": 1n,
-      c9cdbbf0b563e13185c705ce384ac7ae14eba9644979832c2a00d6d7: 1n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 1509138703790278n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n,
-      lovelace: 8592725092356035n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n
-    }
-  }
-]
-virtual: 2407839787672648
-weight: 7
+trials left: 1 - iteration: 0 - block: 0
+virtual: 9007199254740991
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8918019064099991
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+maxTicks: 1
+maxTicks_: 44812306322540
+1
+virtual: 9007199254740991
+weight: 1
 jumpSize: 1
-minAnchorPrice: 8427439256854268
+minAnchorPrice: 4503599627370495
 jumpLog: 0.6931471805599453
 anchorLog: 2.2204460492503128e-16
 3121657384082680
 maxTicks: 1
 maxTicks_: 3121657384082680
 1
-virtual: 2
-weight: 99
-jumpSize: 100
-minAnchorPrice: 196
-jumpLog: 0.009950330853168092
-anchorLog: 0.005089069507471228
-1.9552357928222595
-maxTicks: 1
-maxTicks_: 1
-1
 Opening pool with 1 dirac utxos and 1 param utxos
-getUtxosCore()
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    assets: {
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 9007199254740991n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9007199254740991n,
-      "571d71f3d11c366ab4c400130b5ea207c127546cd371eef18d5f034d": 1n,
-      c9cdbbf0b563e13185c705ce384ac7ae14eba9644979832c2a00d6d7: 1n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 1509138703790278n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n,
-      lovelace: 8592725092356035n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n
-    }
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    outputIndex: 0,
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    assets: {
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 9007199254740991n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9007199254740991n,
-      "571d71f3d11c366ab4c400130b5ea207c127546cd371eef18d5f034d": 1n,
-      c9cdbbf0b563e13185c705ce384ac7ae14eba9644979832c2a00d6d7: 1n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 1509138703790278n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n,
-      lovelace: 8592725092356035n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n
-    }
-  }
-]
-resetting:
 
-spent utxos: [object Object],[object Object]
-
-pending utxos:[object Object],[object Object]
-
-trials left: 10 - iteration: 1 - block: 1000
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "778e07022dbe1f089b6eacd33097eb03e484e8f310952499a5e4de579946090c",
-    outputIndex: 2,
-    assets: {
-      lovelace: 2784260n,
-      "571d71f3d11c366ab4c400130b5ea207c127546cd371eef18d5f034d": 1n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9007199254740991n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 9007199254740991n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 1509138703790278n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "778e07022dbe1f089b6eacd33097eb03e484e8f310952499a5e4de579946090c",
-    outputIndex: 3,
-    assets: { lovelace: 8592725058161928n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "778e07022dbe1f089b6eacd33097eb03e484e8f310952499a5e4de579946090c",
-    outputIndex: 2,
-    assets: {
-      lovelace: 2784260n,
-      "571d71f3d11c366ab4c400130b5ea207c127546cd371eef18d5f034d": 1n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9007199254740991n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 9007199254740991n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 1509138703790278n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "778e07022dbe1f089b6eacd33097eb03e484e8f310952499a5e4de579946090c",
-    outputIndex: 3,
-    assets: { lovelace: 8592725058161928n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-virtual: 1
-weight: 78
-jumpSize: 77
-minAnchorPrice: 77
-jumpLog: 0.012903404835907782
-anchorLog: 0.012903404835907782
-1
-maxTicks: 9007199254740991
-maxTicks_: 1
-1
-virtual: 4100152973327466
+trials left: 1 - iteration: 1 - block: 1000
+virtual: 9007199254740991
 weight: 1
 jumpSize: 100
-minAnchorPrice: 4059557399334124
+minAnchorPrice: 8918019064099991
 jumpLog: 0.009950330853168092
 anchorLog: 2.2204460492503128e-16
 44812306322540.98
-maxTicks: 9007199254740991
+maxTicks: 9007199254740990
 maxTicks_: 44812306322540
 3
-virtual: 156921153871514
-weight: 18
-jumpSize: 33
-minAnchorPrice: 2741504864696450
-jumpLog: 0.02985296314968113
-anchorLog: 4.440892098500625e-16
-67222896858404.555
-maxTicks: 3002399751580330
-maxTicks_: 67222896858404
-3
-virtual: 4100152973327466
-weight: 1
-jumpSize: 100
-minAnchorPrice: 4059557399334124
-jumpLog: 0.009950330853168092
-anchorLog: 2.2204460492503128e-16
-44812306322540.98
-virtual: 4100152973327466
-weight: 1
-jumpSize: 100
-minAnchorPrice: 4059557399334124
-jumpLog: 0.009950330853168092
-anchorLog: 2.2204460492503128e-16
-44812306322540.98
-virtual: 156921153871514
-weight: 18
-jumpSize: 33
-minAnchorPrice: 2741504864696450
-jumpLog: 0.02985296314968113
-anchorLog: 4.440892098500625e-16
-67222896858404.555
-virtual: 156921153871514
-weight: 18
-jumpSize: 33
-minAnchorPrice: 2741504864696450
-jumpLog: 0.02985296314968113
-anchorLog: 4.440892098500625e-16
-67222896858404.555
-virtual: 156921153871514
-weight: 18
-jumpSize: 33
-minAnchorPrice: 2741504864696450
-jumpLog: 0.02985296314968113
-anchorLog: 4.440892098500625e-16
-67222896858404.555
-Opening pool with 6 dirac utxos and 1 param utxos
-getUtxosCore()
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "778e07022dbe1f089b6eacd33097eb03e484e8f310952499a5e4de579946090c",
-    outputIndex: 2,
-    assets: {
-      lovelace: 2784260n,
-      "571d71f3d11c366ab4c400130b5ea207c127546cd371eef18d5f034d": 1n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9007199254740991n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 9007199254740991n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 1509138703790278n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "778e07022dbe1f089b6eacd33097eb03e484e8f310952499a5e4de579946090c",
-    outputIndex: 3,
-    assets: { lovelace: 8592725058161928n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "778e07022dbe1f089b6eacd33097eb03e484e8f310952499a5e4de579946090c",
-    outputIndex: 2,
-    assets: {
-      lovelace: 2784260n,
-      "571d71f3d11c366ab4c400130b5ea207c127546cd371eef18d5f034d": 1n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9007199254740991n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 9007199254740991n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 1509138703790278n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "778e07022dbe1f089b6eacd33097eb03e484e8f310952499a5e4de579946090c",
-    outputIndex: 3,
-    assets: { lovelace: 8592725058161928n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-resetting:
-
-spent utxos: [object Object],[object Object],[object Object]
-
-pending utxos:[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]
-
-trials left: 10 - iteration: 2 - block: 2000
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "ae617306146c14649b2a702463cfd20c034d0bcde9d93ce00e0c312b3b0c3836",
-    outputIndex: 7,
-    assets: {
-      lovelace: 2749780n,
-      "571d71f3d11c366ab4c400130b5ea207c127546cd371eef18d5f034d": 1n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9007199254740991n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 1509138703790278n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "ae617306146c14649b2a702463cfd20c034d0bcde9d93ce00e0c312b3b0c3836",
-    outputIndex: 8,
-    assets: { lovelace: 8592725011378836n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "ae617306146c14649b2a702463cfd20c034d0bcde9d93ce00e0c312b3b0c3836",
-    outputIndex: 7,
-    assets: {
-      lovelace: 2749780n,
-      "571d71f3d11c366ab4c400130b5ea207c127546cd371eef18d5f034d": 1n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9007199254740991n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 1509138703790278n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "ae617306146c14649b2a702463cfd20c034d0bcde9d93ce00e0c312b3b0c3836",
-    outputIndex: 8,
-    assets: { lovelace: 8592725011378836n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
 virtual: 9007199254740991
-weight: 1
-jumpSize: 74
-minAnchorPrice: 8887103264677777
-jumpLog: 0.01342302033214077
-anchorLog: 2.2204460492503128e-16
-60451909366015.77
-maxTicks: 1
-maxTicks_: 60451909366015
-1
-virtual: 9007199254740991
-weight: 1
-jumpSize: 96
-minAnchorPrice: 8914341530465310
-jumpLog: 0.010362787035546658
-anchorLog: 2.2204460492503128e-16
-46669843831807.74
-maxTicks: 1
-maxTicks_: 46669843831807
-1
-virtual: 9007199254740991
-weight: 1
-jumpSize: 79
-minAnchorPrice: 8894609264056728
-jumpLog: 0.012578782206860185
-anchorLog: 2.2204460492503128e-16
-56649798859590.164
-maxTicks: 1
-maxTicks_: 56649798859590
-1
-Opening pool with 1 dirac utxos and 1 param utxos
-getUtxosCore()
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "ae617306146c14649b2a702463cfd20c034d0bcde9d93ce00e0c312b3b0c3836",
-    outputIndex: 7,
-    assets: {
-      lovelace: 2749780n,
-      "571d71f3d11c366ab4c400130b5ea207c127546cd371eef18d5f034d": 1n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9007199254740991n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 1509138703790278n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "ae617306146c14649b2a702463cfd20c034d0bcde9d93ce00e0c312b3b0c3836",
-    outputIndex: 8,
-    assets: { lovelace: 8592725011378836n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "ae617306146c14649b2a702463cfd20c034d0bcde9d93ce00e0c312b3b0c3836",
-    outputIndex: 7,
-    assets: {
-      lovelace: 2749780n,
-      "571d71f3d11c366ab4c400130b5ea207c127546cd371eef18d5f034d": 1n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9007199254740991n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 1509138703790278n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "ae617306146c14649b2a702463cfd20c034d0bcde9d93ce00e0c312b3b0c3836",
-    outputIndex: 8,
-    assets: { lovelace: 8592725011378836n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-resetting:
-
-spent utxos: [object Object],[object Object],[object Object]
-
-pending utxos:[object Object],[object Object]
-
-trials left: 10 - iteration: 3 - block: 2570
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "75857ac17b056a176ec364196f2755fea04257c394de661514385a16b84c77c6",
-    outputIndex: 2,
-    assets: {
-      lovelace: 2607550n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 144459967524444n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "75857ac17b056a176ec364196f2755fea04257c394de661514385a16b84c77c6",
-    outputIndex: 3,
-    assets: { lovelace: 8592724978639688n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "75857ac17b056a176ec364196f2755fea04257c394de661514385a16b84c77c6",
-    outputIndex: 2,
-    assets: {
-      lovelace: 2607550n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 144459967524444n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "75857ac17b056a176ec364196f2755fea04257c394de661514385a16b84c77c6",
-    outputIndex: 3,
-    assets: { lovelace: 8592724978639688n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-virtual: 9007199254740991
-weight: 1
-jumpSize: 7
-minAnchorPrice: 7881299347898367
-jumpLog: 0.13353139262452257
-anchorLog: 2.2204460492503128e-16
-601371930066063.4
-maxTicks: 1
-maxTicks_: 601371930066063
-1
-virtual: 5552076529044496
-weight: 1
-jumpSize: 19
-minAnchorPrice: 5274472702592271
-jumpLog: 0.05129329438755048
-anchorLog: 2.2204460492503128e-16
-231004461490377.53
-maxTicks: 1
-maxTicks_: 231004461490377
-1
-virtual: 623654279547046
 weight: 1
 jumpSize: 1
-minAnchorPrice: 311827139773523
+minAnchorPrice: 4503599627370495
 jumpLog: 0.6931471805599453
-anchorLog: 3.1086244689504336e-15
-222975527434477.44
-maxTicks: 1
-maxTicks_: 222975527434477
-1
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 9007199254740990
+maxTicks_: 3121657384082680
+3
 Opening pool with 1 dirac utxos and 1 param utxos
-getUtxosCore()
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "75857ac17b056a176ec364196f2755fea04257c394de661514385a16b84c77c6",
-    outputIndex: 2,
-    assets: {
-      lovelace: 2607550n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 144459967524444n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "75857ac17b056a176ec364196f2755fea04257c394de661514385a16b84c77c6",
-    outputIndex: 3,
-    assets: { lovelace: 8592724978639688n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "75857ac17b056a176ec364196f2755fea04257c394de661514385a16b84c77c6",
-    outputIndex: 2,
-    assets: {
-      lovelace: 2607550n,
-      a9b4d63bfef82896d9c1abb0e985707cdc9cc7e32cc354b1d472830a5756706c677159656b536e66: 4810850860022106n,
-      b7c7a3fde6a346bfcbc4d1c3d302258ede686280e39153eec3ab40884767777676356c3975756f6f663755496a4e4e6d7170515a37516c7667333279: 1n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 144459967524444n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 4305655114917990n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "75857ac17b056a176ec364196f2755fea04257c394de661514385a16b84c77c6",
-    outputIndex: 3,
-    assets: { lovelace: 8592724978639688n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-resetting:
 
-spent utxos: [object Object],[object Object],[object Object]
+trials left: 1 - iteration: 2 - block: 1449
 
-pending utxos:[object Object],[object Object]
-
-trials left: 10 - iteration: 4 - block: 3570
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "c0b4926e6165a6f0c5927df477bd667ee9a99701a05b8c2b04db813918a407d2",
-    outputIndex: 2,
-    assets: {
-      lovelace: 2094660n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 144459967524444n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "c0b4926e6165a6f0c5927df477bd667ee9a99701a05b8c2b04db813918a407d2",
-    outputIndex: 3,
-    assets: { lovelace: 8592724946110715n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "c0b4926e6165a6f0c5927df477bd667ee9a99701a05b8c2b04db813918a407d2",
-    outputIndex: 2,
-    assets: {
-      lovelace: 2094660n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 144459967524444n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "c0b4926e6165a6f0c5927df477bd667ee9a99701a05b8c2b04db813918a407d2",
-    outputIndex: 3,
-    assets: { lovelace: 8592724946110715n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-virtual: 2697320567995724
-weight: 3
-jumpSize: 35
-minAnchorPrice: 7867184989987528
-jumpLog: 0.028170876966696224
-anchorLog: 2.2204460492503128e-16
-126870351009913.22
-maxTicks: 142291284718043
-maxTicks_: 126870351009913
-3
-virtual: 9007199254740991
-weight: 1
-jumpSize: 100
-minAnchorPrice: 8918019064099991
-jumpLog: 0.009950330853168092
-anchorLog: 2.2204460492503128e-16
-44812306322540.98
-maxTicks: 47430428239347
-maxTicks_: 44812306322540
-3
-virtual: 2697320567995724
-weight: 3
-jumpSize: 35
-minAnchorPrice: 7867184989987528
-jumpLog: 0.028170876966696224
-anchorLog: 2.2204460492503128e-16
-126870351009913.22
-virtual: 2697320567995724
-weight: 3
-jumpSize: 35
-minAnchorPrice: 7867184989987528
-jumpLog: 0.028170876966696224
-anchorLog: 2.2204460492503128e-16
-126870351009913.22
-virtual: 9007199254740991
-weight: 1
-jumpSize: 100
-minAnchorPrice: 8918019064099991
-jumpLog: 0.009950330853168092
-anchorLog: 2.2204460492503128e-16
-44812306322540.98
-virtual: 9007199254740991
-weight: 1
-jumpSize: 100
-minAnchorPrice: 8918019064099991
-jumpLog: 0.009950330853168092
-anchorLog: 2.2204460492503128e-16
-44812306322540.98
-virtual: 9007199254740991
-weight: 1
-jumpSize: 100
-minAnchorPrice: 8918019064099991
-jumpLog: 0.009950330853168092
-anchorLog: 2.2204460492503128e-16
-44812306322540.98
-Opening pool with 6 dirac utxos and 1 param utxos
-getUtxosCore()
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "c0b4926e6165a6f0c5927df477bd667ee9a99701a05b8c2b04db813918a407d2",
-    outputIndex: 2,
-    assets: {
-      lovelace: 2094660n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 144459967524444n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "c0b4926e6165a6f0c5927df477bd667ee9a99701a05b8c2b04db813918a407d2",
-    outputIndex: 3,
-    assets: { lovelace: 8592724946110715n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "c0b4926e6165a6f0c5927df477bd667ee9a99701a05b8c2b04db813918a407d2",
-    outputIndex: 2,
-    assets: {
-      lovelace: 2094660n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 144459967524444n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "c0b4926e6165a6f0c5927df477bd667ee9a99701a05b8c2b04db813918a407d2",
-    outputIndex: 3,
-    assets: { lovelace: 8592724946110715n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-resetting:
-
-spent utxos: [object Object],[object Object],[object Object]
-
-pending utxos:[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]
-
-trials left: 10 - iteration: 5 - block: 3946
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "453f609a2aaa6b0a40b6eb9b3dcb077b8e89d38e800c7eaeec9fd07f4b76989c",
-    outputIndex: 7,
-    assets: {
-      lovelace: 2094660n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 2168682806406n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "453f609a2aaa6b0a40b6eb9b3dcb077b8e89d38e800c7eaeec9fd07f4b76989c",
-    outputIndex: 8,
-    assets: { lovelace: 8592724900595208n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "453f609a2aaa6b0a40b6eb9b3dcb077b8e89d38e800c7eaeec9fd07f4b76989c",
-    outputIndex: 7,
-    assets: {
-      lovelace: 2094660n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 2168682806406n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "453f609a2aaa6b0a40b6eb9b3dcb077b8e89d38e800c7eaeec9fd07f4b76989c",
-    outputIndex: 8,
-    assets: { lovelace: 8592724900595208n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
+trials left: 1 - iteration: 3 - block: 1650
 virtual: 1
 weight: 100
-jumpSize: 1
-minAnchorPrice: 50
-jumpLog: 0.6931471805599453
-anchorLog: 0.01980262729617973
-35.0027887811465
+jumpSize: 26
+minAnchorPrice: 96
+jumpLog: 0.03774032798284711
+anchorLog: 0.010362787035546658
+3.64190905915459
 maxTicks: 1
-maxTicks_: 35
+maxTicks_: 3
 1
-virtual: 1803700838213396
+virtual: 6680140179614070
 weight: 1
-jumpSize: 8
-minAnchorPrice: 1603289633967463
-jumpLog: 0.11778303565638346
-anchorLog: 6.661338147750937e-16
-176815878497551.5
+jumpSize: 30
+minAnchorPrice: 6464651786723293
+jumpLog: 0.03278982282299097
+anchorLog: 2.2204460492503128e-16
+147672233847166.75
 maxTicks: 1
-maxTicks_: 176815878497551
+maxTicks_: 147672233847166
+1
+virtual: 1
+weight: 2
+jumpSize: 1
+minAnchorPrice: 1
+jumpLog: 0.6931471805599453
+anchorLog: 0.6931471805599453
+1
+maxTicks: 1
+maxTicks_: 1
 1
 Opening pool with 1 dirac utxos and 1 param utxos
-getUtxosCore()
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "453f609a2aaa6b0a40b6eb9b3dcb077b8e89d38e800c7eaeec9fd07f4b76989c",
-    outputIndex: 7,
-    assets: {
-      lovelace: 2094660n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 2168682806406n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "453f609a2aaa6b0a40b6eb9b3dcb077b8e89d38e800c7eaeec9fd07f4b76989c",
-    outputIndex: 8,
-    assets: { lovelace: 8592724900595208n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "453f609a2aaa6b0a40b6eb9b3dcb077b8e89d38e800c7eaeec9fd07f4b76989c",
-    outputIndex: 7,
-    assets: {
-      lovelace: 2094660n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      e4bdb06dc29848b173ada385021bbf5be8068fb363309b9244fa2830616955357175656f7339745451784c653238367762624d754852: 1n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 2168682806406n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "453f609a2aaa6b0a40b6eb9b3dcb077b8e89d38e800c7eaeec9fd07f4b76989c",
-    outputIndex: 8,
-    assets: { lovelace: 8592724900595208n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-resetting:
 
-spent utxos: [object Object],[object Object],[object Object]
+trials left: 1 - iteration: 4 - block: 2650
 
-pending utxos:[object Object],[object Object]
+trials left: 1 - iteration: 5 - block: 2651
+Swapping.boundary()
+addedBuyingA0: 153906146446536592912711231656
+addedSellingA0: 153906146446693705733779948592
+diff: -157112821068716936
+Swapping.boundary()
+addedBuyingA0: 145720261380697344
+addedSellingA0: 155803588302677930
+diff: -10083326921980586
+subSwap: 5 bought
+addedBuyingA0: 80955700767054080
+addedSellingA0: 155803588302677930
+diff: -74847887535623850
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 2e5536076078aa972746500f5760cb8a926d6e255aacd6e448970948, 
+   +     +  virtual: +[
+   +     +  +  eff63800576e83d95fb4df99b3ea2c0c62339fa02d4d402e04d3bc32_: 1,
+   +     +  +  ed39bf2b65b6f7795a9db56c3666826d3968bfab5ccfa3e866d8fe80_dNawwUpycPDA2gsaBgXZAzsV2do4BdB6: 6680140179614070,
+   +     +  +  74ae26e5c7ee72416c1b9443b6ed7dbbfef28aee55a37082355a61c6_lQhqcmYzj: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  eff63800576e83d95fb4df99b3ea2c0c62339fa02d4d402e04d3bc32_: 100,
+   +     +  +  ed39bf2b65b6f7795a9db56c3666826d3968bfab5ccfa3e866d8fe80_dNawwUpycPDA2gsaBgXZAzsV2do4BdB6: 1,
+   +     +  +  74ae26e5c7ee72416c1b9443b6ed7dbbfef28aee55a37082355a61c6_lQhqcmYzj: 2
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  eff63800576e83d95fb4df99b3ea2c0c62339fa02d4d402e04d3bc32_: 26,
+   +     +  +  ed39bf2b65b6f7795a9db56c3666826d3968bfab5ccfa3e866d8fe80_dNawwUpycPDA2gsaBgXZAzsV2do4BdB6: 30,
+   +     +  +  74ae26e5c7ee72416c1b9443b6ed7dbbfef28aee55a37082355a61c6_lQhqcmYzj: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 2e5536076078aa972746500f5760cb8a926d6e255aacd6e448970948,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 04d5f02a1013d04d2af46586fdfbecbefd71919f3ab483ad6477faf70257d7b7),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: f9fbca29bb3329acca4eae7be8f83357bfee5c9582855652c3024b2e3394f1ee),
+   +     +  anchorPrices: +[
+   +     +  +  eff63800576e83d95fb4df99b3ea2c0c62339fa02d4d402e04d3bc32_: 96,
+   +     +  +  ed39bf2b65b6f7795a9db56c3666826d3968bfab5ccfa3e866d8fe80_dNawwUpycPDA2gsaBgXZAzsV2do4BdB6: 6464651786723293,
+   +     +  +  74ae26e5c7ee72416c1b9443b6ed7dbbfef28aee55a37082355a61c6_lQhqcmYzj: 1
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 3262670,
+   +  +  74ae26e5c7ee72416c1b9443b6ed7dbbfef28aee55a37082355a61c6_lQhqcmYzj: 1,
+   +  +  ed39bf2b65b6f7795a9db56c3666826d3968bfab5ccfa3e866d8fe80_dNawwUpycPDA2gsaBgXZAzsV2do4BdB6: 9007199254740990,
+   +  +  eff63800576e83d95fb4df99b3ea2c0c62339fa02d4d402e04d3bc32_: 1590647486209130
+   +  ]
+     )
+  boughtAsset: Asset(eff63800576e83d95fb4df99b3ea2c0c62339fa02d4d402e04d3bc32, )
+  soldAsset: Asset(ed39bf2b65b6f7795a9db56c3666826d3968bfab5ccfa3e866d8fe80, dNawwUpycPDA2gsaBgXZAzsV2do4BdB6)
+  boughtAmount: 5
+  soldAmount: 1
+  boughtSpot: 155803588302677930
+  soldSpot: 16191140153410816
+  boughtExp: 928
+  soldExp: 28
+  spotPrice: 0.10392020061795025
+  effectivePrice: 0.2
+)
 
-trials left: 10 - iteration: 6 - block: 4946
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "7f41e613d836757bd49f83ffeb040c428bb5f6c0da0129a8e8f9d2c11613e649",
-    outputIndex: 2,
-    assets: {
-      lovelace: 1836060n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 2168682806405n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "7f41e613d836757bd49f83ffeb040c428bb5f6c0da0129a8e8f9d2c11613e649",
-    outputIndex: 3,
-    assets: { lovelace: 8592724868803406n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "7f41e613d836757bd49f83ffeb040c428bb5f6c0da0129a8e8f9d2c11613e649",
-    outputIndex: 2,
-    assets: {
-      lovelace: 1836060n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 2168682806405n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "7f41e613d836757bd49f83ffeb040c428bb5f6c0da0129a8e8f9d2c11613e649",
-    outputIndex: 3,
-    assets: { lovelace: 8592724868803406n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-getUtxosCore()
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "7f41e613d836757bd49f83ffeb040c428bb5f6c0da0129a8e8f9d2c11613e649",
-    outputIndex: 2,
-    assets: {
-      lovelace: 1836060n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 2168682806405n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "7f41e613d836757bd49f83ffeb040c428bb5f6c0da0129a8e8f9d2c11613e649",
-    outputIndex: 3,
-    assets: { lovelace: 8592724868803406n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "7f41e613d836757bd49f83ffeb040c428bb5f6c0da0129a8e8f9d2c11613e649",
-    outputIndex: 2,
-    assets: {
-      lovelace: 1836060n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 2168682806405n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "7f41e613d836757bd49f83ffeb040c428bb5f6c0da0129a8e8f9d2c11613e649",
-    outputIndex: 3,
-    assets: { lovelace: 8592724868803406n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-resetting:
+trials left: 1 - iteration: 6 - block: 3651
 
-spent utxos: [object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]
-
-pending utxos:
-
-trials left: 10 - iteration: 7 - block: 4947
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "7f41e613d836757bd49f83ffeb040c428bb5f6c0da0129a8e8f9d2c11613e649",
-    outputIndex: 2,
-    assets: {
-      lovelace: 1836060n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 2168682806405n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "025f2c578ebbb7ff36d91a191041db080ac61088e932eb5ac6094f107a23d77f",
-    outputIndex: 0,
-    assets: {
-      lovelace: 1094740n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 142291284718038n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "025f2c578ebbb7ff36d91a191041db080ac61088e932eb5ac6094f107a23d77f",
-    outputIndex: 1,
-    assets: { lovelace: 8592724912091006n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "7f41e613d836757bd49f83ffeb040c428bb5f6c0da0129a8e8f9d2c11613e649",
-    outputIndex: 2,
-    assets: {
-      lovelace: 1836060n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 2168682806405n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "025f2c578ebbb7ff36d91a191041db080ac61088e932eb5ac6094f107a23d77f",
-    outputIndex: 0,
-    assets: {
-      lovelace: 1094740n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 142291284718038n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "025f2c578ebbb7ff36d91a191041db080ac61088e932eb5ac6094f107a23d77f",
-    outputIndex: 1,
-    assets: { lovelace: 8592724912091006n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-virtual: 4539764101393064
+trials left: 1 - iteration: 7 - block: 3781
+virtual: 1495994218790303
+weight: 2
+jumpSize: 100
+minAnchorPrice: 2962364789683768
+jumpLog: 0.009950330853168092
+anchorLog: 4.440892098500625e-16
+22406153161270.49
+maxTicks: 1
+maxTicks_: 22406153161270
+1
+virtual: 841524738829891
 weight: 1
-jumpSize: 79
-minAnchorPrice: 4483017050125650
-jumpLog: 0.012578782206860185
+jumpSize: 100
+minAnchorPrice: 833192810722664
+jumpLog: 0.009950330853168092
+anchorLog: 1.110223024625156e-15
+8962461264508.2
+maxTicks: 1
+maxTicks_: 8962461264508
+1
+virtual: 5166712958380392
+weight: 1
+jumpSize: 100
+minAnchorPrice: 5115557384535041
+jumpLog: 0.009950330853168092
 anchorLog: 2.2204460492503128e-16
-56649798859590.164
-maxTicks: 141925622987158
-maxTicks_: 56649798859590
-3
+44812306322540.98
+maxTicks: 1
+maxTicks_: 44812306322540
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 8 - block: 4237
 virtual: 9007199254740991
 weight: 1
-jumpSize: 61
-minAnchorPrice: 8861921847406458
-jumpLog: 0.016260520871780326
+jumpSize: 100
+minAnchorPrice: 8918019064099991
+jumpLog: 0.009950330853168092
 anchorLog: 2.2204460492503128e-16
-73230875739000.06
-maxTicks: 47308540995719
-maxTicks_: 73230875739000
+44812306322540.98
+maxTicks: 1600469916860794
+maxTicks_: 44812306322540
 3
 virtual: 1
-weight: 16
+weight: 40
 jumpSize: 1
-minAnchorPrice: 8
+minAnchorPrice: 20
 jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-maxTicks: 15769513665239
-maxTicks_: 5
+anchorLog: 0.04879016416943205
+14.206699082890461
+maxTicks: 1600469916860794
+maxTicks_: 14
 3
-virtual: 4539764101393064
-weight: 1
-jumpSize: 79
-minAnchorPrice: 4483017050125650
-jumpLog: 0.012578782206860185
-anchorLog: 2.2204460492503128e-16
-56649798859590.164
-virtual: 4539764101393064
-weight: 1
-jumpSize: 79
-minAnchorPrice: 4483017050125650
-jumpLog: 0.012578782206860185
-anchorLog: 2.2204460492503128e-16
-56649798859590.164
+virtual: 1
+weight: 40
+jumpSize: 1
+minAnchorPrice: 20
+jumpLog: 0.6931471805599453
+anchorLog: 0.04879016416943205
+14.206699082890461
+virtual: 1
+weight: 40
+jumpSize: 1
+minAnchorPrice: 20
+jumpLog: 0.6931471805599453
+anchorLog: 0.04879016416943205
+14.206699082890461
+Opening pool with 3 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 9 - block: 5237
 virtual: 9007199254740991
 weight: 1
-jumpSize: 61
-minAnchorPrice: 8861921847406458
-jumpLog: 0.016260520871780326
+jumpSize: 55
+minAnchorPrice: 8846356410906330
+jumpLog: 0.018018505502678212
 anchorLog: 2.2204460492503128e-16
-73230875739000.06
+81148134667634.84
+maxTicks: 1
+maxTicks_: 81148134667634
+1
 virtual: 9007199254740991
 weight: 1
-jumpSize: 61
-minAnchorPrice: 8861921847406458
-jumpLog: 0.016260520871780326
+jumpSize: 66
+minAnchorPrice: 8872763444968737
+jumpLog: 0.015037877364540502
 anchorLog: 2.2204460492503128e-16
-73230875739000.06
+67724578895387.83
+maxTicks: 1
+maxTicks_: 67724578895387
+1
+virtual: 5586563393594372
+weight: 1
+jumpSize: 42
+minAnchorPrice: 5456643314673572
+jumpLog: 0.023530497410194036
+anchorLog: 2.2204460492503128e-16
+105971939368392.3
+maxTicks: 1
+maxTicks_: 105971939368392
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 10 - block: 5238
+
+trials left: 1 - iteration: 11 - block: 5793
+
+trials left: 1 - iteration: 12 - block: 6247
+Swapping.boundary()
+addedBuyingA0: 9170966513918099
+addedSellingA0: 18014398509481980
+diff: -8843431995563881
+Swapping.boundary()
+addedBuyingA0: 9170966513918099
+addedSellingA0: 11173126787188742
+diff: -2002160273270643
+Swapping.boundary()
+addedBuyingA0: 580579191186364637701898730610
+addedSellingA0: 580579191186371017173354302640
+diff: -6379471455572030
+Swapping.boundary()
+addedBuyingA0: 5719576807727570
+addedSellingA0: 9007199254740990
+diff: -3287622447013420
+subSwap: 1 sold
+addedBuyingA0: 5719576807727570
+addedSellingA0: 9007199254740990
+diff: -3287622447013420
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 2e5536076078aa972746500f5760cb8a926d6e255aacd6e448970948, 
+   +     +  virtual: +[
+   +     +  +  c96ea9ff85b4fad4bf8d0d4008ec6aa276fe1341360b8023e19279f2_EBF2P4SPe9tpi7Ov7z3Tt1r3MKNYMhRV: 9007199254740991,
+   +     +  +  56292a0c4fde11008b666884c9cee6cea3a2710a8619418ac4c3a575_LLerRPUin8RpRLKaKPToWG6MZ2HmIUcG: 9007199254740991,
+   +     +  +  eff63800576e83d95fb4df99b3ea2c0c62339fa02d4d402e04d3bc32_: 5586563393594372
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  c96ea9ff85b4fad4bf8d0d4008ec6aa276fe1341360b8023e19279f2_EBF2P4SPe9tpi7Ov7z3Tt1r3MKNYMhRV: 1,
+   +     +  +  56292a0c4fde11008b666884c9cee6cea3a2710a8619418ac4c3a575_LLerRPUin8RpRLKaKPToWG6MZ2HmIUcG: 1,
+   +     +  +  eff63800576e83d95fb4df99b3ea2c0c62339fa02d4d402e04d3bc32_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  c96ea9ff85b4fad4bf8d0d4008ec6aa276fe1341360b8023e19279f2_EBF2P4SPe9tpi7Ov7z3Tt1r3MKNYMhRV: 55,
+   +     +  +  56292a0c4fde11008b666884c9cee6cea3a2710a8619418ac4c3a575_LLerRPUin8RpRLKaKPToWG6MZ2HmIUcG: 66,
+   +     +  +  eff63800576e83d95fb4df99b3ea2c0c62339fa02d4d402e04d3bc32_: 42
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 2e5536076078aa972746500f5760cb8a926d6e255aacd6e448970948,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: b6f142a380394859fd38273a6ceabaaefa62e7d2eae68e938227b71aa7c70e71),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: edc476791e0c38be139225dbe8b7910d14b4d91857b55a3175ef406dfff3af56),
+   +     +  anchorPrices: +[
+   +     +  +  c96ea9ff85b4fad4bf8d0d4008ec6aa276fe1341360b8023e19279f2_EBF2P4SPe9tpi7Ov7z3Tt1r3MKNYMhRV: 8846356410906330,
+   +     +  +  56292a0c4fde11008b666884c9cee6cea3a2710a8619418ac4c3a575_LLerRPUin8RpRLKaKPToWG6MZ2HmIUcG: 8872763444968737,
+   +     +  +  eff63800576e83d95fb4df99b3ea2c0c62339fa02d4d402e04d3bc32_: 5456643314673572
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 3499720,
+   +  +  56292a0c4fde11008b666884c9cee6cea3a2710a8619418ac4c3a575_LLerRPUin8RpRLKaKPToWG6MZ2HmIUcG: 1,
+   +  +  c96ea9ff85b4fad4bf8d0d4008ec6aa276fe1341360b8023e19279f2_EBF2P4SPe9tpi7Ov7z3Tt1r3MKNYMhRV: 101507368587473,
+   +  +  eff63800576e83d95fb4df99b3ea2c0c62339fa02d4d402e04d3bc32_: 1
+   +  ]
+     )
+  boughtAsset: Asset(c96ea9ff85b4fad4bf8d0d4008ec6aa276fe1341360b8023e19279f2, EBF2P4SPe9tpi7Ov7z3Tt1r3MKNYMhRV)
+  soldAsset: Asset(eff63800576e83d95fb4df99b3ea2c0c62339fa02d4d402e04d3bc32, )
+  boughtAmount: 1
+  soldAmount: 1
+  boughtSpot: 9007199254740990
+  soldSpot: 5719576807727570
+  boughtExp: 1
+  soldExp: 2
+  spotPrice: 0.6350005863051201
+  effectivePrice: 1
+)
+
+trials left: 1 - iteration: 13 - block: 6248
+
+trials left: 1 - iteration: 14 - block: 6249
+virtual: 2
+weight: 96
+jumpSize: 100
+minAnchorPrice: 190
+jumpLog: 0.009950330853168092
+anchorLog: 0.005249355886143745
+1.895533674794862
+maxTicks: 1582519783918151
+maxTicks_: 1
+1
+virtual: 1
+weight: 100
+jumpSize: 41
+minAnchorPrice: 97
+jumpLog: 0.024097551579060524
+anchorLog: 0.010256500167189061
+2.349490682616037
+maxTicks: 1582519783918151
+maxTicks_: 2
+2
 virtual: 9007199254740991
 weight: 1
-jumpSize: 61
-minAnchorPrice: 8861921847406458
-jumpLog: 0.016260520871780326
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
 anchorLog: 2.2204460492503128e-16
-73230875739000.06
+3121657384082680
+maxTicks: 791259891959075
+maxTicks_: 3121657384082680
+3
+virtual: 1
+weight: 100
+jumpSize: 41
+minAnchorPrice: 97
+jumpLog: 0.024097551579060524
+anchorLog: 0.010256500167189061
+2.349490682616037
+Opening pool with 2 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 15 - block: 6250
+
+trials left: 1 - iteration: 16 - block: 7250
 virtual: 9007199254740991
 weight: 1
-jumpSize: 61
-minAnchorPrice: 8861921847406458
-jumpLog: 0.016260520871780326
+jumpSize: 38
+minAnchorPrice: 8776245427696350
+jumpLog: 0.025975486403260736
 anchorLog: 2.2204460492503128e-16
-73230875739000.06
+116983190886492.45
+maxTicks: 1
+maxTicks_: 116983190886492
+1
+virtual: 2
+weight: 51
+jumpSize: 100
+minAnchorPrice: 100
+jumpLog: 0.009950330853168092
+anchorLog: 0.009950330853168092
+1
+maxTicks: 1
+maxTicks_: 1
+1
 virtual: 9007199254740991
 weight: 1
-jumpSize: 61
-minAnchorPrice: 8861921847406458
-jumpLog: 0.016260520871780326
+jumpSize: 10
+minAnchorPrice: 8188362958855446
+jumpLog: 0.09531017980432493
 anchorLog: 2.2204460492503128e-16
-73230875739000.06
+429238890251372.8
+maxTicks: 1
+maxTicks_: 429238890251372
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 17 - block: 7251
+virtual: 807704019137345
+weight: 7
+jumpSize: 100
+minAnchorPrice: 5597948647486549
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+maxTicks: 1
+maxTicks_: 44812306322540
+1
+virtual: 1
+weight: 2
+jumpSize: 1
+minAnchorPrice: 1
+jumpLog: 0.6931471805599453
+anchorLog: 0.6931471805599453
+1
+maxTicks: 1
+maxTicks_: 1
+1
 virtual: 9007199254740991
 weight: 1
-jumpSize: 61
-minAnchorPrice: 8861921847406458
-jumpLog: 0.016260520871780326
+jumpSize: 100
+minAnchorPrice: 8918019064099991
+jumpLog: 0.009950330853168092
 anchorLog: 2.2204460492503128e-16
-73230875739000.06
-virtual: 1
-weight: 16
+44812306322540.98
+maxTicks: 1
+maxTicks_: 44812306322540
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 18 - block: 8226
+virtual: 7706756382148579
+weight: 2
 jumpSize: 1
-minAnchorPrice: 8
+minAnchorPrice: 7706756382148579
 jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-virtual: 1
-weight: 16
-jumpSize: 1
-minAnchorPrice: 8
-jumpLog: 0.6931471805599453
-anchorLog: 0.11778303565638346
-5.884949192361718
-Opening pool with 27 dirac utxos and 1 param utxos
-getUtxosCore()
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "7f41e613d836757bd49f83ffeb040c428bb5f6c0da0129a8e8f9d2c11613e649",
-    outputIndex: 2,
-    assets: {
-      lovelace: 1836060n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 2168682806405n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "025f2c578ebbb7ff36d91a191041db080ac61088e932eb5ac6094f107a23d77f",
-    outputIndex: 0,
-    assets: {
-      lovelace: 1094740n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 142291284718038n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "025f2c578ebbb7ff36d91a191041db080ac61088e932eb5ac6094f107a23d77f",
-    outputIndex: 1,
-    assets: { lovelace: 8592724912091006n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "7f41e613d836757bd49f83ffeb040c428bb5f6c0da0129a8e8f9d2c11613e649",
-    outputIndex: 2,
-    assets: {
-      lovelace: 1836060n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 2168682806405n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "025f2c578ebbb7ff36d91a191041db080ac61088e932eb5ac6094f107a23d77f",
-    outputIndex: 0,
-    assets: {
-      lovelace: 1094740n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 142291284718038n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "025f2c578ebbb7ff36d91a191041db080ac61088e932eb5ac6094f107a23d77f",
-    outputIndex: 1,
-    assets: { lovelace: 8592724912091006n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-splitting action...
-splitting opening
-splitting pool
-handling split action
-Opening pool with 13 dirac utxos and 1 param utxos
-getUtxosCore()
-getUtxos()
-utxos (getUtxos): [
-  {
-    txHash: "7f41e613d836757bd49f83ffeb040c428bb5f6c0da0129a8e8f9d2c11613e649",
-    outputIndex: 2,
-    assets: {
-      lovelace: 1836060n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 2168682806405n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "025f2c578ebbb7ff36d91a191041db080ac61088e932eb5ac6094f107a23d77f",
-    outputIndex: 0,
-    assets: {
-      lovelace: 1094740n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 142291284718038n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "025f2c578ebbb7ff36d91a191041db080ac61088e932eb5ac6094f107a23d77f",
-    outputIndex: 1,
-    assets: { lovelace: 8592724912091006n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
-spentUtxos (getUtxos): []
-utxos (getUtxos, 2): [
-  {
-    txHash: "7f41e613d836757bd49f83ffeb040c428bb5f6c0da0129a8e8f9d2c11613e649",
-    outputIndex: 2,
-    assets: {
-      lovelace: 1836060n,
-      c3ecb18297981bf730683a1a316e9df5dd8ca53f797d14f00c59b2de31684a554e3233743334724c414d734561796b356e4d4c: 9002045815767559n,
-      d2a124edd7ac5fb1eca9fa39acb277fd8fce39ac0beda4266465f0bd7772693265756b4b47684a30486636787050386b4b73416145: 6408969633225074n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 2168682806405n,
-      f9b6c5ab397a393f056b1536b2993569299b24020ca5dcd2c1023e28: 2359974733718337n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "025f2c578ebbb7ff36d91a191041db080ac61088e932eb5ac6094f107a23d77f",
-    outputIndex: 0,
-    assets: {
-      lovelace: 1094740n,
-      f1c739c556bf633d403891dbeeae871f25a3d87f5438a50729b3e4b73072464f5077734c464946486236: 142291284718038n
-    },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  },
-  {
-    txHash: "025f2c578ebbb7ff36d91a191041db080ac61088e932eb5ac6094f107a23d77f",
-    outputIndex: 1,
-    assets: { lovelace: 8592724912091006n },
-    address: "addr_test1vrzzj2jfp8drrhwmar7qu4q8jwmhkdph69dn6x64l7km24slvxfra",
-    datumHash: undefined,
-    datum: undefined,
-    scriptRef: undefined
-  }
-]
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 511761464616569
+maxTicks_: 3121657384082680
+3
+virtual: 1429672370158887
+weight: 1
+jumpSize: 100
+minAnchorPrice: 1415517198177115
+jumpLog: 0.009950330853168092
+anchorLog: 6.661338147750937e-16
+14937435440846.994
+maxTicks: 511761464616569
+maxTicks_: 14937435440846
+3
+virtual: 1429672370158887
+weight: 1
+jumpSize: 100
+minAnchorPrice: 1415517198177115
+jumpLog: 0.009950330853168092
+anchorLog: 6.661338147750937e-16
+14937435440846.994
+virtual: 1429672370158887
+weight: 1
+jumpSize: 100
+minAnchorPrice: 1415517198177115
+jumpLog: 0.009950330853168092
+anchorLog: 6.661338147750937e-16
+14937435440846.994
+Opening pool with 3 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 19 - block: 8227
+traces.length: 20
+Opening: 10
+Closing: 8
+Swapping: 2
+--- DONE ---
+Opening: 10
+Closing: 8
+Swapping: 2
 [0m[38;5;245m----- output end -----[0m
-emulator ... [0m[31mFAILED[0m [0m[38;5;245m(2m6s)[0m
+emulator ... [0m[32mok[0m [0m[38;5;245m(36s)[0m
 [0m[38;5;245mrunning 0 tests from ./tests/types.test.ts[0m
 
-[0m[1m[37m[41m ERRORS [0m
+[0m[32mok[0m | 1 passed | 0 failed [0m[38;5;245m(3m2s)[0m
 
-emulator [0m[38;5;245m=> ./tests/emulator.test.ts:15:6[0m
-[0m[1m[31merror[0m: "Not enough ADA leftover to cover minADA"
-
-[0m[1m[37m[41m FAILURES [0m
-
-emulator [0m[38;5;245m=> ./tests/emulator.test.ts:15:6[0m
-
-[0m[31mFAILED[0m | 0 passed | 1 failed [0m[38;5;245m(5m26s)[0m
-
-[0m[1m[31merror[0m: Test failed

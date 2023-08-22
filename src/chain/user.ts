@@ -52,14 +52,14 @@ export class User {
       this.paymentKeyHash = paymentKeyHash_;
 
       lucid.wallet.getUtxos = async () => {
-        console.log("getUtxos()");
+        // console.log("getUtxos()");
         const utxos = await lucid.utxosAt(address);
-        console.log("utxos (getUtxos):", utxos);
-        console.log("spentUtxos (getUtxos):", this.spentUtxos);
+        // console.log("utxos (getUtxos):", utxos);
+        // console.log("spentUtxos (getUtxos):", this.spentUtxos);
         // NOTE: using mempool-outputs does not quite work yet with nami/blockfrost for
         // utxos belonging to the user, see https://github.com/berry-pool/nami/issues/856
         if (this.userChaining) {
-          console.log("pendingUtxos (getUtxos):", this.pendingUtxos);
+          // console.log("pendingUtxos (getUtxos):", this.pendingUtxos);
           this.pendingUtxos.forEach((pendingUtxo) => {
             if (pendingUtxo.address !== address) return;
             const index = utxos.findIndex((utxo) =>
@@ -76,11 +76,11 @@ export class User {
           );
           if (index >= 0) utxos.splice(index, 1);
         });
-        console.log("utxos (getUtxos, 2):", utxos);
+        // console.log("utxos (getUtxos, 2):", utxos);
         return utxos;
       };
       lucid.wallet.getUtxosCore = async () => {
-        console.log("getUtxosCore()");
+        // console.log("getUtxosCore()");
         const utxos = await lucid.wallet.getUtxos();
         return utxosToCore(utxos);
       };
@@ -121,7 +121,7 @@ export class User {
   public generateActions = async (): Promise<Action[]> => {
     await this.update();
     if (this.balance!.amountOf(Asset.ADA) < feesEtcLovelace) {
-      console.log(`not enough ada to pay fees etc.`);
+      // console.log(`not enough ada to pay fees etc.`);
       return [];
     }
     const action = new UserAction(this).generate();
@@ -145,7 +145,7 @@ export class User {
     ]))[0];
     this.balance = utxos.map((utxo) => PositiveValue.fromLucid(utxo.assets))
       .reduce((a, b) => a.normedPlus(b), new PositiveValue());
-    // console.log(`balance: ${this.balance.concise()}`);
+    // // console.log(`balance: ${this.balance.concise()}`);
     this.lastIdNFT = this.contract.state!.pools.get(this.paymentKeyHash)?.last
       ?.lastIdNFT;
 
@@ -154,9 +154,9 @@ export class User {
 
   // TODO use this and/or make this automatic in update() for example (only when a new block happens though)
   public resetMempool = (): void => {
-    console.log(
-      `resetting:\n\nspent utxos: ${this.spentUtxos}\n\npending utxos:${this.pendingUtxos}`,
-    );
+    // console.log(
+    //   `resetting:\n\nspent utxos: ${this.spentUtxos}\n\npending utxos:${this.pendingUtxos}`,
+    // );
     this.spentUtxos.splice(0, this.spentUtxos.length);
     this.pendingUtxos.splice(0, this.pendingUtxos.length);
     this.usedSplitting = false;
@@ -167,11 +167,11 @@ export class User {
     submit = true,
   ): Promise<string | Lucid.TxSigned | null> => {
     try {
-      // console.log("min fee:", tx.txBuilder.min_fee().to_str()); // TODO figure this out (not working with chaining on emulator)
+      // // console.log("min fee:", tx.txBuilder.min_fee().to_str()); // TODO figure this out (not working with chaining on emulator)
       return await tx
         .complete()
         .then(async (completed) => {
-          // console.log("finalizeTx() - signing:", completed.txComplete.to_js_value());
+          // // console.log("finalizeTx() - signing:", completed.txComplete.to_js_value());
           const signed = await completed
             .sign()
             .complete();
@@ -215,9 +215,9 @@ export class User {
           }
 
           if (submit) {
-            // console.log("submitting", signed.txSigned.to_js_value());
+            // // console.log("submitting", signed.txSigned.to_js_value());
             const h = await signed.submit();
-            console.log("txHash:", h);
+            // console.log("txHash:", h);
             return h;
           } else {
             return signed;
@@ -276,14 +276,14 @@ export class User {
     } catch (e) {
       const e_ = e.toString();
       if (e_.includes("Maximum transaction size")) {
-        console.log("splitting action...");
+        // console.log("splitting action...");
         const actions: Action[] = action.split();
         // NOTE not using Promise.all here to ensure the mempool is handled correctly
         const signedTxes: Lucid.TxSigned[] = [];
         const failed: Action[] = [];
         let first = true;
         for (const action of actions) {
-          console.log(`handling split action`);
+          // console.log(`handling split action`);
           if (first) first = false;
           else this.usedSplitting = true;
           const { succ, fail } = await this.getTxSigned(action);
@@ -350,7 +350,7 @@ export class User {
   ): Promise<User[]> {
     const users = new Array<User>();
     const allAssets = Assets.generate(numAssets, numAssets);
-    // console.log(allAssets.show());
+    // // console.log(allAssets.show());
     const lucid = await Lucid.Lucid.new(undefined, "Custom");
 
     const addresses = new Array<Lucid.Address>();

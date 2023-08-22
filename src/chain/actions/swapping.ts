@@ -9,7 +9,7 @@ import { DiracDatum } from "../../types/euclid/euclidDatum.ts";
 import { Swap } from "../../types/euclid/swap.ts";
 import { Asset } from "../../types/general/derived/asset/asset.ts";
 import { Data } from "../../types/general/fundamental/type.ts";
-import { genPositive, min, randomChoice } from "../../utils/generators.ts";
+import { ceilDiv, genPositive, min, randomChoice } from "../../utils/generators.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
@@ -42,6 +42,11 @@ export class Swapping {
 
     this.spotPrice = Number(soldSpot) / Number(boughtSpot);
     this.effectivePrice = Number(soldAmount) / Number(boughtAmount);
+
+    // TODO ensure this does not fail when in fact the onchain-code would validate it
+    // TODO hard assert again, once the above above is ensured
+    if (!this.validates()) console.error(`Swapping does not validate: ${this.show()}`);
+    // assert(this.validates(), `Swapping does not validate:: ${this.show()}`);
   }
 
   public get type(): string {
@@ -191,12 +196,13 @@ export class Swapping {
     amount: bigint,
     amntIsSold: boolean,
   ): Swapping | undefined => {
+    console.log(`subSwap: ${amount} ${amntIsSold ? "sold" : "bought"}`);
     const offerA0 = (amntIsSold ? this.boughtAmount : amount) * this.soldSpot;
     const demandA0 = (amntIsSold ? amount : this.soldAmount) * this.boughtSpot;
     const swapA0 = min(offerA0, demandA0);
     const boughtAmount = swapA0 / this.soldSpot;
     if (!boughtAmount) return undefined;
-    const soldAmount = BigInt(Math.ceil(Number(boughtAmount) * this.spotPrice));
+    const soldAmount = ceilDiv(boughtAmount * this.soldSpot, this.boughtSpot);
 
     assert(
       soldAmount <= this.soldAmount,
@@ -222,38 +228,49 @@ export class Swapping {
     );
   };
 
-  // TODO should this rather be using subSwap for consistency?
   private randomSubSwap = (): Swapping => {
-    const offerA0 = this.boughtAmount * this.soldSpot;
-    const demandA0 = this.soldAmount * this.boughtSpot;
-    const maxSwapA0 = min(offerA0, demandA0);
-    const maxBought = maxSwapA0 / this.soldSpot;
-    assert(
-      maxBought > 0n,
-      `Swapping.randomSubSwap: maxBought must be positive, but is ${maxBought} (${maxSwapA0} / ${this.soldSpot}) for ${this.show()}`,
-    );
-    // assert(
-    //   maxBought >= 0n,
-    //   `Swapping.randomSubSwap: maxBought must be nonnegative, but is ${maxBought} for ${this.show()}`,
-    // );
+    for (let i = 0; i < 100; i++) {
+      const amountIsSold = Math.random() < 0.5;
+      const amount = genPositive(amountIsSold ? this.soldAmount : this.boughtAmount);
+      const subSwap = this.subSwap(amount, amountIsSold);
+      if (subSwap) return subSwap;
+    }
+    throw new Error(`randomSubSwap(): failed to find a subSwap for ${this.show()}`);
+  }
 
-    const boughtAmount = genPositive(maxBought);
-    const soldAmount = BigInt(Math.ceil(Number(boughtAmount) * this.spotPrice));
+  // TODO should this rather be using subSwap for consistency?
+  // private randomSubSwap = (): Swapping => {
+  //   console.log(`randomSubSwap()`);
+  //   const offerA0 = this.boughtAmount * this.soldSpot;
+  //   const demandA0 = this.soldAmount * this.boughtSpot;
+  //   const maxSwapA0 = min(offerA0, demandA0);
+  //   const maxBought = maxSwapA0 / this.soldSpot;
+  //   assert(
+  //     maxBought > 0n,
+  //     `Swapping.randomSubSwap: maxBought must be positive, but is ${maxBought} (${maxSwapA0} / ${this.soldSpot}) for ${this.show()}`,
+  //   );
+  //   // assert(
+  //   //   maxBought >= 0n,
+  //   //   `Swapping.randomSubSwap: maxBought must be nonnegative, but is ${maxBought} for ${this.show()}`,
+  //   // );
 
-    return new Swapping(
-      this.user,
-      this.paramUtxo,
-      this.diracUtxo,
-      this.boughtAsset,
-      this.soldAsset,
-      boughtAmount,
-      soldAmount,
-      this.boughtSpot,
-      this.soldSpot,
-      this.boughtExp,
-      this.soldExp,
-    );
-  };
+  //   const boughtAmount = genPositive(maxBought);
+  //   const soldAmount = BigInt(Math.ceil(Number(boughtAmount) * this.spotPrice));
+
+  //   return new Swapping(
+  //     this.user,
+  //     this.paramUtxo,
+  //     this.diracUtxo,
+  //     this.boughtAsset,
+  //     this.soldAsset,
+  //     boughtAmount,
+  //     soldAmount,
+  //     this.boughtSpot,
+  //     this.soldSpot,
+  //     this.boughtExp,
+  //     this.soldExp,
+  //   );
+  // };
 
   static boundary(
     user: User | undefined,
@@ -268,6 +285,7 @@ export class Swapping {
     boughtExp: bigint,
     soldExp: bigint,
   ): Swapping {
+    console.log(`Swapping.boundary()`);
     return new Swapping(
       user,
       paramUtxo,
@@ -344,7 +362,7 @@ export class Swapping {
     spotBuying: bigint,
     spotSelling: bigint,
     buyingAmm: bigint,
-    sellingAmm: bigint,
+    sellingAmm: bigint, 
     oldNew: string,
   ): boolean {
     const fitsBuying = spotBuying <= buyingAmm;
@@ -374,6 +392,9 @@ export class Swapping {
   ): boolean {
     const addedBuyingA0 = buyingAmount * spotSelling;
     const addedSellingA0 = sellingAmount * spotBuying;
+    console.log(`addedBuyingA0: ${addedBuyingA0}`);
+    console.log(`addedSellingA0: ${addedSellingA0}`);
+    console.log(`diff: ${addedBuyingA0 - addedSellingA0}`)
     if (addedBuyingA0 > addedSellingA0) {
       console.error(
         `valueEquation: 
@@ -384,29 +405,46 @@ export class Swapping {
     return addedBuyingA0 <= addedSellingA0;
   }
 
-  static validates(
-    expBuying: bigint,
-    expSelling: bigint,
-    spotBuying: bigint,
-    spotSelling: bigint,
-    anchorBuying: bigint,
-    anchorSelling: bigint,
-    jsBuying: bigint,
-    jsSelling: bigint,
-    buyingWeight: bigint,
-    sellingWeight: bigint,
-    buyingLiquidity: bigint,
-    sellingLiquidity: bigint,
-    buyingAmount: bigint,
-    sellingAmount: bigint,
-  ): boolean {
+  // TODO fixme
+  private validates(): boolean {
+
+    // public readonly user: User | undefined, // TODO why can this be undefined again?
+    // public readonly paramUtxo: ParamUtxo,
+    // public readonly diracUtxo: DiracUtxo,
+    // public readonly boughtAsset: Asset,
+    // public readonly soldAsset: Asset,
+    // public readonly boughtAmount: bigint,
+    // public readonly soldAmount: bigint,
+    // public readonly boughtSpot: bigint, // inverted
+    // public readonly soldSpot: bigint, // inverted
+    // public readonly boughtExp: bigint,
+    // public readonly soldExp: bigint,
+
+    const param = this.paramUtxo.param;
+    const buyingWeight = param.weights.amountOf(this.boughtAsset);
+    const sellingWeight = param.weights.amountOf(this.soldAsset);
+    const jsBuying = param.jumpSizes.amountOf(this.boughtAsset);
+    const jsSelling = param.jumpSizes.amountOf(this.soldAsset);
+    const virtualBuying = param.virtual.amountOf(this.boughtAsset);
+    const virtualSelling = param.virtual.amountOf(this.soldAsset);
+
+    const dirac = this.diracUtxo.dirac;
+    const anchorBuying = dirac.anchorPrices.amountOf(this.boughtAsset);
+    const anchorSelling = dirac.anchorPrices.amountOf(this.soldAsset);
+    const balanceBuying = this.diracUtxo.balance.amountOf(this.boughtAsset, 0n);
+    const balanceSelling = this.diracUtxo.balance.amountOf(this.soldAsset, 0n);
+
+    const buyingLiquidity = balanceBuying + virtualBuying;
+    const sellingLiquidity = balanceSelling + virtualSelling;
+
+    
     const oldBuyingAmm = buyingWeight * buyingLiquidity;
     const oldSellingAmm = sellingWeight * sellingLiquidity;
 
-    const newBuyingAmm = buyingWeight * (buyingLiquidity - buyingAmount);
-    const newSellingAmm = sellingWeight * (sellingLiquidity + sellingAmount);
+    const newBuyingAmm = buyingWeight * (buyingLiquidity - this.boughtAmount);
+    const newSellingAmm = sellingWeight * (sellingLiquidity + this.soldAmount);
 
-    return true && // TODO check that exponents and spot prices fit together, either here or in constructor
+    return true &&
       // Swapping.pricesFitDirac(
       //   spotBuying,
       //   spotSelling,
@@ -418,36 +456,36 @@ export class Swapping {
       Swapping.exponentsYieldPrice(
         anchorBuying,
         jsBuying,
-        expBuying,
-        spotBuying,
+        this.boughtExp,
+        this.boughtSpot,
         "buying",
       ) &&
       Swapping.exponentsYieldPrice(
         anchorSelling,
         jsSelling,
-        expSelling,
-        spotSelling,
+        this.soldExp,
+        this.soldSpot,
         "selling",
       ) &&
       Swapping.boughtAssetForSale(
-        spotBuying,
-        spotSelling,
+        this.boughtSpot,
+        this.soldSpot,
         oldBuyingAmm,
         oldSellingAmm,
         "old",
       ) &&
       Swapping.boughtAssetForSale(
-        spotBuying,
-        spotSelling,
+        this.boughtSpot,
+        this.soldSpot,
         newBuyingAmm,
         newSellingAmm,
         "new",
       ) &&
       Swapping.valueEquation(
-        spotBuying,
-        spotSelling,
-        buyingAmount,
-        sellingAmount,
+        this.boughtSpot,
+        this.soldSpot,
+        this.boughtAmount,
+        this.soldAmount,
       );
     // TODO othersUnchanged - con: this is implicit
   }

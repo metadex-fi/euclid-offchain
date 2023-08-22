@@ -409,31 +409,31 @@ export class DiracUtxo {
         const sellingAmount = ceilDiv(maxSwapA0, spotBuying);
         // const sellingAmount = maxSellingA0 <= maxBuyingA0 ? maxSelling : BigInt(sellingAmount_);
 
-        /// logging/debugging
+        // /// logging/debugging
 
-        const buyingJs = param.jumpSizes.amountOf(buyingAsset);
-        const sellingJs = param.jumpSizes.amountOf(sellingAsset);
-        const buyingAnchor = this.dirac.anchorPrices.amountOf(buyingAsset);
-        const sellingAnchor = this.dirac.anchorPrices.amountOf(sellingAsset);
+        // const buyingJs = param.jumpSizes.amountOf(buyingAsset);
+        // const sellingJs = param.jumpSizes.amountOf(sellingAsset);
+        // const buyingAnchor = this.dirac.anchorPrices.amountOf(buyingAsset);
+        // const sellingAnchor = this.dirac.anchorPrices.amountOf(sellingAsset);
 
-        const buyingJumpMultiplier = (Number(buyingJs) + 1) / Number(buyingJs);
-        const sellingJumpMultiplier = (Number(sellingJs) + 1) /
-          Number(sellingJs);
-        const ammBuying = liquidity_.amountOf(buyingAsset) *
-          param.weights.amountOf(buyingAsset);
-        const ammSelling = liquidity_.amountOf(sellingAsset) *
-          param.weights.amountOf(sellingAsset);
-        const buyingExp = Math.log(Number(ammBuying) / Number(buyingAnchor)) /
-          Math.log(buyingJumpMultiplier);
-        const sellingExp =
-          Math.log(Number(ammSelling) / Number(sellingAnchor)) /
-          Math.log(sellingJumpMultiplier);
+        // const buyingJumpMultiplier = (Number(buyingJs) + 1) / Number(buyingJs);
+        // const sellingJumpMultiplier = (Number(sellingJs) + 1) /
+        //   Number(sellingJs);
+        // const ammBuying = liquidity_.amountOf(buyingAsset) *
+        //   param.weights.amountOf(buyingAsset);
+        // const ammSelling = liquidity_.amountOf(sellingAsset) *
+        //   param.weights.amountOf(sellingAsset);
+        // const buyingExp = Math.log(Number(ammBuying) / Number(buyingAnchor)) /
+        //   Math.log(buyingJumpMultiplier);
+        // const sellingExp =
+        //   Math.log(Number(ammSelling) / Number(sellingAnchor)) /
+        //   Math.log(sellingJumpMultiplier);
 
-        console.log(
-          `buyingExp: ${buyingExp} -> ${expBuying}, sellingExp: ${sellingExp} -> ${expSelling}`,
-        );
+        // console.log(
+        //   `buyingExp: ${buyingExp} -> ${expBuying}, sellingExp: ${sellingExp} -> ${expSelling}`,
+        // );
 
-        /// end logging/debugging
+        // /// end logging/debugging
 
         const swapping = Swapping.boundary(
           user,
@@ -450,31 +450,7 @@ export class DiracUtxo {
         );
 
         swappings.push(swapping);
-        // TODO FIXME
-        // if (
-        //   Swapping.validates(
-        //     expBuying,
-        //     expSelling,
-        //     spotBuying,
-        //     spotSelling,
-        //     this.dirac.anchorPrices.amountOf(buyingAsset),
-        //     this.dirac.anchorPrices.amountOf(sellingAsset),
-        //     param.jumpSizes.amountOf(buyingAsset),
-        //     param.jumpSizes.amountOf(sellingAsset),
-        //     param.weights.amountOf(buyingAsset),
-        //     param.weights.amountOf(sellingAsset),
-        //     liquidity_.amountOf(buyingAsset),
-        //     liquidity_.amountOf(sellingAsset),
-        //     buyingAmount,
-        //     sellingAmount,
-        //   )
-        // ) {
-        //   swappings.push(swapping);
-        // } else {
-        //   console.error("invalid swap", swapping.show());
-        //   // return;
-        //   // throw new Error(`invalid swap: ${swapping.show()}`); // TODO throw error and fix
-        // }
+
       });
     });
 
