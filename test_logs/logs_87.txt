@@ -5,162 +5,28 @@
 emulator ...
 [0m[38;5;245m------- output -------[0m
 trials left: 1
-accounts: 1
+accounts: 10
 
 trials left: 1 - iteration: 0 - block: 0
-virtual: 1
-weight: 2
-jumpSize: 1
-minAnchorPrice: 1
-jumpLog: 0.6931471805599453
-anchorLog: 0.6931471805599453
-1
-maxTicks: 4777024263969040
+virtual: 2
+weight: 70
+jumpSize: 100
+minAnchorPrice: 138
+jumpLog: 0.009950330853168092
+anchorLog: 0.007220247973487097
+1.3781148361809616
+maxTicks: 1
 maxTicks_: 1
 1
 virtual: 1
-weight: 2
+weight: 36
 jumpSize: 1
-minAnchorPrice: 1
+minAnchorPrice: 18
 jumpLog: 0.6931471805599453
-anchorLog: 0.6931471805599453
-1
-maxTicks: 4777024263969040
-maxTicks_: 1
-1
-Opening pool with 1 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 1 - block: 1000
-Swapping.boundary()
-addedBuyingA0: 7237861061936690495488
-addedSellingA0: 7237866044376072847360
-diff: -4982439382351872
-subSwap: 1 sold
-subSwap: 70922 bought
-addedBuyingA0: 1277617171089481269248
-addedSellingA0: 1277617171089481269248
-diff: 0
-Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: 88c2ca5ab8d845d6fcc3b0987d4c6cd8c16d820715f0b66a8e163804, 
-   +     +  virtual: +[
-   +     +  +  abd9703a3732e6ea8f882673ba00e4ea52977b0a0bb7c07795cb4f4b_FH2IDZ8XiCbuDB5ajn6yzKwn2AyLlDlS: 1,
-   +     +  +  _: 1
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  abd9703a3732e6ea8f882673ba00e4ea52977b0a0bb7c07795cb4f4b_FH2IDZ8XiCbuDB5ajn6yzKwn2AyLlDlS: 2,
-   +     +  +  _: 2
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  abd9703a3732e6ea8f882673ba00e4ea52977b0a0bb7c07795cb4f4b_FH2IDZ8XiCbuDB5ajn6yzKwn2AyLlDlS: 1,
-   +     +  +  _: 1
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: 88c2ca5ab8d845d6fcc3b0987d4c6cd8c16d820715f0b66a8e163804,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3bd174b0e4ea6085f235fc64891abd47e7f5e5c36a0c93dc36cf12b837f79f3a),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: ffee2fe42c0dfa87f774a9d2db0e9c34eebf7de42be1c8663c08e0225408265d),
-   +     +  anchorPrices: +[
-   +     +  +  abd9703a3732e6ea8f882673ba00e4ea52977b0a0bb7c07795cb4f4b_FH2IDZ8XiCbuDB5ajn6yzKwn2AyLlDlS: 1,
-   +     +  +  _: 1
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 2555830,
-   +  +  abd9703a3732e6ea8f882673ba00e4ea52977b0a0bb7c07795cb4f4b_FH2IDZ8XiCbuDB5ajn6yzKwn2AyLlDlS: 4777024263969040
-   +  ]
-     )
-  boughtAsset: Asset(, )
-  soldAsset: Asset(abd9703a3732e6ea8f882673ba00e4ea52977b0a0bb7c07795cb4f4b, FH2IDZ8XiCbuDB5ajn6yzKwn2AyLlDlS)
-  boughtAmount: 70922
-  soldAmount: 304607670566912
-  boughtSpot: 4194304
-  soldSpot: 18014398509481984
-  boughtExp: 22
-  soldExp: 54
-  spotPrice: 4294967296
-  effectivePrice: 4294967296
-)
-
-trials left: 1 - iteration: 2 - block: 1001
-Swapping.boundary()
-addedBuyingA0: 5960243890847209226240
-addedSellingA0: 5960248873286591578112
-diff: -4982439382351872
-subSwap: 1421034067460678 sold
-addedBuyingA0: 5960243890847209226240
-addedSellingA0: 5960243890847209226240
-diff: 0
-Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: 88c2ca5ab8d845d6fcc3b0987d4c6cd8c16d820715f0b66a8e163804, 
-   +     +  virtual: +[
-   +     +  +  abd9703a3732e6ea8f882673ba00e4ea52977b0a0bb7c07795cb4f4b_FH2IDZ8XiCbuDB5ajn6yzKwn2AyLlDlS: 1,
-   +     +  +  _: 1
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  abd9703a3732e6ea8f882673ba00e4ea52977b0a0bb7c07795cb4f4b_FH2IDZ8XiCbuDB5ajn6yzKwn2AyLlDlS: 2,
-   +     +  +  _: 2
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  abd9703a3732e6ea8f882673ba00e4ea52977b0a0bb7c07795cb4f4b_FH2IDZ8XiCbuDB5ajn6yzKwn2AyLlDlS: 1,
-   +     +  +  _: 1
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: 88c2ca5ab8d845d6fcc3b0987d4c6cd8c16d820715f0b66a8e163804,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3bd174b0e4ea6085f235fc64891abd47e7f5e5c36a0c93dc36cf12b837f79f3a),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: ffee2fe42c0dfa87f774a9d2db0e9c34eebf7de42be1c8663c08e0225408265d),
-   +     +  anchorPrices: +[
-   +     +  +  abd9703a3732e6ea8f882673ba00e4ea52977b0a0bb7c07795cb4f4b_FH2IDZ8XiCbuDB5ajn6yzKwn2AyLlDlS: 1,
-   +     +  +  _: 1
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 2555830,
-   +  +  abd9703a3732e6ea8f882673ba00e4ea52977b0a0bb7c07795cb4f4b_FH2IDZ8XiCbuDB5ajn6yzKwn2AyLlDlS: 5081631934535952
-   +  ]
-     )
-  boughtAsset: Asset(, )
-  soldAsset: Asset(abd9703a3732e6ea8f882673ba00e4ea52977b0a0bb7c07795cb4f4b, FH2IDZ8XiCbuDB5ajn6yzKwn2AyLlDlS)
-  boughtAmount: 330860
-  soldAmount: 1421032879554560
-  boughtSpot: 4194304
-  soldSpot: 18014398509481984
-  boughtExp: 22
-  soldExp: 54
-  spotPrice: 4294967296
-  effectivePrice: 4294967296
-)
-
-trials left: 1 - iteration: 3 - block: 2001
-virtual: 9007199254740991
-weight: 1
-jumpSize: 1
-minAnchorPrice: 4503599627370495
-jumpLog: 0.6931471805599453
-anchorLog: 2.2204460492503128e-16
-3121657384082680
+anchorLog: 0.05406722127027579
+12.820099947341156
 maxTicks: 1
-maxTicks_: 3121657384082680
-1
-virtual: 2820675552342374
-weight: 3
-jumpSize: 83
-minAnchorPrice: 8361288244443465
-jumpLog: 0.01197619104671562
-anchorLog: 2.2204460492503128e-16
-53935969535306.34
-maxTicks: 1
-maxTicks_: 53935969535306
+maxTicks_: 12
 1
 virtual: 9007199254740991
 weight: 1
@@ -174,7 +40,217 @@ maxTicks_: 44812306322540
 1
 Opening pool with 1 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 4 - block: 3001
+trials left: 1 - iteration: 1 - block: 1
+Swapping.boundary()
+addedBuyingA0: 75497322
+addedSellingA0: 75497472
+diff: -150
+subSwap: 1 bought
+addedBuyingA0: 282
+addedSellingA0: 75497472
+diff: -75497190
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 70,
+   +     +  +  _: 36,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 36c43865badd84090027aee30328ffe1a0eee53e28114a89c39aba3f6c3f1e94),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 106de0e37b7ee4f4f34e04efb6849d218798b72d8b73b3fa51c3c03cc1628db8),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 138,
+   +     +  +  _: 18,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 8918019064099991
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2564450,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 1
+  soldAmount: 1
+  boughtSpot: 75497472
+  soldSpot: 282
+  boughtExp: 22
+  soldExp: 72
+  spotPrice: 0.000003735224405924479
+  effectivePrice: 1
+)
+
+trials left: 1 - iteration: 2 - block: 1001
+Swapping.boundary()
+addedBuyingA0: 75497292
+addedSellingA0: 75497472
+diff: -180
+subSwap: 158309 bought
+addedBuyingA0: 55566459
+addedSellingA0: 75497472
+diff: -19931013
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 70,
+   +     +  +  _: 36,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 36c43865badd84090027aee30328ffe1a0eee53e28114a89c39aba3f6c3f1e94),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 106de0e37b7ee4f4f34e04efb6849d218798b72d8b73b3fa51c3c03cc1628db8),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 138,
+   +     +  +  _: 18,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 8918019064099991
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2564450,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 158309
+  soldAmount: 1
+  boughtSpot: 75497472
+  soldSpot: 351
+  boughtExp: 22
+  soldExp: 94
+  spotPrice: 0.000004649162292480469
+  effectivePrice: 0.000006316760259997852
+)
+
+trials left: 1 - iteration: 3 - block: 2001
+virtual: 1
+weight: 86
+jumpSize: 85
+minAnchorPrice: 85
+jumpLog: 0.011696039763191236
+anchorLog: 0.011696039763191236
+1
+maxTicks: 9007199254740991
+maxTicks_: 1
+1
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 9007199254740991
+maxTicks_: 3121657384082680
+3
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 4 - block: 2002
+Swapping.boundary()
+addedBuyingA0: 75497100
+addedSellingA0: 75497472
+diff: -372
+subSwap: 102310 bought
+addedBuyingA0: 42970200
+addedSellingA0: 75497472
+diff: -32527272
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 70,
+   +     +  +  _: 36,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 36c43865badd84090027aee30328ffe1a0eee53e28114a89c39aba3f6c3f1e94),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 106de0e37b7ee4f4f34e04efb6849d218798b72d8b73b3fa51c3c03cc1628db8),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 138,
+   +     +  +  _: 18,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 8918019064099991
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2564450,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 3
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 102310
+  soldAmount: 1
+  boughtSpot: 75497472
+  soldSpot: 420
+  boughtExp: 22
+  soldExp: 112
+  spotPrice: 0.000005563100179036458
+  effectivePrice: 0.00000977421561919656
+)
+
+trials left: 1 - iteration: 5 - block: 3002
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 1
+maxTicks_: 3121657384082680
+1
 virtual: 1
 weight: 2
 jumpSize: 1
@@ -182,105 +258,150 @@ minAnchorPrice: 1
 jumpLog: 0.6931471805599453
 anchorLog: 0.6931471805599453
 1
-maxTicks: 1177738275701222
+maxTicks: 1
 maxTicks_: 1
 1
-virtual: 6286012268407410
-weight: 1
-jumpSize: 1
-minAnchorPrice: 3143006134203705
-jumpLog: 0.6931471805599453
-anchorLog: 2.2204460492503128e-16
-3121657384082680
-maxTicks: 1177738275701222
-maxTicks_: 3121657384082680
-3
 Opening pool with 1 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 5 - block: 3002
 
 trials left: 1 - iteration: 6 - block: 4002
-virtual: 9007199254740991
-weight: 1
-jumpSize: 68
-minAnchorPrice: 8876660135107063
-jumpLog: 0.014598799421152631
-anchorLog: 2.2204460492503128e-16
-65747147633159.61
-maxTicks: 1
-maxTicks_: 65747147633159
-1
-virtual: 1521680501577396
-weight: 11
-jumpSize: 1
-minAnchorPrice: 8369242758675678
-jumpLog: 0.6931471805599453
-anchorLog: 2.2204460492503128e-16
-3121657384082680
-maxTicks: 1
-maxTicks_: 3121657384082680
-1
-Opening pool with 1 dirac utxos and 1 param utxos
+Swapping.boundary()
+addedBuyingA0: 75497034
+addedSellingA0: 75497472
+diff: -438
+subSwap: 1 bought
+addedBuyingA0: 493
+addedSellingA0: 75497472
+diff: -75496979
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 70,
+   +     +  +  _: 36,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 36c43865badd84090027aee30328ffe1a0eee53e28114a89c39aba3f6c3f1e94),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 106de0e37b7ee4f4f34e04efb6849d218798b72d8b73b3fa51c3c03cc1628db8),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 138,
+   +     +  +  _: 18,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 8918019064099991
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2564450,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 4
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 1
+  soldAmount: 1
+  boughtSpot: 75497472
+  soldSpot: 493
+  boughtExp: 22
+  soldExp: 128
+  spotPrice: 0.000006530019972059462
+  effectivePrice: 1
+)
 
 trials left: 1 - iteration: 7 - block: 4003
+Swapping.boundary()
+addedBuyingA0: 75497136
+addedSellingA0: 75497472
+diff: -336
+subSwap: 1 bought
+addedBuyingA0: 561
+addedSellingA0: 75497472
+diff: -75496911
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 70,
+   +     +  +  _: 36,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 36c43865badd84090027aee30328ffe1a0eee53e28114a89c39aba3f6c3f1e94),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 106de0e37b7ee4f4f34e04efb6849d218798b72d8b73b3fa51c3c03cc1628db8),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 138,
+   +     +  +  _: 18,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 8918019064099991
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2564450,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 5
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 1
+  soldAmount: 1
+  boughtSpot: 75497472
+  soldSpot: 561
+  boughtExp: 22
+  soldExp: 141
+  spotPrice: 0.000007430712381998698
+  effectivePrice: 1
+)
 
-trials left: 1 - iteration: 8 - block: 5003
-
-trials left: 1 - iteration: 9 - block: 6003
-
-trials left: 1 - iteration: 10 - block: 7003
-virtual: 3263878762326052
+trials left: 1 - iteration: 8 - block: 4004
+virtual: 9007199254740991
 weight: 1
-jumpSize: 14
-minAnchorPrice: 3046286844837648
-jumpLog: 0.06899287148695142
+jumpSize: 100
+minAnchorPrice: 8918019064099991
+jumpLog: 0.009950330853168092
 anchorLog: 2.2204460492503128e-16
-310716270319855
-maxTicks: 4228509362553532
-maxTicks_: 310716270319855
+44812306322540.98
+maxTicks: 3133703642295799
+maxTicks_: 44812306322540
 3
 virtual: 9007199254740991
 weight: 1
-jumpSize: 16
-minAnchorPrice: 8477364004462109
-jumpLog: 0.06062462181643484
+jumpSize: 56
+minAnchorPrice: 8849178215184131
+jumpLog: 0.017699577099400857
 anchorLog: 2.2204460492503128e-16
-273029024221973.22
-maxTicks: 2114254681276766
-maxTicks_: 273029024221973
+79711808829477.08
+maxTicks: 3133703642295799
+maxTicks_: 79711808829477
 3
-virtual: 9007199254740991
-weight: 1
-jumpSize: 49
-minAnchorPrice: 8827055269646171
-jumpLog: 0.02020270731751947
-anchorLog: 2.2204460492503128e-16
-90984905147055.89
-maxTicks: 2114254681276766
-maxTicks_: 90984905147055
-3
-virtual: 3263878762326052
-weight: 1
-jumpSize: 14
-minAnchorPrice: 3046286844837648
-jumpLog: 0.06899287148695142
-anchorLog: 2.2204460492503128e-16
-310716270319855
-Opening pool with 2 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 11 - block: 7378
-
-trials left: 1 - iteration: 12 - block: 7379
-virtual: 1304622768442970
-weight: 7
-jumpSize: 11
-minAnchorPrice: 8371329430842390
-jumpLog: 0.08701137698962969
-anchorLog: 2.2204460492503128e-16
-391864404987490.06
-maxTicks: 1
-maxTicks_: 391864404987490
-1
 virtual: 1
 weight: 100
 jumpSize: 1
@@ -288,110 +409,699 @@ minAnchorPrice: 50
 jumpLog: 0.6931471805599453
 anchorLog: 0.01980262729617973
 35.0027887811465
-maxTicks: 1
+maxTicks: 3133703642295799
 maxTicks_: 35
-1
-virtual: 1
-weight: 6
-jumpSize: 1
-minAnchorPrice: 3
-jumpLog: 0.6931471805599453
-anchorLog: 0.28768207245178085
-2.4094208396532095
-maxTicks: 1
-maxTicks_: 2
-1
+3
 Opening pool with 1 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 13 - block: 7380
+trials left: 1 - iteration: 9 - block: 4005
 Swapping.boundary()
-addedBuyingA0: 28303118207223380
-addedSellingA0: 28303118207223400
-diff: -20
+addedBuyingA0: 75497456
+addedSellingA0: 75497472
+diff: -16
 Swapping.boundary()
-addedBuyingA0: 4311962844866523980506770391740
-addedSellingA0: 4311962844866535775849660022784
-diff: -11795342889631044
-Swapping.boundary()
-addedBuyingA0: 7117008522422800
-addedSellingA0: 25944525023288098
-diff: -18827516500865298
-Swapping.boundary()
-addedBuyingA0: 27021597764222800
-addedSellingA0: 27021597764222976
-diff: -176
-Swapping.boundary()
-addedBuyingA0: 480782353943639496087287365632
-addedSellingA0: 480782353943663544809767697538
-diff: -24048722480331906
-subSwap: 4794466163870 sold
-addedBuyingA0: 124390147361812130652141649920
-addedSellingA0: 124390147361833309631888619260
-diff: -21178979746969340
+addedBuyingA0: 31286093172742978288000
+addedSellingA0: 31286101287376365420450
+diff: -8114633387132450
+subSwap: 3473455 sold
+addedBuyingA0: 31286093172742978288000
+addedSellingA0: 31286101287376365420450
+diff: -8114633387132450
 Swapping (
   paramUtxo: ParamUtxo (
      +  param: Param (
-   +     +  owner: 88c2ca5ab8d845d6fcc3b0987d4c6cd8c16d820715f0b66a8e163804, 
+   +     +  owner: 0987120c1fbd4b17b7f169fbd4129ec03451ed8b8d1bf5fd76fafb70, 
    +     +  virtual: +[
-   +     +  +  0b71f9c73049ff560f974234fea069cc0aa072cc90fe24aca50b2cf1_: 1304622768442970,
-   +     +  +  2d2635a2f0c74d753d4e4b6caa5f4ea030dedac2fe536fb310a97b7d_: 1,
-   +     +  +  605f91ed57c2c582bd16fe9d5888b5506e1ebdc7d9ff45f5ba3252a6_: 1
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 9007199254740991,
+   +     +  +  af4bdbb6776fb50d4644e7acb5f490affb601a5a8c1bc0d91ba85386_EepjgGcws84edE: 1
    +     +  ], 
    +     +  weights: +[
-   +     +  +  0b71f9c73049ff560f974234fea069cc0aa072cc90fe24aca50b2cf1_: 7,
-   +     +  +  2d2635a2f0c74d753d4e4b6caa5f4ea030dedac2fe536fb310a97b7d_: 100,
-   +     +  +  605f91ed57c2c582bd16fe9d5888b5506e1ebdc7d9ff45f5ba3252a6_: 6
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 1,
+   +     +  +  af4bdbb6776fb50d4644e7acb5f490affb601a5a8c1bc0d91ba85386_EepjgGcws84edE: 100
    +     +  ]
    +     +  jumpSizes: +[
-   +     +  +  0b71f9c73049ff560f974234fea069cc0aa072cc90fe24aca50b2cf1_: 11,
-   +     +  +  2d2635a2f0c74d753d4e4b6caa5f4ea030dedac2fe536fb310a97b7d_: 1,
-   +     +  +  605f91ed57c2c582bd16fe9d5888b5506e1ebdc7d9ff45f5ba3252a6_: 1
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 56,
+   +     +  +  af4bdbb6776fb50d4644e7acb5f490affb601a5a8c1bc0d91ba85386_EepjgGcws84edE: 1
    +     +  ], 
    +     +  active: 1
    +     )
      )
   diracUtxo: DiracUtxo (
      +  dirac: Dirac(
-   +     +  owner: 88c2ca5ab8d845d6fcc3b0987d4c6cd8c16d820715f0b66a8e163804,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3bd174b0e4ea6085f235fc64891abd47e7f5e5c36a0c93dc36cf12b837f79f3a),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: ffee2fe42c0dfa87f774a9d2db0e9c34eebf7de42be1c8663c08e0225408265d),
+   +     +  owner: 0987120c1fbd4b17b7f169fbd4129ec03451ed8b8d1bf5fd76fafb70,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 464c5a8bc3f6eb183b0666920c005803a3c09f3f7150b102ba91558da403b585),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 7a656d2df8469ab27092bc00409ddd394c8dfee3df8940e7dee346b66e432bd1),
    +     +  anchorPrices: +[
-   +     +  +  0b71f9c73049ff560f974234fea069cc0aa072cc90fe24aca50b2cf1_: 8371329430842390,
-   +     +  +  2d2635a2f0c74d753d4e4b6caa5f4ea030dedac2fe536fb310a97b7d_: 50,
-   +     +  +  605f91ed57c2c582bd16fe9d5888b5506e1ebdc7d9ff45f5ba3252a6_: 3
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 8918019064099991,
+   +     +  +  _: 8849178215184131,
+   +     +  +  af4bdbb6776fb50d4644e7acb5f490affb601a5a8c1bc0d91ba85386_EepjgGcws84edE: 50
    +     +  ],
    +     ),
      +  balance: +[
-   +  +  _: 2900630,
-   +  +  0b71f9c73049ff560f974234fea069cc0aa072cc90fe24aca50b2cf1_: 2419530470475673,
-   +  +  2d2635a2f0c74d753d4e4b6caa5f4ea030dedac2fe536fb310a97b7d_: 1,
-   +  +  605f91ed57c2c582bd16fe9d5888b5506e1ebdc7d9ff45f5ba3252a6_: 4084018465263888
+   +  +  _: 2551520,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 3133703642295799
    +  ]
      )
-  boughtAsset: Asset(0b71f9c73049ff560f974234fea069cc0aa072cc90fe24aca50b2cf1, )
-  soldAsset: Asset(605f91ed57c2c582bd16fe9d5888b5506e1ebdc7d9ff45f5ba3252a6, )
-  boughtAmount: 4603360187920
-  soldAmount: 4794466163870
-  boughtSpot: 25944525023288098
-  soldSpot: 27021597764222976
-  boughtExp: 13
-  soldExp: 53
-  spotPrice: 1.0415144520845183
-  effectivePrice: 1.0415144520846955
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 2551520
+  soldAmount: 3473455
+  boughtSpot: 9007199254740990
+  soldSpot: 12261747183146900
+  boughtExp: 1
+  soldExp: 32
+  spotPrice: 1.3613274044862347
+  effectivePrice: 1.3613277575719571
 )
 
-trials left: 1 - iteration: 14 - block: 7438
+trials left: 1 - iteration: 10 - block: 4976
 
-trials left: 1 - iteration: 15 - block: 7807
+trials left: 1 - iteration: 11 - block: 5976
+virtual: 3247245781860988
+weight: 3
+jumpSize: 1
+minAnchorPrice: 4870868672791482
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 4661772506050358
+maxTicks_: 3121657384082680
+3
+virtual: 1
+weight: 2
+jumpSize: 1
+minAnchorPrice: 1
+jumpLog: 0.6931471805599453
+anchorLog: 0.6931471805599453
+1
+maxTicks: 4661772506050358
+maxTicks_: 1
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 12 - block: 6486
+Swapping.boundary()
+addedBuyingA0: 75497456
+addedSellingA0: 75497472
+diff: -16
+Swapping.boundary()
+addedBuyingA0: 31286093172742978288000
+addedSellingA0: 31286101287376365420450
+diff: -8114633387132450
+subSwap: 1 sold
+addedBuyingA0: 75497456
+addedSellingA0: 75497472
+diff: -16
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 70,
+   +     +  +  _: 36,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 36c43865badd84090027aee30328ffe1a0eee53e28114a89c39aba3f6c3f1e94),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 106de0e37b7ee4f4f34e04efb6849d218798b72d8b73b3fa51c3c03cc1628db8),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 138,
+   +     +  +  _: 18,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 8918019064099991
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2564450,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 6
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 119458
+  soldAmount: 1
+  boughtSpot: 75497472
+  soldSpot: 632
+  boughtExp: 22
+  soldExp: 153
+  spotPrice: 0.000008371141221788195
+  effectivePrice: 0.000008371142995864656
+)
+
+trials left: 1 - iteration: 13 - block: 6487
+Swapping.boundary()
+addedBuyingA0: 75497040
+addedSellingA0: 75497472
+diff: -432
+Swapping.boundary()
+addedBuyingA0: 31286093172742978288000
+addedSellingA0: 31286101287376365420450
+diff: -8114633387132450
+subSwap: 1 sold
+addedBuyingA0: 75497040
+addedSellingA0: 75497472
+diff: -432
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 70,
+   +     +  +  _: 36,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 36c43865badd84090027aee30328ffe1a0eee53e28114a89c39aba3f6c3f1e94),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 106de0e37b7ee4f4f34e04efb6849d218798b72d8b73b3fa51c3c03cc1628db8),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 138,
+   +     +  +  _: 18,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 8918019064099991
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2564450,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 7
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 107088
+  soldAmount: 1
+  boughtSpot: 75497472
+  soldSpot: 705
+  boughtExp: 22
+  soldExp: 164
+  spotPrice: 0.000009338061014811197
+  effectivePrice: 0.000009338114447930673
+)
+
+trials left: 1 - iteration: 14 - block: 6488
+
+trials left: 1 - iteration: 15 - block: 6489
+
+trials left: 1 - iteration: 16 - block: 7489
+virtual: 1
+weight: 98
+jumpSize: 29
+minAnchorPrice: 94
+jumpLog: 0.033901551675681416
+anchorLog: 0.010582109330537008
+3.2036667375804764
+maxTicks: 1
+maxTicks_: 3
+1
 virtual: 9007199254740991
 weight: 1
-jumpSize: 45
-minAnchorPrice: 8811390575290099
-jumpLog: 0.021978906718775167
+jumpSize: 84
+minAnchorPrice: 8901232204685214
+jumpLog: 0.011834457647002798
 anchorLog: 2.2204460492503128e-16
-98984196108686.75
-maxTicks: 6502666001996630
-maxTicks_: 98984196108686
+53297659049173.73
+maxTicks: 1
+maxTicks_: 53297659049173
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 17 - block: 7490
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 1
+maxTicks_: 3121657384082680
+1
+virtual: 9007199254740991
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8918019064099991
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+maxTicks: 1
+maxTicks_: 44812306322540
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 18 - block: 8329
+Swapping.boundary()
+addedBuyingA0: 75497091
+addedSellingA0: 75497472
+diff: -381
+Swapping.boundary()
+addedBuyingA0: 31286093172742978288000
+addedSellingA0: 31286101287376365420450
+diff: -8114633387132450
+Swapping.boundary()
+addedBuyingA0: 41538500803089023583000
+addedSellingA0: 41538500803089023583000
+diff: 0
+subSwap: 1 sold
+addedBuyingA0: 75497091
+addedSellingA0: 75497472
+diff: -381
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 70,
+   +     +  +  _: 36,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 36c43865badd84090027aee30328ffe1a0eee53e28114a89c39aba3f6c3f1e94),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 106de0e37b7ee4f4f34e04efb6849d218798b72d8b73b3fa51c3c03cc1628db8),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 138,
+   +     +  +  _: 18,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 8918019064099991
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2564450,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 8
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 97921
+  soldAmount: 1
+  boughtSpot: 75497472
+  soldSpot: 771
+  boughtExp: 22
+  soldExp: 173
+  spotPrice: 0.000010212262471516928
+  effectivePrice: 0.000010212314008231124
+)
+
+trials left: 1 - iteration: 19 - block: 9329
+Swapping.boundary()
+addedBuyingA0: 75496644
+addedSellingA0: 75497472
+diff: -828
+subSwap: 24334 bought
+addedBuyingA0: 20537896
+addedSellingA0: 75497472
+diff: -54959576
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 70,
+   +     +  +  _: 36,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 36c43865badd84090027aee30328ffe1a0eee53e28114a89c39aba3f6c3f1e94),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 106de0e37b7ee4f4f34e04efb6849d218798b72d8b73b3fa51c3c03cc1628db8),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 138,
+   +     +  +  _: 18,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 8918019064099991
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2564450,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 24334
+  soldAmount: 1
+  boughtSpot: 75497472
+  soldSpot: 844
+  boughtExp: 22
+  soldExp: 182
+  spotPrice: 0.00001117918226453993
+  effectivePrice: 0.00004109476452699926
+)
+
+trials left: 1 - iteration: 20 - block: 9330
+Swapping.boundary()
+addedBuyingA0: 75496883
+addedSellingA0: 75497472
+diff: -589
+Swapping.boundary()
+addedBuyingA0: 31286093172742978288000
+addedSellingA0: 31286101287376365420450
+diff: -8114633387132450
+Swapping.boundary()
+addedBuyingA0: 41538500803089023583000
+addedSellingA0: 41538500803089023583000
+diff: 0
+subSwap: 3966150 sold
+addedBuyingA0: 35723903324190977488500
+addedSellingA0: 35723903324190977488500
+diff: 0
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 1df0596d6e14b7a76e21e0b3fe75fb1bea8cdce2dea23aeaa29494fe, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 1df0596d6e14b7a76e21e0b3fe75fb1bea8cdce2dea23aeaa29494fe,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: d191fe1b69d7fdde57e28ea639116852a5cb7c99d8bb6e99aa48013abdf42aef),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: d57e253468c506a37345ddf198d7279deaed65f73e030215ebd10f24f69ad54b),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 4503599627370495,
+   +     +  +  _: 8918019064099991
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2305850,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 1983075
+  soldAmount: 3966150
+  boughtSpot: 9007199254740990
+  soldSpot: 18014398509481980
+  boughtExp: 1
+  soldExp: 2
+  spotPrice: 2
+  effectivePrice: 2
+)
+
+trials left: 1 - iteration: 21 - block: 9331
+Swapping.boundary()
+addedBuyingA0: 75496883
+addedSellingA0: 75497472
+diff: -589
+Swapping.boundary()
+addedBuyingA0: 31286093172742978288000
+addedSellingA0: 31286101287376365420450
+diff: -8114633387132450
+Swapping.boundary()
+addedBuyingA0: 41849069033392492918200
+addedSellingA0: 41849069033392492918200
+diff: 0
+subSwap: 2323090 bought
+addedBuyingA0: 41849069033392492918200
+addedSellingA0: 41849069033392492918200
+diff: 0
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 1df0596d6e14b7a76e21e0b3fe75fb1bea8cdce2dea23aeaa29494fe, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 1df0596d6e14b7a76e21e0b3fe75fb1bea8cdce2dea23aeaa29494fe,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: d191fe1b69d7fdde57e28ea639116852a5cb7c99d8bb6e99aa48013abdf42aef),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: d57e253468c506a37345ddf198d7279deaed65f73e030215ebd10f24f69ad54b),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 4503599627370495,
+   +     +  +  _: 8918019064099991
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2323090,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 3966151
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 2323090
+  soldAmount: 4646180
+  boughtSpot: 9007199254740990
+  soldSpot: 18014398509481980
+  boughtExp: 1
+  soldExp: 2
+  spotPrice: 2
+  effectivePrice: 2
+)
+
+trials left: 1 - iteration: 22 - block: 9332
+
+trials left: 1 - iteration: 23 - block: 10332
+
+trials left: 1 - iteration: 24 - block: 11332
+
+trials left: 1 - iteration: 25 - block: 12099
+Swapping.boundary()
+addedBuyingA0: 75496883
+addedSellingA0: 75497472
+diff: -589
+Swapping.boundary()
+addedBuyingA0: 31286093172742978288000
+addedSellingA0: 31286101287376365420450
+diff: -8114633387132450
+Swapping.boundary()
+addedBuyingA0: 41849069033392492918200
+addedSellingA0: 41849069033392492918200
+diff: 0
+subSwap: 1 sold
+addedBuyingA0: 75496883
+addedSellingA0: 75497472
+diff: -589
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 70,
+   +     +  +  _: 36,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 36c43865badd84090027aee30328ffe1a0eee53e28114a89c39aba3f6c3f1e94),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 106de0e37b7ee4f4f34e04efb6849d218798b72d8b73b3fa51c3c03cc1628db8),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 138,
+   +     +  +  _: 18,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 8918019064099991
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2564450,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 10
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 82691
+  soldAmount: 1
+  boughtSpot: 75497472
+  soldSpot: 913
+  boughtExp: 22
+  soldExp: 190
+  spotPrice: 0.00001209312015109592
+  effectivePrice: 0.000012093214497345539
+)
+
+trials left: 1 - iteration: 26 - block: 13099
+
+trials left: 1 - iteration: 27 - block: 14099
+virtual: 5680288661805006
+weight: 1
+jumpSize: 1
+minAnchorPrice: 2840144330902503
+jumpLog: 0.6931471805599453
+anchorLog: 4.440892098500625e-16
+1560828692041340
+maxTicks: 9007199254740989
+maxTicks_: 1560828692041340
+3
+virtual: 9007199254740991
+weight: 1
+jumpSize: 26
+minAnchorPrice: 8673599282343176
+jumpLog: 0.03774032798284711
+anchorLog: 2.2204460492503128e-16
+169967327040390.6
+maxTicks: 9007199254740989
+maxTicks_: 169967327040390
+3
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 9007199254740989
+maxTicks_: 3121657384082680
+3
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+Opening pool with 3 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 28 - block: 14869
+virtual: 9007199254740991
+weight: 1
+jumpSize: 89
+minAnchorPrice: 8907119263021646
+jumpLog: 0.011173300598125255
+anchorLog: 2.2204460492503128e-16
+50320072410215.445
+maxTicks: 9007199254740989
+maxTicks_: 50320072410215
+3
+virtual: 9007199254740991
+weight: 1
+jumpSize: 26
+minAnchorPrice: 8673599282343176
+jumpLog: 0.03774032798284711
+anchorLog: 2.2204460492503128e-16
+169967327040390.6
+maxTicks: 4503599627370494
+maxTicks_: 169967327040390
+3
+virtual: 794609233135588
+weight: 5
+jumpSize: 88
+minAnchorPrice: 3928405197524255
+jumpLog: 0.011299555253933466
+anchorLog: 2.2204460492503128e-16
+50888672831067.09
+maxTicks: 4503599627370494
+maxTicks_: 50888672831067
+3
+virtual: 9007199254740991
+weight: 1
+jumpSize: 89
+minAnchorPrice: 8907119263021646
+jumpLog: 0.011173300598125255
+anchorLog: 2.2204460492503128e-16
+50320072410215.445
+Opening pool with 2 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 29 - block: 15869
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 3246726
+maxTicks_: 3121657384082680
 3
 virtual: 2
 weight: 100
@@ -400,78 +1110,744 @@ minAnchorPrice: 198
 jumpLog: 0.009950330853168092
 anchorLog: 0.005037794029957081
 1.9751364970458831
-maxTicks: 3251333000998315
-maxTicks_: 1
-1
-virtual: 1
-weight: 92
-jumpSize: 91
-minAnchorPrice: 91
-jumpLog: 0.01092907053219023
-anchorLog: 0.01092907053219023
-1
-maxTicks: 3251333000998315
+maxTicks: 1623363
 maxTicks_: 1
 1
 virtual: 9007199254740991
 weight: 1
-jumpSize: 45
-minAnchorPrice: 8811390575290099
-jumpLog: 0.021978906718775167
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
 anchorLog: 2.2204460492503128e-16
-98984196108686.75
+3121657384082680
 Opening pool with 2 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 16 - block: 8807
+trials left: 1 - iteration: 30 - block: 15870
+Swapping.boundary()
+addedBuyingA0: 75497293
+addedSellingA0: 75497472
+diff: -179
+Swapping.boundary()
+addedBuyingA0: 31286093172742978288000
+addedSellingA0: 31286101287376365420450
+diff: -8114633387132450
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 79497540622343977740
+addedSellingA0: 79497540622558622310
+diff: -214644570
+Swapping.boundary()
+addedBuyingA0: 56213250061712463672
+addedSellingA0: 56213250061857691110
+diff: -145227438
+subSwap: 76337 bought
+addedBuyingA0: 75497293
+addedSellingA0: 75497472
+diff: -179
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 70,
+   +     +  +  _: 36,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 36c43865badd84090027aee30328ffe1a0eee53e28114a89c39aba3f6c3f1e94),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 106de0e37b7ee4f4f34e04efb6849d218798b72d8b73b3fa51c3c03cc1628db8),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 138,
+   +     +  +  _: 18,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 8918019064099991
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2564450,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 11
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 76337
+  soldAmount: 1
+  boughtSpot: 75497472
+  soldSpot: 989
+  boughtExp: 22
+  soldExp: 198
+  spotPrice: 0.000013099776373969184
+  effectivePrice: 0.000013099807432830738
+)
+
+trials left: 1 - iteration: 31 - block: 15871
+Swapping.boundary()
+addedBuyingA0: 75497100
+addedSellingA0: 75497472
+diff: -372
+subSwap: 1 sold
+addedBuyingA0: 75497100
+addedSellingA0: 75497472
+diff: -372
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 70,
+   +     +  +  _: 36,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 1,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: fea5ea9f814dfb148988c1f53af7b10e346765143622b1486cf74f17,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 36c43865badd84090027aee30328ffe1a0eee53e28114a89c39aba3f6c3f1e94),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 106de0e37b7ee4f4f34e04efb6849d218798b72d8b73b3fa51c3c03cc1628db8),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 138,
+   +     +  +  _: 18,
+   +     +  +  39cab33d5e56af26e260b41313ac5b7a34a12f943d5ca28cccd7e449_5jd9W8cuTXdnXpV0unJMGcEEbmVXqfX1: 8918019064099991
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2564450,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 12
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 71902
+  soldAmount: 1
+  boughtSpot: 75497472
+  soldSpot: 1050
+  boughtExp: 22
+  soldExp: 204
+  spotPrice: 0.000013907750447591146
+  effectivePrice: 0.00001390781897582821
+)
+
+trials left: 1 - iteration: 32 - block: 15872
+Swapping.boundary()
+addedBuyingA0: 75497174
+addedSellingA0: 75497472
+diff: -298
+Swapping.boundary()
+addedBuyingA0: 31286093172742978288000
+addedSellingA0: 31286101287376365420450
+diff: -8114633387132450
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+subSwap: 292872 bought
+addedBuyingA0: 3327195001920311434464
+addedSellingA0: 3327196354306538519070
+diff: -1352386227084606
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 5680288661805006,
+   +     +  +  _: 9007199254740991,
+   +     +  +  fb73c8051afb393ce81a9914656504cbbc94e3786950867b20ef7ad0_HyOmBNt7Wu2YjnPIzyt1tWYViM: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 1,
+   +     +  +  fb73c8051afb393ce81a9914656504cbbc94e3786950867b20ef7ad0_HyOmBNt7Wu2YjnPIzyt1tWYViM: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 26,
+   +     +  +  fb73c8051afb393ce81a9914656504cbbc94e3786950867b20ef7ad0_HyOmBNt7Wu2YjnPIzyt1tWYViM: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dea6cd5ce7a7ea91965701c2e24394f29d95c66c9ffaba428dac744be379a752),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3005311e517491130ed1c772d4c5b7933091076499e66cc25ad02df588a37b7c),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2840144330902503,
+   +     +  +  _: 8673599282343176,
+   +     +  +  fb73c8051afb393ce81a9914656504cbbc94e3786950867b20ef7ad0_HyOmBNt7Wu2YjnPIzyt1tWYViM: 7149018786131515
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2637720,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 3002399751580329
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 292872
+  soldAmount: 369393
+  boughtSpot: 9007199254740990
+  soldSpot: 11360577323610012
+  boughtExp: 1
+  soldExp: 2
+  spotPrice: 1.2612774517706276
+  effectivePrice: 1.261277964434975
+)
+
+trials left: 1 - iteration: 33 - block: 15897
 virtual: 9007199254740991
 weight: 1
-jumpSize: 1
-minAnchorPrice: 4503599627370495
-jumpLog: 0.6931471805599453
+jumpSize: 11
+minAnchorPrice: 8256599316845908
+jumpLog: 0.08701137698962969
 anchorLog: 2.2204460492503128e-16
-3121657384082680
-maxTicks: 1
-maxTicks_: 3121657384082680
+391864404987490.06
+maxTicks: 3400771511869650
+maxTicks_: 391864404987490
+3
+virtual: 2
+weight: 100
+jumpSize: 100
+minAnchorPrice: 198
+jumpLog: 0.009950330853168092
+anchorLog: 0.005037794029957081
+1.9751364970458831
+maxTicks: 1133590503956550
+maxTicks_: 1
 1
 virtual: 9007199254740991
 weight: 1
-jumpSize: 1
-minAnchorPrice: 4503599627370495
-jumpLog: 0.6931471805599453
+jumpSize: 11
+minAnchorPrice: 8256599316845908
+jumpLog: 0.08701137698962969
 anchorLog: 2.2204460492503128e-16
-3121657384082680
-maxTicks: 1
-maxTicks_: 3121657384082680
-1
-virtual: 3901514841014458
+391864404987490.06
+virtual: 9007199254740991
+weight: 1
+jumpSize: 11
+minAnchorPrice: 8256599316845908
+jumpLog: 0.08701137698962969
+anchorLog: 2.2204460492503128e-16
+391864404987490.06
+Opening pool with 3 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 34 - block: 16780
+
+trials left: 1 - iteration: 35 - block: 16832
+Swapping.boundary()
+addedBuyingA0: 75497174
+addedSellingA0: 75497472
+diff: -298
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 79497540622343977740
+addedSellingA0: 79497540622558622310
+diff: -214644570
+Swapping.boundary()
+addedBuyingA0: 56213250061712463672
+addedSellingA0: 56213250061857691110
+diff: -145227438
+Swapping.boundary()
+addedBuyingA0: 232105252121145104853
+addedSellingA0: 232105252121268637710
+diff: -123532857
+Swapping.boundary()
+addedBuyingA0: 238935761161865295542
+addedSellingA0: 238935761162057531070
+diff: -192235528
+Swapping.boundary()
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+subSwap: 1 sold
+subSwap: 1261 bought
+addedBuyingA0: 16062748318109996984
+addedSellingA0: 16062748318237165230
+diff: -127168246
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 1df0596d6e14b7a76e21e0b3fe75fb1bea8cdce2dea23aeaa29494fe, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 2
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 100
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 1df0596d6e14b7a76e21e0b3fe75fb1bea8cdce2dea23aeaa29494fe,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 6c34b9ca256fc53462a2c2b035b4df7ac91f071f066886675f61a38ab85e0c08),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: d57e253468c506a37345ddf198d7279deaed65f73e030215ebd10f24f69ad54b),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 6369051672525772,
+   +     +  +  _: 198
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2292920,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1623363
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 1261
+  soldAmount: 70188708107
+  boughtSpot: 228850890
+  soldSpot: 12738103345051544
+  boughtExp: 1403
+  soldExp: 1
+  spotPrice: 55661148.379416585
+  effectivePrice: 55661148.37985726
+)
+
+trials left: 1 - iteration: 36 - block: 16833
+Swapping.boundary()
+addedBuyingA0: 75497174
+addedSellingA0: 75497472
+diff: -298
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 79497540622343977740
+addedSellingA0: 79497540622558622310
+diff: -214644570
+Swapping.boundary()
+addedBuyingA0: 275818151730401082232
+addedSellingA0: 275818151730513815400
+diff: -112733168
+Swapping.boundary()
+addedBuyingA0: 232105252121145104853
+addedSellingA0: 232105252121268637710
+diff: -123532857
+Swapping.boundary()
+addedBuyingA0: 238935761161865295542
+addedSellingA0: 238935761162057531070
+diff: -192235528
+Swapping.boundary()
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+subSwap: 1 bought
+addedBuyingA0: 10412876199204844
+addedSellingA0: 10412876377175670
+diff: -177970826
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 935cee98e3ec31384881ecd004c217edbd66b6ae9b7923a8a5d92e88, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 2
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 100
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 11,
+   +     +  +  _: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 935cee98e3ec31384881ecd004c217edbd66b6ae9b7923a8a5d92e88,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: cdd86b1a7ec9b160f85b4e7fdbc1f3485b1c2e483589e329f719e61cb673da4f),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: a75c71a883491a8548d3771cd0b10f1b15a074e8a67d1b4ec2b22950d0fe5654),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 8749708472942960,
+   +     +  +  _: 198
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2310160,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1133590503956550
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 1
+  soldAmount: 45500703
+  boughtSpot: 228850890
+  soldSpot: 10412876199204844
+  boughtExp: 1403
+  soldExp: 2
+  spotPrice: 45500702.222328454
+  effectivePrice: 45500703
+)
+
+trials left: 1 - iteration: 37 - block: 16834
+virtual: 1351845342616230
 weight: 1
 jumpSize: 1
-minAnchorPrice: 1950757420507229
+minAnchorPrice: 675922671308115
 jumpLog: 0.6931471805599453
-anchorLog: 4.440892098500625e-16
-1560828692041340
+anchorLog: 1.554312234475218e-15
+445951054868954.56
 maxTicks: 1
-maxTicks_: 1560828692041340
+maxTicks_: 445951054868954
+1
+virtual: 662931302713017
+weight: 13
+jumpSize: 100
+minAnchorPrice: 8532779143830911
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+maxTicks: 1
+maxTicks_: 44812306322540
+1
+virtual: 9007199254740991
+weight: 1
+jumpSize: 47
+minAnchorPrice: 8819549270267220
+jumpLog: 0.021053409197832263
+anchorLog: 2.2204460492503128e-16
+94816125818235.97
+maxTicks: 1
+maxTicks_: 94816125818235
 1
 Opening pool with 1 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 17 - block: 9807
+trials left: 1 - iteration: 38 - block: 17537
+Swapping.boundary()
+addedBuyingA0: 75497174
+addedSellingA0: 75497472
+diff: -298
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 79497540622343977740
+addedSellingA0: 79497540622558622310
+diff: -214644570
+Swapping.boundary()
+addedBuyingA0: 275818151730401082232
+addedSellingA0: 275818151730513815400
+diff: -112733168
+Swapping.boundary()
+addedBuyingA0: 7038355739424549170400
+addedSellingA0: 7038356225392760358680
+diff: -485968211188280
+Swapping.boundary()
+addedBuyingA0: 232105252121145104853
+addedSellingA0: 232105252121268637710
+diff: -123532857
+Swapping.boundary()
+addedBuyingA0: 238935761161865295542
+addedSellingA0: 238935761162057531070
+diff: -192235528
+Swapping.boundary()
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+subSwap: 985226705221 sold
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 935cee98e3ec31384881ecd004c217edbd66b6ae9b7923a8a5d92e88, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 2
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 100
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 11,
+   +     +  +  _: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 935cee98e3ec31384881ecd004c217edbd66b6ae9b7923a8a5d92e88,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: cdd86b1a7ec9b160f85b4e7fdbc1f3485b1c2e483589e329f719e61cb673da4f),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: a75c71a883491a8548d3771cd0b10f1b15a074e8a67d1b4ec2b22950d0fe5654),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 8749708472942960,
+   +     +  +  _: 198
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2310160,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1133590549457253
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 21653
+  soldAmount: 985226705221
+  boughtSpot: 228850890
+  soldSpot: 10412876199204844
+  boughtExp: 1403
+  soldExp: 2
+  spotPrice: 45500702.222328454
+  effectivePrice: 45500702.222371034
+)
 
-trials left: 1 - iteration: 18 - block: 10650
-virtual: 1
-weight: 97
-jumpSize: 96
-minAnchorPrice: 96
-jumpLog: 0.010362787035546658
-anchorLog: 0.010362787035546658
-1
+trials left: 1 - iteration: 39 - block: 18537
+
+trials left: 1 - iteration: 40 - block: 19125
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 7038355739424549170400
+addedSellingA0: 7038356225392760358680
+diff: -485968211188280
+subSwap: 2362077 bought
+addedBuyingA0: 6386325582701833419420
+addedSellingA0: 6386327490884161711920
+diff: -1908182328292500
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 1df0596d6e14b7a76e21e0b3fe75fb1bea8cdce2dea23aeaa29494fe, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1351845342616230,
+   +     +  +  _: 662931302713017,
+   +     +  +  68881b3c06d38e5a2c5258e5b86353aded53dafd33a314d03cb64bf4_eGeOsJWXJc1j3CyWUflhzBQ5f3: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 13,
+   +     +  +  68881b3c06d38e5a2c5258e5b86353aded53dafd33a314d03cb64bf4_eGeOsJWXJc1j3CyWUflhzBQ5f3: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 100,
+   +     +  +  68881b3c06d38e5a2c5258e5b86353aded53dafd33a314d03cb64bf4_eGeOsJWXJc1j3CyWUflhzBQ5f3: 47
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 1df0596d6e14b7a76e21e0b3fe75fb1bea8cdce2dea23aeaa29494fe,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 14104a550eb95a22f1a6d5a80912335766c382c6ee9d8e10989a9c0dcd5e0f13),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3f366302f6c0516c070b83cea2c7d89873567060eff6c8427cb5e17b60ce95ee),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 675922671308115,
+   +     +  +  _: 8532779143830911,
+   +     +  +  68881b3c06d38e5a2c5258e5b86353aded53dafd33a314d03cb64bf4_eGeOsJWXJc1j3CyWUflhzBQ5f3: 8819549270267220
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2603240,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 2362077
+  soldAmount: 741036
+  boughtSpot: 8618106935269220
+  soldSpot: 2703690685232460
+  boughtExp: 1
+  soldExp: 2
+  spotPrice: 0.31372210922189026
+  effectivePrice: 0.31372220295951403
+)
+
+trials left: 1 - iteration: 41 - block: 19269
+
+trials left: 1 - iteration: 42 - block: 20269
+Swapping.boundary()
+addedBuyingA0: 113605773236100120
+addedSellingA0: 117093590311632870
+diff: -3487817075532750
+Swapping.boundary()
+addedBuyingA0: 113605773236100120
+addedSellingA0: 117093590311632870
+diff: -3487817075532750
+Swapping.boundary()
+addedBuyingA0: 113605773236100120
+addedSellingA0: 117093590311632870
+diff: -3487817075532750
+Swapping.boundary()
+addedBuyingA0: 110851318094530860
+addedSellingA0: 112035390158499860
+diff: -1184072063969000
+subSwap: 1 bought
+addedBuyingA0: 11360577323610012
+addedSellingA0: 18014398509481980
+diff: -6653821185871968
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 5680288661805006,
+   +     +  +  _: 9007199254740991,
+   +     +  +  fb73c8051afb393ce81a9914656504cbbc94e3786950867b20ef7ad0_HyOmBNt7Wu2YjnPIzyt1tWYViM: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 1,
+   +     +  +  fb73c8051afb393ce81a9914656504cbbc94e3786950867b20ef7ad0_HyOmBNt7Wu2YjnPIzyt1tWYViM: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 26,
+   +     +  +  fb73c8051afb393ce81a9914656504cbbc94e3786950867b20ef7ad0_HyOmBNt7Wu2YjnPIzyt1tWYViM: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 55fb57612ca7d0d09682f9acb9793dd83a2b2d79dd25ac6b5ba9026af9fc00a9),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3005311e517491130ed1c772d4c5b7933091076499e66cc25ad02df588a37b7c),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2840144330902503,
+   +     +  +  _: 8673599282343176,
+   +     +  +  fb73c8051afb393ce81a9914656504cbbc94e3786950867b20ef7ad0_HyOmBNt7Wu2YjnPIzyt1tWYViM: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2637720,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 3002399751580329
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 1
+  soldAmount: 2
+  boughtSpot: 9007199254740990
+  soldSpot: 11360577323610012
+  boughtExp: 1
+  soldExp: 2
+  spotPrice: 1.2612774517706276
+  effectivePrice: 2
+)
+
+trials left: 1 - iteration: 43 - block: 21084
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
 maxTicks: 1
-maxTicks_: 1
+maxTicks_: 3121657384082680
 1
-virtual: 5866414666754572
+virtual: 3980978695933868
+weight: 2
+jumpSize: 27
+minAnchorPrice: 7677601770729602
+jumpLog: 0.03636764417087479
+anchorLog: 2.2204460492503128e-16
+163785308736294.53
+maxTicks: 1
+maxTicks_: 163785308736294
+1
+virtual: 8851253467772277
 weight: 1
 jumpSize: 100
-minAnchorPrice: 5808331353222348
+minAnchorPrice: 8763617294824036
 jumpLog: 0.009950330853168092
 anchorLog: 2.2204460492503128e-16
 44812306322540.98
@@ -480,7 +1856,116 @@ maxTicks_: 44812306322540
 1
 Opening pool with 1 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 19 - block: 11481
+trials left: 1 - iteration: 44 - block: 22084
+
+trials left: 1 - iteration: 45 - block: 22085
+
+trials left: 1 - iteration: 46 - block: 22086
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 29966022018032600852640
+addedSellingA0: 29966024179000035408030
+diff: -2160967434555390
+Swapping.boundary()
+addedBuyingA0: 79497540622343977740
+addedSellingA0: 79497540622558622310
+diff: -214644570
+Swapping.boundary()
+addedBuyingA0: 275818151730401082232
+addedSellingA0: 275818151730513815400
+diff: -112733168
+Swapping.boundary()
+addedBuyingA0: 7084967366837956780800
+addedSellingA0: 7084971565805631569660
+diff: -4198967674788860
+Swapping.boundary()
+addedBuyingA0: 232105252121145104853
+addedSellingA0: 232105252121268637710
+diff: -123532857
+Swapping.boundary()
+addedBuyingA0: 238935761161865295542
+addedSellingA0: 238935761162057531070
+diff: -192235528
+Swapping.boundary()
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+subSwap: 674014 sold
+addedBuyingA0: 5808722623162196827320
+addedSellingA0: 5808724727868548049080
+diff: -2104706351221760
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 1df0596d6e14b7a76e21e0b3fe75fb1bea8cdce2dea23aeaa29494fe, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1351845342616230,
+   +     +  +  _: 662931302713017,
+   +     +  +  68881b3c06d38e5a2c5258e5b86353aded53dafd33a314d03cb64bf4_eGeOsJWXJc1j3CyWUflhzBQ5f3: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 13,
+   +     +  +  68881b3c06d38e5a2c5258e5b86353aded53dafd33a314d03cb64bf4_eGeOsJWXJc1j3CyWUflhzBQ5f3: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 100,
+   +     +  +  68881b3c06d38e5a2c5258e5b86353aded53dafd33a314d03cb64bf4_eGeOsJWXJc1j3CyWUflhzBQ5f3: 47
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 1df0596d6e14b7a76e21e0b3fe75fb1bea8cdce2dea23aeaa29494fe,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 14104a550eb95a22f1a6d5a80912335766c382c6ee9d8e10989a9c0dcd5e0f13),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3f366302f6c0516c070b83cea2c7d89873567060eff6c8427cb5e17b60ce95ee),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 675922671308115,
+   +     +  +  _: 8532779143830911,
+   +     +  +  68881b3c06d38e5a2c5258e5b86353aded53dafd33a314d03cb64bf4_eGeOsJWXJc1j3CyWUflhzBQ5f3: 8819549270267220
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2620480,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 741037
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 2148442
+  soldAmount: 674014
+  boughtSpot: 8618106935269220
+  soldSpot: 2703690685232460
+  boughtExp: 1
+  soldExp: 2
+  spotPrice: 0.31372210922189026
+  effectivePrice: 0.31372222289454404
+)
+
+trials left: 1 - iteration: 47 - block: 22192
+
+trials left: 1 - iteration: 48 - block: 22211
+
+trials left: 1 - iteration: 49 - block: 23109
+virtual: 5338596046446748
+weight: 1
+jumpSize: 100
+minAnchorPrice: 5285738659848265
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+maxTicks: 7794490925114390
+maxTicks_: 44812306322540
+3
 virtual: 1
 weight: 100
 jumpSize: 1
@@ -488,8 +1973,1740 @@ minAnchorPrice: 50
 jumpLog: 0.6931471805599453
 anchorLog: 0.01980262729617973
 35.0027887811465
-maxTicks: 754829275270195
+maxTicks: 2598163641704796
 maxTicks_: 35
+3
+virtual: 1
+weight: 10
+jumpSize: 1
+minAnchorPrice: 5
+jumpLog: 0.6931471805599453
+anchorLog: 0.1823215567939546
+3.8017840169239308
+maxTicks: 2598163641704796
+maxTicks_: 3
+3
+virtual: 5338596046446748
+weight: 1
+jumpSize: 100
+minAnchorPrice: 5285738659848265
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+virtual: 5338596046446748
+weight: 1
+jumpSize: 100
+minAnchorPrice: 5285738659848265
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+virtual: 1
+weight: 10
+jumpSize: 1
+minAnchorPrice: 5
+jumpLog: 0.6931471805599453
+anchorLog: 0.1823215567939546
+3.8017840169239308
+virtual: 1
+weight: 10
+jumpSize: 1
+minAnchorPrice: 5
+jumpLog: 0.6931471805599453
+anchorLog: 0.1823215567939546
+3.8017840169239308
+virtual: 1
+weight: 10
+jumpSize: 1
+minAnchorPrice: 5
+jumpLog: 0.6931471805599453
+anchorLog: 0.1823215567939546
+3.8017840169239308
+Opening pool with 6 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 50 - block: 24109
+virtual: 955111411288902
+weight: 7
+jumpSize: 36
+minAnchorPrice: 6505083125535224
+jumpLog: 0.027398974188114347
+anchorLog: 2.2204460492503128e-16
+123394009943925.62
+maxTicks: 1
+maxTicks_: 123394009943925
+1
+virtual: 2
+weight: 100
+jumpSize: 100
+minAnchorPrice: 198
+jumpLog: 0.009950330853168092
+anchorLog: 0.005037794029957081
+1.9751364970458831
+maxTicks: 1
+maxTicks_: 1
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 51 - block: 24110
+
+trials left: 1 - iteration: 52 - block: 24111
+virtual: 8498092755679721
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8413953223445268
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+maxTicks: 11
+maxTicks_: 44812306322540
+3
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 3
+maxTicks_: 3121657384082680
+3
+virtual: 8498092755679721
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8413953223445268
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+virtual: 8498092755679721
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8413953223445268
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+Opening pool with 3 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 53 - block: 24112
+virtual: 9007199254740991
+weight: 1
+jumpSize: 34
+minAnchorPrice: 8749850704605534
+jumpLog: 0.028987536873252187
+anchorLog: 2.2204460492503128e-16
+130548260260767.08
+maxTicks: 1
+maxTicks_: 130548260260767
+1
+virtual: 4515784790917254
+weight: 3
+jumpSize: 1
+minAnchorPrice: 6773677186375881
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 1
+maxTicks_: 3121657384082680
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 54 - block: 25112
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 3791866251614216
+maxTicks_: 3121657384082680
+3
+virtual: 1
+weight: 2
+jumpSize: 1
+minAnchorPrice: 1
+jumpLog: 0.6931471805599453
+anchorLog: 0.6931471805599453
+1
+maxTicks: 1263955417204738
+maxTicks_: 1
+1
+virtual: 1
+weight: 85
+jumpSize: 1
+minAnchorPrice: 42
+jumpLog: 0.6931471805599453
+anchorLog: 0.023530497410194036
+29.45739601151209
+maxTicks: 1263955417204738
+maxTicks_: 29
+3
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+virtual: 1
+weight: 85
+jumpSize: 1
+minAnchorPrice: 42
+jumpLog: 0.6931471805599453
+anchorLog: 0.023530497410194036
+29.45739601151209
+virtual: 1
+weight: 85
+jumpSize: 1
+minAnchorPrice: 42
+jumpLog: 0.6931471805599453
+anchorLog: 0.023530497410194036
+29.45739601151209
+virtual: 1
+weight: 85
+jumpSize: 1
+minAnchorPrice: 42
+jumpLog: 0.6931471805599453
+anchorLog: 0.023530497410194036
+29.45739601151209
+virtual: 1
+weight: 85
+jumpSize: 1
+minAnchorPrice: 42
+jumpLog: 0.6931471805599453
+anchorLog: 0.023530497410194036
+29.45739601151209
+virtual: 1
+weight: 85
+jumpSize: 1
+minAnchorPrice: 42
+jumpLog: 0.6931471805599453
+anchorLog: 0.023530497410194036
+29.45739601151209
+virtual: 1
+weight: 85
+jumpSize: 1
+minAnchorPrice: 42
+jumpLog: 0.6931471805599453
+anchorLog: 0.023530497410194036
+29.45739601151209
+Opening pool with 9 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 55 - block: 25113
+virtual: 8278738661986303
+weight: 1
+jumpSize: 70
+minAnchorPrice: 8162136709000580
+jumpLog: 0.014184634991956381
+anchorLog: 2.2204460492503128e-16
+63881916864161.266
+maxTicks: 1
+maxTicks_: 63881916864161
+1
+virtual: 3978155037133798
+weight: 3
+jumpSize: 1
+minAnchorPrice: 5967232555700697
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 1
+maxTicks_: 3121657384082680
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 56 - block: 26113
+virtual: 3521268931320592
+weight: 4
+jumpSize: 1
+minAnchorPrice: 7042537862641184
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 1
+maxTicks_: 3121657384082680
+1
+virtual: 1
+weight: 100
+jumpSize: 69
+minAnchorPrice: 98
+jumpLog: 0.01438873745209967
+anchorLog: 0.010152371464017908
+1.4172784657354507
+maxTicks: 1
+maxTicks_: 1
+1
+virtual: 4032008809798054
+weight: 1
+jumpSize: 21
+minAnchorPrice: 3848735682079960
+jumpLog: 0.04652001563489291
+anchorLog: 2.2204460492503128e-16
+209507525078573.38
+maxTicks: 1
+maxTicks_: 209507525078573
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 57 - block: 26114
+
+trials left: 1 - iteration: 58 - block: 26115
+
+trials left: 1 - iteration: 59 - block: 27115
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 987504659099546820480
+addedSellingA0: 987504659099750775440
+diff: -203954960
+Swapping.boundary()
+addedBuyingA0: 19362237108651702079750
+addedSellingA0: 19362237507435393597720
+diff: -398783691517970
+Swapping.boundary()
+addedBuyingA0: 232105252121145104853
+addedSellingA0: 232105252121268637710
+diff: -123532857
+Swapping.boundary()
+addedBuyingA0: 238935761161865295542
+addedSellingA0: 238935761162057531070
+diff: -192235528
+Swapping.boundary()
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+Swapping.boundary()
+addedBuyingA0: 67553677045964704323
+addedSellingA0: 67553677046069645200
+diff: -104940877
+Swapping.boundary()
+addedBuyingA0: 21380110707472291821350
+addedSellingA0: 21380123081926257497874
+diff: -12374453965676524
+subSwap: 844860 sold
+addedBuyingA0: 11445612341926962591572
+addedSellingA0: 11445617815363053643320
+diff: -5473436091051748
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 4515784790917254
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 3
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 34,
+   +     +  +  _: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 55fb57612ca7d0d09682f9acb9793dd83a2b2d79dd25ac6b5ba9026af9fc00a9),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3005311e517491130ed1c772d4c5b7933091076499e66cc25ad02df588a37b7c),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 8749850704605534,
+   +     +  +  _: 6773677186375881
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2305850,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 1234412
+  soldAmount: 844860
+  boughtSpot: 13547354372751762
+  soldSpot: 9272116879880431
+  boughtExp: 1
+  soldExp: 2
+  spotPrice: 0.6844227016405318
+  effectivePrice: 0.6844230289400945
+)
+
+trials left: 1 - iteration: 60 - block: 27856
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 987504659099546820480
+addedSellingA0: 987504659099750775440
+diff: -203954960
+Swapping.boundary()
+addedBuyingA0: 19362237108651702079750
+addedSellingA0: 19362237507435393597720
+diff: -398783691517970
+Swapping.boundary()
+addedBuyingA0: 232105252121145104853
+addedSellingA0: 232105252121268637710
+diff: -123532857
+Swapping.boundary()
+addedBuyingA0: 238935761161865295542
+addedSellingA0: 238935761162057531070
+diff: -192235528
+Swapping.boundary()
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+Swapping.boundary()
+addedBuyingA0: 67553677045964704323
+addedSellingA0: 67553677046069645200
+diff: -104940877
+Swapping.boundary()
+addedBuyingA0: 21539962002481430451790
+addedSellingA0: 21539968316170355537712
+diff: -6313688925085922
+subSwap: 355239 bought
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: e65fcfe3529194f1d3c163a740dc16cb6623485a0482d53da540624b, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 1,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 2,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 85
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 1,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: e65fcfe3529194f1d3c163a740dc16cb6623485a0482d53da540624b,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 0dcba9797da325b37a74746e537ea2abb0147872df8b2de6374d20d9b2fef176),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: f5aaa6d5405fcb1eac8e9cdbbb04c6500b7c5d96f9f917db1e686d46ad59ebbb),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 5674179970822794,
+   +     +  +  _: 1,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 66
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2452390,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 421318472401579
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 355239
+  soldAmount: 961155900313911
+  boughtSpot: 4194304
+  soldSpot: 11348359941645588
+  boughtExp: 22
+  soldExp: 1
+  spotPrice: 2705659852.420232
+  effectivePrice: 2705659852.420233
+)
+
+trials left: 1 - iteration: 61 - block: 28856
+
+trials left: 1 - iteration: 62 - block: 28857
+
+trials left: 1 - iteration: 63 - block: 29473
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 4021018984683514613688
+addedSellingA0: 4021021842348628246528
+diff: -2857665113632840
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 987504659099546820480
+addedSellingA0: 987504659099750775440
+diff: -203954960
+Swapping.boundary()
+addedBuyingA0: 232105252121145104853
+addedSellingA0: 232105252121268637710
+diff: -123532857
+Swapping.boundary()
+addedBuyingA0: 238935761161865295542
+addedSellingA0: 238935761162057531070
+diff: -192235528
+Swapping.boundary()
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+Swapping.boundary()
+addedBuyingA0: 67553677045964704323
+addedSellingA0: 67553677046069645200
+diff: -104940877
+Swapping.boundary()
+addedBuyingA0: 21539962002481430451790
+addedSellingA0: 21539968316170355537712
+diff: -6313688925085922
+subSwap: 1589976 sold
+addedBuyingA0: 21539962002481430451790
+addedSellingA0: 21539968316170355537712
+diff: -6313688925085922
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 4515784790917254
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 3
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 34,
+   +     +  +  _: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 55fb57612ca7d0d09682f9acb9793dd83a2b2d79dd25ac6b5ba9026af9fc00a9),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3005311e517491130ed1c772d4c5b7933091076499e66cc25ad02df588a37b7c),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 8749850704605534,
+   +     +  +  _: 6773677186375881
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2323090,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 844861
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 2323090
+  soldAmount: 1589976
+  boughtSpot: 13547354372751762
+  soldSpot: 9272116879880431
+  boughtExp: 1
+  soldExp: 2
+  spotPrice: 0.6844227016405318
+  effectivePrice: 0.684422902255186
+)
+
+trials left: 1 - iteration: 64 - block: 29474
+virtual: 8203516928180209
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4101758464090104
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 9007199253520407
+maxTicks_: 3121657384082680
+3
+virtual: 1
+weight: 100
+jumpSize: 1
+minAnchorPrice: 50
+jumpLog: 0.6931471805599453
+anchorLog: 0.01980262729617973
+35.0027887811465
+maxTicks: 3002399751173469
+maxTicks_: 35
+3
+virtual: 8203516928180209
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4101758464090104
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+virtual: 8203516928180209
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4101758464090104
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+virtual: 1
+weight: 100
+jumpSize: 1
+minAnchorPrice: 50
+jumpLog: 0.6931471805599453
+anchorLog: 0.01980262729617973
+35.0027887811465
+virtual: 1
+weight: 100
+jumpSize: 1
+minAnchorPrice: 50
+jumpLog: 0.6931471805599453
+anchorLog: 0.01980262729617973
+35.0027887811465
+virtual: 1
+weight: 100
+jumpSize: 1
+minAnchorPrice: 50
+jumpLog: 0.6931471805599453
+anchorLog: 0.01980262729617973
+35.0027887811465
+Opening pool with 6 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 65 - block: 29651
+Swapping.boundary()
+addedBuyingA0: 37088467519521724
+addedSellingA0: 40642063118255286
+diff: -3553595598733562
+subSwap: 2 bought
+addedBuyingA0: 18544233759760862
+addedSellingA0: 27094708745503524
+diff: -8550474985742662
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 4515784790917254
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 3
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 34,
+   +     +  +  _: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 55fb57612ca7d0d09682f9acb9793dd83a2b2d79dd25ac6b5ba9026af9fc00a9),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3005311e517491130ed1c772d4c5b7933091076499e66cc25ad02df588a37b7c),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 8749850704605534,
+   +     +  +  _: 6773677186375881
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2323090,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2434837
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 2
+  soldAmount: 2
+  boughtSpot: 13547354372751762
+  soldSpot: 9272116879880431
+  boughtExp: 1
+  soldExp: 2
+  spotPrice: 0.6844227016405318
+  effectivePrice: 1
+)
+
+trials left: 1 - iteration: 66 - block: 30651
+
+trials left: 1 - iteration: 67 - block: 31209
+Swapping.boundary()
+addedBuyingA0: 5616457109692253796480
+addedSellingA0: 5616467155386768556032
+diff: -10045694514759552
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 5616457109692253796480
+addedSellingA0: 5616467155386768556032
+diff: -10045694514759552
+Swapping.boundary()
+addedBuyingA0: 5616457109692253796480
+addedSellingA0: 5616467155386768556032
+diff: -10045694514759552
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 4021018984683514613688
+addedSellingA0: 4021021842348628246528
+diff: -2857665113632840
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 987504659099546820480
+addedSellingA0: 987504659099750775440
+diff: -203954960
+Swapping.boundary()
+addedBuyingA0: 232105252121145104853
+addedSellingA0: 232105252121268637710
+diff: -123532857
+Swapping.boundary()
+addedBuyingA0: 238935761161865295542
+addedSellingA0: 238935761162057531070
+diff: -192235528
+Swapping.boundary()
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+Swapping.boundary()
+addedBuyingA0: 21539962002481430451790
+addedSellingA0: 21539968316170355537712
+diff: -6313688925085922
+subSwap: 1 sold
+subSwap: 1339070118757908 sold
+addedBuyingA0: 5616457109692253796480
+addedSellingA0: 5616457109692255043584
+diff: -1247104
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: e65fcfe3529194f1d3c163a740dc16cb6623485a0482d53da540624b, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 1,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 2,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 85
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 1,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: e65fcfe3529194f1d3c163a740dc16cb6623485a0482d53da540624b,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 0b48b828651b39f3005083b7e2d38a4751ef91ad3c93ea4a0761081840b55e11),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: f5aaa6d5405fcb1eac8e9cdbbb04c6500b7c5d96f9f917db1e686d46ad59ebbb),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 4503599627370495,
+   +     +  +  _: 1,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 52
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2452390,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 421318472401579
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 311776
+  soldAmount: 1339067723677696
+  boughtSpot: 4194304
+  soldSpot: 18014398509481980
+  boughtExp: 22
+  soldExp: 2
+  spotPrice: 4294967295.999999
+  effectivePrice: 4294967296
+)
+
+trials left: 1 - iteration: 68 - block: 31329
+virtual: 8197401989232839
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8116239593299840
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+maxTicks: 1
+maxTicks_: 44812306322540
+1
+virtual: 8357287520492311
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8274542099497337
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+maxTicks: 1
+maxTicks_: 44812306322540
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 69 - block: 31330
+virtual: 1
+weight: 100
+jumpSize: 1
+minAnchorPrice: 50
+jumpLog: 0.6931471805599453
+anchorLog: 0.01980262729617973
+35.0027887811465
+maxTicks: 1
+maxTicks_: 35
+1
+virtual: 7583141695167001
+weight: 1
+jumpSize: 1
+minAnchorPrice: 3791570847583500
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 1
+maxTicks_: 3121657384082680
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 70 - block: 32330
+virtual: 2
+weight: 100
+jumpSize: 100
+minAnchorPrice: 198
+jumpLog: 0.009950330853168092
+anchorLog: 0.005037794029957081
+1.9751364970458831
+maxTicks: 1
+maxTicks_: 1
+1
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 1
+maxTicks_: 3121657384082680
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 71 - block: 32331
+Swapping.boundary()
+addedBuyingA0: 591573180461859456
+addedSellingA0: 614068819460566960
+diff: -22495638998707504
+Swapping.boundary()
+addedBuyingA0: 546684886998494451
+addedSellingA0: 548116238137588680
+diff: -1431351139094229
+Swapping.boundary()
+addedBuyingA0: 540703472818149886
+addedSellingA0: 548116238137588680
+diff: -7412765319438794
+Swapping.boundary()
+addedBuyingA0: 541469562358651888
+addedSellingA0: 548116238137588680
+diff: -6646675778936792
+Swapping.boundary()
+addedBuyingA0: 912547680
+addedSellingA0: 9007199254740990
+diff: -9007198342193310
+Swapping.boundary()
+addedBuyingA0: 21539962002481430451790
+addedSellingA0: 21539968316170355537712
+diff: -6313688925085922
+subSwap: 2395080212 sold
+addedBuyingA0: 546684886998494451
+addedSellingA0: 546684887042171220
+diff: -43676769
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 935cee98e3ec31384881ecd004c217edbd66b6ae9b7923a8a5d92e88, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 2
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 100
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 11,
+   +     +  +  _: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 935cee98e3ec31384881ecd004c217edbd66b6ae9b7923a8a5d92e88,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: c6512956de943b489ba59371dd90c9c5d1d1137142834900cccc6bb69552096a),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: a75c71a883491a8548d3771cd0b10f1b15a074e8a67d1b4ec2b22950d0fe5654),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 8256599316845908,
+   +     +  +  _: 198
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2310160,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1133590503956550
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 51
+  soldAmount: 2388825698
+  boughtSpot: 228850890
+  soldSpot: 10719311509774401
+  boughtExp: 1403
+  soldExp: 3
+  spotPrice: 46839719.564885244
+  effectivePrice: 46839719.568627454
+)
+
+trials left: 1 - iteration: 72 - block: 32549
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 1
+maxTicks_: 3121657384082680
+1
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 1
+maxTicks_: 3121657384082680
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 73 - block: 33549
+Swapping.boundary()
+addedBuyingA0: 912547680
+addedSellingA0: 9007199254740990
+diff: -9007198342193310
+Swapping.boundary()
+addedBuyingA0: 18544233759760862
+addedSellingA0: 27094708745503524
+diff: -8550474985742662
+subSwap: 1 bought
+addedBuyingA0: 9272116879880431
+addedSellingA0: 13547354372751762
+diff: -4275237492871331
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 4515784790917254
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 3
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 34,
+   +     +  +  _: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 55fb57612ca7d0d09682f9acb9793dd83a2b2d79dd25ac6b5ba9026af9fc00a9),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3005311e517491130ed1c772d4c5b7933091076499e66cc25ad02df588a37b7c),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 8749850704605534,
+   +     +  +  _: 6773677186375881
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2323090,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2434839
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 1
+  soldAmount: 1
+  boughtSpot: 13547354372751762
+  soldSpot: 9272116879880431
+  boughtExp: 1
+  soldExp: 2
+  spotPrice: 0.6844227016405318
+  effectivePrice: 1
+)
+
+trials left: 1 - iteration: 74 - block: 33949
+
+trials left: 1 - iteration: 75 - block: 34027
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 4021018984683514613688
+addedSellingA0: 4021021842348628246528
+diff: -2857665113632840
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 987504659099546820480
+addedSellingA0: 987504659099750775440
+diff: -203954960
+Swapping.boundary()
+addedBuyingA0: 232105252121145104853
+addedSellingA0: 232105252121268637710
+diff: -123532857
+Swapping.boundary()
+addedBuyingA0: 238935761161865295542
+addedSellingA0: 238935761162057531070
+diff: -192235528
+Swapping.boundary()
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+Swapping.boundary()
+addedBuyingA0: 912547680
+addedSellingA0: 9007199254740990
+diff: -9007198342193310
+Swapping.boundary()
+addedBuyingA0: 21539962002481430451790
+addedSellingA0: 21539968316170355537712
+diff: -6313688925085922
+subSwap: 650771514992099 sold
+addedBuyingA0: 2729530229884480116936
+addedSellingA0: 2729530229884480126976
+diff: -10040
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: e65fcfe3529194f1d3c163a740dc16cb6623485a0482d53da540624b, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 1,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 2,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 85
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 1,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: e65fcfe3529194f1d3c163a740dc16cb6623485a0482d53da540624b,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: cac41925d33b7e8ad48897e011cb3e36162856d33617f74eab1efe590f77cbf0),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: f5aaa6d5405fcb1eac8e9cdbbb04c6500b7c5d96f9f917db1e686d46ad59ebbb),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 5674179970822794,
+   +     +  +  _: 1,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 52
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2452390,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 421318472401579
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 240522
+  soldAmount: 650770719023819
+  boughtSpot: 4194304
+  soldSpot: 11348359941645588
+  boughtExp: 22
+  soldExp: 1
+  spotPrice: 2705659852.420232
+  effectivePrice: 2705659852.420232
+)
+
+trials left: 1 - iteration: 76 - block: 35027
+Swapping.boundary()
+addedBuyingA0: 288230376151711680
+addedSellingA0: 294430179575463936
+diff: -6199803423752256
+Swapping.boundary()
+addedBuyingA0: 283708998541139700
+addedSellingA0: 294430179575463936
+diff: -10721181034324236
+Swapping.boundary()
+addedBuyingA0: 285960751445260600
+addedSellingA0: 294430179575463936
+diff: -8469428130203336
+Swapping.boundary()
+addedBuyingA0: 288230376151711680
+addedSellingA0: 294430179575463936
+diff: -6199803423752256
+Swapping.boundary()
+addedBuyingA0: 288230376151711680
+addedSellingA0: 294430179575463936
+diff: -6199803423752256
+Swapping.boundary()
+addedBuyingA0: 283708998541139700
+addedSellingA0: 294430179575463936
+diff: -10721181034324236
+Swapping.boundary()
+addedBuyingA0: 283708998541139700
+addedSellingA0: 294430179575463936
+diff: -10721181034324236
+Swapping.boundary()
+addedBuyingA0: 285960751445260600
+addedSellingA0: 294430179575463936
+diff: -8469428130203336
+Swapping.boundary()
+addedBuyingA0: 285960751445260600
+addedSellingA0: 294430179575463936
+diff: -8469428130203336
+Swapping.boundary()
+addedBuyingA0: 17972556625460301568
+addedSellingA0: 17997799210624367220
+diff: -25242585164065652
+Swapping.boundary()
+addedBuyingA0: 16057528641642052698
+addedSellingA0: 16064788970638452510
+diff: -7260328996399812
+Swapping.boundary()
+addedBuyingA0: 16055582713273634370
+addedSellingA0: 16064788970638452510
+diff: -9206257364818140
+Swapping.boundary()
+addedBuyingA0: 16056655099173869448
+addedSellingA0: 16064788970638452510
+diff: -8133871464583062
+Swapping.boundary()
+addedBuyingA0: 912547680
+addedSellingA0: 9007199254740990
+diff: -9007198342193310
+Swapping.boundary()
+addedBuyingA0: 21539962002481430451790
+addedSellingA0: 21539968316170355537712
+diff: -6313688925085922
+subSwap: 30062 sold
+addedBuyingA0: 407259189714988170813
+addedSellingA0: 407260567153663469244
+diff: -1377438675298431
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 4515784790917254
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 3
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 34,
+   +     +  +  _: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 55fb57612ca7d0d09682f9acb9793dd83a2b2d79dd25ac6b5ba9026af9fc00a9),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3005311e517491130ed1c772d4c5b7933091076499e66cc25ad02df588a37b7c),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 8749850704605534,
+   +     +  +  _: 6773677186375881
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2323090,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2434840
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 43923
+  soldAmount: 30062
+  boughtSpot: 13547354372751762
+  soldSpot: 9272116879880431
+  boughtExp: 1
+  soldExp: 2
+  spotPrice: 0.6844227016405318
+  effectivePrice: 0.6844250165061585
+)
+
+trials left: 1 - iteration: 77 - block: 35028
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 4021018984683514613688
+addedSellingA0: 4021021842348628246528
+diff: -2857665113632840
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 987504659099546820480
+addedSellingA0: 987504659099750775440
+diff: -203954960
+Swapping.boundary()
+addedBuyingA0: 232105252121145104853
+addedSellingA0: 232105252121268637710
+diff: -123532857
+Swapping.boundary()
+addedBuyingA0: 238935761161865295542
+addedSellingA0: 238935761162057531070
+diff: -192235528
+Swapping.boundary()
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+Swapping.boundary()
+addedBuyingA0: 912547680
+addedSellingA0: 9007199254740990
+diff: -9007198342193310
+Swapping.boundary()
+addedBuyingA0: 21539962002481430451790
+addedSellingA0: 21539968316170355537712
+diff: -6313688925085922
+subSwap: 1 bought
+addedBuyingA0: 10719311509774401
+addedSellingA0: 10719311609350800
+diff: -99576399
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 935cee98e3ec31384881ecd004c217edbd66b6ae9b7923a8a5d92e88, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 2
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 100
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 11,
+   +     +  +  _: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 935cee98e3ec31384881ecd004c217edbd66b6ae9b7923a8a5d92e88,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: c6512956de943b489ba59371dd90c9c5d1d1137142834900cccc6bb69552096a),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: a75c71a883491a8548d3771cd0b10f1b15a074e8a67d1b4ec2b22950d0fe5654),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 8256599316845908,
+   +     +  +  _: 198
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2310160,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1133592892782248
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 1
+  soldAmount: 46839720
+  boughtSpot: 228850890
+  soldSpot: 10719311509774401
+  boughtExp: 1403
+  soldExp: 3
+  spotPrice: 46839719.564885244
+  effectivePrice: 46839720
+)
+
+trials left: 1 - iteration: 78 - block: 36028
+virtual: 1
+weight: 88
+jumpSize: 87
+minAnchorPrice: 87
+jumpLog: 0.01142869582362285
+anchorLog: 0.01142869582362285
+1
+maxTicks: 1
+maxTicks_: 1
+1
+virtual: 9007199254740991
+weight: 1
+jumpSize: 90
+minAnchorPrice: 8908219043150430
+jumpLog: 0.011049836186584935
+anchorLog: 2.2204460492503128e-16
+49764038132408.945
+maxTicks: 1
+maxTicks_: 49764038132408
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 79 - block: 36029
+
+trials left: 1 - iteration: 80 - block: 37029
+
+trials left: 1 - iteration: 81 - block: 37030
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 4021018984683514613688
+addedSellingA0: 4021021842348628246528
+diff: -2857665113632840
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 987504659099546820480
+addedSellingA0: 987504659099750775440
+diff: -203954960
+Swapping.boundary()
+addedBuyingA0: 605330880
+addedSellingA0: 9007199254740990
+diff: -9007198649410110
+Swapping.boundary()
+addedBuyingA0: 232105252121145104853
+addedSellingA0: 232105252121268637710
+diff: -123532857
+Swapping.boundary()
+addedBuyingA0: 238935761161865295542
+addedSellingA0: 238935761162057531070
+diff: -192235528
+Swapping.boundary()
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+Swapping.boundary()
+addedBuyingA0: 912547680
+addedSellingA0: 9007199254740990
+diff: -9007198342193310
+Swapping.boundary()
+addedBuyingA0: 21539962002481430451790
+addedSellingA0: 21539968316170355537712
+diff: -6313688925085922
+subSwap: 11036 bought
+addedBuyingA0: 310885791408432426496
+addedSellingA0: 310885791408588292880
+diff: -155866384
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: e65fcfe3529194f1d3c163a740dc16cb6623485a0482d53da540624b, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 3521268931320592,
+   +     +  +  _: 1,
+   +     +  +  90e979932b6a0a5e56fee9bc35788419bc94cb42bdf9271412171f05_JYABE3n9sWmzKXCcLMiBbcgO3WEjIvXa: 4032008809798054
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 4,
+   +     +  +  _: 100,
+   +     +  +  90e979932b6a0a5e56fee9bc35788419bc94cb42bdf9271412171f05_JYABE3n9sWmzKXCcLMiBbcgO3WEjIvXa: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 69,
+   +     +  +  90e979932b6a0a5e56fee9bc35788419bc94cb42bdf9271412171f05_JYABE3n9sWmzKXCcLMiBbcgO3WEjIvXa: 21
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: e65fcfe3529194f1d3c163a740dc16cb6623485a0482d53da540624b,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 4b167cef13d2a80f9bd65fdf348046d3456038e2f7921a059f0de7dbc1e01451),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 2566b453ec1df3933cd12c1a71db2500b36887839d682a37b89d8cd10c317ce5),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 7042537862641184,
+   +     +  +  _: 98,
+   +     +  +  90e979932b6a0a5e56fee9bc35788419bc94cb42bdf9271412171f05_JYABE3n9sWmzKXCcLMiBbcgO3WEjIvXa: 3848735682079960
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2598930,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 11036
+  soldAmount: 1212561823036
+  boughtSpot: 256387580
+  soldSpot: 28170151450564736
+  boughtExp: 1027
+  soldExp: 2
+  spotPrice: 109873307.63278289
+  effectivePrice: 109873307.63283798
+)
+
+trials left: 1 - iteration: 82 - block: 37031
+virtual: 4259451046054208
+weight: 1
+jumpSize: 100
+minAnchorPrice: 4217278263420007
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+maxTicks: 828202232680627
+maxTicks_: 44812306322540
+3
+virtual: 2
+weight: 51
+jumpSize: 100
+minAnchorPrice: 100
+jumpLog: 0.009950330853168092
+anchorLog: 0.009950330853168092
+1
+maxTicks: 414101116340313
+maxTicks_: 1
+1
+virtual: 4259451046054208
+weight: 1
+jumpSize: 100
+minAnchorPrice: 4217278263420007
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+Opening pool with 2 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 83 - block: 37032
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 4021018984683514613688
+addedSellingA0: 4021021842348628246528
+diff: -2857665113632840
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 912064993514934457472
+addedSellingA0: 912064993514972659200
+diff: -38201728
+Swapping.boundary()
+addedBuyingA0: 605330880
+addedSellingA0: 9007199254740990
+diff: -9007198649410110
+Swapping.boundary()
+addedBuyingA0: 232105252121145104853
+addedSellingA0: 232105252121268637710
+diff: -123532857
+Swapping.boundary()
+addedBuyingA0: 238935761161865295542
+addedSellingA0: 238935761162057531070
+diff: -192235528
+Swapping.boundary()
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+Swapping.boundary()
+addedBuyingA0: 912547680
+addedSellingA0: 9007199254740990
+diff: -9007198342193310
+Swapping.boundary()
+addedBuyingA0: 21539962002481430451790
+addedSellingA0: 21539968316170355537712
+diff: -6313688925085922
+Swapping.boundary()
+addedBuyingA0: 99743072908772793824
+addedSellingA0: 99743072908846921780
+diff: -74127956
+Swapping.boundary()
+addedBuyingA0: 99248067010055372659
+addedSellingA0: 99248067010071108330
+diff: -15735671
+subSwap: 1 sold
+addedBuyingA0: 912547680
+addedSellingA0: 9007199254740990
+diff: -9007198342193310
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 0987120c1fbd4b17b7f169fbd4129ec03451ed8b8d1bf5fd76fafb70, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2,
+   +     +  +  _: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 0987120c1fbd4b17b7f169fbd4129ec03451ed8b8d1bf5fd76fafb70,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: e774f893e60c6dbe7db78d385885f92587d09a6ffe9bfcb028069e985d360dd0),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3aec2759750c29196ba9230f9c7f7ad82d9c8c54723fb3aafe9bced089fd5b0a),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 198,
+   +     +  +  _: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2275680,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 2275680
+  soldAmount: 1
+  boughtSpot: 9007199254740990
+  soldSpot: 401
+  boughtExp: 1
+  soldExp: 71
+  spotPrice: 4.451994328746879e-14
+  effectivePrice: 4.3942909372143713e-7
+)
+
+trials left: 1 - iteration: 84 - block: 37079
+virtual: 7016775626514037
+weight: 1
+jumpSize: 76
+minAnchorPrice: 6925648670325543
+jumpLog: 0.0130720815673527
+anchorLog: 2.2204460492503128e-16
+58871421675686.36
+maxTicks: 1590883364816425
+maxTicks_: 58871421675686
 3
 virtual: 9007199254740991
 weight: 1
@@ -498,87 +3715,682 @@ minAnchorPrice: 8918019064099991
 jumpLog: 0.009950330853168092
 anchorLog: 2.2204460492503128e-16
 44812306322540.98
-maxTicks: 251609758423398
+maxTicks: 1590883364816425
 maxTicks_: 44812306322540
 3
-virtual: 1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 85 - block: 38079
+
+trials left: 1 - iteration: 86 - block: 38636
+
+trials left: 1 - iteration: 87 - block: 38637
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 4021018984683514613688
+addedSellingA0: 4021021842348628246528
+diff: -2857665113632840
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 912064993514934457472
+addedSellingA0: 912064993514972659200
+diff: -38201728
+Swapping.boundary()
+addedBuyingA0: 605330880
+addedSellingA0: 9007199254740990
+diff: -9007198649410110
+Swapping.boundary()
+addedBuyingA0: 232105252121145104853
+addedSellingA0: 232105252121268637710
+diff: -123532857
+Swapping.boundary()
+addedBuyingA0: 238935761161865295542
+addedSellingA0: 238935761162057531070
+diff: -192235528
+Swapping.boundary()
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+Swapping.boundary()
+addedBuyingA0: 1146942720
+addedSellingA0: 9007199254740990
+diff: -9007198107798270
+Swapping.boundary()
+addedBuyingA0: 21539962002481430451790
+addedSellingA0: 21539968316170355537712
+diff: -6313688925085922
+Swapping.boundary()
+addedBuyingA0: 99743072908772793824
+addedSellingA0: 99743072908846921780
+diff: -74127956
+Swapping.boundary()
+addedBuyingA0: 99248067010055372659
+addedSellingA0: 99248067010071108330
+diff: -15735671
+Swapping.boundary()
+addedBuyingA0: 20241785363824641637260
+addedSellingA0: 20241788813186879417100
+diff: -3449362237779840
+subSwap: 1210980551036155 sold
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: e65fcfe3529194f1d3c163a740dc16cb6623485a0482d53da540624b, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 1,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 2,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 85
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 1,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: e65fcfe3529194f1d3c163a740dc16cb6623485a0482d53da540624b,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: e4d3a56ae245614bb1db9fb4f2e60fc338530ab420e6843005f15e4c300c47c6),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: f5aaa6d5405fcb1eac8e9cdbbb04c6500b7c5d96f9f917db1e686d46ad59ebbb),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 7149018786131515,
+   +     +  +  _: 1,
+   +     +  +  e4c6eaf80df859d7e41c48904b29a431d31dc2beb8ce98fe699af3f3_: 52
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2452390,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 421318472401579
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 355239
+  soldAmount: 1210980551036155
+  boughtSpot: 4194304
+  soldSpot: 14298037572263030
+  boughtExp: 22
+  soldExp: 1
+  spotPrice: 3408917801.919706
+  effectivePrice: 3408917801.919708
+)
+
+trials left: 1 - iteration: 88 - block: 38638
+virtual: 2
 weight: 100
-jumpSize: 15
-minAnchorPrice: 93
-jumpLog: 0.06453852113757116
-anchorLog: 0.01069528911674795
-6.034294204960678
-maxTicks: 251609758423398
-maxTicks_: 6
+jumpSize: 100
+minAnchorPrice: 198
+jumpLog: 0.009950330853168092
+anchorLog: 0.005037794029957081
+1.9751364970458831
+maxTicks: 1
+maxTicks_: 1
+1
+virtual: 4385536895390648
+weight: 1
+jumpSize: 1
+minAnchorPrice: 2192768447695324
+jumpLog: 0.6931471805599453
+anchorLog: 4.440892098500625e-16
+1560828692041340
+maxTicks: 1
+maxTicks_: 1560828692041340
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 89 - block: 39638
+virtual: 9007199254740991
+weight: 1
+jumpSize: 24
+minAnchorPrice: 8646911284551351
+jumpLog: 0.0408219945202552
+anchorLog: 2.2204460492503128e-16
+183845919309941.78
+maxTicks: 1
+maxTicks_: 183845919309941
+1
+virtual: 2890789507766327
+weight: 1
+jumpSize: 100
+minAnchorPrice: 2862167829471610
+jumpLog: 0.009950330853168092
+anchorLog: 4.440892098500625e-16
+22406153161270.49
+maxTicks: 1
+maxTicks_: 22406153161270
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 90 - block: 40638
+virtual: 2
+weight: 100
+jumpSize: 100
+minAnchorPrice: 198
+jumpLog: 0.009950330853168092
+anchorLog: 0.005037794029957081
+1.9751364970458831
+maxTicks: 764213172193256
+maxTicks_: 1
+1
+virtual: 5862704592353442
+weight: 1
+jumpSize: 100
+minAnchorPrice: 5804658012231130
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+maxTicks: 764213172193256
+maxTicks_: 44812306322540
 3
-virtual: 1
-weight: 100
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 91 - block: 41638
+
+trials left: 1 - iteration: 92 - block: 41714
+
+trials left: 1 - iteration: 93 - block: 41926
+virtual: 3063691582496836
+weight: 4
 jumpSize: 1
-minAnchorPrice: 50
+minAnchorPrice: 6127383164993672
 jumpLog: 0.6931471805599453
-anchorLog: 0.01980262729617973
-35.0027887811465
-virtual: 1
-weight: 100
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 9007199254066976
+maxTicks_: 3121657384082680
+3
+virtual: 4047983141646164
+weight: 1
+jumpSize: 100
+minAnchorPrice: 4007904100639766
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+maxTicks: 9007199254066976
+maxTicks_: 44812306322540
+3
+virtual: 4047983141646164
+weight: 1
+jumpSize: 100
+minAnchorPrice: 4007904100639766
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+virtual: 4047983141646164
+weight: 1
+jumpSize: 100
+minAnchorPrice: 4007904100639766
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+Opening pool with 3 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 94 - block: 41927
+Swapping.boundary()
+addedBuyingA0: 288230376151711680
+addedSellingA0: 294430053486297088
+diff: -6199677334585408
+Swapping.boundary()
+addedBuyingA0: 283708998541139700
+addedSellingA0: 294430053486297088
+diff: -10721054945157388
+Swapping.boundary()
+addedBuyingA0: 285960751445260600
+addedSellingA0: 294430053486297088
+diff: -8469302041036488
+Swapping.boundary()
+addedBuyingA0: 288230376151711680
+addedSellingA0: 294430053486297088
+diff: -6199677334585408
+Swapping.boundary()
+addedBuyingA0: 288230376151711680
+addedSellingA0: 294430053486297088
+diff: -6199677334585408
+Swapping.boundary()
+addedBuyingA0: 283708998541139700
+addedSellingA0: 294430053486297088
+diff: -10721054945157388
+Swapping.boundary()
+addedBuyingA0: 283708998541139700
+addedSellingA0: 294430053486297088
+diff: -10721054945157388
+Swapping.boundary()
+addedBuyingA0: 285960751445260600
+addedSellingA0: 294430053486297088
+diff: -8469302041036488
+Swapping.boundary()
+addedBuyingA0: 285960751445260600
+addedSellingA0: 294430053486297088
+diff: -8469302041036488
+Swapping.boundary()
+addedBuyingA0: 18254258139965948928
+addedSellingA0: 18258629059082179974
+diff: -4370919116231046
+Swapping.boundary()
+addedBuyingA0: 605330880
+addedSellingA0: 9007199254740990
+diff: -9007198649410110
+Swapping.boundary()
+addedBuyingA0: 16057528641642052698
+addedSellingA0: 16064782090922997330
+diff: -7253449280944632
+Swapping.boundary()
+addedBuyingA0: 16055582713273634370
+addedSellingA0: 16064782090922997330
+diff: -9199377649362960
+Swapping.boundary()
+addedBuyingA0: 16056655099173869448
+addedSellingA0: 16064782090922997330
+diff: -8126991749127882
+Swapping.boundary()
+addedBuyingA0: 1146942720
+addedSellingA0: 9007199254740990
+diff: -9007198107798270
+Swapping.boundary()
+addedBuyingA0: 21539962002481430451790
+addedSellingA0: 21539968316170355537712
+diff: -6313688925085922
+Swapping.boundary()
+addedBuyingA0: 8191551013452211616
+addedSellingA0: 8194661560996438790
+diff: -3110547544227174
+Swapping.boundary()
+addedBuyingA0: 8193033504768946750
+addedSellingA0: 8194661560996438790
+diff: -1628056227492040
+Swapping.boundary()
+addedBuyingA0: 20241785363824641637260
+addedSellingA0: 20241788813186879417100
+diff: -3449362237779840
+Swapping.boundary()
+addedBuyingA0: 177527296871558515575440
+addedSellingA0: 177527297279567190931185
+diff: -408008675355745
+subSwap: 1524810 sold
+addedBuyingA0: 20657135937997374974987
+addedSellingA0: 20657141421115614215220
+diff: -5483118239240233
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 9007199254740991,
+   +     +  +  _: 4515784790917254
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 3
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 34,
+   +     +  +  _: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 1d6053e7dc829b9dfe07b7bb41e99a9f0afad49669200f6d4e082c2b,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 55fb57612ca7d0d09682f9acb9793dd83a2b2d79dd25ac6b5ba9026af9fc00a9),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3005311e517491130ed1c772d4c5b7933091076499e66cc25ad02df588a37b7c),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 8749850704605534,
+   +     +  +  _: 6773677186375881
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2323090,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 2464902
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 2227877
+  soldAmount: 1524810
+  boughtSpot: 13547354372751762
+  soldSpot: 9272116879880431
+  boughtExp: 1
+  soldExp: 2
+  spotPrice: 0.6844227016405318
+  effectivePrice: 0.6844228833099852
+)
+
+trials left: 1 - iteration: 95 - block: 42089
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 4021018984683514613688
+addedSellingA0: 4021021842348628246528
+diff: -2857665113632840
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 912064993514934457472
+addedSellingA0: 912064993514972659200
+diff: -38201728
+Swapping.boundary()
+addedBuyingA0: 605330880
+addedSellingA0: 9007199254740990
+diff: -9007198649410110
+Swapping.boundary()
+addedBuyingA0: 232105252121145104853
+addedSellingA0: 232105252121268637710
+diff: -123532857
+Swapping.boundary()
+addedBuyingA0: 238935761161865295542
+addedSellingA0: 238935761162057531070
+diff: -192235528
+Swapping.boundary()
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+Swapping.boundary()
+addedBuyingA0: 1146942720
+addedSellingA0: 9007199254740990
+diff: -9007198107798270
+Swapping.boundary()
+addedBuyingA0: 21539962002481430451790
+addedSellingA0: 21539968316170355537712
+diff: -6313688925085922
+Swapping.boundary()
+addedBuyingA0: 99743072908772793824
+addedSellingA0: 99743072908846921780
+diff: -74127956
+Swapping.boundary()
+addedBuyingA0: 99248067010055372659
+addedSellingA0: 99248067010071108330
+diff: -15735671
+Swapping.boundary()
+addedBuyingA0: 20241785363824641637260
+addedSellingA0: 20241788813186879417100
+diff: -3449362237779840
+Swapping.boundary()
+addedBuyingA0: 177527296871558515575440
+addedSellingA0: 177527297279567190931185
+diff: -408008675355745
+subSwap: 1 sold
+addedBuyingA0: 605330880
+addedSellingA0: 9007199254740990
+diff: -9007198649410110
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: e65fcfe3529194f1d3c163a740dc16cb6623485a0482d53da540624b, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 88,
+   +     +  +  _: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 87,
+   +     +  +  _: 90
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: e65fcfe3529194f1d3c163a740dc16cb6623485a0482d53da540624b,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 27024630f15cfae2b35239cfd54528d12d19e58aeedba8d36016061f945ef383),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 32d14cb2d9fe23625e9a10312fbb7bba85a2b7d982c1e5ed316bb1d2b8cc83b4),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 87,
+   +     +  +  _: 8908219043150430
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2275680,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 2275680
+  soldAmount: 1
+  boughtSpot: 9007199254740990
+  soldSpot: 266
+  boughtExp: 1
+  soldExp: 98
+  spotPrice: 2.953193245502917e-14
+  effectivePrice: 4.3942909372143713e-7
+)
+
+trials left: 1 - iteration: 96 - block: 43089
+virtual: 9007199254740991
+weight: 1
 jumpSize: 1
-minAnchorPrice: 50
+minAnchorPrice: 4503599627370495
 jumpLog: 0.6931471805599453
-anchorLog: 0.01980262729617973
-35.0027887811465
-virtual: 1
-weight: 100
-jumpSize: 15
-minAnchorPrice: 93
-jumpLog: 0.06453852113757116
-anchorLog: 0.01069528911674795
-6.034294204960678
-virtual: 1
-weight: 100
-jumpSize: 15
-minAnchorPrice: 93
-jumpLog: 0.06453852113757116
-anchorLog: 0.01069528911674795
-6.034294204960678
-virtual: 1
-weight: 100
-jumpSize: 15
-minAnchorPrice: 93
-jumpLog: 0.06453852113757116
-anchorLog: 0.01069528911674795
-6.034294204960678
-virtual: 1
-weight: 100
-jumpSize: 15
-minAnchorPrice: 93
-jumpLog: 0.06453852113757116
-anchorLog: 0.01069528911674795
-6.034294204960678
-virtual: 1
-weight: 100
-jumpSize: 15
-minAnchorPrice: 93
-jumpLog: 0.06453852113757116
-anchorLog: 0.01069528911674795
-6.034294204960678
-virtual: 1
-weight: 100
-jumpSize: 15
-minAnchorPrice: 93
-jumpLog: 0.06453852113757116
-anchorLog: 0.01069528911674795
-6.034294204960678
-Opening pool with 9 dirac utxos and 1 param utxos
-traces.length: 20
-Opening: 10
-Swapping: 3
-Closing: 7
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 1
+maxTicks_: 3121657384082680
+1
+virtual: 2776425761142461
+weight: 2
+jumpSize: 100
+minAnchorPrice: 5497872794341506
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+maxTicks: 1
+maxTicks_: 44812306322540
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 97 - block: 43090
+
+trials left: 1 - iteration: 98 - block: 43091
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 6399416912109869093220
+addedSellingA0: 6399416912109870514176
+diff: -1420956
+Swapping.boundary()
+addedBuyingA0: 4031380037310237035532
+addedSellingA0: 4031380037310238162944
+diff: -1127412
+Swapping.boundary()
+addedBuyingA0: 4021018984683514613688
+addedSellingA0: 4021021842348628246528
+diff: -2857665113632840
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 5079220569133146514170
+addedSellingA0: 5079220569133149061120
+diff: -2546950
+Swapping.boundary()
+addedBuyingA0: 912064993514934457472
+addedSellingA0: 912064993514972659200
+diff: -38201728
+Swapping.boundary()
+addedBuyingA0: 805590720
+addedSellingA0: 9007199254740990
+diff: -9007198449150270
+Swapping.boundary()
+addedBuyingA0: 232105252121145104853
+addedSellingA0: 232105252121268637710
+diff: -123532857
+Swapping.boundary()
+addedBuyingA0: 238935761161865295542
+addedSellingA0: 238935761162057531070
+diff: -192235528
+Swapping.boundary()
+addedBuyingA0: 225470008341382487132
+addedSellingA0: 225470008341593496690
+diff: -211009558
+Swapping.boundary()
+addedBuyingA0: 1146942720
+addedSellingA0: 9007199254740990
+diff: -9007198107798270
+Swapping.boundary()
+addedBuyingA0: 21539962002481430451790
+addedSellingA0: 21539968316170355537712
+diff: -6313688925085922
+Swapping.boundary()
+addedBuyingA0: 99743072908772793824
+addedSellingA0: 99743072908846921780
+diff: -74127956
+Swapping.boundary()
+addedBuyingA0: 99248067010055372659
+addedSellingA0: 99248067010071108330
+diff: -15735671
+Swapping.boundary()
+addedBuyingA0: 177527296871558515575440
+addedSellingA0: 177527297279567190931185
+diff: -408008675355745
+subSwap: 672680686390 sold
+addedBuyingA0: 78526714843136882193
+addedSellingA0: 78526714843227269200
+diff: -90387007
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: d808ed0db13859c69890dc1a072024baca62fcbd0337da0a0bffd438, 
+   +     +  virtual: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 4259451046054208,
+   +     +  +  _: 2
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 1,
+   +     +  +  _: 51
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 100,
+   +     +  +  _: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: d808ed0db13859c69890dc1a072024baca62fcbd0337da0a0bffd438,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 61a2845e29bcb0f05c0291f2e52933756060778fa39da965b0b4facb2235567b),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: b7b33029b447d857ac0c85f9a27218bb41e3dd88c259f883b94fa1040be95a5c),
+   +     +  anchorPrices: +[
+   +     +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 4238312200702777,
+   +     +  +  _: 100
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2310160,
+   +  +  7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9_: 414101116340313
+   +  ]
+     )
+  boughtAsset: Asset(, )
+  soldAsset: Asset(7ff84ffa00bfee6ff4ae7c7226ef8ccf6ded104aa76edf7cd580a1d9, )
+  boughtAmount: 16773
+  soldAmount: 672680193560
+  boughtSpot: 116737070
+  soldSpot: 4681733431296541
+  boughtExp: 1404
+  soldExp: 10
+  spotPrice: 40104942.083063595
+  effectivePrice: 40104942.08310976
+)
+
+trials left: 1 - iteration: 99 - block: 44091
+traces.length: 87
+Opening: 33
+Swapping: 38
+Closing: 16
 --- DONE ---
-Opening: 10
-Swapping: 3
-Closing: 7
+Opening: 33
+Swapping: 38
+Closing: 16
 [0m[38;5;245m----- output end -----[0m
-emulator ... [0m[32mok[0m [0m[38;5;245m(40s)[0m
+emulator ... [0m[32mok[0m [0m[38;5;245m(18m35s)[0m
 [0m[38;5;245mrunning 0 tests from ./tests/types.test.ts[0m
 
-[0m[32mok[0m | 1 passed | 0 failed [0m[38;5;245m(3m3s)[0m
+[0m[32mok[0m | 1 passed | 0 failed [0m[38;5;245m(20m54s)[0m
 

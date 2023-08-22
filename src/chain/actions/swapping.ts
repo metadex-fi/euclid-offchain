@@ -406,7 +406,7 @@ export class Swapping {
   }
 
   // TODO fixme
-  private validates(): boolean {
+  public validates(): boolean {
 
     // public readonly user: User | undefined, // TODO why can this be undefined again?
     // public readonly paramUtxo: ParamUtxo,
