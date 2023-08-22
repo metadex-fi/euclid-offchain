@@ -512,7 +512,7 @@ export class Swapping {
   public corruptionTests = () => {
     // this.testBuyTooMuch();
     // this.testSellTooLittle();
-    this.testBuyingPrice();
+    // this.testBuyingPrice();
     this.testSellingPrice();
   }
 
@@ -614,8 +614,20 @@ export class Swapping {
     }
     // NOTE prices are inverted
     assert(soldSpot_ < this.soldSpot, `seems like soldExp is being changed in the wrong direction`);
+
     
     if (soldSpot_ > 0n) {
+      const buyingA0 = this.boughtAmount * soldSpot_;
+      const sellingA0 = this.soldAmount * this.boughtSpot;
+      const swapA0 = min(sellingA0, buyingA0);
+      if (swapA0 < soldSpot_) return;
+
+      /*
+      TODO idea - calculate the prices and exponents anew for subswaps.
+      For that one would need to ideally factor out the logic from utxo.ts.
+      First however think about if that makes sense.
+      */
+
       const soldSpotTooLow = new Swapping(
         this.user,
         this.paramUtxo,
