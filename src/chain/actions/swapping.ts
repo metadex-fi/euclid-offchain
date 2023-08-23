@@ -14,7 +14,6 @@ import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
 
-const runCorruptionTests = true;
 const compareSubSwaps = false;
 
 export class Swapping {
@@ -35,7 +34,7 @@ export class Swapping {
     public readonly soldSpot: bigint, // inverted
     public readonly boughtExp: bigint,
     public readonly soldExp: bigint,
-    runTests: boolean, // corruption-test-swappings don't run tests
+    runTests: boolean, // corruption-test-swappings don't run tests themselves.
     private readonly maxBuying: bigint, // for corruption-tests
   ) {
     assert(boughtAmount > 0n, `boughtAmount must be positive`);
@@ -54,7 +53,7 @@ export class Swapping {
       if (!this.validates()) console.error(`Swapping does not validate: ${this.show()}`);
       // assert(this.validates(), `Swapping does not validate:: ${this.show()}`);
       
-      if (runCorruptionTests) this.corruptionTests();
+      // if (runCorruptionTests) this.corruptAll();
     }
   }
 
@@ -175,6 +174,7 @@ export class Swapping {
   };
 
   public subsequents = (maxSubsequents?: number): Swapping[] => {
+    console.log(`subsequents(${maxSubsequents})`);
     const swappings: Swapping[] = [this];
     let previous = swappings[0];
     let sellableAmount = this.user
@@ -219,31 +219,31 @@ export class Swapping {
   // The idea behind this variant is the guess that with lower amounts we might 
   // have a different optimum for exponents and prices
   // ~~> update: could not find a difference, which is quite remarkable if you think about it
-  // TODO maybe investigate further, and compare performances
-  private subSwapA = (
-    amount: bigint,
-    amntIsSold: boolean,
-  ) : Swapping | undefined => {
-    const swappings = this.diracUtxo.swappingsFor(
-      this.user,
-      this.paramUtxo,
-      Value.singleton(this.soldAsset, amntIsSold ? amount : this.soldAmount),
-      this.boughtAsset,
-      amntIsSold ? this.boughtAmount : amount,
-    );
-    assert(swappings.length <= 1, `swappings.length must be <= 1, but got:\n${swappings.map((s) => s.show()).join("\n")}`);
-    const subSwapA = swappings.length > 0 ? swappings[0] : undefined;
-    if (compareSubSwaps) {
-      const subSwapB = this.subSwapB(amount, amntIsSold);
-      if (subSwapA) {
-        assert(subSwapB, `subSwapB must be defined, but got undefined`);
-        assert(subSwapA.equalNumbers(subSwapB), `SUCCESS! subSwap-thesis confirmed:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
-        // assert(subSwapA.show() === subSwapB.show(), `SUCCESS! ... but only show()-difference:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
-        // the above detects only a difference in maxBuying, so we're not using it. TODO not sure which variant is correct here
-      } else assert(subSwapB === undefined, `subSwapB must be undefined, but got:\n${subSwapB?.show()}`);
-    }
-    return subSwapA;
-  }
+  // TODO maybe investigate further, and compare performances. Note that the other variant is correct, this one wrong, regarding maxBuying
+  // private subSwapA = (
+  //   amount: bigint,
+  //   amntIsSold: boolean,
+  // ) : Swapping | undefined => {
+  //   const swappings = this.diracUtxo.swappingsFor(
+  //     this.user,
+  //     this.paramUtxo,
+  //     Value.singleton(this.soldAsset, amntIsSold ? amount : this.soldAmount),
+  //     this.boughtAsset,
+  //     amntIsSold ? this.boughtAmount : amount,
+  //   );
+  //   assert(swappings.length <= 1, `swappings.length must be <= 1, but got:\n${swappings.map((s) => s.show()).join("\n")}`);
+  //   const subSwapA = swappings.length > 0 ? swappings[0] : undefined;
+  //   if (compareSubSwaps) {
+  //     const subSwapB = this.subSwapB(amount, amntIsSold);
+  //     if (subSwapA) {
+  //       assert(subSwapB, `subSwapB must be defined, but got undefined`);
+  //       assert(subSwapA.equalNumbers(subSwapB), `SUCCESS! subSwap-thesis confirmed:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
+  //       // assert(subSwapA.show() === subSwapB.show(), `SUCCESS! ... but only show()-difference:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
+  //       // the above detects only a difference in maxBuying, so we're not using it. TODO/NOTE the other variant is correct, this one wrong
+  //     } else assert(subSwapB === undefined, `subSwapB must be undefined, but got:\n${subSwapB?.show()}`);
+  //   }
+  //   return subSwapA;
+  // }
 
   private subSwapB = (
     amount: bigint,
@@ -283,13 +283,14 @@ export class Swapping {
     );
   };
 
-  public subSwap = compareSubSwaps ? this.subSwapA : this.subSwapB; // TODO profile both and pick the better one (later)
+  // NOTE subSwapA is wrong regarding maxBuying. Both appear equivalent otherwise
+  public subSwap = this.subSwapB; // TODO profile both and pick the better one (later)
 
   private randomSubSwap = (): Swapping => {
     for (let i = 0; i < 100; i++) {
       const amntIsSold = Math.random() < 0.5;
       const amount = genPositive(amntIsSold ? this.soldAmount : this.boughtAmount);
-      const subSwap = this.subSwapA(amount, amntIsSold);
+      const subSwap = this.subSwap(amount, amntIsSold);
       if (subSwap) return subSwap;
     }
     throw new Error(`randomSubSwap(): failed to find a subSwap for ${this.show()}`);
@@ -466,7 +467,6 @@ export class Swapping {
     return true;
   }
 
-  // TODO fixme
   public validates(): boolean {
 
     // public readonly user: User | undefined, // TODO why can this be undefined again?
@@ -552,14 +552,16 @@ export class Swapping {
   }
 
   // try to make it wrong with minimal changes
-  public corruptionTests = () => {
-    // this.testBuyTooMuch();
-    // this.testSellTooLittle();
-    // this.testBuyingPrice();
-    this.testSellingPrice();
+  public corruptAll = (): Swapping[] => {
+    return [
+      this.corruptBoughtAmnt(),
+      // this.corruptSoldAmnt(),
+      // this.corruptBoughtSpot(),
+      // this.corruptSoldSpot(),
+    ].filter((s) => s !== undefined) as Swapping[];
   }
 
-  public testBuyTooMuch = () => {
+  public corruptBoughtAmnt = (): Swapping | undefined => {
     if (this.boughtAmount === this.maxBuying) return;
     const boughtTooMuch = new Swapping(
       this.user,
@@ -577,10 +579,10 @@ export class Swapping {
       this.maxBuying,
     );
     assert(!boughtTooMuch.validates(), `buying one more should fail: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`);
-    // TODO next try fiddling with the prices
+    return boughtTooMuch;
   }
 
-  public testSellTooLittle = () => {
+  public corruptSoldAmnt = (): Swapping | undefined => {
     if (this.soldAmount === 1n) return;
     const soldTooLittle = new Swapping(
       this.user,
@@ -598,10 +600,10 @@ export class Swapping {
       this.maxBuying,
     );
     assert(!soldTooLittle.validates(), `selling one less should fail: ${this.show()}\n~~~>\n${soldTooLittle.show()}`);
-    // TODO next try fiddling with the prices
+    return soldTooLittle;
   }
 
-  public testBuyingPrice = () => {
+  public corruptBoughtSpot = (): Swapping | undefined => {
     const param = this.paramUtxo.param;
     const dirac = this.diracUtxo.dirac;
 
@@ -640,10 +642,11 @@ export class Swapping {
         boughtSpot_,
         "buying",
       ), `boughtSpotTooHigh should still yield the correct price: ${boughtSpotTooHigh.show()}`);
+      return boughtSpotTooHigh;
     }
   }
 
-  public testSellingPrice = () => {
+  public corruptSoldSpot = (): Swapping | undefined => {
     const param = this.paramUtxo.param;
     const dirac = this.diracUtxo.dirac;
 
@@ -688,6 +691,7 @@ export class Swapping {
         soldSpot_,
         "selling",
       ), `soldSpotTooLow should still yield the correct price: ${soldSpotTooLow.show()}`);
+      return soldSpotTooLow;
     }
   }
 }

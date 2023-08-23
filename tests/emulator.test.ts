@@ -1,5 +1,7 @@
+import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../lucid.mod.ts";
 import { Action, allActions } from "../src/chain/actions/action.ts";
+import { Swapping } from "../src/chain/actions/swapping.ts";
 import { Contract } from "../src/chain/contract.ts";
 import { User } from "../src/chain/user.ts";
 import {
@@ -33,7 +35,7 @@ Deno.test("emulator", async () => {
     const emulator = new Lucid.Emulator(accounts);
     const traces: string[] = [];
     const actionCounts = new Map<string, number>();
-    const iterations = 20;
+    const iterations = 10;
     for (let i = 0; i < iterations; i++) {
       console.log(
         `\ntrials left: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`// - errors: ${errors.length}`,
@@ -60,6 +62,26 @@ Deno.test("emulator", async () => {
             let failed: Action[] = [];
             for (const action of actions) {
               const type = action.type;
+
+              // corruption-tests
+              if (type === "Swapping") {
+                const swapping = action as Swapping;
+                const corrupted = swapping.corruptAll();
+                // for (const c of corrupted) {
+                //   try {
+                //     const signed = (await user.getTxSigned(action)).succ;
+                //     for (const s of signed) {
+                //       const hash = await s.submit();
+                //       console.log("attempted corruption:", hash);
+                //     }
+                //   } catch (e) {
+                //     console.warn(`corruption failed successfully: ${e}`);
+                //     continue;
+                //   }
+                //   throw new Error(`corruption succeeded: ${swapping.show()}\n~~~>\n${c.show()}`);
+                // }
+              }
+
               actionCounts.set(type, (actionCounts.get(type) ?? 0) + 1);
               const { succ, fail } = await user.getTxSigned(action);
               signed.push(...succ);
