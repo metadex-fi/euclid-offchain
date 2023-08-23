@@ -13,6 +13,7 @@ import { Data } from "../src/types/general/fundamental/type.ts";
 import { genPositive, randomChoice } from "../src/utils/generators.ts";
 
 Deno.test("emulator", async () => {
+  // return;
   let trials = 1;
   const actionCounts_ = new Map<string, number>();
   // const errors = [];
@@ -121,135 +122,135 @@ Deno.test("emulator", async () => {
   // }
 });
 
-// Deno.test("constr", async () => {
-//   for (let i = 0; i < 100; i++) {
-//     const privateKey = Lucid.generatePrivateKey();
+// // Deno.test("constr", async () => {
+// //   for (let i = 0; i < 100; i++) {
+// //     const privateKey = Lucid.generatePrivateKey();
 
-//     const address = await (await Lucid.Lucid.new(undefined, "Custom"))
-//       .selectWalletFromPrivateKey(privateKey).wallet.address();
+// //     const address = await (await Lucid.Lucid.new(undefined, "Custom"))
+// //       .selectWalletFromPrivateKey(privateKey).wallet.address();
 
-//     const emulator = new Lucid.Emulator([{
-//       address,
-//       assets: { lovelace: 3000000000n },
-//     }]);
+// //     const emulator = new Lucid.Emulator([{
+// //       address,
+// //       assets: { lovelace: 3000000000n },
+// //     }]);
 
-//     const lucid = await Lucid.Lucid.new(emulator);
+// //     const lucid = await Lucid.Lucid.new(emulator);
 
-//     lucid.selectWalletFromPrivateKey(privateKey);
+// //     lucid.selectWalletFromPrivateKey(privateKey);
 
-//     const contract = new Contract(lucid);
-//     const param = PParam.ptype.genData();
-//     const param_ = new Param(
-//       KeyHash.fromCredential(
-//         lucid.utils.getAddressDetails(address).paymentCredential!,
-//       ),
-//       param.virtual,
-//       param.weights,
-//       param.jumpSizes,
-//     );
-//     const paramDatum = new ParamDatum(param_);
-//     const peuclidDatum = PPreEuclidDatum.genPType(); //only need this for ParamDatum, so this is fine
+// //     const contract = new Contract(lucid);
+// //     const param = PParam.ptype.genData();
+// //     const param_ = new Param(
+// //       KeyHash.fromCredential(
+// //         lucid.utils.getAddressDetails(address).paymentCredential!,
+// //       ),
+// //       param.virtual,
+// //       param.weights,
+// //       param.jumpSizes,
+// //     );
+// //     const paramDatum = new ParamDatum(param_);
+// //     const peuclidDatum = PPreEuclidDatum.genPType(); //only need this for ParamDatum, so this is fine
 
-//     const datum = peuclidDatum.pconstant(paramDatum);
+// //     const datum = peuclidDatum.pconstant(paramDatum);
 
-//     console.log(datum);
-//     (datum.fields[0] as Lucid.Constr<Data>).fields.forEach((f) => {
-//       console.log(f);
-//       console.log("---");
-//     });
-//     try {
-//       const tx = lucid.newTx()
-//         .payToContract(
-//           contract.address,
-//           {
-//             inline: Data.to(datum),
-//             scriptRef: contract.validator,
-//           },
-//           { lovelace: 42n },
-//         );
-//       const txComplete = await tx.complete();
-//       const signedTx = await txComplete.sign().complete();
-//       await signedTx.submit();
+// //     console.log(datum);
+// //     (datum.fields[0] as Lucid.Constr<Data>).fields.forEach((f) => {
+// //       console.log(f);
+// //       console.log("---");
+// //     });
+// //     try {
+// //       const tx = lucid.newTx()
+// //         .payToContract(
+// //           contract.address,
+// //           {
+// //             inline: Data.to(datum),
+// //             scriptRef: contract.validator,
+// //           },
+// //           { lovelace: 42n },
+// //         );
+// //       const txComplete = await tx.complete();
+// //       const signedTx = await txComplete.sign().complete();
+// //       await signedTx.submit();
 
-//       emulator.awaitBlock(4);
+// //       emulator.awaitBlock(4);
 
-//       const utxos = await lucid.utxosAt(contract.address);
-//       console.log(utxos);
+// //       const utxos = await lucid.utxosAt(contract.address);
+// //       console.log(utxos);
 
-//       const tx2 = lucid.newTx()
-//         // .attachMintingPolicy(contract.mintingPolicy)
-//         // .mintAssets(burningNFTs, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
-//         .addSigner(address)
-//         .collectFrom(
-//           utxos,
-//           Lucid.Data.void(),
-//         );
-//       const tx2complete = await tx2.complete();
-//       const signedTx2 = await tx2complete.sign().complete();
-//       await signedTx2.submit();
-//       emulator.awaitBlock(4);
-//     } catch (e) {
-//       throw new Error(e);
-//     }
-//   }
-// });
+// //       const tx2 = lucid.newTx()
+// //         // .attachMintingPolicy(contract.mintingPolicy)
+// //         // .mintAssets(burningNFTs, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+// //         .addSigner(address)
+// //         .collectFrom(
+// //           utxos,
+// //           Lucid.Data.void(),
+// //         );
+// //       const tx2complete = await tx2.complete();
+// //       const signedTx2 = await tx2complete.sign().complete();
+// //       await signedTx2.submit();
+// //       emulator.awaitBlock(4);
+// //     } catch (e) {
+// //       throw new Error(e);
+// //     }
+// //   }
+// // });
 
-// Deno.test("lucid-example", async () => {
-//   const l = 32n; // empirical maximum = 32n
-//   console.log(l);
-//   const privateKey = Lucid.generatePrivateKey();
+// // Deno.test("lucid-example", async () => {
+// //   const l = 32n; // empirical maximum = 32n
+// //   console.log(l);
+// //   const privateKey = Lucid.generatePrivateKey();
 
-//   const address = await (await Lucid.Lucid.new(undefined, "Custom"))
-//     .selectWalletFromPrivateKey(privateKey).wallet.address();
+// //   const address = await (await Lucid.Lucid.new(undefined, "Custom"))
+// //     .selectWalletFromPrivateKey(privateKey).wallet.address();
 
-//   const { paymentCredential } = Lucid.getAddressDetails(address);
+// //   const { paymentCredential } = Lucid.getAddressDetails(address);
 
-//   const emulator = new Lucid.Emulator([{
-//     address,
-//     assets: { lovelace: 3000000000n },
-//   }]);
+// //   const emulator = new Lucid.Emulator([{
+// //     address,
+// //     assets: { lovelace: 3000000000n },
+// //   }]);
 
-//   const lucid = await Lucid.Lucid.new(emulator);
+// //   const lucid = await Lucid.Lucid.new(emulator);
 
-//   lucid.selectWalletFromPrivateKey(privateKey);
+// //   lucid.selectWalletFromPrivateKey(privateKey);
 
-//   const mintingPolicy = lucid.utils.nativeScriptFromJson({
-//     type: "all",
-//     scripts: [
-//       {
-//         type: "before",
-//         slot: lucid.utils.unixTimeToSlot(emulator.now() + 60000),
-//       },
-//       { type: "sig", keyHash: paymentCredential?.hash! },
-//     ],
-//   });
+// //   const mintingPolicy = lucid.utils.nativeScriptFromJson({
+// //     type: "all",
+// //     scripts: [
+// //       {
+// //         type: "before",
+// //         slot: lucid.utils.unixTimeToSlot(emulator.now() + 60000),
+// //       },
+// //       { type: "sig", keyHash: paymentCredential?.hash! },
+// //     ],
+// //   });
 
-//   const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
+// //   const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
 
-//   const token = genName(1n, l);
-//   const assets = {
-//     [Lucid.toUnit(policyId, Lucid.fromText(token))]: 123n,
-//   };
+// //   const token = genName(1n, l);
+// //   const assets = {
+// //     [Lucid.toUnit(policyId, Lucid.fromText(token))]: 123n,
+// //   };
 
-//   console.log(mintingPolicy.type);
-//   console.log(mintingPolicy.script);
-//   console.log(policyId);
-//   console.log(token);
-//   console.log(assets);
+// //   console.log(mintingPolicy.type);
+// //   console.log(mintingPolicy.script);
+// //   console.log(policyId);
+// //   console.log(token);
+// //   console.log(assets);
 
-//   async function mint(): Promise<Lucid.TxHash> {
-//     const tx = await lucid.newTx()
-//       .mintAssets(assets)
-//       .validTo(emulator.now() + 30000)
-//       .attachMintingPolicy(mintingPolicy)
-//       .complete();
-//     const signedTx = await tx.sign().complete();
+// //   async function mint(): Promise<Lucid.TxHash> {
+// //     const tx = await lucid.newTx()
+// //       .mintAssets(assets)
+// //       .validTo(emulator.now() + 30000)
+// //       .attachMintingPolicy(mintingPolicy)
+// //       .complete();
+// //     const signedTx = await tx.sign().complete();
 
-//     return signedTx.submit();
-//   }
-//   await mint();
+// //     return signedTx.submit();
+// //   }
+// //   await mint();
 
-//   emulator.awaitBlock(4);
+// //   emulator.awaitBlock(4);
 
-//   console.log(await lucid.wallet.getUtxos());
-// });
+// //   console.log(await lucid.wallet.getUtxos());
+// // });

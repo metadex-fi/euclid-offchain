@@ -15,6 +15,7 @@ import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
 
 const runCorruptionTests = true;
+const compareSubSwaps = false;
 
 export class Swapping {
   public readonly spotPrice: number; // uninverted
@@ -81,6 +82,17 @@ export class Swapping {
   (maxBuyingA0: ${this.maxBuying * this.soldSpot})
 )`;
   };
+
+  public equalNumbers = (other: Swapping): boolean => {
+    return (
+      this.boughtAmount === other.boughtAmount &&
+      this.soldAmount === other.soldAmount &&
+      this.boughtSpot === other.boughtSpot &&
+      this.soldSpot === other.soldSpot &&
+      this.boughtExp === other.boughtExp &&
+      this.soldExp === other.soldExp
+    );
+  }
 
   public split = (): Swapping[] => {
     throw new Error("Swapping-split not implemented");
@@ -204,7 +216,36 @@ export class Swapping {
     return swappings;
   };
 
-  public subSwap = (
+  // The idea behind this variant is the guess that with lower amounts we might 
+  // have a different optimum for exponents and prices
+  // ~~> update: could not find a difference, which is quite remarkable if you think about it
+  // TODO maybe investigate further, and compare performances
+  private subSwapA = (
+    amount: bigint,
+    amntIsSold: boolean,
+  ) : Swapping | undefined => {
+    const swappings = this.diracUtxo.swappingsFor(
+      this.user,
+      this.paramUtxo,
+      Value.singleton(this.soldAsset, amntIsSold ? amount : this.soldAmount),
+      this.boughtAsset,
+      amntIsSold ? this.boughtAmount : amount,
+    );
+    assert(swappings.length <= 1, `swappings.length must be <= 1, but got:\n${swappings.map((s) => s.show()).join("\n")}`);
+    const subSwapA = swappings.length > 0 ? swappings[0] : undefined;
+    if (compareSubSwaps) {
+      const subSwapB = this.subSwapB(amount, amntIsSold);
+      if (subSwapA) {
+        assert(subSwapB, `subSwapB must be defined, but got undefined`);
+        assert(subSwapA.equalNumbers(subSwapB), `SUCCESS! subSwap-thesis confirmed:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
+        // assert(subSwapA.show() === subSwapB.show(), `SUCCESS! ... but only show()-difference:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
+        // the above detects only a difference in maxBuying, so we're not using it. TODO not sure which variant is correct here
+      } else assert(subSwapB === undefined, `subSwapB must be undefined, but got:\n${subSwapB?.show()}`);
+    }
+    return subSwapA;
+  }
+
+  private subSwapB = (
     amount: bigint,
     amntIsSold: boolean,
   ): Swapping | undefined => {
@@ -242,11 +283,13 @@ export class Swapping {
     );
   };
 
+  public subSwap = compareSubSwaps ? this.subSwapA : this.subSwapB; // TODO profile both and pick the better one (later)
+
   private randomSubSwap = (): Swapping => {
     for (let i = 0; i < 100; i++) {
-      const amountIsSold = Math.random() < 0.5;
-      const amount = genPositive(amountIsSold ? this.soldAmount : this.boughtAmount);
-      const subSwap = this.subSwap(amount, amountIsSold);
+      const amntIsSold = Math.random() < 0.5;
+      const amount = genPositive(amntIsSold ? this.soldAmount : this.boughtAmount);
+      const subSwap = this.subSwapA(amount, amntIsSold);
       if (subSwap) return subSwap;
     }
     throw new Error(`randomSubSwap(): failed to find a subSwap for ${this.show()}`);
@@ -621,12 +664,6 @@ export class Swapping {
       const sellingA0 = this.soldAmount * this.boughtSpot;
       const swapA0 = min(sellingA0, buyingA0);
       if (swapA0 < soldSpot_) return;
-
-      /*
-      TODO idea - calculate the prices and exponents anew for subswaps.
-      For that one would need to ideally factor out the logic from utxo.ts.
-      First however think about if that makes sense.
-      */
 
       const soldSpotTooLow = new Swapping(
         this.user,

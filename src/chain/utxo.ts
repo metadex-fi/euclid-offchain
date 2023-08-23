@@ -217,13 +217,14 @@ export class DiracUtxo {
     paramUtxo: ParamUtxo,
     sellable_?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
     buyingAsset?: Asset, // for subsequent swappings we want only a single direction
+    buyableAmnt?: bigint, // for the new subswap-calculator, in concert with buyingAsset
   ): Swapping[] => {
     const swappings = new Array<Swapping>();
     let buyable_ = this.balance;
     if (buyingAsset) {
-      const buyableAmnt = this.balance.amountOf(buyingAsset, 0n);
-      if (buyableAmnt > 0n) {
-        buyable_ = PositiveValue.singleton(buyingAsset, buyableAmnt);
+      const buyableAmnt_ = buyableAmnt ?? this.balance.amountOf(buyingAsset, 0n);
+      if (buyableAmnt_ > 0n) {
+        buyable_ = PositiveValue.singleton(buyingAsset, buyableAmnt_);
       } else {
         return [];
       }
@@ -331,12 +332,18 @@ export class DiracUtxo {
     const sellableAssets = maxSelling_.assets.toList;
     const buyableAssets = maxBuying_.assets.toList;
     sellableAssets.forEach((sellingAsset) => {
-      let spotSelling = spotSelling_.amountOf(sellingAsset); // NOTE: inverted
-      let expSelling = expSelling_.amountOf(sellingAsset);
-      let maxSelling = maxSelling_.amountOf(sellingAsset);
-
       buyableAssets.forEach((buyingAsset) => {
         if (sellingAsset.equals(buyingAsset)) return;
+        // console.log(`
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // buyingAsset: ${buyingAsset.show()}
+        // sellingAsset: ${sellingAsset.show()}
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // `);
+        
+        let spotSelling = spotSelling_.amountOf(sellingAsset); // NOTE: inverted
+        let expSelling = expSelling_.amountOf(sellingAsset);
+        let maxSelling = maxSelling_.amountOf(sellingAsset);
 
         const spotBuying = spotBuying_.amountOf(buyingAsset); // NOTE: inverted
         const expBuying = expBuying_.amountOf(buyingAsset) - 1n; // NOTE the -1 is part of the hack to fit zeroes into PositiveValue (see above)
@@ -354,6 +361,7 @@ export class DiracUtxo {
 
         // if (maxSwapA0 < spotSelling) return; // TODO comment out again
         if (maxSwapA0 < spotSelling) {
+          // console.log("looping")
           // TODO marginal efficiency gains possible here by initialzing only JIT
           const sellingAnchor = this.dirac.anchorPrices.amountOf(sellingAsset);
           // const buyingAnchor = this.dirac.anchorPrices.amountOf(buyingAsset);
@@ -376,6 +384,20 @@ export class DiracUtxo {
 
           let limitReached = false;
           while (maxSwapA0 < spotSelling) {
+            // const buyingAmount = maxSwapA0 / spotSelling;
+            // const sellingAmount = ceilDiv(buyingAmount * spotSelling, spotBuying);
+            // console.log(`
+            //   maxBuying:     ${maxBuying}
+            //   maxSelling:    ${maxSelling}
+            //   maxBuyingA0:   ${maxBuyingA0}
+            //   maxSellingA0:  ${maxSellingA0}
+            //   maxSwapA0:     ${maxSwapA0}
+            //   spotBuying:    ${spotBuying}
+            //   spotSelling:   ${spotSelling}
+            //   buyingAmount:  ${buyingAmount}
+            //   sellingAmount: ${sellingAmount}
+            //   limitReached: ${limitReached}
+            // `)
             if (limitReached) return;
             if (maxSellingA0 <= maxBuyingA0) {
               expSelling++;
@@ -408,21 +430,23 @@ export class DiracUtxo {
             // assert(maxSwapA0_ < maxSwapA0, `maxSwapA0 should be strictly decreasing`);
             maxSwapA0 = maxSwapA0_;
           }
-        }
+        } //else console.log("not looping")
 
         const buyingAmount = maxSwapA0 / spotSelling;
         const sellingAmount = ceilDiv(buyingAmount * spotSelling, spotBuying);
-        console.log(`
-          maxBuying: ${maxBuying}
-          maxSelling: ${maxSelling}
-          maxBuyingA0: ${maxBuyingA0}
-          maxSellingA0: ${maxSellingA0}
-          maxSwapA0: ${maxSwapA0}
-          spotBuying: ${spotBuying}
-          spotSelling: ${spotSelling}
-          buyingAmount: ${buyingAmount}
-          sellingAmount: ${sellingAmount}
-        `)
+        // console.log(`
+        //   ---------------------------
+        //   maxBuying:     ${maxBuying}
+        //   maxSelling:    ${maxSelling}
+        //   maxBuyingA0:   ${maxBuyingA0}
+        //   maxSellingA0:  ${maxSellingA0}
+        //   maxSwapA0:     ${maxSwapA0}
+        //   spotBuying:    ${spotBuying}
+        //   spotSelling:   ${spotSelling}
+        //   buyingAmount:  ${buyingAmount}
+        //   sellingAmount: ${sellingAmount}
+        //   ---------------------------
+        // `)
         // const sellingAmount = maxSellingA0 <= maxBuyingA0 ? maxSelling : BigInt(sellingAmount_);
 
         // /// logging/debugging

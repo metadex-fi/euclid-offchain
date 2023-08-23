@@ -5,542 +5,9 @@
 emulator ...
 [0m[38;5;245m------- output -------[0m
 trials left: 1
-accounts: 5
+accounts: 10
 
 trials left: 1 - iteration: 0 - block: 0
-virtual: 9000
-weight: 1
-jumpSize: 1
-minAnchorPrice: 4500
-jumpLog: 0.6931471805599453
-anchorLog: 0.00022219753452146847
-3119.5088732767836
-maxTicks: 1
-maxTicks_: 3119
-1
-virtual: 9000
-weight: 1
-jumpSize: 93
-minAnchorPrice: 8904
-jumpLog: 0.01069528911674795
-anchorLog: 0.00011230276838119965
-95.23620184004675
-maxTicks: 1
-maxTicks_: 95
-1
-Opening pool with 1 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 1 - block: 1000
-
-          maxBuying: 6
-          maxSelling: 8999
-          maxBuyingA0: 108000
-          maxSellingA0: 96100321
-          maxSwapA0: 108000
-          spotBuying: 10679
-          spotSelling: 18000
-          buyingAmount: 6
-          sellingAmount: 11
-        
-Swapping.boundary()
-boughtAssetForSale (old):
-        sellingAmm  9001 > 
-        spotSelling 9000
-subSwap: 11 sold
-boughtAssetForSale (old):
-        sellingAmm  9001 > 
-        spotSelling 9000
-Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: 3d00115744a0d10edbeae697adb46d2a5244491d2d9d7faf9f572f0f, 
-   +     +  virtual: +[
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 9000,
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 9000
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 1,
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 1
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 1,
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 93
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: 3d00115744a0d10edbeae697adb46d2a5244491d2d9d7faf9f572f0f,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 622248a6e33d55ca30a79769bbfbdbb8a05f48a07345025f44921fe042fe4166),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 535831347f547991f70eb6299c18ff56c9f0b6376827b29bb9ebef26d91eb1fb),
-   +     +  anchorPrices: +[
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 4500,
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 8904
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 3068720,
-   +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 1685,
-   +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 1
-   +  ]
-     )
-  boughtAsset:  Asset(50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8, hMYUqwdeIC9HkAbEETqlPQ0BWTzl)
-  soldAsset:    Asset(5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd, u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx)
-  boughtAmount: 6
-  soldAmount:   11
-  boughtSpot:   10679
-  soldSpot:     18000
-  (boughtA0:    108000)
-  (soldA0:      117469)
-  boughtExp:    17
-  soldExp:      2
-  spotPrice:    1.685551081561944
-  eff.Price:    1.8333333333333333
-  maxBuying:    1685
-  (maxBuyingA0: 30330000)
-)
-
-trials left: 1 - iteration: 2 - block: 1001
-
-          maxBuying: 114
-          maxSelling: 8988
-          maxBuyingA0: 2052000
-          maxSellingA0: 94958220
-          maxSwapA0: 2052000
-          spotBuying: 10565
-          spotSelling: 18000
-          buyingAmount: 114
-          sellingAmount: 195
-        
-Swapping.boundary()
-boughtAssetForSale (old):
-        sellingAmm  9012 > 
-        spotSelling 9000
-
-          maxBuying: 12
-          maxSelling: 115
-          maxBuyingA0: 129528
-          maxSellingA0: 1035000
-          maxSwapA0: 129528
-          spotBuying: 9000
-          spotSelling: 10794
-          buyingAmount: 12
-          sellingAmount: 15
-        
-Swapping.boundary()
-boughtAssetForSale (new):
-        sellingAmm  10694 > 
-        spotSelling 10679
-subSwap: 15 sold
-boughtAssetForSale (new):
-        sellingAmm  10694 > 
-        spotSelling 10679
-Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: 3d00115744a0d10edbeae697adb46d2a5244491d2d9d7faf9f572f0f, 
-   +     +  virtual: +[
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 9000,
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 9000
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 1,
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 1
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 1,
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 93
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: 3d00115744a0d10edbeae697adb46d2a5244491d2d9d7faf9f572f0f,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 622248a6e33d55ca30a79769bbfbdbb8a05f48a07345025f44921fe042fe4166),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 535831347f547991f70eb6299c18ff56c9f0b6376827b29bb9ebef26d91eb1fb),
-   +     +  anchorPrices: +[
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 4500,
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 8904
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 3068720,
-   +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 1679,
-   +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 12
-   +  ]
-     )
-  boughtAsset:  Asset(5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd, u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx)
-  soldAsset:    Asset(50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8, hMYUqwdeIC9HkAbEETqlPQ0BWTzl)
-  boughtAmount: 12
-  soldAmount:   15
-  boughtSpot:   9000
-  soldSpot:     10794
-  (boughtA0:    129528)
-  (soldA0:      135000)
-  boughtExp:    1
-  soldExp:      18
-  spotPrice:    1.1993333333333334
-  eff.Price:    1.25
-  maxBuying:    12
-  (maxBuyingA0: 129528)
-)
-
-trials left: 1 - iteration: 3 - block: 1002
-
-          maxBuying: 15
-          maxSelling: 9000
-          maxBuyingA0: 270000
-          maxSellingA0: 96111000
-          maxSwapA0: 270000
-          spotBuying: 10679
-          spotSelling: 18000
-          buyingAmount: 15
-          sellingAmount: 26
-        
-Swapping.boundary()
-boughtAssetForSale (new):
-        sellingAmm  9026 > 
-        spotSelling 9000
-subSwap: 13 sold
-boughtAssetForSale (new):
-        sellingAmm  9012 > 
-        spotSelling 9000
-Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: 3d00115744a0d10edbeae697adb46d2a5244491d2d9d7faf9f572f0f, 
-   +     +  virtual: +[
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 9000,
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 9000
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 1,
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 1
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 1,
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 93
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: 3d00115744a0d10edbeae697adb46d2a5244491d2d9d7faf9f572f0f,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 622248a6e33d55ca30a79769bbfbdbb8a05f48a07345025f44921fe042fe4166),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 535831347f547991f70eb6299c18ff56c9f0b6376827b29bb9ebef26d91eb1fb),
-   +     +  anchorPrices: +[
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 4500,
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 8904
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 3068720,
-   +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 1694
-   +  ]
-     )
-  boughtAsset:  Asset(50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8, hMYUqwdeIC9HkAbEETqlPQ0BWTzl)
-  soldAsset:    Asset(5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd, u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx)
-  boughtAmount: 7
-  soldAmount:   12
-  boughtSpot:   10679
-  soldSpot:     18000
-  (boughtA0:    126000)
-  (soldA0:      128148)
-  boughtExp:    17
-  soldExp:      2
-  spotPrice:    1.685551081561944
-  eff.Price:    1.7142857142857142
-  maxBuying:    1694
-  (maxBuyingA0: 30492000)
-)
-
-trials left: 1 - iteration: 4 - block: 2002
-
-trials left: 1 - iteration: 5 - block: 2003
-virtual: 4989
-weight: 1
-jumpSize: 28
-minAnchorPrice: 4816
-jumpLog: 0.03509131981127019
-anchorLog: 0.00020761964156377707
-169.01734126388405
-maxTicks: 1
-maxTicks_: 169
-1
-virtual: 5240
-weight: 1
-jumpSize: 80
-minAnchorPrice: 5175
-jumpLog: 0.01242251999855711
-anchorLog: 0.00019321804716677753
-64.29275205247532
-maxTicks: 1
-maxTicks_: 64
-1
-virtual: 709
-weight: 12
-jumpSize: 65
-minAnchorPrice: 8379
-jumpLog: 0.01526747213078838
-anchorLog: 0.00011933886284227938
-127.93378256809918
-maxTicks: 1
-maxTicks_: 127
-1
-Opening pool with 1 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 6 - block: 2004
-
-trials left: 1 - iteration: 7 - block: 3004
-virtual: 1
-weight: 69
-jumpSize: 1
-minAnchorPrice: 34
-jumpLog: 0.6931471805599453
-anchorLog: 0.028987536873252187
-23.911903366978944
-maxTicks: 1
-maxTicks_: 23
-1
-virtual: 1
-weight: 100
-jumpSize: 1
-minAnchorPrice: 50
-jumpLog: 0.6931471805599453
-anchorLog: 0.01980262729617973
-35.0027887811465
-maxTicks: 1
-maxTicks_: 35
-1
-Opening pool with 1 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 8 - block: 3005
-
-          maxBuying: 518
-          maxSelling: 1
-          maxBuyingA0: 140896
-          maxSellingA0: 819200
-          maxSwapA0: 140896
-          spotBuying: 819200
-          spotSelling: 272
-          buyingAmount: 518
-          sellingAmount: 1
-        
-Swapping.boundary()
-boughtAssetForSale (old):
-        sellingAmm  138 > 
-        spotSelling 136
-subSwap: 1 sold
-boughtAssetForSale (old):
-        sellingAmm  138 > 
-        spotSelling 136
-Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: ac52e159e2f23c8b0747277fec6f3a41c04ad78a8d7e8f4f76a40565, 
-   +     +  virtual: +[
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 1,
-   +     +  +  1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4_: 1
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 69,
-   +     +  +  1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4_: 100
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 1,
-   +     +  +  1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4_: 1
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: ac52e159e2f23c8b0747277fec6f3a41c04ad78a8d7e8f4f76a40565,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: ce1929b1d037bb1b3a840da9d45c18d454f1827f42f34d7c387e278b3c55d9c5),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 588e7894265847739f520940c1a430891ddce8a9189b1542432b30a2cac2c0e4),
-   +     +  anchorPrices: +[
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 34,
-   +     +  +  1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4_: 50
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 2775640,
-   +  +  1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4_: 8709,
-   +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 1
-   +  ]
-     )
-  boughtAsset:  Asset(1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4, )
-  soldAsset:    Asset(50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8, hMYUqwdeIC9HkAbEETqlPQ0BWTzl)
-  boughtAmount: 518
-  soldAmount:   1
-  boughtSpot:   819200
-  soldSpot:     272
-  (boughtA0:    140896)
-  (soldA0:      819200)
-  boughtExp:    14
-  soldExp:      3
-  spotPrice:    0.00033203125
-  eff.Price:    0.0019305019305019305
-  maxBuying:    8709
-  (maxBuyingA0: 2368848)
-)
-
-trials left: 1 - iteration: 9 - block: 3006
-
-          maxBuying: 4096
-          maxSelling: 4
-          maxBuyingA0: 2228224
-          maxSellingA0: 1638400
-          maxSwapA0: 1638400
-          spotBuying: 409600
-          spotSelling: 544
-          buyingAmount: 3011
-          sellingAmount: 4
-        
-Swapping.boundary()
-boughtAssetForSale (new):
-        sellingAmm  483 > 
-        spotSelling 272
-subSwap: 1 bought
-boughtAssetForSale (new):
-        sellingAmm  276 > 
-        spotSelling 272
-Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: ac52e159e2f23c8b0747277fec6f3a41c04ad78a8d7e8f4f76a40565, 
-   +     +  virtual: +[
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 1,
-   +     +  +  1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4_: 1
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 69,
-   +     +  +  1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4_: 100
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 1,
-   +     +  +  1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4_: 1
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: ac52e159e2f23c8b0747277fec6f3a41c04ad78a8d7e8f4f76a40565,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: ce1929b1d037bb1b3a840da9d45c18d454f1827f42f34d7c387e278b3c55d9c5),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 588e7894265847739f520940c1a430891ddce8a9189b1542432b30a2cac2c0e4),
-   +     +  anchorPrices: +[
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 34,
-   +     +  +  1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4_: 50
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 2775640,
-   +  +  1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4_: 8191,
-   +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 2
-   +  ]
-     )
-  boughtAsset:  Asset(1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4, )
-  soldAsset:    Asset(50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8, hMYUqwdeIC9HkAbEETqlPQ0BWTzl)
-  boughtAmount: 1
-  soldAmount:   1
-  boughtSpot:   409600
-  soldSpot:     544
-  (boughtA0:    544)
-  (soldA0:      409600)
-  boughtExp:    13
-  soldExp:      4
-  spotPrice:    0.001328125
-  eff.Price:    1
-  maxBuying:    1
-  (maxBuyingA0: 544)
-)
-
-trials left: 1 - iteration: 10 - block: 3007
-
-          maxBuying: 4095
-          maxSelling: 1
-          maxBuyingA0: 2227680
-          maxSellingA0: 409600
-          maxSwapA0: 409600
-          spotBuying: 409600
-          spotSelling: 544
-          buyingAmount: 752
-          sellingAmount: 1
-        
-Swapping.boundary()
-boughtAssetForSale (old):
-        sellingAmm  276 > 
-        spotSelling 272
-subSwap: 1 bought
-boughtAssetForSale (old):
-        sellingAmm  276 > 
-        spotSelling 272
-Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: ac52e159e2f23c8b0747277fec6f3a41c04ad78a8d7e8f4f76a40565, 
-   +     +  virtual: +[
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 1,
-   +     +  +  1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4_: 1
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 69,
-   +     +  +  1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4_: 100
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 1,
-   +     +  +  1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4_: 1
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: ac52e159e2f23c8b0747277fec6f3a41c04ad78a8d7e8f4f76a40565,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: ce1929b1d037bb1b3a840da9d45c18d454f1827f42f34d7c387e278b3c55d9c5),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 588e7894265847739f520940c1a430891ddce8a9189b1542432b30a2cac2c0e4),
-   +     +  anchorPrices: +[
-   +     +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 34,
-   +     +  +  1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4_: 50
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 2775640,
-   +  +  1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4_: 8190,
-   +  +  50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8_hMYUqwdeIC9HkAbEETqlPQ0BWTzl: 3
-   +  ]
-     )
-  boughtAsset:  Asset(1f8e64d88703282bbc2fd859d83096fbdff475e8149d95aca6a368f4, )
-  soldAsset:    Asset(50c2043a0098d9248ca016289aaa1028d4066e765dcc4149e13364c8, hMYUqwdeIC9HkAbEETqlPQ0BWTzl)
-  boughtAmount: 1
-  soldAmount:   1
-  boughtSpot:   409600
-  soldSpot:     544
-  (boughtA0:    544)
-  (soldA0:      409600)
-  boughtExp:    13
-  soldExp:      4
-  spotPrice:    0.001328125
-  eff.Price:    1
-  maxBuying:    1
-  (maxBuyingA0: 544)
-)
-
-trials left: 1 - iteration: 11 - block: 4007
-virtual: 2562
-weight: 7
-jumpSize: 1
-minAnchorPrice: 8967
-jumpLog: 0.6931471805599453
-anchorLog: 0.00011151379994828864
-6215.797335230013
-maxTicks: 1
-maxTicks_: 6215
-1
 virtual: 9000
 weight: 1
 jumpSize: 100
@@ -551,230 +18,3344 @@ anchorLog: 0.00011222714786481952
 maxTicks: 1
 maxTicks_: 88
 1
-virtual: 1
-weight: 100
-jumpSize: 1
-minAnchorPrice: 50
-jumpLog: 0.6931471805599453
-anchorLog: 0.01980262729617973
-35.0027887811465
-maxTicks: 1
-maxTicks_: 35
-1
-Opening pool with 1 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 12 - block: 5007
-virtual: 1
-weight: 100
-jumpSize: 1
-minAnchorPrice: 50
-jumpLog: 0.6931471805599453
-anchorLog: 0.01980262729617973
-35.0027887811465
-maxTicks: 1
-maxTicks_: 35
-1
-virtual: 1
-weight: 25
-jumpSize: 24
-minAnchorPrice: 24
-jumpLog: 0.0408219945202552
-anchorLog: 0.0408219945202552
-1
-maxTicks: 1
-maxTicks_: 1
-1
-virtual: 2804
+virtual: 4346
 weight: 1
-jumpSize: 1
-minAnchorPrice: 1402
-jumpLog: 0.6931471805599453
-anchorLog: 0.0007130125079254985
-972.1388795501623
-maxTicks: 1
-maxTicks_: 972
-1
-Opening pool with 1 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 13 - block: 6007
-virtual: 9000
-weight: 1
-jumpSize: 1
-minAnchorPrice: 4500
-jumpLog: 0.6931471805599453
-anchorLog: 0.00022219753452146847
-3119.5088732767836
-maxTicks: 1
-maxTicks_: 3119
-1
-virtual: 2928
-weight: 2
-jumpSize: 78
-minAnchorPrice: 5781
-jumpLog: 0.012739025777429712
-anchorLog: 0.00017296549381518283
-73.65067734863707
-maxTicks: 1
-maxTicks_: 73
-1
-virtual: 2
-weight: 51
 jumpSize: 100
-minAnchorPrice: 100
+minAnchorPrice: 4302
 jumpLog: 0.009950330853168092
-anchorLog: 0.009950330853168092
+anchorLog: 0.00023242301092417651
+42.81129830305053
+maxTicks: 1
+maxTicks_: 42
 1
+virtual: 1
+weight: 50
+jumpSize: 44
+minAnchorPrice: 48
+jumpLog: 0.022472855852058576
+anchorLog: 0.02061928720273561
+1.089894894576038
 maxTicks: 1
 maxTicks_: 1
 1
 Opening pool with 1 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 14 - block: 6008
+trials left: 1 - iteration: 1 - block: 453
 
-          maxBuying: 1027599
-          maxSelling: 1
-          maxBuyingA0: 73715841864
-          maxSellingA0: 209715200
-          maxSwapA0: 209715200
-          spotBuying: 209715200
-          spotSelling: 71736
-          buyingAmount: 2923
-          sellingAmount: 1
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    66
+          maxBuyingA0:   12621
+          maxSellingA0:  286770
+          maxSwapA0:     12621
+          spotBuying:    4345
+          spotSelling:   12621
+          buyingAmount:  1
+          sellingAmount: 3
+          ---------------------------
         
 Swapping.boundary()
-[0m[38;5;245m----- output end -----[0m
-emulator ... [0m[31mFAILED[0m [0m[38;5;245m(3s)[0m
-[0m[38;5;245mrunning 0 tests from ./tests/types.test.ts[0m
+boughtAssetForSale (old):
+        sellingAmm  12555 > 
+        spotSelling 12496
 
-[0m[1m[37m[41m ERRORS [0m
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
 
-emulator [0m[38;5;245m=> ./tests/emulator.test.ts:15:6[0m
-[0m[1m[31merror[0m: AssertionError: lowering selling price should fail: Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: 3773534bc8f5014b132277bd9ea1619079806d9c86576e12d1fa53d7, 
-   +     +  virtual: +[
-   +     +  +  ea86e78bc7cb6890e5ed06ec4bc709a5ae78ba67f38f80ab6ed6735e_Q42HnYgngsksSVdj06bYdjNZTMD9cux1: 2562,
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 9000,
-   +     +  +  _: 1
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  ea86e78bc7cb6890e5ed06ec4bc709a5ae78ba67f38f80ab6ed6735e_Q42HnYgngsksSVdj06bYdjNZTMD9cux1: 7,
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 1,
-   +     +  +  _: 100
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  ea86e78bc7cb6890e5ed06ec4bc709a5ae78ba67f38f80ab6ed6735e_Q42HnYgngsksSVdj06bYdjNZTMD9cux1: 1,
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 100,
-   +     +  +  _: 1
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: 3773534bc8f5014b132277bd9ea1619079806d9c86576e12d1fa53d7,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 7556f03c2c481f538915cdbe77f084a2c38a96d2bf4dab0942074188dbe89915),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: e1d5c0495c2bd2ba0af7e4c526fc4ee6e473eb4ca26c553c56d48ee6817510b8),
-   +     +  anchorPrices: +[
-   +     +  +  ea86e78bc7cb6890e5ed06ec4bc709a5ae78ba67f38f80ab6ed6735e_Q42HnYgngsksSVdj06bYdjNZTMD9cux1: 8967,
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 8910,
-   +     +  +  _: 50
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 3124750,
-   +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 8030,
-   +  +  ea86e78bc7cb6890e5ed06ec4bc709a5ae78ba67f38f80ab6ed6735e_Q42HnYgngsksSVdj06bYdjNZTMD9cux1: 1
-   +  ]
-     )
-  boughtAsset:  Asset(, )
-  soldAsset:    Asset(ea86e78bc7cb6890e5ed06ec4bc709a5ae78ba67f38f80ab6ed6735e, Q42HnYgngsksSVdj06bYdjNZTMD9cux1)
-  boughtAmount: 2923
-  soldAmount:   1
-  boughtSpot:   209715200
-  soldSpot:     71736
-  (boughtA0:    209684328)
-  (soldA0:      209715200)
-  boughtExp:    22
-  soldExp:      3
-  spotPrice:    0.00034206390380859376
-  eff.Price:    0.00034211426616489907
-  maxBuying:    3124750
-  (maxBuyingA0: 224157066000)
-)
-~~~>
+              maxBuying:     1
+              maxSelling:    66
+              maxBuyingA0:   12621
+              maxSellingA0:  3300
+              maxSwapA0:     3300
+              spotBuying:    50
+              spotSelling:   12621
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+              maxBuying:     1
+              maxSelling:    193
+              maxBuyingA0:   12748
+              maxSellingA0:  9650
+              maxSwapA0:     9650
+              spotBuying:    50
+              spotSelling:   12748
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    320
+          maxBuyingA0:   12875
+          maxSellingA0:  16000
+          maxSwapA0:     12875
+          spotBuying:    50
+          spotSelling:   12875
+          buyingAmount:  1
+          sellingAmount: 258
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  12813 > 
+        spotSelling 12748
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     59
+          maxSelling:    41
+          maxBuyingA0:   258892
+          maxSellingA0:  512336
+          maxSwapA0:     258892
+          spotBuying:    12496
+          spotSelling:   4388
+          buyingAmount:  59
+          sellingAmount: 21
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  4347 > 
+        spotSelling 4345
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    41
+              maxBuyingA0:   4388
+              maxSellingA0:  2050
+              maxSwapA0:     2050
+              spotBuying:    50
+              spotSelling:   4388
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+              maxBuying:     1
+              maxSelling:    85
+              maxBuyingA0:   4432
+              maxSellingA0:  4250
+              maxSwapA0:     4250
+              spotBuying:    50
+              spotSelling:   4432
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    129
+          maxBuyingA0:   4476
+          maxSellingA0:  6450
+          maxSwapA0:     4476
+          spotBuying:    50
+          spotSelling:   4476
+          buyingAmount:  1
+          sellingAmount: 90
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  4437 > 
+        spotSelling 4432
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     59
+          maxSelling:    1
+          maxBuyingA0:   8909
+          maxSellingA0:  12496
+          maxSwapA0:     8909
+          spotBuying:    12496
+          spotSelling:   151
+          buyingAmount:  59
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  150 > 
+        spotSelling 147
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    1
+          maxBuyingA0:   151
+          maxSellingA0:  4345
+          maxSwapA0:     151
+          spotBuying:    4345
+          spotSelling:   151
+          buyingAmount:  1
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  150 > 
+        spotSelling 147
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    1
+          maxBuyingA0:   151
+          maxSellingA0:  4345
+          maxSwapA0:     151
+          spotBuying:    4345
+          spotSelling:   151
+          buyingAmount:  1
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  150 > 
+        spotSelling 147
 Swapping (
   paramUtxo: ParamUtxo (
      +  param: Param (
-   +     +  owner: 3773534bc8f5014b132277bd9ea1619079806d9c86576e12d1fa53d7, 
+   +     +  owner: f2c8673be63012b94c675f9d79926fbc7bfef25a09b2f186b3405dfd, 
    +     +  virtual: +[
-   +     +  +  ea86e78bc7cb6890e5ed06ec4bc709a5ae78ba67f38f80ab6ed6735e_Q42HnYgngsksSVdj06bYdjNZTMD9cux1: 2562,
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 9000,
-   +     +  +  _: 1
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 9000,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 4346,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 1
    +     +  ], 
    +     +  weights: +[
-   +     +  +  ea86e78bc7cb6890e5ed06ec4bc709a5ae78ba67f38f80ab6ed6735e_Q42HnYgngsksSVdj06bYdjNZTMD9cux1: 7,
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 1,
-   +     +  +  _: 100
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 1,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 1,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 50
    +     +  ]
    +     +  jumpSizes: +[
-   +     +  +  ea86e78bc7cb6890e5ed06ec4bc709a5ae78ba67f38f80ab6ed6735e_Q42HnYgngsksSVdj06bYdjNZTMD9cux1: 1,
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 100,
-   +     +  +  _: 1
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 100,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 100,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 44
    +     +  ], 
    +     +  active: 1
    +     )
      )
   diracUtxo: DiracUtxo (
      +  dirac: Dirac(
-   +     +  owner: 3773534bc8f5014b132277bd9ea1619079806d9c86576e12d1fa53d7,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 7556f03c2c481f538915cdbe77f084a2c38a96d2bf4dab0942074188dbe89915),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: e1d5c0495c2bd2ba0af7e4c526fc4ee6e473eb4ca26c553c56d48ee6817510b8),
+   +     +  owner: f2c8673be63012b94c675f9d79926fbc7bfef25a09b2f186b3405dfd,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: d1127048d65df0f5e07b511701e90b65cc21d8cb549d1ffc6278b2d201d050ce),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 1a383455ab69c981c3bd082b7cc8d5dc490e9416040bbeb58f49c62f81bf6acc),
    +     +  anchorPrices: +[
-   +     +  +  ea86e78bc7cb6890e5ed06ec4bc709a5ae78ba67f38f80ab6ed6735e_Q42HnYgngsksSVdj06bYdjNZTMD9cux1: 8967,
-   +     +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 8910,
-   +     +  +  _: 50
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 8910,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 4302,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 48
    +     +  ],
    +     ),
      +  balance: +[
-   +  +  _: 3124750,
-   +  +  5d3bebfbc6e91dcf282ce52d1dac2b102c79710376b5fc599fcf99bd_u8Lbb1KpCi6enpc8xYy0PaOfoOW6mDvx: 8030,
-   +  +  ea86e78bc7cb6890e5ed06ec4bc709a5ae78ba67f38f80ab6ed6735e_Q42HnYgngsksSVdj06bYdjNZTMD9cux1: 1
+   +  +  _: 3676430,
+   +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 1,
+   +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 3555,
+   +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 1
+   +  ]
+     )
+  boughtAsset:  Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+  soldAsset:    Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+  boughtAmount: 1
+  soldAmount:   1
+  boughtSpot:   4345
+  soldSpot:     151
+  (boughtA0:    151)
+  (soldA0:      4345)
+  boughtExp:    1
+  soldExp:      51
+  spotPrice:    0.03475258918296893
+  eff.Price:    1
+  maxBuying:    1
+  (maxBuyingA0: 151)
+)
+
+trials left: 1 - iteration: 2 - block: 454
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    66
+              maxBuyingA0:   12621
+              maxSellingA0:  6600
+              maxSwapA0:     6600
+              spotBuying:    100
+              spotSelling:   12621
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    193
+          maxBuyingA0:   12748
+          maxSellingA0:  19300
+          maxSwapA0:     12748
+          spotBuying:    100
+          spotSelling:   12748
+          buyingAmount:  1
+          sellingAmount: 128
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  12683 > 
+        spotSelling 12621
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     59
+          maxSelling:    42
+          maxBuyingA0:   258892
+          maxSellingA0:  524832
+          maxSwapA0:     258892
+          spotBuying:    12496
+          spotSelling:   4388
+          buyingAmount:  59
+          sellingAmount: 21
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  4346 > 
+        spotSelling 4345
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    42
+              maxBuyingA0:   4388
+              maxSellingA0:  4200
+              maxSwapA0:     4200
+              spotBuying:    100
+              spotSelling:   4388
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    86
+          maxBuyingA0:   4432
+          maxSellingA0:  8600
+          maxSwapA0:     4432
+          spotBuying:    100
+          spotSelling:   4432
+          buyingAmount:  1
+          sellingAmount: 45
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  4391 > 
+        spotSelling 4388
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     59
+          maxSelling:    1
+          maxBuyingA0:   11918
+          maxSellingA0:  12496
+          maxSwapA0:     11918
+          spotBuying:    12496
+          spotSelling:   202
+          buyingAmount:  59
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  200 > 
+        spotSelling 197
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     59
+          maxSelling:    1
+          maxBuyingA0:   11918
+          maxSellingA0:  12496
+          maxSwapA0:     11918
+          spotBuying:    12496
+          spotSelling:   202
+          buyingAmount:  59
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  200 > 
+        spotSelling 197
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: f2c8673be63012b94c675f9d79926fbc7bfef25a09b2f186b3405dfd, 
+   +     +  virtual: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 9000,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 4346,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 1,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 1,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 50
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 100,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 100,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 44
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: f2c8673be63012b94c675f9d79926fbc7bfef25a09b2f186b3405dfd,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: d1127048d65df0f5e07b511701e90b65cc21d8cb549d1ffc6278b2d201d050ce),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 1a383455ab69c981c3bd082b7cc8d5dc490e9416040bbeb58f49c62f81bf6acc),
+   +     +  anchorPrices: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 8910,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 4302,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 48
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 3676430,
+   +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 3555,
+   +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 2
+   +  ]
+     )
+  boughtAsset:  Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+  soldAsset:    Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+  boughtAmount: 59
+  soldAmount:   1
+  boughtSpot:   12496
+  soldSpot:     202
+  (boughtA0:    11918)
+  (soldA0:      12496)
+  boughtExp:    34
+  soldExp:      64
+  spotPrice:    0.0161651728553137
+  eff.Price:    0.01694915254237288
+  maxBuying:    3555
+  (maxBuyingA0: 718110)
+)
+
+trials left: 1 - iteration: 3 - block: 1454
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    125
+          maxBuyingA0:   12621
+          maxSellingA0:  18375
+          maxSwapA0:     12621
+          spotBuying:    147
+          spotSelling:   12621
+          buyingAmount:  1
+          sellingAmount: 86
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  12582 > 
+        spotSelling 12496
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     123
+          maxSelling:    42
+          maxBuyingA0:   539724
+          maxSellingA0:  519666
+          maxSwapA0:     519666
+          spotBuying:    12373
+          spotSelling:   4388
+          buyingAmount:  118
+          sellingAmount: 42
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  4346 > 
+        spotSelling 4345
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    42
+          maxBuyingA0:   4388
+          maxSellingA0:  6174
+          maxSwapA0:     4388
+          spotBuying:    147
+          spotSelling:   4388
+          buyingAmount:  1
+          sellingAmount: 30
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  4346 > 
+        spotSelling 4345
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    18
+              maxBuyingA0:   4388
+              maxSellingA0:  2646
+              maxSwapA0:     2646
+              spotBuying:    147
+              spotSelling:   4388
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+              maxBuying:     1
+              maxSelling:    18
+              maxBuyingA0:   4432
+              maxSellingA0:  2646
+              maxSwapA0:     2646
+              spotBuying:    147
+              spotSelling:   4432
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: true
+            
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    30
+          maxBuyingA0:   4388
+          maxSellingA0:  4410
+          maxSwapA0:     4388
+          spotBuying:    147
+          spotSelling:   4388
+          buyingAmount:  1
+          sellingAmount: 30
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  4346 > 
+        spotSelling 4345
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: f2c8673be63012b94c675f9d79926fbc7bfef25a09b2f186b3405dfd, 
+   +     +  virtual: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 9000,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 4346,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 1,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 1,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 50
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 100,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 100,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 44
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: f2c8673be63012b94c675f9d79926fbc7bfef25a09b2f186b3405dfd,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: d1127048d65df0f5e07b511701e90b65cc21d8cb549d1ffc6278b2d201d050ce),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 1a383455ab69c981c3bd082b7cc8d5dc490e9416040bbeb58f49c62f81bf6acc),
+   +     +  anchorPrices: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 8910,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 4302,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 48
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 3676430,
+   +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 3496,
+   +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 3
+   +  ]
+     )
+  boughtAsset:  Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+  soldAsset:    Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+  boughtAmount: 1
+  soldAmount:   30
+  boughtSpot:   147
+  soldSpot:     4388
+  (boughtA0:    4388)
+  (soldA0:      4410)
+  boughtExp:    50
+  soldExp:      2
+  spotPrice:    29.85034013605442
+  eff.Price:    30
+  maxBuying:    3
+  (maxBuyingA0: 13164)
+)
+
+trials left: 1 - iteration: 4 - block: 2252
+
+trials left: 1 - iteration: 5 - block: 2253
+
+trials left: 1 - iteration: 6 - block: 3253
+virtual: 1
+weight: 2
+jumpSize: 1
+minAnchorPrice: 1
+jumpLog: 0.6931471805599453
+anchorLog: 0.6931471805599453
+1
+maxTicks: 866
+maxTicks_: 1
+1
+virtual: 2
+weight: 100
+jumpSize: 100
+minAnchorPrice: 198
+jumpLog: 0.009950330853168092
+anchorLog: 0.005037794029957081
+1.9751364970458831
+maxTicks: 866
+maxTicks_: 1
+1
+virtual: 2795
+weight: 2
+jumpSize: 76
+minAnchorPrice: 5517
+jumpLog: 0.0130720815673527
+anchorLog: 0.00018124150480060101
+72.12520985043903
+maxTicks: 866
+maxTicks_: 72
+3
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 7 - block: 3254
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     30
+          maxSelling:    125
+          maxBuyingA0:   378630
+          maxSellingA0:  543125
+          maxSwapA0:     378630
+          spotBuying:    4345
+          spotSelling:   12621
+          buyingAmount:  30
+          sellingAmount: 88
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  12584 > 
+        spotSelling 12496
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    125
+              maxBuyingA0:   12621
+              maxSellingA0:  12500
+              maxSwapA0:     12500
+              spotBuying:    100
+              spotSelling:   12621
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    252
+          maxBuyingA0:   12748
+          maxSellingA0:  25200
+          maxSwapA0:     12748
+          spotBuying:    100
+          spotSelling:   12748
+          buyingAmount:  1
+          sellingAmount: 128
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  12624 > 
+        spotSelling 12621
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     123
+          maxSelling:    12
+          maxBuyingA0:   539724
+          maxSellingA0:  148476
+          maxSwapA0:     148476
+          spotBuying:    12373
+          spotSelling:   4388
+          buyingAmount:  33
+          sellingAmount: 12
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  4376 > 
+        spotSelling 4345
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    12
+              maxBuyingA0:   4388
+              maxSellingA0:  1200
+              maxSwapA0:     1200
+              spotBuying:    100
+              spotSelling:   4388
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    56
+          maxBuyingA0:   4432
+          maxSellingA0:  5600
+          maxSwapA0:     4432
+          spotBuying:    100
+          spotSelling:   4432
+          buyingAmount:  1
+          sellingAmount: 45
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  4421 > 
+        spotSelling 4388
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     123
+          maxSelling:    1
+          maxBuyingA0:   24846
+          maxSellingA0:  12373
+          maxSwapA0:     12373
+          spotBuying:    12373
+          spotSelling:   202
+          buyingAmount:  61
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  200 > 
+        spotSelling 197
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     30
+          maxSelling:    1
+          maxBuyingA0:   6060
+          maxSellingA0:  4345
+          maxSwapA0:     4345
+          spotBuying:    4345
+          spotSelling:   202
+          buyingAmount:  21
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  200 > 
+        spotSelling 197
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     5985
+          maxSelling:    157
+          maxBuyingA0:   12257280
+          maxSellingA0:  42130269719
+          maxSwapA0:     12257280
+          spotBuying:    268345667
+          spotSelling:   2048
+          buyingAmount:  5985
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  1734 > 
+        spotSelling 1024
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     21
+          maxSelling:    1
+          maxBuyingA0:   4242
+          maxSellingA0:  4345
+          maxSwapA0:     4242
+          spotBuying:    4345
+          spotSelling:   202
+          buyingAmount:  21
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  200 > 
+        spotSelling 197
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: f2c8673be63012b94c675f9d79926fbc7bfef25a09b2f186b3405dfd, 
+   +     +  virtual: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 9000,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 4346,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 1,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 1,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 50
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 100,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 100,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 44
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: f2c8673be63012b94c675f9d79926fbc7bfef25a09b2f186b3405dfd,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: d1127048d65df0f5e07b511701e90b65cc21d8cb549d1ffc6278b2d201d050ce),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 1a383455ab69c981c3bd082b7cc8d5dc490e9416040bbeb58f49c62f81bf6acc),
+   +     +  anchorPrices: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 8910,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 4302,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 48
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 3680740,
+   +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 30,
+   +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 3496,
+   +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 2
+   +  ]
+     )
+  boughtAsset:  Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+  soldAsset:    Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+  boughtAmount: 21
+  soldAmount:   1
+  boughtSpot:   4345
+  soldSpot:     202
+  (boughtA0:    4242)
+  (soldA0:      4345)
+  boughtExp:    1
+  soldExp:      64
+  spotPrice:    0.04649021864211737
+  eff.Price:    0.047619047619047616
+  maxBuying:    30
+  (maxBuyingA0: 6060)
+)
+
+trials left: 1 - iteration: 8 - block: 3255
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     9
+          maxSelling:    125
+          maxBuyingA0:   113589
+          maxSellingA0:  543125
+          maxSwapA0:     113589
+          spotBuying:    4345
+          spotSelling:   12621
+          buyingAmount:  9
+          sellingAmount: 27
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  12523 > 
+        spotSelling 12496
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    125
+          maxBuyingA0:   12621
+          maxSellingA0:  18375
+          maxSwapA0:     12621
+          spotBuying:    147
+          spotSelling:   12621
+          buyingAmount:  1
+          sellingAmount: 86
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  12582 > 
+        spotSelling 12496
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     123
+          maxSelling:    33
+          maxBuyingA0:   539724
+          maxSellingA0:  408309
+          maxSwapA0:     408309
+          spotBuying:    12373
+          spotSelling:   4388
+          buyingAmount:  93
+          sellingAmount: 33
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  4355 > 
+        spotSelling 4345
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    33
+          maxBuyingA0:   4388
+          maxSellingA0:  4851
+          maxSwapA0:     4388
+          spotBuying:    147
+          spotSelling:   4388
+          buyingAmount:  1
+          sellingAmount: 30
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  4355 > 
+        spotSelling 4345
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     123
+          maxSelling:    1
+          maxBuyingA0:   31119
+          maxSellingA0:  12373
+          maxSwapA0:     12373
+          spotBuying:    12373
+          spotSelling:   253
+          buyingAmount:  48
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  250 > 
+        spotSelling 247
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     9
+          maxSelling:    1
+          maxBuyingA0:   2277
+          maxSellingA0:  4345
+          maxSwapA0:     2277
+          spotBuying:    4345
+          spotSelling:   253
+          buyingAmount:  9
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  250 > 
+        spotSelling 247
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     5985
+          maxSelling:    157
+          maxBuyingA0:   12257280
+          maxSellingA0:  42130269719
+          maxSwapA0:     12257280
+          spotBuying:    268345667
+          spotSelling:   2048
+          buyingAmount:  5985
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  1734 > 
+        spotSelling 1024
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     5985
+          maxSelling:    1
+          maxBuyingA0:   12257280
+          maxSellingA0:  268345667
+          maxSwapA0:     12257280
+          spotBuying:    268345667
+          spotSelling:   2048
+          buyingAmount:  5985
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  1734 > 
+        spotSelling 1024
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 6003551a4df7ff99a5f668e38cf310df98f42c4d53ffaf2c391aef19, 
+   +     +  virtual: +[
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 1,
+   +     +  +  _: 2,
+   +     +  +  83f20c4570de0e5cdd1e9ed59b41ff1c4d55fb6f6fab43ee8176bf57_: 2795
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 2,
+   +     +  +  _: 100,
+   +     +  +  83f20c4570de0e5cdd1e9ed59b41ff1c4d55fb6f6fab43ee8176bf57_: 2
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 1,
+   +     +  +  _: 100,
+   +     +  +  83f20c4570de0e5cdd1e9ed59b41ff1c4d55fb6f6fab43ee8176bf57_: 76
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 6003551a4df7ff99a5f668e38cf310df98f42c4d53ffaf2c391aef19,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: c46b20b687996841be6b986032f9b022d2f57c76f9d535975eae8ac6b6180a0d),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: af44c86d2825cc475836eb20be09a8fdd2f5ec386331f15367a6542db46521ae),
+   +     +  anchorPrices: +[
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 1,
+   +     +  +  _: 198,
+   +     +  +  83f20c4570de0e5cdd1e9ed59b41ff1c4d55fb6f6fab43ee8176bf57_: 5517
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2689440,
+   +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 866
    +  ]
      )
   boughtAsset:  Asset(, )
-  soldAsset:    Asset(ea86e78bc7cb6890e5ed06ec4bc709a5ae78ba67f38f80ab6ed6735e, Q42HnYgngsksSVdj06bYdjNZTMD9cux1)
-  boughtAmount: 2923
+  soldAsset:    Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+  boughtAmount: 5985
   soldAmount:   1
-  boughtSpot:   209715200
-  soldSpot:     35868
-  (boughtA0:    104842164)
-  (soldA0:      209715200)
-  boughtExp:    22
-  soldExp:      2
-  spotPrice:    0.00017103195190429688
-  eff.Price:    0.00034211426616489907
-  maxBuying:    3124750
-  (maxBuyingA0: 112078533000)
+  boughtSpot:   268345667
+  soldSpot:     2048
+  (boughtA0:    12257280)
+  (soldA0:      268345667)
+  boughtExp:    1419
+  soldExp:      11
+  spotPrice:    0.000007631947342007949
+  eff.Price:    0.0001670843776106934
+  maxBuying:    2689440
+  (maxBuyingA0: 5507973120)
 )
-    throw new AssertionError(msg);
-[0m[31m          ^[0m
-    at [0m[1m[3massert[0m ([0m[36mhttps://deno.land/std@0.167.0/testing/asserts.ts[0m:[0m[33m141[0m:[0m[33m11[0m)
-    at [0m[1m[3mSwapping.testSellingPrice[0m ([0m[36mfile:///Users/ChrisHiatt/Projects/adaswap/vasil_2022Q3/euclid-offchain/src/chain/actions/swapping.ts[0m:[0m[33m640[0m:[0m[33m7[0m)
-    at [0m[1m[3mSwapping.corruptionTests[0m ([0m[36mfile:///Users/ChrisHiatt/Projects/adaswap/vasil_2022Q3/euclid-offchain/src/chain/actions/swapping.ts[0m:[0m[33m516[0m:[0m[33m10[0m)
-    at new [0m[1m[3mSwapping[0m ([0m[36mfile:///Users/ChrisHiatt/Projects/adaswap/vasil_2022Q3/euclid-offchain/src/chain/actions/swapping.ts[0m:[0m[33m56[0m:[0m[33m36[0m)
-    at [0m[1m[3mFunction.boundary[0m ([0m[36mfile:///Users/ChrisHiatt/Projects/adaswap/vasil_2022Q3/euclid-offchain/src/chain/actions/swapping.ts[0m:[0m[33m303[0m:[0m[33m12[0m)
-    at [0m[36mfile:///Users/ChrisHiatt/Projects/adaswap/vasil_2022Q3/euclid-offchain/src/chain/utxo.ts[0m:[0m[33m454[0m:[0m[33m35[0m
-    at [0m[1m[3mArray.forEach[0m ([0m[36m<anonymous>[0m)
-    at [0m[36mfile:///Users/ChrisHiatt/Projects/adaswap/vasil_2022Q3/euclid-offchain/src/chain/utxo.ts[0m:[0m[33m338[0m:[0m[33m21[0m
-    at [0m[1m[3mArray.forEach[0m ([0m[36m<anonymous>[0m)
-    at [0m[1m[3mDiracUtxo.swappingsFor[0m ([0m[36mfile:///Users/ChrisHiatt/Projects/adaswap/vasil_2022Q3/euclid-offchain/src/chain/utxo.ts[0m:[0m[33m333[0m:[0m[33m20[0m)
 
-[0m[1m[37m[41m FAILURES [0m
+trials left: 1 - iteration: 9 - block: 4089
 
-emulator [0m[38;5;245m=> ./tests/emulator.test.ts:15:6[0m
+trials left: 1 - iteration: 10 - block: 4090
+virtual: 9000
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8910
+jumpLog: 0.009950330853168092
+anchorLog: 0.00011222714786481952
+88.66242297410535
+maxTicks: 1
+maxTicks_: 88
+1
+virtual: 2
+weight: 72
+jumpSize: 100
+minAnchorPrice: 142
+jumpLog: 0.009950330853168092
+anchorLog: 0.00701757265864654
+1.4179163276504194
+maxTicks: 1
+maxTicks_: 1
+1
+Opening pool with 1 dirac utxos and 1 param utxos
 
-[0m[31mFAILED[0m | 0 passed | 1 failed [0m[38;5;245m(31s)[0m
+trials left: 1 - iteration: 11 - block: 4904
 
-[0m[1m[31merror[0m: Test failed
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     9
+          maxSelling:    125
+          maxBuyingA0:   113589
+          maxSellingA0:  543125
+          maxSwapA0:     113589
+          spotBuying:    4345
+          spotSelling:   12621
+          buyingAmount:  9
+          sellingAmount: 27
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  12523 > 
+        spotSelling 12496
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    125
+          maxBuyingA0:   12621
+          maxSellingA0:  18375
+          maxSwapA0:     12621
+          spotBuying:    147
+          spotSelling:   12621
+          buyingAmount:  1
+          sellingAmount: 86
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  12582 > 
+        spotSelling 12496
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     123
+          maxSelling:    33
+          maxBuyingA0:   539724
+          maxSellingA0:  408309
+          maxSwapA0:     408309
+          spotBuying:    12373
+          spotSelling:   4388
+          buyingAmount:  93
+          sellingAmount: 33
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  4355 > 
+        spotSelling 4345
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    33
+          maxBuyingA0:   4388
+          maxSellingA0:  4851
+          maxSwapA0:     4388
+          spotBuying:    147
+          spotSelling:   4388
+          buyingAmount:  1
+          sellingAmount: 30
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  4355 > 
+        spotSelling 4345
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     16274
+          maxSelling:    88
+          maxBuyingA0:   147914386
+          maxSellingA0:  15954094904
+          maxSwapA0:     147914386
+          spotBuying:    181296533
+          spotSelling:   9089
+          buyingAmount:  16274
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  9001 > 
+        spotSelling 8999
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    86
+          maxBuyingA0:   12621
+          maxSellingA0:  12642
+          maxSwapA0:     12621
+          spotBuying:    147
+          spotSelling:   12621
+          buyingAmount:  1
+          sellingAmount: 86
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  12582 > 
+        spotSelling 12496
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: f2c8673be63012b94c675f9d79926fbc7bfef25a09b2f186b3405dfd, 
+   +     +  virtual: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 9000,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 4346,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 1,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 1,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 50
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 100,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 100,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 44
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: f2c8673be63012b94c675f9d79926fbc7bfef25a09b2f186b3405dfd,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: d1127048d65df0f5e07b511701e90b65cc21d8cb549d1ffc6278b2d201d050ce),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 1a383455ab69c981c3bd082b7cc8d5dc490e9416040bbeb58f49c62f81bf6acc),
+   +     +  anchorPrices: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 8910,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 4302,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 48
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 3680740,
+   +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 9,
+   +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 3496,
+   +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 3
+   +  ]
+     )
+  boughtAsset:  Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+  soldAsset:    Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+  boughtAmount: 1
+  soldAmount:   86
+  boughtSpot:   147
+  soldSpot:     12621
+  (boughtA0:    12621)
+  (soldA0:      12642)
+  boughtExp:    50
+  soldExp:      35
+  spotPrice:    85.85714285714286
+  eff.Price:    86
+  maxBuying:    3
+  (maxBuyingA0: 37863)
+)
+
+trials left: 1 - iteration: 12 - block: 5904
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     9
+          maxSelling:    39
+          maxBuyingA0:   113589
+          maxSellingA0:  169455
+          maxSwapA0:     113589
+          spotBuying:    4345
+          spotSelling:   12621
+          buyingAmount:  9
+          sellingAmount: 27
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  12582 > 
+        spotSelling 12496
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    39
+              maxBuyingA0:   12621
+              maxSellingA0:  3900
+              maxSwapA0:     3900
+              spotBuying:    100
+              spotSelling:   12621
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    166
+          maxBuyingA0:   12748
+          maxSellingA0:  16600
+          maxSwapA0:     12748
+          spotBuying:    100
+          spotSelling:   12748
+          buyingAmount:  1
+          sellingAmount: 128
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  12710 > 
+        spotSelling 12621
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    1
+              maxBuyingA0:   12621
+              maxSellingA0:  100
+              maxSwapA0:     100
+              spotBuying:    100
+              spotSelling:   12621
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+              maxBuying:     1
+              maxSelling:    1
+              maxBuyingA0:   12748
+              maxSellingA0:  100
+              maxSwapA0:     100
+              spotBuying:    100
+              spotSelling:   12748
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: true
+            
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    39
+              maxBuyingA0:   12621
+              maxSellingA0:  3900
+              maxSwapA0:     3900
+              spotBuying:    100
+              spotSelling:   12621
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    128
+          maxBuyingA0:   12748
+          maxSellingA0:  12800
+          maxSwapA0:     12748
+          spotBuying:    100
+          spotSelling:   12748
+          buyingAmount:  1
+          sellingAmount: 128
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  12710 > 
+        spotSelling 12621
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: f2c8673be63012b94c675f9d79926fbc7bfef25a09b2f186b3405dfd, 
+   +     +  virtual: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 9000,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 4346,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 1,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 1,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 50
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 100,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 100,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 44
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: f2c8673be63012b94c675f9d79926fbc7bfef25a09b2f186b3405dfd,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: d1127048d65df0f5e07b511701e90b65cc21d8cb549d1ffc6278b2d201d050ce),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 1a383455ab69c981c3bd082b7cc8d5dc490e9416040bbeb58f49c62f81bf6acc),
+   +     +  anchorPrices: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 8910,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 4302,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 48
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 3680740,
+   +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 9,
+   +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 3582,
+   +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 2
+   +  ]
+     )
+  boughtAsset:  Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+  soldAsset:    Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+  boughtAmount: 1
+  soldAmount:   128
+  boughtSpot:   100
+  soldSpot:     12748
+  (boughtA0:    12748)
+  (soldA0:      12800)
+  boughtExp:    33
+  soldExp:      36
+  spotPrice:    127.48
+  eff.Price:    128
+  maxBuying:    2
+  (maxBuyingA0: 25496)
+)
+
+trials left: 1 - iteration: 13 - block: 5905
+virtual: 1242
+weight: 1
+jumpSize: 76
+minAnchorPrice: 1225
+jumpLog: 0.0130720815673527
+anchorLog: 0.0008159935173293592
+16.01983507189607
+maxTicks: 8426
+maxTicks_: 16
+3
+virtual: 9000
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8910
+jumpLog: 0.009950330853168092
+anchorLog: 0.00011222714786481952
+88.66242297410535
+maxTicks: 8426
+maxTicks_: 88
+3
+virtual: 4666
+weight: 1
+jumpSize: 100
+minAnchorPrice: 4619
+jumpLog: 0.009950330853168092
+anchorLog: 0.00021647364517923627
+45.96555319669236
+maxTicks: 2808
+maxTicks_: 45
+3
+virtual: 9000
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8910
+jumpLog: 0.009950330853168092
+anchorLog: 0.00011222714786481952
+88.66242297410535
+virtual: 9000
+weight: 1
+jumpSize: 100
+minAnchorPrice: 8910
+jumpLog: 0.009950330853168092
+anchorLog: 0.00011222714786481952
+88.66242297410535
+virtual: 4666
+weight: 1
+jumpSize: 100
+minAnchorPrice: 4619
+jumpLog: 0.009950330853168092
+anchorLog: 0.00021647364517923627
+45.96555319669236
+virtual: 4666
+weight: 1
+jumpSize: 100
+minAnchorPrice: 4619
+jumpLog: 0.009950330853168092
+anchorLog: 0.00021647364517923627
+45.96555319669236
+virtual: 4666
+weight: 1
+jumpSize: 100
+minAnchorPrice: 4619
+jumpLog: 0.009950330853168092
+anchorLog: 0.00021647364517923627
+45.96555319669236
+Opening pool with 6 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 14 - block: 5906
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     9
+          maxSelling:    38
+          maxBuyingA0:   114732
+          maxSellingA0:  165110
+          maxSwapA0:     114732
+          spotBuying:    4345
+          spotSelling:   12748
+          buyingAmount:  9
+          sellingAmount: 27
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  12710 > 
+        spotSelling 12621
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    38
+              maxBuyingA0:   12748
+              maxSellingA0:  1900
+              maxSwapA0:     1900
+              spotBuying:    50
+              spotSelling:   12748
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+              maxBuying:     1
+              maxSelling:    165
+              maxBuyingA0:   12875
+              maxSellingA0:  8250
+              maxSwapA0:     8250
+              spotBuying:    50
+              spotSelling:   12875
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    294
+          maxBuyingA0:   13004
+          maxSellingA0:  14700
+          maxSwapA0:     13004
+          spotBuying:    50
+          spotSelling:   13004
+          buyingAmount:  1
+          sellingAmount: 261
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  12971 > 
+        spotSelling 12875
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     89
+          maxSelling:    33
+          maxBuyingA0:   390532
+          maxSellingA0:  416493
+          maxSwapA0:     390532
+          spotBuying:    12621
+          spotSelling:   4388
+          buyingAmount:  89
+          sellingAmount: 31
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  4355 > 
+        spotSelling 4345
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    33
+              maxBuyingA0:   4388
+              maxSellingA0:  1650
+              maxSwapA0:     1650
+              spotBuying:    50
+              spotSelling:   4388
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+              maxBuying:     1
+              maxSelling:    77
+              maxBuyingA0:   4432
+              maxSellingA0:  3850
+              maxSwapA0:     3850
+              spotBuying:    50
+              spotSelling:   4432
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    121
+          maxBuyingA0:   4476
+          maxSellingA0:  6050
+          maxSwapA0:     4476
+          spotBuying:    50
+          spotSelling:   4476
+          buyingAmount:  1
+          sellingAmount: 90
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  4445 > 
+        spotSelling 4432
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     89
+          maxSelling:    1
+          maxBuyingA0:   13439
+          maxSellingA0:  12621
+          maxSwapA0:     12621
+          spotBuying:    12621
+          spotSelling:   151
+          buyingAmount:  83
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  150 > 
+        spotSelling 147
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     9
+          maxSelling:    1
+          maxBuyingA0:   1359
+          maxSellingA0:  4345
+          maxSwapA0:     1359
+          spotBuying:    4345
+          spotSelling:   151
+          buyingAmount:  9
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  150 > 
+        spotSelling 147
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     16274
+          maxSelling:    88
+          maxBuyingA0:   147914386
+          maxSellingA0:  15954094904
+          maxSwapA0:     147914386
+          spotBuying:    181296533
+          spotSelling:   9089
+          buyingAmount:  16274
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  9001 > 
+        spotSelling 8999
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     12499
+          maxSelling:    3
+          maxBuyingA0:   33109851
+          maxSellingA0:  8406861
+          maxSwapA0:     8406861
+          spotBuying:    2802287
+          spotSelling:   2649
+          buyingAmount:  3173
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     12499
+          maxSelling:    3
+          maxBuyingA0:   33109851
+          maxSellingA0:  8406861
+          maxSwapA0:     8406861
+          spotBuying:    2802287
+          spotSelling:   2649
+          buyingAmount:  3173
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     12499
+          maxSelling:    3
+          maxBuyingA0:   33109851
+          maxSellingA0:  8406861
+          maxSwapA0:     8406861
+          spotBuying:    2802287
+          spotSelling:   2649
+          buyingAmount:  3173
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     26429
+          maxSelling:    3
+          maxBuyingA0:   70010421
+          maxSellingA0:  8365071
+          maxSwapA0:     8365071
+          spotBuying:    2788357
+          spotSelling:   2649
+          buyingAmount:  3157
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     26429
+          maxSelling:    3
+          maxBuyingA0:   70010421
+          maxSellingA0:  8365071
+          maxSwapA0:     8365071
+          spotBuying:    2788357
+          spotSelling:   2649
+          buyingAmount:  3157
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     26429
+          maxSelling:    3
+          maxBuyingA0:   70010421
+          maxSellingA0:  8365071
+          maxSwapA0:     8365071
+          spotBuying:    2788357
+          spotSelling:   2649
+          buyingAmount:  3157
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     3157
+          maxSelling:    1
+          maxBuyingA0:   8362893
+          maxSellingA0:  2788357
+          maxSwapA0:     2788357
+          spotBuying:    2788357
+          spotSelling:   2649
+          buyingAmount:  1052
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 6003551a4df7ff99a5f668e38cf310df98f42c4d53ffaf2c391aef19, 
+   +     +  virtual: +[
+   +     +  +  16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b_T6Zvx7OJiFiasITg54MNVN31GHWJab1U: 1242,
+   +     +  +  c956d9c4a797ffa8818f284734abfda4fb8cf780d388933110797f22_K0MHFR0eRZUTkpshG4f6D3pV: 9000,
+   +     +  +  _: 4666
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b_T6Zvx7OJiFiasITg54MNVN31GHWJab1U: 1,
+   +     +  +  c956d9c4a797ffa8818f284734abfda4fb8cf780d388933110797f22_K0MHFR0eRZUTkpshG4f6D3pV: 1,
+   +     +  +  _: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b_T6Zvx7OJiFiasITg54MNVN31GHWJab1U: 76,
+   +     +  +  c956d9c4a797ffa8818f284734abfda4fb8cf780d388933110797f22_K0MHFR0eRZUTkpshG4f6D3pV: 100,
+   +     +  +  _: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 6003551a4df7ff99a5f668e38cf310df98f42c4d53ffaf2c391aef19,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 65fea11c90f57cf5f1a133d5da5aa7c5a1d679529e67561cafc23d0ffb65138d),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: af44c86d2825cc475836eb20be09a8fdd2f5ec386331f15367a6542db46521ae),
+   +     +  anchorPrices: +[
+   +     +  +  16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b_T6Zvx7OJiFiasITg54MNVN31GHWJab1U: 1225,
+   +     +  +  c956d9c4a797ffa8818f284734abfda4fb8cf780d388933110797f22_K0MHFR0eRZUTkpshG4f6D3pV: 8969,
+   +     +  +  _: 4642
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2810120,
+   +  +  16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b_T6Zvx7OJiFiasITg54MNVN31GHWJab1U: 1404
+   +  ]
+     )
+  boughtAsset:  Asset(, )
+  soldAsset:    Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+  boughtAmount: 1052
+  soldAmount:   1
+  boughtSpot:   2788357
+  soldSpot:     2649
+  (boughtA0:    2786748)
+  (soldA0:      2788357)
+  boughtExp:    643
+  soldExp:      59
+  spotPrice:    0.000950021822887098
+  eff.Price:    0.0009505703422053232
+  maxBuying:    2810120
+  (maxBuyingA0: 7444007880)
+)
+
+trials left: 1 - iteration: 15 - block: 6502
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     9
+          maxSelling:    38
+          maxBuyingA0:   114732
+          maxSellingA0:  165110
+          maxSwapA0:     114732
+          spotBuying:    4345
+          spotSelling:   12748
+          buyingAmount:  9
+          sellingAmount: 27
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  12710 > 
+        spotSelling 12621
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    38
+              maxBuyingA0:   12748
+              maxSellingA0:  1900
+              maxSwapA0:     1900
+              spotBuying:    50
+              spotSelling:   12748
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+              maxBuying:     1
+              maxSelling:    165
+              maxBuyingA0:   12875
+              maxSellingA0:  8250
+              maxSwapA0:     8250
+              spotBuying:    50
+              spotSelling:   12875
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    294
+          maxBuyingA0:   13004
+          maxSellingA0:  14700
+          maxSwapA0:     13004
+          spotBuying:    50
+          spotSelling:   13004
+          buyingAmount:  1
+          sellingAmount: 261
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  12971 > 
+        spotSelling 12875
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     89
+          maxSelling:    33
+          maxBuyingA0:   390532
+          maxSellingA0:  416493
+          maxSwapA0:     390532
+          spotBuying:    12621
+          spotSelling:   4388
+          buyingAmount:  89
+          sellingAmount: 31
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  4355 > 
+        spotSelling 4345
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    33
+              maxBuyingA0:   4388
+              maxSellingA0:  1650
+              maxSwapA0:     1650
+              spotBuying:    50
+              spotSelling:   4388
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+              maxBuying:     1
+              maxSelling:    77
+              maxBuyingA0:   4432
+              maxSellingA0:  3850
+              maxSwapA0:     3850
+              spotBuying:    50
+              spotSelling:   4432
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    121
+          maxBuyingA0:   4476
+          maxSellingA0:  6050
+          maxSwapA0:     4476
+          spotBuying:    50
+          spotSelling:   4476
+          buyingAmount:  1
+          sellingAmount: 90
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  4445 > 
+        spotSelling 4432
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     89
+          maxSelling:    1
+          maxBuyingA0:   13439
+          maxSellingA0:  12621
+          maxSwapA0:     12621
+          spotBuying:    12621
+          spotSelling:   151
+          buyingAmount:  83
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  150 > 
+        spotSelling 147
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     9
+          maxSelling:    1
+          maxBuyingA0:   1359
+          maxSellingA0:  4345
+          maxSwapA0:     1359
+          spotBuying:    4345
+          spotSelling:   151
+          buyingAmount:  9
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  150 > 
+        spotSelling 147
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     16274
+          maxSelling:    88
+          maxBuyingA0:   147914386
+          maxSellingA0:  15954094904
+          maxSwapA0:     147914386
+          spotBuying:    181296533
+          spotSelling:   9089
+          buyingAmount:  16274
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  9001 > 
+        spotSelling 8999
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     12499
+          maxSelling:    3
+          maxBuyingA0:   33109851
+          maxSellingA0:  8406861
+          maxSwapA0:     8406861
+          spotBuying:    2802287
+          spotSelling:   2649
+          buyingAmount:  3173
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     12499
+          maxSelling:    3
+          maxBuyingA0:   33109851
+          maxSellingA0:  8406861
+          maxSwapA0:     8406861
+          spotBuying:    2802287
+          spotSelling:   2649
+          buyingAmount:  3173
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     12499
+          maxSelling:    3
+          maxBuyingA0:   33109851
+          maxSellingA0:  8406861
+          maxSwapA0:     8406861
+          spotBuying:    2802287
+          spotSelling:   2649
+          buyingAmount:  3173
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     26429
+          maxSelling:    3
+          maxBuyingA0:   70010421
+          maxSellingA0:  8365071
+          maxSwapA0:     8365071
+          spotBuying:    2788357
+          spotSelling:   2649
+          buyingAmount:  3157
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     26429
+          maxSelling:    3
+          maxBuyingA0:   70010421
+          maxSellingA0:  8365071
+          maxSwapA0:     8365071
+          spotBuying:    2788357
+          spotSelling:   2649
+          buyingAmount:  3157
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     26429
+          maxSelling:    2
+          maxBuyingA0:   70010421
+          maxSellingA0:  5576714
+          maxSwapA0:     5576714
+          spotBuying:    2788357
+          spotSelling:   2649
+          buyingAmount:  2105
+          sellingAmount: 2
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2647 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     3157
+          maxSelling:    3
+          maxBuyingA0:   8362893
+          maxSellingA0:  8365071
+          maxSwapA0:     8362893
+          spotBuying:    2788357
+          spotSelling:   2649
+          buyingAmount:  3157
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 6003551a4df7ff99a5f668e38cf310df98f42c4d53ffaf2c391aef19, 
+   +     +  virtual: +[
+   +     +  +  16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b_T6Zvx7OJiFiasITg54MNVN31GHWJab1U: 1242,
+   +     +  +  c956d9c4a797ffa8818f284734abfda4fb8cf780d388933110797f22_K0MHFR0eRZUTkpshG4f6D3pV: 9000,
+   +     +  +  _: 4666
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b_T6Zvx7OJiFiasITg54MNVN31GHWJab1U: 1,
+   +     +  +  c956d9c4a797ffa8818f284734abfda4fb8cf780d388933110797f22_K0MHFR0eRZUTkpshG4f6D3pV: 1,
+   +     +  +  _: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b_T6Zvx7OJiFiasITg54MNVN31GHWJab1U: 76,
+   +     +  +  c956d9c4a797ffa8818f284734abfda4fb8cf780d388933110797f22_K0MHFR0eRZUTkpshG4f6D3pV: 100,
+   +     +  +  _: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 6003551a4df7ff99a5f668e38cf310df98f42c4d53ffaf2c391aef19,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 37cd40507ffa50efc7fec59cd0625010082c01dddfd74b9a4601f9d27d48e2f3),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: af44c86d2825cc475836eb20be09a8fdd2f5ec386331f15367a6542db46521ae),
+   +     +  anchorPrices: +[
+   +     +  +  16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b_T6Zvx7OJiFiasITg54MNVN31GHWJab1U: 1225,
+   +     +  +  c956d9c4a797ffa8818f284734abfda4fb8cf780d388933110797f22_K0MHFR0eRZUTkpshG4f6D3pV: 8910,
+   +     +  +  _: 4642
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2810120,
+   +  +  16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b_T6Zvx7OJiFiasITg54MNVN31GHWJab1U: 1404
+   +  ]
+     )
+  boughtAsset:  Asset(, )
+  soldAsset:    Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+  boughtAmount: 3157
+  soldAmount:   3
+  boughtSpot:   2788357
+  soldSpot:     2649
+  (boughtA0:    8362893)
+  (soldA0:      8365071)
+  boughtExp:    643
+  soldExp:      59
+  spotPrice:    0.000950021822887098
+  eff.Price:    0.0009502692429521698
+  maxBuying:    2810120
+  (maxBuyingA0: 7444007880)
+)
+
+trials left: 1 - iteration: 16 - block: 7502
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     9
+          maxSelling:    38
+          maxBuyingA0:   114732
+          maxSellingA0:  165110
+          maxSwapA0:     114732
+          spotBuying:    4345
+          spotSelling:   12748
+          buyingAmount:  9
+          sellingAmount: 27
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  12710 > 
+        spotSelling 12621
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    38
+              maxBuyingA0:   12748
+              maxSellingA0:  1900
+              maxSwapA0:     1900
+              spotBuying:    50
+              spotSelling:   12748
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+              maxBuying:     1
+              maxSelling:    165
+              maxBuyingA0:   12875
+              maxSellingA0:  8250
+              maxSwapA0:     8250
+              spotBuying:    50
+              spotSelling:   12875
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    294
+          maxBuyingA0:   13004
+          maxSellingA0:  14700
+          maxSwapA0:     13004
+          spotBuying:    50
+          spotSelling:   13004
+          buyingAmount:  1
+          sellingAmount: 261
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  12971 > 
+        spotSelling 12875
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     89
+          maxSelling:    33
+          maxBuyingA0:   390532
+          maxSellingA0:  416493
+          maxSwapA0:     390532
+          spotBuying:    12621
+          spotSelling:   4388
+          buyingAmount:  89
+          sellingAmount: 31
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  4355 > 
+        spotSelling 4345
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        sellingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    33
+              maxBuyingA0:   4388
+              maxSellingA0:  1650
+              maxSwapA0:     1650
+              spotBuying:    50
+              spotSelling:   4388
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+              maxBuying:     1
+              maxSelling:    77
+              maxBuyingA0:   4432
+              maxSellingA0:  3850
+              maxSwapA0:     3850
+              spotBuying:    50
+              spotSelling:   4432
+              buyingAmount:  0
+              sellingAmount: 0
+              limitReached: false
+            
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    121
+          maxBuyingA0:   4476
+          maxSellingA0:  6050
+          maxSwapA0:     4476
+          spotBuying:    50
+          spotSelling:   4476
+          buyingAmount:  1
+          sellingAmount: 90
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  4445 > 
+        spotSelling 4432
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     89
+          maxSelling:    1
+          maxBuyingA0:   13439
+          maxSellingA0:  12621
+          maxSwapA0:     12621
+          spotBuying:    12621
+          spotSelling:   151
+          buyingAmount:  83
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  150 > 
+        spotSelling 147
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     9
+          maxSelling:    1
+          maxBuyingA0:   1359
+          maxSellingA0:  4345
+          maxSwapA0:     1359
+          spotBuying:    4345
+          spotSelling:   151
+          buyingAmount:  9
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  150 > 
+        spotSelling 147
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     16274
+          maxSelling:    88
+          maxBuyingA0:   147914386
+          maxSellingA0:  15954094904
+          maxSwapA0:     147914386
+          spotBuying:    181296533
+          spotSelling:   9089
+          buyingAmount:  16274
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  9001 > 
+        spotSelling 8999
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     12499
+          maxSelling:    3
+          maxBuyingA0:   33109851
+          maxSellingA0:  8406861
+          maxSwapA0:     8406861
+          spotBuying:    2802287
+          spotSelling:   2649
+          buyingAmount:  3173
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     12499
+          maxSelling:    3
+          maxBuyingA0:   33109851
+          maxSellingA0:  8406861
+          maxSwapA0:     8406861
+          spotBuying:    2802287
+          spotSelling:   2649
+          buyingAmount:  3173
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     12499
+          maxSelling:    3
+          maxBuyingA0:   33109851
+          maxSellingA0:  8406861
+          maxSwapA0:     8406861
+          spotBuying:    2802287
+          spotSelling:   2649
+          buyingAmount:  3173
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     26429
+          maxSelling:    34
+          maxBuyingA0:   70909007
+          maxSellingA0:  94804138
+          maxSwapA0:     70909007
+          spotBuying:    2788357
+          spotSelling:   2683
+          buyingAmount:  26429
+          sellingAmount: 26
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  2675 > 
+        spotSelling 2649
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     26429
+          maxSelling:    3
+          maxBuyingA0:   70010421
+          maxSellingA0:  8365071
+          maxSwapA0:     8365071
+          spotBuying:    2788357
+          spotSelling:   2649
+          buyingAmount:  3157
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     26429
+          maxSelling:    2
+          maxBuyingA0:   70010421
+          maxSellingA0:  5576714
+          maxSwapA0:     5576714
+          spotBuying:    2788357
+          spotSelling:   2649
+          buyingAmount:  2105
+          sellingAmount: 2
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2647 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     9
+          maxSelling:    1
+          maxBuyingA0:   1359
+          maxSellingA0:  4345
+          maxSwapA0:     1359
+          spotBuying:    4345
+          spotSelling:   151
+          buyingAmount:  9
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  150 > 
+        spotSelling 147
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: f2c8673be63012b94c675f9d79926fbc7bfef25a09b2f186b3405dfd, 
+   +     +  virtual: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 9000,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 4346,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 1,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 1,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 50
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 100,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 100,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 44
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: f2c8673be63012b94c675f9d79926fbc7bfef25a09b2f186b3405dfd,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: d1127048d65df0f5e07b511701e90b65cc21d8cb549d1ffc6278b2d201d050ce),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 1a383455ab69c981c3bd082b7cc8d5dc490e9416040bbeb58f49c62f81bf6acc),
+   +     +  anchorPrices: +[
+   +     +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 8910,
+   +     +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 4302,
+   +     +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 48
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 3680740,
+   +  +  020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b_tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s: 9,
+   +  +  63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe_Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0: 3710,
+   +  +  de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c_zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW: 1
+   +  ]
+     )
+  boughtAsset:  Asset(020cb48bc18187600650e2a4788b953ced0445d1a01d6d028ece3a9b, tF3ohM04MWNWDxrWuMTeVIoeb0o2Ui8s)
+  soldAsset:    Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+  boughtAmount: 9
+  soldAmount:   1
+  boughtSpot:   4345
+  soldSpot:     151
+  (boughtA0:    1359)
+  (soldA0:      4345)
+  boughtExp:    1
+  soldExp:      51
+  spotPrice:    0.03475258918296893
+  eff.Price:    0.1111111111111111
+  maxBuying:    9
+  (maxBuyingA0: 1359)
+)
+
+trials left: 1 - iteration: 17 - block: 8502
+
+trials left: 1 - iteration: 18 - block: 9043
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(63ebe21385d78e8b688c21289d0c0e07ff4a8440e4f2000ec4651bbe, Ua2SeBkBa08NMHT60TTPV1uB3cjHmwQ0)
+        sellingAsset: Asset(de4221a59c66bfae0b462ddfcd8a11f5160d1c8135ba8fa8f58c600c, zbwOVnKzK5PCuNLUoMARpaj1VuicUwmW)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     89
+          maxSelling:    1
+          maxBuyingA0:   17978
+          maxSellingA0:  12621
+          maxSwapA0:     12621
+          spotBuying:    12621
+          spotSelling:   202
+          buyingAmount:  62
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  200 > 
+        spotSelling 197
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     16274
+          maxSelling:    88
+          maxBuyingA0:   147914386
+          maxSellingA0:  15954094904
+          maxSwapA0:     147914386
+          spotBuying:    181296533
+          spotSelling:   9089
+          buyingAmount:  16274
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  9001 > 
+        spotSelling 8999
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     12499
+          maxSelling:    3
+          maxBuyingA0:   33109851
+          maxSellingA0:  8406861
+          maxSwapA0:     8406861
+          spotBuying:    2802287
+          spotSelling:   2649
+          buyingAmount:  3173
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     12499
+          maxSelling:    3
+          maxBuyingA0:   33109851
+          maxSellingA0:  8406861
+          maxSwapA0:     8406861
+          spotBuying:    2802287
+          spotSelling:   2649
+          buyingAmount:  3173
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     12499
+          maxSelling:    3
+          maxBuyingA0:   33109851
+          maxSellingA0:  8406861
+          maxSwapA0:     8406861
+          spotBuying:    2802287
+          spotSelling:   2649
+          buyingAmount:  3173
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     26429
+          maxSelling:    34
+          maxBuyingA0:   70909007
+          maxSellingA0:  94804138
+          maxSwapA0:     70909007
+          spotBuying:    2788357
+          spotSelling:   2683
+          buyingAmount:  26429
+          sellingAmount: 26
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (new):
+        sellingAmm  2675 > 
+        spotSelling 2649
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     26429
+          maxSelling:    3
+          maxBuyingA0:   70010421
+          maxSellingA0:  8365071
+          maxSwapA0:     8365071
+          spotBuying:    2788357
+          spotSelling:   2649
+          buyingAmount:  3157
+          sellingAmount: 3
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     26429
+          maxSelling:    2
+          maxBuyingA0:   70010421
+          maxSellingA0:  5576714
+          maxSwapA0:     5576714
+          spotBuying:    2788357
+          spotSelling:   2649
+          buyingAmount:  2105
+          sellingAmount: 2
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2647 > 
+        spotSelling 2614
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        buyingAsset: Asset(, )
+        sellingAsset: Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+not looping
+
+          ---------------------------
+          maxBuying:     1
+          maxSelling:    3
+          maxBuyingA0:   2649
+          maxSellingA0:  8365071
+          maxSwapA0:     2649
+          spotBuying:    2788357
+          spotSelling:   2649
+          buyingAmount:  1
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+boughtAssetForSale (old):
+        sellingAmm  2646 > 
+        spotSelling 2614
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 6003551a4df7ff99a5f668e38cf310df98f42c4d53ffaf2c391aef19, 
+   +     +  virtual: +[
+   +     +  +  16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b_T6Zvx7OJiFiasITg54MNVN31GHWJab1U: 1242,
+   +     +  +  c956d9c4a797ffa8818f284734abfda4fb8cf780d388933110797f22_K0MHFR0eRZUTkpshG4f6D3pV: 9000,
+   +     +  +  _: 4666
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b_T6Zvx7OJiFiasITg54MNVN31GHWJab1U: 1,
+   +     +  +  c956d9c4a797ffa8818f284734abfda4fb8cf780d388933110797f22_K0MHFR0eRZUTkpshG4f6D3pV: 1,
+   +     +  +  _: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b_T6Zvx7OJiFiasITg54MNVN31GHWJab1U: 76,
+   +     +  +  c956d9c4a797ffa8818f284734abfda4fb8cf780d388933110797f22_K0MHFR0eRZUTkpshG4f6D3pV: 100,
+   +     +  +  _: 100
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 6003551a4df7ff99a5f668e38cf310df98f42c4d53ffaf2c391aef19,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 07f580f6fd7cde16d1cb16fe586e6a9b17c4b2efec18a8e46c3130c3145d6a0a),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: af44c86d2825cc475836eb20be09a8fdd2f5ec386331f15367a6542db46521ae),
+   +     +  anchorPrices: +[
+   +     +  +  16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b_T6Zvx7OJiFiasITg54MNVN31GHWJab1U: 1225,
+   +     +  +  c956d9c4a797ffa8818f284734abfda4fb8cf780d388933110797f22_K0MHFR0eRZUTkpshG4f6D3pV: 8939,
+   +     +  +  _: 4642
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2810120,
+   +  +  16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b_T6Zvx7OJiFiasITg54MNVN31GHWJab1U: 1404
+   +  ]
+     )
+  boughtAsset:  Asset(, )
+  soldAsset:    Asset(16a271f7c9e3f4ba1bec54dfa5944d83cb8c9c28f51672f2e356b85b, T6Zvx7OJiFiasITg54MNVN31GHWJab1U)
+  boughtAmount: 1
+  soldAmount:   1
+  boughtSpot:   2788357
+  soldSpot:     2649
+  (boughtA0:    2649)
+  (soldA0:      2788357)
+  boughtExp:    643
+  soldExp:      59
+  spotPrice:    0.000950021822887098
+  eff.Price:    1
+  maxBuying:    2810120
+  (maxBuyingA0: 7444007880)
+)
+
+trials left: 1 - iteration: 19 - block: 10043
+virtual: 6799
+weight: 1
+jumpSize: 1
+minAnchorPrice: 3399
+jumpLog: 0.6931471805599453
+anchorLog: 0.00029416090813685897
+2356.3538233212726
+maxTicks: 1
+maxTicks_: 2356
+1
+virtual: 1893
+weight: 1
+jumpSize: 100
+minAnchorPrice: 1874
+jumpLog: 0.009950330853168092
+anchorLog: 0.0005334756061437835
+18.65189474190551
+maxTicks: 1
+maxTicks_: 18
+1
+Opening pool with 1 dirac utxos and 1 param utxos
+traces.length: 17
+Opening: 5
+Swapping: 11
+Closing: 1
+--- DONE ---
+Opening: 5
+Swapping: 11
+Closing: 1
+[0m[38;5;245m----- output end -----[0m
+emulator ... [0m[32mok[0m [0m[38;5;245m(6s)[0m
+[0m[38;5;245mrunning 0 tests from ./tests/types.test.ts[0m
+
+[0m[32mok[0m | 1 passed | 0 failed [0m[38;5;245m(24s)[0m
+
