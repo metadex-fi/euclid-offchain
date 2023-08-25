@@ -20,9 +20,8 @@ import { Contract } from "./contract.ts";
 import { User } from "./user.ts";
 import { utxoToCore } from "https://deno.land/x/lucid@0.10.7/mod.ts";
 
-// TODO minimum deposit of 1 ADA is rather the guess
-const getMinAda = (asset: Asset): bigint => asset.equals(Asset.ADA) ? 1000000n : 0n;
-export const getMinBuying = (asset: Asset): bigint => getMinAda(asset) || 1n;
+// TODO minimum ADA deposit is rather the guess
+export const getMinBalance = (asset: Asset): bigint => asset.equals(Asset.ADA) ? 5000000n : 0n;
 
 export class ParamUtxo {
   private constructor(
@@ -261,10 +260,9 @@ export class DiracUtxo {
 
     param.assets.forEach((asset) => {
       // if (asset.equals(Asset.ADA)) return; // TODO for debugging, revert
-      const buyable = buyable_.amountOf(asset, 0n);
+      const buyable = buyable_.amountOf(asset, 0n) - getMinBalance(asset);
       const sellable = sellable_?.amountOf(asset, 0n);
-      const minBuying = getMinBuying(asset);
-      if (buyable < minBuying && sellable && sellable === 0n) return;
+      if (buyable <= 0n && sellable && sellable === 0n) return;
 
       const virtual = param.virtual.amountOf(asset);
       const weight = param.weights.amountOf(asset); // NOTE: inverted
@@ -296,7 +294,7 @@ export class DiracUtxo {
 
       const delta_ = delta(weight, liquidity);
 
-      if (buyable >= minBuying) {
+      if (buyable > 0n) {
         while (spotBuying > 0n) {
           const d = delta_(spotBuying);
           const maxBuying = min(buyable, -d);
@@ -306,7 +304,7 @@ export class DiracUtxo {
           // maxBuying: ${maxBuying}
           // `);
 
-          if (maxBuying >= minBuying) {
+          if (maxBuying > 0n) {
             spotBuying_.initAmountOf(asset, spotBuying);
             expBuying_.initAmountOf(asset, expBuying + 1n); // NOTE/TODO +1n is a hack to fit zeroes into PositiveValue
             maxBuying_.initAmountOf(asset, maxBuying);
@@ -351,8 +349,6 @@ export class DiracUtxo {
     const buyableAssets = maxBuying_.assets.toList;
     
     buyableAssets.forEach((buyingAsset) => {
-      const minBuying = getMinBuying(buyingAsset);
-
       sellableAssets.forEach((sellingAsset) => {
         if (sellingAsset.equals(buyingAsset)) return;
         // console.log(`
@@ -382,7 +378,7 @@ export class DiracUtxo {
         let buyingAmount = maxSwapA0 / spotSelling;
 
         // if (maxSwapA0 < spotSelling) return; // TODO comment out again
-        if (buyingAmount <= minBuying) {
+        if (buyingAmount <= 0n) {
           // console.log("looping")
           // TODO marginal efficiency gains possible here by initialzing only JIT
           const sellingAnchor = this.dirac.anchorPrices.amountOf(sellingAsset);
@@ -393,7 +389,7 @@ export class DiracUtxo {
 
           const buyable = buyable_.amountOf(buyingAsset, 0n);
           const sellable = sellable_?.amountOf(sellingAsset, 0n);
-          if (buyable < minBuying || (sellable && sellable === 0n)) return;
+          if (buyable <= 0n || (sellable && sellable === 0n)) return;
 
           const deltaSelling = delta(
             param.weights.amountOf(sellingAsset),
@@ -405,7 +401,7 @@ export class DiracUtxo {
           );
 
           let limitReached = false;
-          while (buyingAmount <= minBuying) {
+          while (buyingAmount <= 0n) {
             // const buyingAmount = maxSwapA0 / spotSelling;
             // const sellingAmount = ceilDiv(buyingAmount * spotSelling, spotBuying);
             // console.log(`

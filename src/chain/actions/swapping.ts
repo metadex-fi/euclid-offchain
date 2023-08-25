@@ -9,9 +9,9 @@ import { DiracDatum } from "../../types/euclid/euclidDatum.ts";
 import { Swap } from "../../types/euclid/swap.ts";
 import { Asset } from "../../types/general/derived/asset/asset.ts";
 import { Data } from "../../types/general/fundamental/type.ts";
-import { ceilDiv, genNonNegative, min, randomChoice } from "../../utils/generators.ts";
+import { ceilDiv, genNonNegative, genPositive, min, randomChoice } from "../../utils/generators.ts";
 import { User } from "../user.ts";
-import { DiracUtxo, ParamUtxo, getMinBuying } from "../utxo.ts";
+import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
 
 // const compareSubSwaps = false;
@@ -37,9 +37,8 @@ export class Swapping {
     runTests: boolean, // corruption-test-swappings don't run tests themselves.
     private readonly maxBuying: bigint, // for corruption-tests
   ) {
-    const minBuying = getMinBuying(boughtAsset);
     assert(boughtAmount <= maxBuying, `boughtAmount (${boughtAmount}) must be less than or equal to maxBuying (${maxBuying}`);
-    assert(boughtAmount >= minBuying, `boughtAmount (${boughtAmount}) must be at least ${minBuying}`);
+    assert(boughtAmount > 0n, `boughtAmount must be positive`);
     assert(soldAmount > 0n, `soldAmount must be positive`);
     assert(boughtSpot > 0n, `boughtSpot must be positive`);
     assert(soldSpot > 0n, `soldSpot must be positive`);
@@ -299,13 +298,9 @@ export class Swapping {
 
   private randomSubSwap = (): Swapping => {
     for (let i = 0; i < 100; i++) {
-      const minBuying = getMinBuying(this.boughtAsset);
-      const minSelling = ceilDiv(minBuying * this.soldSpot, this.boughtSpot);
-
       const amntIsSold = Math.random() < 0.5;
-      const minAmnt = amntIsSold ? minSelling : minBuying;
       const maxAmnt = amntIsSold ? this.soldAmount : this.boughtAmount;
-      const amount = minAmnt + genNonNegative(maxAmnt - minAmnt);
+      const amount = genPositive(maxAmnt);
       const subSwap = this.subSwap(amount, amntIsSold);
       if (subSwap) return subSwap;
     }
@@ -570,15 +565,14 @@ export class Swapping {
   // try to make it wrong with minimal changes
   public corruptAll = (): Swapping[] => {
     return [
-      // this.corruptBoughtSpot(),
-      // this.corruptSoldSpot(),
-      // this.corruptSoldAmnt(),
-      this.boughtAsset.equals(Asset.ADA) ? this.corruptBoughtAmnt(true) : undefined,
-      this.corruptBoughtAmnt(false),
+      this.corruptSoldAmnt(),
+      this.corruptBoughtAmnt(),
+      this.corruptBoughtSpot(),
+      this.corruptSoldSpot(),
     ].filter((s) => s !== undefined) as Swapping[];
   }
 
-  public corruptBoughtAmnt = (max: boolean): Swapping | undefined => {
+  public corruptBoughtAmnt = (): Swapping | undefined => {
     if (this.boughtAmount === this.maxBuying) return undefined;
     const boughtTooMuch = new Swapping(
       this.user,
@@ -586,7 +580,7 @@ export class Swapping {
       this.diracUtxo,
       this.boughtAsset,
       this.soldAsset,
-      max ? this.maxBuying : this.boughtAmount + 1n,
+      this.boughtAmount + 1n,
       this.soldAmount,
       this.boughtSpot,
       this.soldSpot,
@@ -595,8 +589,8 @@ export class Swapping {
       false,
       this.maxBuying,
     );
-    assert(!boughtTooMuch.validates(), `buying more should fail: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`);
-    console.log(`returning corruptBoughtAmnt(${max})`);
+    assert(!boughtTooMuch.validates(), `buying more one should fail: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`);
+    console.log(`returning corruptBoughtAmnt`);
     return boughtTooMuch;
   }
 
@@ -617,7 +611,7 @@ export class Swapping {
       false,
       this.maxBuying,
     );
-    assert(!soldTooLittle.validates(), `selling less should fail: ${this.show()}\n~~~>\n${soldTooLittle.show()}`);
+    assert(!soldTooLittle.validates(), `selling one less should fail: ${this.show()}\n~~~>\n${soldTooLittle.show()}`);
     console.log(`returning corruptSoldAmnt`);
     return soldTooLittle;
   }

@@ -169,7 +169,7 @@ export class User {
   ): Promise<{
     txHash: string | null;
     txSigned: Lucid.TxSigned;
-  } | string> => {
+  } | Error> => {
     try {
       // // console.log("min fee:", tx.txBuilder.min_fee().to_str()); // TODO figure this out (not working with chaining on emulator)
       return await tx
@@ -257,7 +257,7 @@ export class User {
         console.warn(
           `catching ${e} in finalizeTx() after splitting`,
         );
-        return e.toString();
+        return new Error(e.toString());
       } else {
         throw e;
       }
@@ -288,7 +288,7 @@ export class User {
     const tx = action.tx(this.lucid.newTx());
     try {
       const signed = await this.finalizeTx(tx, false);
-      if (typeof signed === "string") { // means mempool-related issue right now (TODO remove spaghette)
+      if (signed instanceof Error) { // means mempool-related issue right now (TODO remove spaghette)
         return {
           succ: [],
           fail: [action],
