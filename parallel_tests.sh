@@ -2,7 +2,7 @@
 
 rm -rf test_logs
 mkdir -p test_logs
-N=10
+N=3
 pipe=$(mktemp -u)
 mkfifo $pipe
 
@@ -49,3 +49,5 @@ if [ ! -z "$failed_indices" ]; then
 fi
 
 grep "does not validate" test_logs/*.txt
+
+grep "corruption failed" test_logs/*.txt

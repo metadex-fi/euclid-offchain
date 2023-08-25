@@ -14,7 +14,7 @@ import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
 
-const compareSubSwaps = false;
+// const compareSubSwaps = false;
 
 export class Swapping {
   public readonly spotPrice: number; // uninverted
@@ -99,16 +99,21 @@ export class Swapping {
 
   // TODO set subsequent's diracUtxo's utxo to the one resulting from this tx
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
-    console.log(this.show());
+    console.log(`compiling tx for ${this.show()}`);
     assert(
       this.diracUtxo.utxo,
       `diracUtxo.utxo must be defined - subsequents-issue?`,
     );
     const funds = this.diracUtxo.balance.clone; // TODO cloning probably not required here
+    console.log(`funds before: ${funds.show()}`)
     funds.addAmountOf(this.boughtAsset, -this.boughtAmount);
-    funds.addAmountOf(this.soldAsset, this.soldAmount);
-    const retour = funds.toLucid;
+    funds.addAmountOf(this.soldAsset, this.soldAmount); 
+    console.log(`funds after: ${funds.show()}`)
+    const retour: Lucid.Assets = funds.toLucid;
     retour[this.diracUtxo.dirac.threadNFT.toLucid] = 1n;
+    Object.entries(retour).forEach(([asset, amount]) => {
+      console.log(`\t${asset}: ${amount}`);
+    });
 
     const swapRedeemer = PEuclidAction.ptype.pconstant(
       new SwapRedeemer(
@@ -133,6 +138,10 @@ export class Swapping {
         [this.diracUtxo.utxo!],
         Data.to(swapRedeemer),
       )
+      // .payToAddress( // TODO is this really necessary?
+      //   this.user!.address!,
+      //   this.boughtAsset.toLucidWith(this.boughtAmount)
+      // )
       .payToContract(
         this.user!.contract.address,
         {
@@ -509,7 +518,7 @@ export class Swapping {
       // Swapping.pricesFitDirac(
       //   spotBuying,
       //   spotSelling,
-      //   buyingLowest,
+      //   buyingLowest,x
       //   sellingLowest,
       //   buyingJumpSize,
       //   sellingJumpSize,
@@ -555,14 +564,14 @@ export class Swapping {
   public corruptAll = (): Swapping[] => {
     return [
       this.corruptBoughtAmnt(),
-      // this.corruptSoldAmnt(),
-      // this.corruptBoughtSpot(),
-      // this.corruptSoldSpot(),
+      this.corruptSoldAmnt(),
+      this.corruptBoughtSpot(), // TODO activate those again
+      this.corruptSoldSpot(),
     ].filter((s) => s !== undefined) as Swapping[];
   }
 
   public corruptBoughtAmnt = (): Swapping | undefined => {
-    if (this.boughtAmount === this.maxBuying) return;
+    if (this.boughtAmount === this.maxBuying) return undefined;
     const boughtTooMuch = new Swapping(
       this.user,
       this.paramUtxo,
@@ -579,11 +588,12 @@ export class Swapping {
       this.maxBuying,
     );
     assert(!boughtTooMuch.validates(), `buying one more should fail: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`);
+    console.log(`returning corruptBoughtAmnt`);
     return boughtTooMuch;
   }
 
   public corruptSoldAmnt = (): Swapping | undefined => {
-    if (this.soldAmount === 1n) return;
+    if (this.soldAmount === 1n) return undefined;
     const soldTooLittle = new Swapping(
       this.user,
       this.paramUtxo,
@@ -600,6 +610,7 @@ export class Swapping {
       this.maxBuying,
     );
     assert(!soldTooLittle.validates(), `selling one less should fail: ${this.show()}\n~~~>\n${soldTooLittle.show()}`);
+    console.log(`returning corruptSoldAmnt`);
     return soldTooLittle;
   }
 
@@ -642,8 +653,9 @@ export class Swapping {
         boughtSpot_,
         "buying",
       ), `boughtSpotTooHigh should still yield the correct price: ${boughtSpotTooHigh.show()}`);
+      console.log(`returning corruptBoughtSpot`);
       return boughtSpotTooHigh;
-    }
+    } else return undefined;
   }
 
   public corruptSoldSpot = (): Swapping | undefined => {
@@ -666,7 +678,7 @@ export class Swapping {
       const buyingA0 = this.boughtAmount * soldSpot_;
       const sellingA0 = this.soldAmount * this.boughtSpot;
       const swapA0 = min(sellingA0, buyingA0);
-      if (swapA0 < soldSpot_) return;
+      if (swapA0 < soldSpot_) return undefined;
 
       const soldSpotTooLow = new Swapping(
         this.user,
@@ -691,6 +703,7 @@ export class Swapping {
         soldSpot_,
         "selling",
       ), `soldSpotTooLow should still yield the correct price: ${soldSpotTooLow.show()}`);
+      console.log(`returning corruptSoldSpot`);
       return soldSpotTooLow;
     }
   }

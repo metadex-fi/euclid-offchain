@@ -171,6 +171,22 @@ export class User {
       return await tx
         .complete()
         .then(async (completed) => {
+
+
+          const outs = completed.txComplete.body().outputs();
+          console.log(`outs: ${outs.len()}`)
+          for (let i = 0; i < outs.len(); i++) {
+            const out = outs.get(i);
+            console.log(`${out.address().to_bech32(undefined)}`);
+            const assets = Lucid.valueToAssets(out.amount());
+            Object.entries(assets).forEach(([asset, amount]) => {
+              console.log(`  ${asset}: ${amount}`);
+            });
+          }
+
+
+
+
           // // console.log("finalizeTx() - signing:", completed.txComplete.to_js_value());
           const signed = await completed
             .sign()

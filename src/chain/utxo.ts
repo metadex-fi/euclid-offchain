@@ -219,7 +219,7 @@ export class DiracUtxo {
     buyingAsset?: Asset, // for subsequent swappings we want only a single direction
     //buyableAmnt?: bigint, // for the new subswap-calculator, in concert with buyingAsset. Unused rn
   ): Swapping[] => {
-    console.log("swappingsFor()");
+    // console.log("swappingsFor()");
     const swappings = new Array<Swapping>();
     let buyable_ = this.balance;
     if (buyingAsset) {
@@ -251,6 +251,7 @@ export class DiracUtxo {
       (a * ((j + 1n) ** e)) / (j ** e);
 
     param.assets.forEach((asset) => {
+      if (asset.equals(Asset.ADA)) return; // TODO for debugging, revert
       const buyable = buyable_.amountOf(asset, 0n);
       const sellable = sellable_?.amountOf(asset, 0n);
       if (buyable <= 0n && sellable && sellable === 0n) return;
@@ -289,11 +290,11 @@ export class DiracUtxo {
         while (spotBuying > 0n) {
           const d = delta_(spotBuying);
           const maxBuying = min(buyable, -d);
-          console.log(`
-          buyable: ${buyable}
-          d: ${d}
-          maxBuying: ${maxBuying}
-          `);
+          // console.log(`
+          // buyable: ${buyable}
+          // d: ${d}
+          // maxBuying: ${maxBuying}
+          // `);
 
           if (maxBuying > 0n) {
             spotBuying_.initAmountOf(asset, spotBuying);
@@ -346,12 +347,12 @@ export class DiracUtxo {
 
       sellableAssets.forEach((sellingAsset) => {
         if (sellingAsset.equals(buyingAsset)) return;
-        console.log(`
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        buyingAsset: ${buyingAsset.show()}
-        sellingAsset: ${sellingAsset.show()}
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        `);
+        // console.log(`
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // buyingAsset: ${buyingAsset.show()}
+        // sellingAsset: ${sellingAsset.show()}
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // `);
         
         let spotSelling = spotSelling_.amountOf(sellingAsset); // NOTE: inverted
         let expSelling = expSelling_.amountOf(sellingAsset);
@@ -369,7 +370,7 @@ export class DiracUtxo {
 
         // if (maxSwapA0 < spotSelling) return; // TODO comment out again
         if (maxSwapA0 < spotSelling) {
-          console.log("looping")
+          // console.log("looping")
           // TODO marginal efficiency gains possible here by initialzing only JIT
           const sellingAnchor = this.dirac.anchorPrices.amountOf(sellingAsset);
           // const buyingAnchor = this.dirac.anchorPrices.amountOf(buyingAsset);
@@ -392,20 +393,20 @@ export class DiracUtxo {
 
           let limitReached = false;
           while (maxSwapA0 < spotSelling) {
-            const buyingAmount = maxSwapA0 / spotSelling;
-            const sellingAmount = ceilDiv(buyingAmount * spotSelling, spotBuying);
-            console.log(`
-              maxBuying:     ${maxBuying}
-              maxSelling:    ${maxSelling}
-              maxBuyingA0:   ${maxBuyingA0}
-              maxSellingA0:  ${maxSellingA0}
-              maxSwapA0:     ${maxSwapA0}
-              spotBuying:    ${spotBuying}
-              spotSelling:   ${spotSelling}
-              buyingAmount:  ${buyingAmount}
-              sellingAmount: ${sellingAmount}
-              limitReached: ${limitReached}
-            `)
+            // const buyingAmount = maxSwapA0 / spotSelling;
+            // const sellingAmount = ceilDiv(buyingAmount * spotSelling, spotBuying);
+            // console.log(`
+            //   maxBuying:     ${maxBuying}
+            //   maxSelling:    ${maxSelling}
+            //   maxBuyingA0:   ${maxBuyingA0}
+            //   maxSellingA0:  ${maxSellingA0}
+            //   maxSwapA0:     ${maxSwapA0}
+            //   spotBuying:    ${spotBuying}
+            //   spotSelling:   ${spotSelling}
+            //   buyingAmount:  ${buyingAmount}
+            //   sellingAmount: ${sellingAmount}
+            //   limitReached: ${limitReached}
+            // `)
             if (limitReached) return;
             if (maxSellingA0 <= maxBuyingA0) {
               expSelling++;
@@ -438,23 +439,23 @@ export class DiracUtxo {
             // assert(maxSwapA0_ < maxSwapA0, `maxSwapA0 should be strictly decreasing`);
             maxSwapA0 = maxSwapA0_;
           }
-        } else console.log("not looping")
+        } //else console.log("not looping")
 
         const buyingAmount = maxSwapA0 / spotSelling;
         const sellingAmount = ceilDiv(buyingAmount * spotSelling, spotBuying);
-        console.log(`
-          ---------------------------
-          maxBuying:     ${maxBuying}
-          maxSelling:    ${maxSelling}
-          maxBuyingA0:   ${maxBuyingA0}
-          maxSellingA0:  ${maxSellingA0}
-          maxSwapA0:     ${maxSwapA0}
-          spotBuying:    ${spotBuying}
-          spotSelling:   ${spotSelling}
-          buyingAmount:  ${buyingAmount}
-          sellingAmount: ${sellingAmount}
-          ---------------------------
-        `)
+        // console.log(`
+        //   ---------------------------
+        //   maxBuying:     ${maxBuying}
+        //   maxSelling:    ${maxSelling}
+        //   maxBuyingA0:   ${maxBuyingA0}
+        //   maxSellingA0:  ${maxSellingA0}
+        //   maxSwapA0:     ${maxSwapA0}
+        //   spotBuying:    ${spotBuying}
+        //   spotSelling:   ${spotSelling}
+        //   buyingAmount:  ${buyingAmount}
+        //   sellingAmount: ${sellingAmount}
+        //   ---------------------------
+        // `)
         // const sellingAmount = maxSellingA0 <= maxBuyingA0 ? maxSelling : BigInt(sellingAmount_);
 
         // /// logging/debugging
@@ -477,7 +478,7 @@ export class DiracUtxo {
         //   Math.log(Number(ammSelling) / Number(sellingAnchor)) /
         //   Math.log(sellingJumpMultiplier);
 
-        // console.log(
+        // // console.log(
         //   `buyingExp: ${buyingExp} -> ${expBuying}, sellingExp: ${sellingExp} -> ${expSelling}`,
         // );
 
@@ -502,7 +503,7 @@ export class DiracUtxo {
       });
     });
 
-    // console.log("swappings", swappings)
+    // // console.log("swappings", swappings)
     return swappings;
   };
 }

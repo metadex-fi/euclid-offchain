@@ -13,6 +13,7 @@ import { Param, PParam } from "../src/types/euclid/param.ts";
 import { KeyHash } from "../src/types/general/derived/hash/keyHash.ts";
 import { Data } from "../src/types/general/fundamental/type.ts";
 import { genPositive, randomChoice } from "../src/utils/generators.ts";
+import { randomIndexedChoice } from "../mod.ts";
 
 Deno.test("emulator", async () => {
   // return;
@@ -35,7 +36,7 @@ Deno.test("emulator", async () => {
     const emulator = new Lucid.Emulator(accounts);
     const traces: string[] = [];
     const actionCounts = new Map<string, number>();
-    const iterations = 10;
+    const iterations = 20;
     for (let i = 0; i < iterations; i++) {
       console.log(
         `\ntrials left: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`// - errors: ${errors.length}`,
@@ -53,7 +54,7 @@ Deno.test("emulator", async () => {
       //   }),
       // );
       // console.log(`users: ${users.length}`);
-      // try {
+      try {
         // for (const user of users) {
         const hashes = await user
           .generateActions()
@@ -67,21 +68,20 @@ Deno.test("emulator", async () => {
               if (type === "Swapping") {
                 const swapping = action as Swapping;
                 const corrupted = swapping.corruptAll();
-                // for (const c of corrupted) {
-                //   try {
-                //     const signed = (await user.getTxSigned(action)).succ;
-                //     for (const s of signed) {
-                //       const hash = await s.submit();
-                //       console.log("attempted corruption:", hash);
-                //     }
-                //   } catch (e) {
-                //     console.warn(`corruption failed successfully: ${e}`);
-                //     continue;
-                //   }
-                //   throw new Error(`corruption succeeded: ${swapping.show()}\n~~~>\n${c.show()}`);
-                // }
-              }
-
+                console.log(`attempting ${corrupted.length} corruptions...`);
+                for (const [t, c] of corrupted.entries()) {
+                //const [c, t] = randomIndexedChoice(corrupted);
+                  try {
+                    const hash = await user.finalizeTx(c.tx(user.lucid.newTx()));
+                    console.log(`submitted type ${t} corruption: ${hash}`);
+                  } catch (e) {
+                    console.log(`type ${t} corruption failed successfully: ${e}`);
+                    continue;
+                  }
+                  // console.log(`type ${t} corruption succeeded: ${swapping.show()}\n~~~>\n${c.show()}`)
+                  throw new Error(`type ${t} corruption succeeded: ${swapping.show()}\n~~~>\n${c.show()}`);
+                }
+              } 
               actionCounts.set(type, (actionCounts.get(type) ?? 0) + 1);
               const { succ, fail } = await user.getTxSigned(action);
               signed.push(...succ);
@@ -93,7 +93,7 @@ Deno.test("emulator", async () => {
             while (failed.length) {
               console.warn(`failed: ${failed.length}`);
               user.resetMempool(); // TODO do this automatically in user.update() - requires checking blocks, however
-              emulator.awaitBlock(1);
+              emulator.awaitBlock(1); // TODO this does not take into account the possibility that others do or attempt stuff in the meantime
               const failed_ = [];
               for (const action of failed) {
                 const { succ, fail } = await user.getTxSigned(action);
@@ -111,13 +111,15 @@ Deno.test("emulator", async () => {
         // console.log(hashes);
         traces.push(...hashes.flat());
         // }
-      // } catch (e) {
-      //   if (e.toString().includes("TypeError: Cannot read properties of undefined (reading '__wbindgen_add_to_stack_pointer')")) {
-      //     console.error("caught:", e);
-      //   } else {
-      //     throw e;
-      //   }
-      // }
+      } catch (e) {
+        console.error(e);
+        throw e;
+        // if (e.toString().includes("TypeError: Cannot read properties of undefined (reading '__wbindgen_add_to_stack_pointer')")) {
+        //   console.error("caught:", e);
+        // } else {
+        //   throw e;
+        // }
+      }
       user.resetMempool();
       emulator.awaitBlock(Number(genPositive(1000n))); // NOTE/TODO this arbitrary limit is a hotfix for block height overflow issue
     }
