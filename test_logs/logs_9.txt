@@ -1,6 +1,4 @@
 [0m[32mTask[0m [0m[36mtest[0m deno test --allow-env --allow-read --allow-net tests
-[0m[32mCheck[0m file:///Users/ChrisHiatt/Projects/adaswap/vasil_2022Q3/euclid-offchain/tests/emulator.test.ts
-[0m[32mCheck[0m file:///Users/ChrisHiatt/Projects/adaswap/vasil_2022Q3/euclid-offchain/tests/types.test.ts
 [0m[38;5;245mrunning 1 test from ./tests/emulator.test.ts[0m
 emulator ...
 [0m[38;5;245m------- output -------[0m
@@ -10,385 +8,858 @@ accounts: 10
 trials left: 1 - iteration: 0 - block: 0
 virtual: 9007199254740991
 weight: 1
-jumpSize: 1
-minAnchorPrice: 4503599627370495
-jumpLog: 0.6931471805599453
+jumpSize: 99
+minAnchorPrice: 8917127262193581
+jumpLog: 0.010050335853501506
 anchorLog: 2.2204460492503128e-16
-3121657384082680
-maxTicks: 2145181432184676
-maxTicks_: 3121657384082680
-3
+45262688804777.73
+maxTicks: 1
+maxTicks_: 45262688804777
+1
+virtual: 4039392751699236
+weight: 1
+jumpSize: 1
+minAnchorPrice: 2019696375849618
+jumpLog: 0.6931471805599453
+anchorLog: 4.440892098500625e-16
+1560828692041340
+maxTicks: 1
+maxTicks_: 1560828692041340
+1
+attempting Opening...
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 1 - block: 333
 virtual: 9007199254740991
 weight: 1
-jumpSize: 100
-minAnchorPrice: 8918019064099991
-jumpLog: 0.009950330853168092
+jumpSize: 9
+minAnchorPrice: 8106479329266891
+jumpLog: 0.10536051565782635
 anchorLog: 2.2204460492503128e-16
-44812306322540.98
-maxTicks: 2145181432184676
-maxTicks_: 44812306322540
-3
-attempting Opening...
-Opening pool with 1 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 1 - block: 407
-virtual: 1163708207038694
-weight: 1
-jumpSize: 20
-minAnchorPrice: 1108293530513041
-jumpLog: 0.04879016416943205
-anchorLog: 8.881784197001248e-16
-54932841293199.9
+474501579056150.1
 maxTicks: 1
-maxTicks_: 54932841293199
+maxTicks_: 474501579056150
 1
-virtual: 7272993459416999
+virtual: 5329606739925694
 weight: 1
-jumpSize: 1
-minAnchorPrice: 3636496729708499
-jumpLog: 0.6931471805599453
+jumpSize: 7
+minAnchorPrice: 4663405897434982
+jumpLog: 0.13353139262452257
 anchorLog: 2.2204460492503128e-16
-3121657384082680
+601371930066063.4
 maxTicks: 1
-maxTicks_: 3121657384082680
+maxTicks_: 601371930066063
 1
 attempting Opening...
 Opening pool with 1 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 2 - block: 437
-virtual: 1516205853383857
-weight: 1
+trials left: 1 - iteration: 2 - block: 847
+virtual: 2
+weight: 98
 jumpSize: 100
-minAnchorPrice: 1501193914241442
+minAnchorPrice: 194
 jumpLog: 0.009950330853168092
-anchorLog: 6.661338147750937e-16
-14937435440846.994
+anchorLog: 0.005141399500418652
+1.9353350877242392
 maxTicks: 1
-maxTicks_: 14937435440846
+maxTicks_: 1
 1
-virtual: 4300762708132574
-weight: 4
+virtual: 1
+weight: 32
 jumpSize: 1
-minAnchorPrice: 8601525416265148
+minAnchorPrice: 16
 jumpLog: 0.6931471805599453
-anchorLog: 2.2204460492503128e-16
-3121657384082680
+anchorLog: 0.06062462181643484
+11.433426878252934
 maxTicks: 1
-maxTicks_: 3121657384082680
+maxTicks_: 11
 1
 attempting Opening...
 Opening pool with 1 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 3 - block: 1437
-virtual: 3250124226071114
-weight: 4
-jumpSize: 1
-minAnchorPrice: 6500248452142228
-jumpLog: 0.6931471805599453
-anchorLog: 2.2204460492503128e-16
-3121657384082680
-maxTicks: 7404023564209279
-maxTicks_: 3121657384082680
-3
-virtual: 1087410490160402
-weight: 1
-jumpSize: 58
-minAnchorPrice: 1068979803886496
-jumpLog: 0.01709443335930004
-anchorLog: 8.881784197001248e-16
-19246620926763.367
-maxTicks: 7404023564209279
-maxTicks_: 19246620926763
-3
-virtual: 8773233314087795
-weight: 1
-jumpSize: 100
-minAnchorPrice: 8686369617908707
-jumpLog: 0.009950330853168092
-anchorLog: 2.2204460492503128e-16
-44812306322540.98
-maxTicks: 2468007854736426
-maxTicks_: 44812306322540
-3
-attempting Opening...
-virtual: 1087410490160402
-weight: 1
-jumpSize: 58
-minAnchorPrice: 1068979803886496
-jumpLog: 0.01709443335930004
-anchorLog: 8.881784197001248e-16
-19246620926763.367
-virtual: 1087410490160402
-weight: 1
-jumpSize: 58
-minAnchorPrice: 1068979803886496
-jumpLog: 0.01709443335930004
-anchorLog: 8.881784197001248e-16
-19246620926763.367
-virtual: 8773233314087795
-weight: 1
-jumpSize: 100
-minAnchorPrice: 8686369617908707
-jumpLog: 0.009950330853168092
-anchorLog: 2.2204460492503128e-16
-44812306322540.98
-virtual: 8773233314087795
-weight: 1
-jumpSize: 100
-minAnchorPrice: 8686369617908707
-jumpLog: 0.009950330853168092
-anchorLog: 2.2204460492503128e-16
-44812306322540.98
-virtual: 8773233314087795
-weight: 1
-jumpSize: 100
-minAnchorPrice: 8686369617908707
-jumpLog: 0.009950330853168092
-anchorLog: 2.2204460492503128e-16
-44812306322540.98
-virtual: 8773233314087795
-weight: 1
-jumpSize: 100
-minAnchorPrice: 8686369617908707
-jumpLog: 0.009950330853168092
-anchorLog: 2.2204460492503128e-16
-44812306322540.98
-virtual: 8773233314087795
-weight: 1
-jumpSize: 100
-minAnchorPrice: 8686369617908707
-jumpLog: 0.009950330853168092
-anchorLog: 2.2204460492503128e-16
-44812306322540.98
-virtual: 8773233314087795
-weight: 1
-jumpSize: 100
-minAnchorPrice: 8686369617908707
-jumpLog: 0.009950330853168092
-anchorLog: 2.2204460492503128e-16
-44812306322540.98
-Opening pool with 9 dirac utxos and 1 param utxos
+trials left: 1 - iteration: 3 - block: 848
+Swapping.boundary()
+subSwap: 1 sold
+boughtAssetForSale (old): 
+        buyingAmm  731230165616531294 > 
+        spotBuying 735113191813912074
+returning corruptBoughtSpot
+boughtAssetForSale (new):
+        sellingAmm  96 > 
+        spotSelling 64
+returning corruptSoldSpot
+boughtAssetForSale (new): 
+        buyingAmm  727834843380110886 > 
+        spotBuying 727834843380110964
+returning corruptBoughtAmnt
+boughtAssetForSale (new): 
+        buyingAmm  446691623610863330 > 
+        spotBuying 727834843380110964
+returning corruptBoughtAmnt
+boughtAssetForSale (new): 
+        buyingAmm  727834843380110886 > 
+        spotBuying 727834843380110964
+returning corruptBoughtAmnt
+boughtAssetForSale (new): 
+        buyingAmm  196 > 
+        spotBuying 727834843380110964
+returning corruptBoughtAmnt
+boughtAssetForSale (new): 
+        buyingAmm  427211566950584808 > 
+        spotBuying 727834843380110964
+returning corruptBoughtAmnt
+boughtAssetForSale (new): 
+        buyingAmm  727834843380110886 > 
+        spotBuying 727834843380110964
+returning corruptBoughtAmnt
+attempting 8 corruptions...
+attempting corruption 0...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7461532302209501
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 34646145269595
+  soldAmount:   1
+  boughtSpot:   735113191813912074
+  soldSpot:     128
+  (boughtA0:    4434706594508160)
+  (soldA0:      735113191813912074)
+  boughtExp:    3605
+  soldExp:      3
+  spotPrice:    1.74122844516171e-16
+  eff.Price:    2.886323982707499e-14
+  maxBuying:    7461532302209501
+  (maxBuyingA0: 955076134682816128)
+)
+type 0 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
 
-trials left: 1 - iteration: 4 - block: 1611
+ExBudget {
+    mem: 1380874,
+    cpu: 622275136,
+}
+
+G3883026197380780
+attempting corruption 1...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7461532302209501
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 34646145269595
+  soldAmount:   1
+  boughtSpot:   727834843380110964
+  soldSpot:     64
+  (boughtA0:    2217353297254080)
+  (soldA0:      727834843380110964)
+  boughtExp:    3604
+  soldExp:      2
+  spotPrice:    8.793203648066635e-17
+  eff.Price:    2.886323982707499e-14
+  maxBuying:    7461532302209501
+  (maxBuyingA0: 477538067341408064)
+)
+type 1 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1575911,
+    cpu: 749822823,
+}
+
+H32
+attempting corruption 2...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7461532302209501
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 34646145269596
+  soldAmount:   1
+  boughtSpot:   727834843380110964
+  soldSpot:     128
+  (boughtA0:    4434706594508288)
+  (soldA0:      727834843380110964)
+  boughtExp:    3604
+  soldExp:      3
+  spotPrice:    1.758640729613327e-16
+  eff.Price:    2.8863239827074154e-14
+  maxBuying:    7461532302209501
+  (maxBuyingA0: 955076134682816128)
+)
+type 2 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1595672,
+    cpu: 756613264,
+}
+
+G78
+attempting corruption 3...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7461532302209501
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 2903454510261918
+  soldAmount:   1
+  boughtSpot:   727834843380110964
+  soldSpot:     128
+  (boughtA0:    371642177313525504)
+  (soldA0:      727834843380110964)
+  boughtExp:    3604
+  soldExp:      3
+  spotPrice:    1.758640729613327e-16
+  eff.Price:    3.4441731270995215e-16
+  maxBuying:    7461532302209501
+  (maxBuyingA0: 955076134682816128)
+)
+type 3 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1836472,
+    cpu: 876447136,
+}
+
+G281143219769247634
+attempting corruption 4...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7461532302209501
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 34646145269596
+  soldAmount:   1
+  boughtSpot:   727834843380110964
+  soldSpot:     128
+  (boughtA0:    4434706594508288)
+  (soldA0:      727834843380110964)
+  boughtExp:    3604
+  soldExp:      3
+  spotPrice:    1.758640729613327e-16
+  eff.Price:    2.8863239827074154e-14
+  maxBuying:    7461532302209501
+  (maxBuyingA0: 955076134682816128)
+)
+type 4 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1595672,
+    cpu: 756613264,
+}
+
+G78
+attempting corruption 5...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7461532302209501
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 7461532302209501
+  soldAmount:   1
+  boughtSpot:   727834843380110964
+  soldSpot:     128
+  (boughtA0:    955076134682816128)
+  (soldA0:      727834843380110964)
+  boughtExp:    3604
+  soldExp:      3
+  spotPrice:    1.758640729613327e-16
+  eff.Price:    1.3402072918774084e-16
+  maxBuying:    7461532302209501
+  (maxBuyingA0: 955076134682816128)
+)
+type 5 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1836086,
+    cpu: 873527406,
+}
+
+G727834843380110768
+attempting corruption 6...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7461532302209501
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 3102230598632107
+  soldAmount:   1
+  boughtSpot:   727834843380110964
+  soldSpot:     128
+  (boughtA0:    397085516624909696)
+  (soldA0:      727834843380110964)
+  boughtExp:    3604
+  soldExp:      3
+  spotPrice:    1.758640729613327e-16
+  eff.Price:    3.2234869981649285e-16
+  maxBuying:    7461532302209501
+  (maxBuyingA0: 955076134682816128)
+)
+type 6 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1836452,
+    cpu: 873552246,
+}
+
+G300623276429526156
+attempting corruption 7...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7461532302209501
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 34646145269596
+  soldAmount:   1
+  boughtSpot:   727834843380110964
+  soldSpot:     128
+  (boughtA0:    4434706594508288)
+  (soldA0:      727834843380110964)
+  boughtExp:    3604
+  soldExp:      3
+  spotPrice:    1.758640729613327e-16
+  eff.Price:    2.8863239827074154e-14
+  maxBuying:    7461532302209501
+  (maxBuyingA0: 955076134682816128)
+)
+type 7 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1595672,
+    cpu: 756613264,
+}
+
+G78
+attempting Swapping...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7461532302209501
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 34646145269595
+  soldAmount:   1
+  boughtSpot:   727834843380110964
+  soldSpot:     128
+  (boughtA0:    4434706594508160)
+  (soldA0:      727834843380110964)
+  boughtExp:    3604
+  soldExp:      3
+  spotPrice:    1.758640729613327e-16
+  eff.Price:    2.886323982707499e-14
+  maxBuying:    7461532302209501
+  (maxBuyingA0: 955076134682816128)
+)
+
+trials left: 1 - iteration: 4 - block: 1446
 attempting Closing...
 
-trials left: 1 - iteration: 5 - block: 2611
+trials left: 1 - iteration: 5 - block: 2407
 Swapping.boundary()
-subSwap: 1 bought
-boughtAssetForSale (old): 
-        buyingAmm  7272993459417000 > 
-        spotBuying 14545986918833996
+subSwap: 72926992187543 bought
+boughtAssetForSale (new): 
+        buyingAmm  720687998145731770 > 
+        spotBuying 727834843380110964
 returning corruptBoughtSpot
 boughtAssetForSale (old):
-        sellingAmm  1163708207038695 > 
-        spotSelling 1163708207038693
+        sellingAmm  96 > 
+        spotSelling 64
 returning corruptSoldSpot
 attempting 2 corruptions...
 attempting corruption 0...
 compiling tx for Swapping (
   paramUtxo: ParamUtxo (
      +  param: Param (
-   +     +  owner: b2a04ebbd9e4a8c1d184c1dcac94e8ff983cf2f7e018476042e004e6, 
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
    +     +  virtual: +[
-   +     +  +  967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5_: 1163708207038694,
-   +     +  +  5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449_T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry: 7272993459416999
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
    +     +  ], 
    +     +  weights: +[
-   +     +  +  967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5_: 1,
-   +     +  +  5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449_T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry: 1
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
    +     +  ]
    +     +  jumpSizes: +[
-   +     +  +  967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5_: 20,
-   +     +  +  5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449_T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry: 1
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
    +     +  ], 
    +     +  active: 1
    +     )
      )
   diracUtxo: DiracUtxo (
      +  dirac: Dirac(
-   +     +  owner: b2a04ebbd9e4a8c1d184c1dcac94e8ff983cf2f7e018476042e004e6,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 5847d0a87225975cb9eba6316bf8464e9af9afacdc6b4cfed18e22f86b9fef88),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 1171b317f231522015fb61e45af90c19e28567fc35c3431725398b66f658f74e),
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
    +     +  anchorPrices: +[
-   +     +  +  967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5_: 1108293530513041,
-   +     +  +  5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449_T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry: 3636496729708499
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
    +     +  ],
    +     ),
      +  balance: +[
-   +  +  _: 2861840,
-   +  +  5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449_T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry: 1,
-   +  +  967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5_: 1
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 2,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7426886156939906
    +  ]
      )
-  boughtAsset:  Asset(5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449, T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry)
-  soldAsset:    Asset(967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5, )
-  boughtAmount: 1
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 72926992187543
   soldAmount:   1
-  boughtSpot:   14545986918833996
-  soldSpot:     1221893617390627
-  (boughtA0:    1221893617390627)
-  (soldA0:      14545986918833996)
-  boughtExp:    2
-  soldExp:      2
-  spotPrice:    0.08400211166205103
-  eff.Price:    1
-  maxBuying:    1
-  (maxBuyingA0: 1221893617390627)
+  boughtSpot:   727834843380110964
+  soldSpot:     128
+  (boughtA0:    9334655000005504)
+  (soldA0:      727834843380110964)
+  boughtExp:    3604
+  soldExp:      3
+  spotPrice:    1.758640729613327e-16
+  eff.Price:    1.3712343948429217e-14
+  maxBuying:    72926992187543
+  (maxBuyingA0: 9334655000005504)
 )
-type 0 corruption failed successfully: Redeemer (Spend, 0): The provided Plutus code called 'error'.
+type 0 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
 
 ExBudget {
-    mem: 1235797,
-    cpu: 511181867,
+    mem: 1816356,
+    cpu: 864827880,
 }
 
-G7272993459416996
+G7146845234379194
 attempting corruption 1...
 compiling tx for Swapping (
   paramUtxo: ParamUtxo (
      +  param: Param (
-   +     +  owner: b2a04ebbd9e4a8c1d184c1dcac94e8ff983cf2f7e018476042e004e6, 
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
    +     +  virtual: +[
-   +     +  +  967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5_: 1163708207038694,
-   +     +  +  5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449_T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry: 7272993459416999
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
    +     +  ], 
    +     +  weights: +[
-   +     +  +  967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5_: 1,
-   +     +  +  5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449_T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry: 1
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
    +     +  ]
    +     +  jumpSizes: +[
-   +     +  +  967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5_: 20,
-   +     +  +  5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449_T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry: 1
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
    +     +  ], 
    +     +  active: 1
    +     )
      )
   diracUtxo: DiracUtxo (
      +  dirac: Dirac(
-   +     +  owner: b2a04ebbd9e4a8c1d184c1dcac94e8ff983cf2f7e018476042e004e6,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 5847d0a87225975cb9eba6316bf8464e9af9afacdc6b4cfed18e22f86b9fef88),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 1171b317f231522015fb61e45af90c19e28567fc35c3431725398b66f658f74e),
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
    +     +  anchorPrices: +[
-   +     +  +  967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5_: 1108293530513041,
-   +     +  +  5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449_T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry: 3636496729708499
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
    +     +  ],
    +     ),
      +  balance: +[
-   +  +  _: 2861840,
-   +  +  5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449_T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry: 1,
-   +  +  967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5_: 1
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 2,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7426886156939906
    +  ]
      )
-  boughtAsset:  Asset(5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449, T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry)
-  soldAsset:    Asset(967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5, )
-  boughtAmount: 1
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 72926992187543
   soldAmount:   1
-  boughtSpot:   7272993459416998
-  soldSpot:     1163708207038693
-  (boughtA0:    1163708207038693)
-  (soldA0:      7272993459416998)
-  boughtExp:    1
-  soldExp:      1
-  spotPrice:    0.16000402221343063
-  eff.Price:    1
-  maxBuying:    1
-  (maxBuyingA0: 1163708207038693)
+  boughtSpot:   720628557802090064
+  soldSpot:     64
+  (boughtA0:    4667327500002752)
+  (soldA0:      720628557802090064)
+  boughtExp:    3603
+  soldExp:      2
+  spotPrice:    8.881135684547301e-17
+  eff.Price:    1.3712343948429217e-14
+  maxBuying:    72926992187543
+  (maxBuyingA0: 4667327500002752)
 )
-type 1 corruption failed successfully: Redeemer (Spend, 0): The provided Plutus code called 'error'.
+type 1 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
 
 ExBudget {
-    mem: 955251,
-    cpu: 372608596,
+    mem: 1160432,
+    cpu: 544163840,
 }
 
-H2
+H32
 attempting Swapping...
 compiling tx for Swapping (
   paramUtxo: ParamUtxo (
      +  param: Param (
-   +     +  owner: b2a04ebbd9e4a8c1d184c1dcac94e8ff983cf2f7e018476042e004e6, 
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
    +     +  virtual: +[
-   +     +  +  967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5_: 1163708207038694,
-   +     +  +  5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449_T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry: 7272993459416999
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
    +     +  ], 
    +     +  weights: +[
-   +     +  +  967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5_: 1,
-   +     +  +  5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449_T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry: 1
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
    +     +  ]
    +     +  jumpSizes: +[
-   +     +  +  967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5_: 20,
-   +     +  +  5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449_T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry: 1
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
    +     +  ], 
    +     +  active: 1
    +     )
      )
   diracUtxo: DiracUtxo (
      +  dirac: Dirac(
-   +     +  owner: b2a04ebbd9e4a8c1d184c1dcac94e8ff983cf2f7e018476042e004e6,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 5847d0a87225975cb9eba6316bf8464e9af9afacdc6b4cfed18e22f86b9fef88),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 1171b317f231522015fb61e45af90c19e28567fc35c3431725398b66f658f74e),
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
    +     +  anchorPrices: +[
-   +     +  +  967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5_: 1108293530513041,
-   +     +  +  5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449_T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry: 3636496729708499
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
    +     +  ],
    +     ),
      +  balance: +[
-   +  +  _: 2861840,
-   +  +  5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449_T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry: 1,
-   +  +  967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5_: 1
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 2,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7426886156939906
    +  ]
      )
-  boughtAsset:  Asset(5fa5a327d11b0d2d9bf9405980f239861f484ac064ad679859494449, T1BlcFz7rkhgvhTyyZllEbiVGw6uQ0ry)
-  soldAsset:    Asset(967a71f53c0561e844e4b018f0b8a353d134f4cefb76acbea50ca9a5, )
-  boughtAmount: 1
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 72926992187543
   soldAmount:   1
-  boughtSpot:   7272993459416998
-  soldSpot:     1221893617390627
-  (boughtA0:    1221893617390627)
-  (soldA0:      7272993459416998)
-  boughtExp:    1
-  soldExp:      2
-  spotPrice:    0.16800422332410206
-  eff.Price:    1
-  maxBuying:    1
-  (maxBuyingA0: 1221893617390627)
+  boughtSpot:   720628557802090064
+  soldSpot:     128
+  (boughtA0:    9334655000005504)
+  (soldA0:      720628557802090064)
+  boughtExp:    3603
+  soldExp:      3
+  spotPrice:    1.7762271369094602e-16
+  eff.Price:    1.3712343948429217e-14
+  maxBuying:    72926992187543
+  (maxBuyingA0: 9334655000005504)
 )
 
-trials left: 1 - iteration: 6 - block: 3611
-virtual: 9007199254740991
+trials left: 1 - iteration: 6 - block: 3407
+attempting Closing...
+
+trials left: 1 - iteration: 7 - block: 3408
+virtual: 4321727021533820
 weight: 1
-jumpSize: 91
-minAnchorPrice: 8909294915015545
-jumpLog: 0.01092907053219023
+jumpSize: 7
+minAnchorPrice: 3781511143842092
+jumpLog: 0.13353139262452257
 anchorLog: 2.2204460492503128e-16
-49220157976277.8
+601371930066063.4
 maxTicks: 1
-maxTicks_: 49220157976277
+maxTicks_: 601371930066063
 1
 virtual: 9007199254740991
 weight: 1
-jumpSize: 100
-minAnchorPrice: 8918019064099991
-jumpLog: 0.009950330853168092
+jumpSize: 97
+minAnchorPrice: 8915289058264042
+jumpLog: 0.010256500167189061
 anchorLog: 2.2204460492503128e-16
-44812306322540.98
+46191170331078.09
 maxTicks: 1
-maxTicks_: 44812306322540
+maxTicks_: 46191170331078
+1
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 1
+maxTicks_: 3121657384082680
 1
 attempting Opening...
 Opening pool with 1 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 7 - block: 3701
-virtual: 3794005258170390
-weight: 3
-jumpSize: 1
-minAnchorPrice: 5691007887255585
-jumpLog: 0.6931471805599453
-anchorLog: 2.2204460492503128e-16
-3121657384082680
-maxTicks: 6373306931507674
-maxTicks_: 3121657384082680
-3
+trials left: 1 - iteration: 8 - block: 4408
 virtual: 1
 weight: 2
 jumpSize: 1
@@ -396,23 +867,709 @@ minAnchorPrice: 1
 jumpLog: 0.6931471805599453
 anchorLog: 0.6931471805599453
 1
-maxTicks: 6373306931507674
+maxTicks: 1
 maxTicks_: 1
+1
+virtual: 1
+weight: 2
+jumpSize: 1
+minAnchorPrice: 1
+jumpLog: 0.6931471805599453
+anchorLog: 0.6931471805599453
+1
+maxTicks: 1
+maxTicks_: 1
+1
+virtual: 4923028779274466
+weight: 1
+jumpSize: 1
+minAnchorPrice: 2461514389637233
+jumpLog: 0.6931471805599453
+anchorLog: 4.440892098500625e-16
+1560828692041340
+maxTicks: 1
+maxTicks_: 1560828692041340
 1
 attempting Opening...
 Opening pool with 1 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 8 - block: 4701
-virtual: 2
-weight: 100
+trials left: 1 - iteration: 9 - block: 5408
+Swapping.boundary()
+Swapping.boundary()
+Swapping.boundary()
+subSwap: 1217747139116 bought
+boughtAssetForSale (old): 
+        buyingAmm  18014398509481981 > 
+        spotBuying 18091933684251552
+returning corruptBoughtSpot
+boughtAssetForSale (old):
+        sellingAmm  10256976991125732 > 
+        spotSelling 9629616982149967
+returning corruptSoldSpot
+valueEquation: 
+        addedBuyingA0  13401644035195396865783535944 > 
+        addedSellingA0 13401644035185632331648871656
+returning corruptSoldAmnt
+valueEquation: 
+        addedBuyingA0  13401644035195396865783535944 > 
+        addedSellingA0 2559048097189200660468389064
+returning corruptSoldAmnt
+valueEquation: 
+        addedBuyingA0  13401644035195396865783535944 > 
+        addedSellingA0 13401644035185632331648871656
+returning corruptSoldAmnt
+valueEquation: 
+        addedBuyingA0  13401644035195396865783535944 > 
+        addedSellingA0 17907322116044904
+returning corruptSoldAmnt
+valueEquation: 
+        addedBuyingA0  13401644035195396865783535944 > 
+        addedSellingA0 13401644035185632331648871656
+returning corruptSoldAmnt
+valueEquation: 
+        addedBuyingA0  13401644035195396865783535944 > 
+        addedSellingA0 17907322116044904
+returning corruptSoldAmnt
+attempting 8 corruptions...
+attempting corruption 0...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
+   +     +  virtual: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
+   +     +  anchorPrices: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740990,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935249969591912,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +  ]
+     )
+  boughtAsset:  Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  soldAsset:    Asset(a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f, )
+  boughtAmount: 1217747139116
+  soldAmount:   748389063890
+  boughtSpot:   18091933684251552
+  soldSpot:     11005276551028534
+  (boughtA0:    13401644035195396865783535944)
+  (soldA0:      13539805313916977836559657280)
+  boughtExp:    69
+  soldExp:      8
+  spotPrice:    0.6082974182360769
+  eff.Price:    0.6145685256409459
+  maxBuying:    1217747139116
+  (maxBuyingA0: 13401644035195396865783535944)
+)
+type 0 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1482881,
+    cpu: 609465151,
+}
+
+G77535174769571
+attempting corruption 1...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
+   +     +  virtual: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
+   +     +  anchorPrices: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740990,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935249969591912,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +  ]
+     )
+  boughtAsset:  Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  soldAsset:    Asset(a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f, )
+  boughtAmount: 1217747139116
+  soldAmount:   748389063890
+  boughtSpot:   17907322116044904
+  soldSpot:     9629616982149967
+  (boughtA0:    11726438530795971953123809172)
+  (soldA0:      13401644035203539653764916560)
+  boughtExp:    68
+  soldExp:      7
+  spotPrice:    0.537747459935501
+  eff.Price:    0.6145685256409459
+  maxBuying:    1217747139116
+  (maxBuyingA0: 11726438530795971953123809172)
+)
+type 1 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1483165,
+    cpu: 609057007,
+}
+
+H627360008975765
+attempting corruption 2...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
+   +     +  virtual: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
+   +     +  anchorPrices: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740990,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935249969591912,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +  ]
+     )
+  boughtAsset:  Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  soldAsset:    Asset(a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f, )
+  boughtAmount: 1217747139116
+  soldAmount:   748389063889
+  boughtSpot:   17907322116044904
+  soldSpot:     11005276551028534
+  (boughtA0:    13401644035195396865783535944)
+  (soldA0:      13401644035185632331648871656)
+  boughtExp:    68
+  soldExp:      8
+  spotPrice:    0.6145685256405725
+  eff.Price:    0.6145685256401248
+  maxBuying:    1217747139116
+  (maxBuyingA0: 13401644035195396865783535944)
+)
+type 2 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 3375309,
+    cpu: 1497884367,
+}
+
+13401644035195396865783535944 - 13401644035185632331648871656 = 9764534134664288
+attempting corruption 3...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
+   +     +  virtual: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
+   +     +  anchorPrices: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740990,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935249969591912,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +  ]
+     )
+  boughtAsset:  Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  soldAsset:    Asset(a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f, )
+  boughtAmount: 1217747139116
+  soldAmount:   142905124541
+  boughtSpot:   17907322116044904
+  soldSpot:     11005276551028534
+  (boughtA0:    13401644035195396865783535944)
+  (soldA0:      2559048097189200660468389064)
+  boughtExp:    68
+  soldExp:      8
+  spotPrice:    0.6145685256405725
+  eff.Price:    0.11735205113660888
+  maxBuying:    1217747139116
+  (maxBuyingA0: 13401644035195396865783535944)
+)
+type 3 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 3556246,
+    cpu: 1592728950,
+}
+
+13401644035195396865783535944 - 2559048097189200660468389064 = 10842595938006196205315146880
+attempting corruption 4...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
+   +     +  virtual: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
+   +     +  anchorPrices: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740990,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935249969591912,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +  ]
+     )
+  boughtAsset:  Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  soldAsset:    Asset(a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f, )
+  boughtAmount: 1217747139116
+  soldAmount:   748389063889
+  boughtSpot:   17907322116044904
+  soldSpot:     11005276551028534
+  (boughtA0:    13401644035195396865783535944)
+  (soldA0:      13401644035185632331648871656)
+  boughtExp:    68
+  soldExp:      8
+  spotPrice:    0.6145685256405725
+  eff.Price:    0.6145685256401248
+  maxBuying:    1217747139116
+  (maxBuyingA0: 13401644035195396865783535944)
+)
+type 4 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 3375309,
+    cpu: 1497884367,
+}
+
+13401644035195396865783535944 - 13401644035185632331648871656 = 9764534134664288
+attempting corruption 5...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
+   +     +  virtual: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
+   +     +  anchorPrices: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740990,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935249969591912,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +  ]
+     )
+  boughtAsset:  Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  soldAsset:    Asset(a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f, )
+  boughtAmount: 1217747139116
+  soldAmount:   1
+  boughtSpot:   17907322116044904
+  soldSpot:     11005276551028534
+  (boughtA0:    13401644035195396865783535944)
+  (soldA0:      17907322116044904)
+  boughtExp:    68
+  soldExp:      8
+  spotPrice:    0.6145685256405725
+  eff.Price:    8.21188543892561e-13
+  maxBuying:    1217747139116
+  (maxBuyingA0: 13401644035195396865783535944)
+)
+type 5 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 3355343,
+    cpu: 1491631709,
+}
+
+13401644035195396865783535944 - 17907322116044904 = 13401644035177489543667491040
+attempting corruption 6...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
+   +     +  virtual: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
+   +     +  anchorPrices: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740990,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935249969591912,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +  ]
+     )
+  boughtAsset:  Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  soldAsset:    Asset(a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f, )
+  boughtAmount: 1217747139116
+  soldAmount:   748389063889
+  boughtSpot:   17907322116044904
+  soldSpot:     11005276551028534
+  (boughtA0:    13401644035195396865783535944)
+  (soldA0:      13401644035185632331648871656)
+  boughtExp:    68
+  soldExp:      8
+  spotPrice:    0.6145685256405725
+  eff.Price:    0.6145685256401248
+  maxBuying:    1217747139116
+  (maxBuyingA0: 13401644035195396865783535944)
+)
+type 6 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 3375309,
+    cpu: 1497884367,
+}
+
+13401644035195396865783535944 - 13401644035185632331648871656 = 9764534134664288
+attempting corruption 7...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
+   +     +  virtual: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
+   +     +  anchorPrices: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740990,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935249969591912,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +  ]
+     )
+  boughtAsset:  Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  soldAsset:    Asset(a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f, )
+  boughtAmount: 1217747139116
+  soldAmount:   1
+  boughtSpot:   17907322116044904
+  soldSpot:     11005276551028534
+  (boughtA0:    13401644035195396865783535944)
+  (soldA0:      17907322116044904)
+  boughtExp:    68
+  soldExp:      8
+  spotPrice:    0.6145685256405725
+  eff.Price:    8.21188543892561e-13
+  maxBuying:    1217747139116
+  (maxBuyingA0: 13401644035195396865783535944)
+)
+type 7 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 3355343,
+    cpu: 1491631709,
+}
+
+13401644035195396865783535944 - 17907322116044904 = 13401644035177489543667491040
+attempting Swapping...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
+   +     +  virtual: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
+   +     +  anchorPrices: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740990,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935249969591912,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +  ]
+     )
+  boughtAsset:  Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  soldAsset:    Asset(a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f, )
+  boughtAmount: 1217747139116
+  soldAmount:   748389063890
+  boughtSpot:   17907322116044904
+  soldSpot:     11005276551028534
+  (boughtA0:    13401644035195396865783535944)
+  (soldA0:      13401644035203539653764916560)
+  boughtExp:    68
+  soldExp:      8
+  spotPrice:    0.6145685256405725
+  eff.Price:    0.6145685256409459
+  maxBuying:    1217747139116
+  (maxBuyingA0: 13401644035195396865783535944)
+)
+
+trials left: 1 - iteration: 10 - block: 6408
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 9007199254740991
+maxTicks_: 3121657384082680
+3
+virtual: 1286983183634553
+weight: 7
 jumpSize: 100
-minAnchorPrice: 198
+minAnchorPrice: 8919685431130565
 jumpLog: 0.009950330853168092
-anchorLog: 0.005037794029957081
-1.9751364970458831
-maxTicks: 1
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+maxTicks: 4503599627370495
+maxTicks_: 44812306322540
+3
+virtual: 1
+weight: 72
+jumpSize: 71
+minAnchorPrice: 71
+jumpLog: 0.01398624197473987
+anchorLog: 0.01398624197473987
+1
+maxTicks: 1501199875790165
 maxTicks_: 1
 1
+attempting Opening...
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+virtual: 1286983183634553
+weight: 7
+jumpSize: 100
+minAnchorPrice: 8919685431130565
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+virtual: 1286983183634553
+weight: 7
+jumpSize: 100
+minAnchorPrice: 8919685431130565
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+virtual: 1286983183634553
+weight: 7
+jumpSize: 100
+minAnchorPrice: 8919685431130565
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+virtual: 1286983183634553
+weight: 7
+jumpSize: 100
+minAnchorPrice: 8919685431130565
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+Opening pool with 6 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 11 - block: 7408
 virtual: 9007199254740991
 weight: 1
 jumpSize: 1
@@ -423,20 +1580,6 @@ anchorLog: 2.2204460492503128e-16
 maxTicks: 1
 maxTicks_: 3121657384082680
 1
-attempting Opening...
-Opening pool with 1 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 9 - block: 4702
-virtual: 961962717365531
-weight: 1
-jumpSize: 100
-minAnchorPrice: 952438334025278
-jumpLog: 0.009950330853168092
-anchorLog: 1.110223024625156e-15
-8962461264508.2
-maxTicks: 6235871581895732
-maxTicks_: 8962461264508
-3
 virtual: 2
 weight: 51
 jumpSize: 100
@@ -444,337 +1587,1295 @@ minAnchorPrice: 100
 jumpLog: 0.009950330853168092
 anchorLog: 0.009950330853168092
 1
-maxTicks: 6235871581895732
+maxTicks: 1
 maxTicks_: 1
 1
-virtual: 9007199254740991
+attempting Opening...
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 12 - block: 7788
+virtual: 4088723908431796
 weight: 1
 jumpSize: 1
-minAnchorPrice: 4503599627370495
+minAnchorPrice: 2044361954215898
 jumpLog: 0.6931471805599453
+anchorLog: 4.440892098500625e-16
+1560828692041340
+maxTicks: 3517453942205702
+maxTicks_: 1560828692041340
+3
+virtual: 1663954659553068
+weight: 2
+jumpSize: 79
+minAnchorPrice: 3286310452617309
+jumpLog: 0.012578782206860185
 anchorLog: 2.2204460492503128e-16
-3121657384082680
-maxTicks: 6235871581895732
-maxTicks_: 3121657384082680
+56649798859590.164
+maxTicks: 3517453942205702
+maxTicks_: 56649798859590
 3
 attempting Opening...
-virtual: 9007199254740991
-weight: 1
-jumpSize: 1
-minAnchorPrice: 4503599627370495
-jumpLog: 0.6931471805599453
+virtual: 1663954659553068
+weight: 2
+jumpSize: 79
+minAnchorPrice: 3286310452617309
+jumpLog: 0.012578782206860185
 anchorLog: 2.2204460492503128e-16
-3121657384082680
-virtual: 9007199254740991
-weight: 1
-jumpSize: 1
-minAnchorPrice: 4503599627370495
-jumpLog: 0.6931471805599453
+56649798859590.164
+virtual: 1663954659553068
+weight: 2
+jumpSize: 79
+minAnchorPrice: 3286310452617309
+jumpLog: 0.012578782206860185
 anchorLog: 2.2204460492503128e-16
-3121657384082680
+56649798859590.164
 Opening pool with 3 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 10 - block: 5141
+trials left: 1 - iteration: 13 - block: 8788
+attempting Closing...
+
+trials left: 1 - iteration: 14 - block: 8789
+virtual: 9007199254740991
+weight: 1
+jumpSize: 1
+minAnchorPrice: 4503599627370495
+jumpLog: 0.6931471805599453
+anchorLog: 2.2204460492503128e-16
+3121657384082680
+maxTicks: 1
+maxTicks_: 3121657384082680
+1
+virtual: 1
+weight: 100
+jumpSize: 23
+minAnchorPrice: 95
+jumpLog: 0.0425596144187959
+anchorLog: 0.010471299867295437
+4.064406039189129
+maxTicks: 1
+maxTicks_: 4
+1
+attempting Opening...
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 15 - block: 9789
+Swapping.boundary()
 Swapping.boundary()
 Swapping.boundary()
 subSwap: 1 bought
-valueEquation: 
-        addedBuyingA0  18075317516252420 > 
-        addedSellingA0 18014398509481980
-returning corruptSoldAmnt
 boughtAssetForSale (old): 
         buyingAmm  9007199254740992 > 
-        spotBuying 9106179466331550
+        spotBuying 18014398509481980
 returning corruptBoughtSpot
 boughtAssetForSale (old):
-        sellingAmm  18014398509481982 > 
-        spotSelling 17896353976487545
+        sellingAmm  18013180762342865 > 
+        spotSelling 17907322116044904
 returning corruptSoldSpot
-attempting 3 corruptions...
+valueEquation: 
+        addedBuyingA0  18091933684251552 > 
+        addedSellingA0 18014398509481980
+returning corruptSoldAmnt
+valueEquation: 
+        addedBuyingA0  18091933684251552 > 
+        addedSellingA0 9007199254740990
+returning corruptSoldAmnt
+valueEquation: 
+        addedBuyingA0  18091933684251552 > 
+        addedSellingA0 9007199254740990
+returning corruptSoldAmnt
+valueEquation: 
+        addedBuyingA0  18091933684251552 > 
+        addedSellingA0 18014398509481980
+returning corruptSoldAmnt
+valueEquation: 
+        addedBuyingA0  18091933684251552 > 
+        addedSellingA0 18014398509481980
+returning corruptSoldAmnt
+valueEquation: 
+        addedBuyingA0  18091933684251552 > 
+        addedSellingA0 18014398509481980
+returning corruptSoldAmnt
+attempting 8 corruptions...
 attempting corruption 0...
 compiling tx for Swapping (
   paramUtxo: ParamUtxo (
      +  param: Param (
-   +     +  owner: 84c0c02fa796641656cfc08cf82921449ba02505ee9d2936848655e9, 
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
    +     +  virtual: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 9007199254740991,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 9007199254740991
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
    +     +  ], 
    +     +  weights: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 1,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 1
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
    +     +  ]
    +     +  jumpSizes: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 91,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 100
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
    +     +  ], 
    +     +  active: 1
    +     )
      )
   diracUtxo: DiracUtxo (
      +  dirac: Dirac(
-   +     +  owner: 84c0c02fa796641656cfc08cf82921449ba02505ee9d2936848655e9,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: c1b4eda966c0177824827397098f11b305d891f84e04ea95f7cfa0e1a6830a8b),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3aa6de9b79284fd6222be5df1741bf8ffba947f8f980f9c0c15a5ca93132d8f0),
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
    +     +  anchorPrices: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 8909294915015545,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 8918019064099991
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
    +     +  ],
    +     ),
      +  balance: +[
-   +  +  _: 2827360,
-   +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 9007199254740991,
-   +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 1
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9005981507601874,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935998358655802,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
    +  ]
      )
-  boughtAsset:  Asset(c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2, cJ1DsXYJxUO3qzfD474DzyJU)
-  soldAsset:    Asset(2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f, )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
   boughtAmount: 1
-  soldAmount:   2
-  boughtSpot:   9007199254740990
-  soldSpot:     18075317516252420
-  (boughtA0:    18075317516252420)
-  (soldA0:      18014398509481980)
-  boughtExp:    1
-  soldExp:      71
-  spotPrice:    2.006763368395384
-  eff.Price:    2
+  soldAmount:   3
+  boughtSpot:   18014398509481980
+  soldSpot:     18091933684251552
+  (boughtA0:    18091933684251552)
+  (soldA0:      54043195528445940)
+  boughtExp:    2
+  soldExp:      69
+  spotPrice:    1.0043040668123757
+  eff.Price:    3
   maxBuying:    1
-  (maxBuyingA0: 18075317516252420)
+  (maxBuyingA0: 18091933684251552)
 )
-type 0 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+type 0 corruption failed successfully: Redeemer (Spend, 2): The provided Plutus code called 'error'.
 
 ExBudget {
-    mem: 2584839,
-    cpu: 1137174360,
+    mem: 1524545,
+    cpu: 633311996,
 }
 
-18075317516252420 - 18014398509481980 = 60919006770440
+G9007199254740988
 attempting corruption 1...
 compiling tx for Swapping (
   paramUtxo: ParamUtxo (
      +  param: Param (
-   +     +  owner: 84c0c02fa796641656cfc08cf82921449ba02505ee9d2936848655e9, 
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
    +     +  virtual: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 9007199254740991,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 9007199254740991
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
    +     +  ], 
    +     +  weights: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 1,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 1
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
    +     +  ]
    +     +  jumpSizes: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 91,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 100
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
    +     +  ], 
    +     +  active: 1
    +     )
      )
   diracUtxo: DiracUtxo (
      +  dirac: Dirac(
-   +     +  owner: 84c0c02fa796641656cfc08cf82921449ba02505ee9d2936848655e9,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: c1b4eda966c0177824827397098f11b305d891f84e04ea95f7cfa0e1a6830a8b),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3aa6de9b79284fd6222be5df1741bf8ffba947f8f980f9c0c15a5ca93132d8f0),
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
    +     +  anchorPrices: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 8909294915015545,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 8918019064099991
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
    +     +  ],
    +     ),
      +  balance: +[
-   +  +  _: 2827360,
-   +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 9007199254740991,
-   +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 1
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9005981507601874,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935998358655802,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
    +  ]
      )
-  boughtAsset:  Asset(c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2, cJ1DsXYJxUO3qzfD474DzyJU)
-  soldAsset:    Asset(2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f, )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
   boughtAmount: 1
   soldAmount:   3
-  boughtSpot:   9106179466331550
-  soldSpot:     18075317516252420
-  (boughtA0:    18075317516252420)
-  (soldA0:      27318538398994650)
-  boughtExp:    2
-  soldExp:      71
-  spotPrice:    1.9849507230867385
+  boughtSpot:   9007199254740990
+  soldSpot:     17907322116044904
+  (boughtA0:    17907322116044904)
+  (soldA0:      27021597764222970)
+  boughtExp:    1
+  soldExp:      68
+  spotPrice:    1.9881121322612336
   eff.Price:    3
   maxBuying:    1
-  (maxBuyingA0: 18075317516252420)
+  (maxBuyingA0: 17907322116044904)
 )
-type 1 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+type 1 corruption failed successfully: Redeemer (Spend, 2): The provided Plutus code called 'error'.
 
 ExBudget {
-    mem: 1297638,
-    cpu: 544697161,
+    mem: 1504721,
+    cpu: 621478012,
 }
 
-G98980211590558
+H105858646297961
 attempting corruption 2...
 compiling tx for Swapping (
   paramUtxo: ParamUtxo (
      +  param: Param (
-   +     +  owner: 84c0c02fa796641656cfc08cf82921449ba02505ee9d2936848655e9, 
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
    +     +  virtual: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 9007199254740991,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 9007199254740991
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
    +     +  ], 
    +     +  weights: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 1,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 1
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
    +     +  ]
    +     +  jumpSizes: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 91,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 100
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
    +     +  ], 
    +     +  active: 1
    +     )
      )
   diracUtxo: DiracUtxo (
      +  dirac: Dirac(
-   +     +  owner: 84c0c02fa796641656cfc08cf82921449ba02505ee9d2936848655e9,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: c1b4eda966c0177824827397098f11b305d891f84e04ea95f7cfa0e1a6830a8b),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3aa6de9b79284fd6222be5df1741bf8ffba947f8f980f9c0c15a5ca93132d8f0),
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
    +     +  anchorPrices: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 8909294915015545,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 8918019064099991
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
    +     +  ],
    +     ),
      +  balance: +[
-   +  +  _: 2827360,
-   +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 9007199254740991,
-   +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 1
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9005981507601874,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935998358655802,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
    +  ]
      )
-  boughtAsset:  Asset(c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2, cJ1DsXYJxUO3qzfD474DzyJU)
-  soldAsset:    Asset(2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f, )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
   boughtAmount: 1
-  soldAmount:   3
+  soldAmount:   2
   boughtSpot:   9007199254740990
-  soldSpot:     17896353976487545
-  (boughtA0:    17896353976487545)
-  (soldA0:      27021597764222970)
+  soldSpot:     18091933684251552
+  (boughtA0:    18091933684251552)
+  (soldA0:      18014398509481980)
   boughtExp:    1
-  soldExp:      70
-  spotPrice:    1.9868944241538453
-  eff.Price:    3
+  soldExp:      69
+  spotPrice:    2.0086081336247514
+  eff.Price:    2
   maxBuying:    1
-  (maxBuyingA0: 17896353976487545)
+  (maxBuyingA0: 18091933684251552)
 )
-type 2 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
+type 2 corruption failed successfully: Redeemer (Spend, 3): The provided Plutus code called 'error'.
 
 ExBudget {
-    mem: 1297916,
-    cpu: 543677510,
+    mem: 2936114,
+    cpu: 1287456644,
 }
 
-H118044532994437
+18091933684251552 - 18014398509481980 = 77535174769572
+attempting corruption 3...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
+   +     +  virtual: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
+   +     +  anchorPrices: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9005981507601874,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935998358655802,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 1
+  soldAmount:   1
+  boughtSpot:   9007199254740990
+  soldSpot:     18091933684251552
+  (boughtA0:    18091933684251552)
+  (soldA0:      9007199254740990)
+  boughtExp:    1
+  soldExp:      69
+  spotPrice:    2.0086081336247514
+  eff.Price:    1
+  maxBuying:    1
+  (maxBuyingA0: 18091933684251552)
+)
+type 3 corruption failed successfully: Redeemer (Spend, 2): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 2915215,
+    cpu: 1278794140,
+}
+
+18091933684251552 - 9007199254740990 = 9084734429510562
+attempting corruption 4...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
+   +     +  virtual: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
+   +     +  anchorPrices: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9005981507601874,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935998358655802,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 1
+  soldAmount:   1
+  boughtSpot:   9007199254740990
+  soldSpot:     18091933684251552
+  (boughtA0:    18091933684251552)
+  (soldA0:      9007199254740990)
+  boughtExp:    1
+  soldExp:      69
+  spotPrice:    2.0086081336247514
+  eff.Price:    1
+  maxBuying:    1
+  (maxBuyingA0: 18091933684251552)
+)
+type 4 corruption failed successfully: Redeemer (Spend, 2): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 2915215,
+    cpu: 1278794140,
+}
+
+18091933684251552 - 9007199254740990 = 9084734429510562
+attempting corruption 5...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
+   +     +  virtual: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
+   +     +  anchorPrices: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9005981507601874,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935998358655802,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 1
+  soldAmount:   2
+  boughtSpot:   9007199254740990
+  soldSpot:     18091933684251552
+  (boughtA0:    18091933684251552)
+  (soldA0:      18014398509481980)
+  boughtExp:    1
+  soldExp:      69
+  spotPrice:    2.0086081336247514
+  eff.Price:    2
+  maxBuying:    1
+  (maxBuyingA0: 18091933684251552)
+)
+type 5 corruption failed successfully: Redeemer (Spend, 2): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 2915180,
+    cpu: 1278251933,
+}
+
+18091933684251552 - 18014398509481980 = 77535174769572
+attempting corruption 6...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
+   +     +  virtual: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
+   +     +  anchorPrices: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9005981507601874,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935998358655802,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 1
+  soldAmount:   2
+  boughtSpot:   9007199254740990
+  soldSpot:     18091933684251552
+  (boughtA0:    18091933684251552)
+  (soldA0:      18014398509481980)
+  boughtExp:    1
+  soldExp:      69
+  spotPrice:    2.0086081336247514
+  eff.Price:    2
+  maxBuying:    1
+  (maxBuyingA0: 18091933684251552)
+)
+type 6 corruption failed successfully: Redeemer (Spend, 2): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 2915180,
+    cpu: 1278251933,
+}
+
+18091933684251552 - 18014398509481980 = 77535174769572
+attempting corruption 7...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
+   +     +  virtual: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
+   +     +  anchorPrices: +[
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9005981507601874,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935998358655802,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 1
+  soldAmount:   2
+  boughtSpot:   9007199254740990
+  soldSpot:     18091933684251552
+  (boughtA0:    18091933684251552)
+  (soldA0:      18014398509481980)
+  boughtExp:    1
+  soldExp:      69
+  spotPrice:    2.0086081336247514
+  eff.Price:    2
+  maxBuying:    1
+  (maxBuyingA0: 18091933684251552)
+)
+type 7 corruption failed successfully: Redeemer (Spend, 3): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 2936114,
+    cpu: 1287456644,
+}
+
+18091933684251552 - 18014398509481980 = 77535174769572
 attempting Swapping...
 compiling tx for Swapping (
   paramUtxo: ParamUtxo (
      +  param: Param (
-   +     +  owner: 84c0c02fa796641656cfc08cf82921449ba02505ee9d2936848655e9, 
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e, 
    +     +  virtual: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 9007199254740991,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 9007199254740991
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 4321727021533820,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9007199254740991,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 9007199254740991
    +     +  ], 
    +     +  weights: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 1,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 1
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 1,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
    +     +  ]
    +     +  jumpSizes: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 91,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 100
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 7,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 97,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
    +     +  ], 
    +     +  active: 1
    +     )
      )
   diracUtxo: DiracUtxo (
      +  dirac: Dirac(
-   +     +  owner: 84c0c02fa796641656cfc08cf82921449ba02505ee9d2936848655e9,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: c1b4eda966c0177824827397098f11b305d891f84e04ea95f7cfa0e1a6830a8b),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3aa6de9b79284fd6222be5df1741bf8ffba947f8f980f9c0c15a5ca93132d8f0),
+   +     +  owner: 053754efd2aa83feee59349bc3e2871b8271f88b53db9dde0d46648e,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: dc9caff7851ef4d734175131a1a705a5faf117b79409c02954a6e5a4484e06a5),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 3ba889aa0a5156fc9d32962c689db70eb9688d15c41b0015ad8abf9c7f314cc3),
    +     +  anchorPrices: +[
-   +     +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 8909294915015545,
-   +     +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 8918019064099991
+   +     +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 3781511143842092,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 8915289058264042,
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 4503599627370495
    +     +  ],
    +     ),
      +  balance: +[
-   +  +  _: 2827360,
-   +  +  2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f_: 9007199254740991,
-   +  +  c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2_cJ1DsXYJxUO3qzfD474DzyJU: 1
+   +  +  _: 2965280,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 9005981507601874,
+   +  +  a97b500249184f5b8ea03903af8676225df8575ba9c3f7d1dfba3b0f_: 5935998358655802,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 1
    +  ]
      )
-  boughtAsset:  Asset(c8a14fa614c830e420dd7ef74b4c10f5819d6ef673ec75a7dc988ed2, cJ1DsXYJxUO3qzfD474DzyJU)
-  soldAsset:    Asset(2bb44bee56b74595b5ba2a5e2e9af76495b452083d1685bfd9ad506f, )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
   boughtAmount: 1
   soldAmount:   3
   boughtSpot:   9007199254740990
-  soldSpot:     18075317516252420
-  (boughtA0:    18075317516252420)
+  soldSpot:     18091933684251552
+  (boughtA0:    18091933684251552)
   (soldA0:      27021597764222970)
   boughtExp:    1
-  soldExp:      71
-  spotPrice:    2.006763368395384
+  soldExp:      69
+  spotPrice:    2.0086081336247514
   eff.Price:    3
   maxBuying:    1
-  (maxBuyingA0: 18075317516252420)
+  (maxBuyingA0: 18091933684251552)
 )
 
-trials left: 1 - iteration: 11 - block: 5142
-attempting Closing...
-
-trials left: 1 - iteration: 12 - block: 5667
-virtual: 4230672695375000
+trials left: 1 - iteration: 16 - block: 9790
+virtual: 6080871883622636
 weight: 1
-jumpSize: 90
-minAnchorPrice: 4184181786634615
-jumpLog: 0.011049836186584935
+jumpSize: 100
+minAnchorPrice: 6020665231309540
+jumpLog: 0.009950330853168092
 anchorLog: 2.2204460492503128e-16
-49764038132408.945
-maxTicks: 2145181432184676
-maxTicks_: 49764038132408
-3
-virtual: 4854304401379574
-weight: 1
-jumpSize: 66
-minAnchorPrice: 4781852096881371
-jumpLog: 0.015037877364540502
-anchorLog: 2.2204460492503128e-16
-67724578895387.83
-maxTicks: 2145181432184676
-maxTicks_: 67724578895387
-3
-attempting Opening...
-virtual: 4854304401379574
-weight: 1
-jumpSize: 66
-minAnchorPrice: 4781852096881371
-jumpLog: 0.015037877364540502
-anchorLog: 2.2204460492503128e-16
-67724578895387.83
-Opening pool with 2 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 13 - block: 6239
-virtual: 7448485745871951
-weight: 1
-jumpSize: 64
-minAnchorPrice: 7333893657473920
-jumpLog: 0.015504186535965254
-anchorLog: 2.2204460492503128e-16
-69824648706055.79
-maxTicks: 1421657130813763
-maxTicks_: 69824648706055
-3
+44812306322540.98
+maxTicks: 1
+maxTicks_: 44812306322540
+1
 virtual: 9007199254740991
 weight: 1
+jumpSize: 100
+minAnchorPrice: 8918019064099991
+jumpLog: 0.009950330853168092
+anchorLog: 2.2204460492503128e-16
+44812306322540.98
+maxTicks: 1
+maxTicks_: 44812306322540
+1
+virtual: 3550223745404902
+weight: 5
 jumpSize: 1
-minAnchorPrice: 4503599627370495
+minAnchorPrice: 8875559363512255
 jumpLog: 0.6931471805599453
 anchorLog: 2.2204460492503128e-16
 3121657384082680
-maxTicks: 1421657130813763
+maxTicks: 1
 maxTicks_: 3121657384082680
-3
+1
+attempting Opening...
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 1 - iteration: 17 - block: 9805
+Swapping.boundary()
+Swapping.boundary()
+Swapping.boundary()
+Swapping.boundary()
+Swapping.boundary()
+Swapping.boundary()
+Swapping.boundary()
+subSwap: 1 sold
+boughtAssetForSale (old): 
+        buyingAmm  720687998145731770 > 
+        spotBuying 727834843380110964
+returning corruptBoughtSpot
+boughtAssetForSale (new):
+        sellingAmm  160 > 
+        spotSelling 128
+returning corruptSoldSpot
+boughtAssetForSale (new): 
+        buyingAmm  720628557802090056 > 
+        spotBuying 720628557802090064
+returning corruptBoughtAmnt
+boughtAssetForSale (new): 
+        buyingAmm  556714775253447832 > 
+        spotBuying 720628557802090064
+returning corruptBoughtAmnt
+boughtAssetForSale (new): 
+        buyingAmm  196 > 
+        spotBuying 720628557802090064
+returning corruptBoughtAmnt
+returning corruptBoughtAmnt
+boughtAssetForSale (new): 
+        buyingAmm  196 > 
+        spotBuying 720628557802090064
+boughtAssetForSale (new): 
+        buyingAmm  696836047330835328 > 
+        spotBuying 720628557802090064
+returning corruptBoughtAmnt
+boughtAssetForSale (new): 
+        buyingAmm  457531877895399678 > 
+        spotBuying 720628557802090064
+returning corruptBoughtAmnt
+attempting 8 corruptions...
+attempting corruption 0...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 3,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7353959164752363
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 606534118792
+  soldAmount:   1
+  boughtSpot:   727834843380110964
+  soldSpot:     256
+  (boughtA0:    155272734410752)
+  (soldA0:      727834843380110964)
+  boughtExp:    3604
+  soldExp:      4
+  spotPrice:    3.517281459226654e-16
+  eff.Price:    1.648711868001167e-12
+  maxBuying:    7353959164752363
+  (maxBuyingA0: 1882613546176604928)
+)
+type 0 corruption failed successfully: Redeemer (Spend, 0): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1359447,
+    cpu: 611232746,
+}
+
+G7146845234379194
+attempting corruption 1...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 3,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7353959164752363
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 606534118792
+  soldAmount:   1
+  boughtSpot:   720628557802090064
+  soldSpot:     128
+  (boughtA0:    77636367205376)
+  (soldA0:      720628557802090064)
+  boughtExp:    3603
+  soldExp:      3
+  spotPrice:    1.7762271369094602e-16
+  eff.Price:    1.648711868001167e-12
+  maxBuying:    7353959164752363
+  (maxBuyingA0: 941306773088302464)
+)
+type 1 corruption failed successfully: Redeemer (Spend, 0): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1554449,
+    cpu: 796585768,
+}
+
+H32
+attempting corruption 2...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 3,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7353959164752363
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 606534118793
+  soldAmount:   1
+  boughtSpot:   720628557802090064
+  soldSpot:     256
+  (boughtA0:    155272734411008)
+  (soldA0:      720628557802090064)
+  boughtExp:    3603
+  soldExp:      4
+  spotPrice:    3.5524542738189203e-16
+  eff.Price:    1.6487118679984487e-12
+  maxBuying:    7353959164752363
+  (maxBuyingA0: 1882613546176604928)
+)
+type 2 corruption failed successfully: Redeemer (Spend, 0): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1554211,
+    cpu: 800965894,
+}
+
+G8
+attempting corruption 3...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 3,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7353959164752363
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 1673196151962081
+  soldAmount:   1
+  boughtSpot:   720628557802090064
+  soldSpot:     256
+  (boughtA0:    428338214902292736)
+  (soldA0:      720628557802090064)
+  boughtExp:    3603
+  soldExp:      4
+  spotPrice:    3.5524542738189203e-16
+  eff.Price:    5.976585583389882e-16
+  maxBuying:    7353959164752363
+  (maxBuyingA0: 1882613546176604928)
+)
+type 3 corruption failed successfully: Redeemer (Spend, 0): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1815044,
+    cpu: 929028374,
+}
+
+G163913782548642232
+attempting corruption 4...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 3,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7353959164752363
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 7353959164752363
+  soldAmount:   1
+  boughtSpot:   720628557802090064
+  soldSpot:     256
+  (boughtA0:    1882613546176604928)
+  (soldA0:      720628557802090064)
+  boughtExp:    3603
+  soldExp:      4
+  spotPrice:    3.5524542738189203e-16
+  eff.Price:    1.3598117389514686e-16
+  maxBuying:    7353959164752363
+  (maxBuyingA0: 1882613546176604928)
+)
+type 4 corruption failed successfully: Redeemer (Spend, 0): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1834686,
+    cpu: 934761490,
+}
+
+G720628557802089868
+attempting corruption 5...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 3,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7353959164752363
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 7353959164752363
+  soldAmount:   1
+  boughtSpot:   720628557802090064
+  soldSpot:     256
+  (boughtA0:    1882613546176604928)
+  (soldA0:      720628557802090064)
+  boughtExp:    3603
+  soldExp:      4
+  spotPrice:    3.5524542738189203e-16
+  eff.Price:    1.3598117389514686e-16
+  maxBuying:    7353959164752363
+  (maxBuyingA0: 1882613546176604928)
+)
+type 5 corruption failed successfully: Redeemer (Spend, 0): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1834686,
+    cpu: 934761490,
+}
+
+G720628557802089868
+attempting corruption 6...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 3,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7353959164752363
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 243387253213229
+  soldAmount:   1
+  boughtSpot:   720628557802090064
+  soldSpot:     256
+  (boughtA0:    62307136822586624)
+  (soldA0:      720628557802090064)
+  boughtExp:    3603
+  soldExp:      4
+  spotPrice:    3.5524542738189203e-16
+  eff.Price:    4.108678604971603e-15
+  maxBuying:    7353959164752363
+  (maxBuyingA0: 1882613546176604928)
+)
+type 6 corruption failed successfully: Redeemer (Spend, 0): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1794971,
+    cpu: 918868146,
+}
+
+G23792510471254736
+attempting corruption 7...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 3,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7353959164752363
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 2685266533166654
+  soldAmount:   1
+  boughtSpot:   720628557802090064
+  soldSpot:     256
+  (boughtA0:    687428232490663424)
+  (soldA0:      720628557802090064)
+  boughtExp:    3603
+  soldExp:      4
+  spotPrice:    3.5524542738189203e-16
+  eff.Price:    3.724025111282827e-16
+  maxBuying:    7353959164752363
+  (maxBuyingA0: 1882613546176604928)
+)
+type 7 corruption failed successfully: Redeemer (Spend, 0): The provided Plutus code called 'error'.
+
+ExBudget {
+    mem: 1835082,
+    cpu: 939128665,
+}
+
+G263096679906690386
+attempting Swapping...
+compiling tx for Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211, 
+   +     +  virtual: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 2,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 98,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 32
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 100,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 1
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: dcd4b538dc4599b72395746a5399030fce7fc91cc083856702637211,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 11c47bffb4f00c9e78a91e9c9e88259099d4024c484d811eb7ca6e255cd26f15),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 081e55765cf3185c9c0738ac22bbadb0af9bf2169882eccdbc170eeb98015f31),
+   +     +  anchorPrices: +[
+   +     +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 194,
+   +     +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 16
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 2542900,
+   +  +  2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164_: 3,
+   +  +  da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e_: 7353959164752363
+   +  ]
+     )
+  boughtAsset:  Asset(da8b7cc4fe777995cf2c018a47b9085d94c305c9ee712acd7433da7e, )
+  soldAsset:    Asset(2d15fcb5a31ac29cbfa249026567203bde05a3f3a29fb60612cab164, )
+  boughtAmount: 606534118792
+  soldAmount:   1
+  boughtSpot:   720628557802090064
+  soldSpot:     256
+  (boughtA0:    155272734410752)
+  (soldA0:      720628557802090064)
+  boughtExp:    3603
+  soldExp:      4
+  spotPrice:    3.5524542738189203e-16
+  eff.Price:    1.648711868001167e-12
+  maxBuying:    7353959164752363
+  (maxBuyingA0: 1882613546176604928)
+)
+
+trials left: 1 - iteration: 18 - block: 10805
+virtual: 1
+weight: 100
+jumpSize: 9
+minAnchorPrice: 90
+jumpLog: 0.10536051565782635
+anchorLog: 0.011049836186584935
+9.535029649194202
+maxTicks: 1
+maxTicks_: 9
+1
 virtual: 1
 weight: 2
 jumpSize: 1
@@ -782,216 +2883,33 @@ minAnchorPrice: 1
 jumpLog: 0.6931471805599453
 anchorLog: 0.6931471805599453
 1
-maxTicks: 1421657130813763
+maxTicks: 1
 maxTicks_: 1
 1
 attempting Opening...
 Opening pool with 1 dirac utxos and 1 param utxos
 
-trials left: 1 - iteration: 14 - block: 7239
-Swapping.boundary()
-Swapping.boundary()
-Swapping.boundary()
-Swapping.boundary()
-Swapping.boundary()
-Swapping.boundary()
-Swapping.boundary()
-subSwap: 1 bought
-boughtAssetForSale (old): 
-        buyingAmm  10966894026230997 > 
-        spotBuying 18014398509481980
-returning corruptBoughtSpot
-boughtAssetForSale (old):
-        sellingAmm  8870142876685714 > 
-        spotSelling 8833548548780994
-returning corruptSoldSpot
-attempting 2 corruptions...
-attempting corruption 0...
-compiling tx for Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: e480fd378ab65751a2803aa9f7596d5793167f0b640b6194f233bbf2, 
-   +     +  virtual: +[
-   +     +  +  b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e_: 7448485745871951,
-   +     +  +  9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5_: 9007199254740991,
-   +     +  +  9e20ee3bf7dc4b6d56e417850a9bc6285cc469e22f29741fcf23b623_: 1
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e_: 1,
-   +     +  +  9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5_: 1,
-   +     +  +  9e20ee3bf7dc4b6d56e417850a9bc6285cc469e22f29741fcf23b623_: 2
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e_: 64,
-   +     +  +  9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5_: 1,
-   +     +  +  9e20ee3bf7dc4b6d56e417850a9bc6285cc469e22f29741fcf23b623_: 1
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: e480fd378ab65751a2803aa9f7596d5793167f0b640b6194f233bbf2,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: bb9050331a7949ba7c638dc1884e834cf2ce1deabf026aca563188640c847c12),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 1a4044ef5524cdd16c1767abb7f5df58a484974306ceafebc01f8167f6d6a08b),
-   +     +  anchorPrices: +[
-   +     +  +  b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e_: 7333893657473920,
-   +     +  +  9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5_: 4503599627370495,
-   +     +  +  9e20ee3bf7dc4b6d56e417850a9bc6285cc469e22f29741fcf23b623_: 1
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 2965280,
-   +  +  9e20ee3bf7dc4b6d56e417850a9bc6285cc469e22f29741fcf23b623_: 5185766262409382,
-   +  +  9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5_: 1959694771490006,
-   +  +  b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e_: 1421657130813763
-   +  ]
-     )
-  boughtAsset:  Asset(9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5, )
-  soldAsset:    Asset(b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e, )
-  boughtAmount: 1
-  soldAmount:   1
-  boughtSpot:   18014398509481980
-  soldSpot:     8971572744855697
-  (boughtA0:    8971572744855697)
-  (soldA0:      18014398509481980)
-  boughtExp:    2
-  soldExp:      13
-  spotPrice:    0.4980223314219156
-  eff.Price:    1
-  maxBuying:    1
-  (maxBuyingA0: 8971572744855697)
-)
-type 0 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
-
-ExBudget {
-    mem: 1463613,
-    cpu: 601933946,
-}
-
-G7047504483250983
-attempting corruption 1...
-compiling tx for Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: e480fd378ab65751a2803aa9f7596d5793167f0b640b6194f233bbf2, 
-   +     +  virtual: +[
-   +     +  +  b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e_: 7448485745871951,
-   +     +  +  9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5_: 9007199254740991,
-   +     +  +  9e20ee3bf7dc4b6d56e417850a9bc6285cc469e22f29741fcf23b623_: 1
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e_: 1,
-   +     +  +  9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5_: 1,
-   +     +  +  9e20ee3bf7dc4b6d56e417850a9bc6285cc469e22f29741fcf23b623_: 2
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e_: 64,
-   +     +  +  9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5_: 1,
-   +     +  +  9e20ee3bf7dc4b6d56e417850a9bc6285cc469e22f29741fcf23b623_: 1
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: e480fd378ab65751a2803aa9f7596d5793167f0b640b6194f233bbf2,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: bb9050331a7949ba7c638dc1884e834cf2ce1deabf026aca563188640c847c12),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 1a4044ef5524cdd16c1767abb7f5df58a484974306ceafebc01f8167f6d6a08b),
-   +     +  anchorPrices: +[
-   +     +  +  b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e_: 7333893657473920,
-   +     +  +  9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5_: 4503599627370495,
-   +     +  +  9e20ee3bf7dc4b6d56e417850a9bc6285cc469e22f29741fcf23b623_: 1
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 2965280,
-   +  +  9e20ee3bf7dc4b6d56e417850a9bc6285cc469e22f29741fcf23b623_: 5185766262409382,
-   +  +  9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5_: 1959694771490006,
-   +  +  b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e_: 1421657130813763
-   +  ]
-     )
-  boughtAsset:  Asset(9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5, )
-  soldAsset:    Asset(b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e, )
-  boughtAmount: 1
-  soldAmount:   1
-  boughtSpot:   9007199254740990
-  soldSpot:     8833548548780994
-  (boughtA0:    8833548548780994)
-  (soldA0:      9007199254740990)
-  boughtExp:    1
-  soldExp:      12
-  spotPrice:    0.98072089880008
-  eff.Price:    1
-  maxBuying:    1
-  (maxBuyingA0: 8833548548780994)
-)
-type 1 corruption failed successfully: Redeemer (Spend, 1): The provided Plutus code called 'error'.
-
-ExBudget {
-    mem: 1423732,
-    cpu: 581789861,
-}
-
-H36594327904720
-attempting Swapping...
-compiling tx for Swapping (
-  paramUtxo: ParamUtxo (
-     +  param: Param (
-   +     +  owner: e480fd378ab65751a2803aa9f7596d5793167f0b640b6194f233bbf2, 
-   +     +  virtual: +[
-   +     +  +  b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e_: 7448485745871951,
-   +     +  +  9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5_: 9007199254740991,
-   +     +  +  9e20ee3bf7dc4b6d56e417850a9bc6285cc469e22f29741fcf23b623_: 1
-   +     +  ], 
-   +     +  weights: +[
-   +     +  +  b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e_: 1,
-   +     +  +  9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5_: 1,
-   +     +  +  9e20ee3bf7dc4b6d56e417850a9bc6285cc469e22f29741fcf23b623_: 2
-   +     +  ]
-   +     +  jumpSizes: +[
-   +     +  +  b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e_: 64,
-   +     +  +  9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5_: 1,
-   +     +  +  9e20ee3bf7dc4b6d56e417850a9bc6285cc469e22f29741fcf23b623_: 1
-   +     +  ], 
-   +     +  active: 1
-   +     )
-     )
-  diracUtxo: DiracUtxo (
-     +  dirac: Dirac(
-   +     +  owner: e480fd378ab65751a2803aa9f7596d5793167f0b640b6194f233bbf2,
-   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: bb9050331a7949ba7c638dc1884e834cf2ce1deabf026aca563188640c847c12),
-   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 1a4044ef5524cdd16c1767abb7f5df58a484974306ceafebc01f8167f6d6a08b),
-   +     +  anchorPrices: +[
-   +     +  +  b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e_: 7333893657473920,
-   +     +  +  9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5_: 4503599627370495,
-   +     +  +  9e20ee3bf7dc4b6d56e417850a9bc6285cc469e22f29741fcf23b623_: 1
-   +     +  ],
-   +     ),
-     +  balance: +[
-   +  +  _: 2965280,
-   +  +  9e20ee3bf7dc4b6d56e417850a9bc6285cc469e22f29741fcf23b623_: 5185766262409382,
-   +  +  9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5_: 1959694771490006,
-   +  +  b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e_: 1421657130813763
-   +  ]
-     )
-  boughtAsset:  Asset(9f6745d7a76738371c5439a4aade4877abde3adf926f23260e9d17f5, )
-  soldAsset:    Asset(b3d3c536ddfca79623eeff5a44bd22d45fb19efdc50e85e8842d0e1e, )
-  boughtAmount: 1
-  soldAmount:   1
-  boughtSpot:   9007199254740990
-  soldSpot:     8971572744855697
-  (boughtA0:    8971572744855697)
-  (soldA0:      9007199254740990)
-  boughtExp:    1
-  soldExp:      13
-  spotPrice:    0.9960446628438312
-  eff.Price:    1
-  maxBuying:    1
-  (maxBuyingA0: 8971572744855697)
-)
-
-trials left: 1 - iteration: 15 - block: 8239
+trials left: 1 - iteration: 19 - block: 11805
+virtual: 1
+weight: 16
+jumpSize: 15
+minAnchorPrice: 15
+jumpLog: 0.06453852113757116
+anchorLog: 0.06453852113757116
+1
+maxTicks: 1
+maxTicks_: 1
+1
+virtual: 1
+weight: 8
+jumpSize: 7
+minAnchorPrice: 7
+jumpLog: 0.13353139262452257
+anchorLog: 0.13353139262452257
+1
+maxTicks: 1
+maxTicks_: 1
+1
 virtual: 2
 weight: 100
 jumpSize: 100
@@ -1002,72 +2920,19 @@ anchorLog: 0.005037794029957081
 maxTicks: 1
 maxTicks_: 1
 1
-virtual: 4771707206669908
-weight: 1
-jumpSize: 100
-minAnchorPrice: 4724462580861295
-jumpLog: 0.009950330853168092
-anchorLog: 2.2204460492503128e-16
-44812306322540.98
-maxTicks: 1
-maxTicks_: 44812306322540
-1
-attempting Opening...
-Opening pool with 1 dirac utxos and 1 param utxos
-
-trials left: 1 - iteration: 16 - block: 9239
-attempting Closing...
-
-trials left: 1 - iteration: 17 - block: 9240
-attempting Closing...
-
-trials left: 1 - iteration: 18 - block: 9241
-attempting Closing...
-
-trials left: 1 - iteration: 19 - block: 9242
-virtual: 1
-weight: 69
-jumpSize: 17
-minAnchorPrice: 65
-jumpLog: 0.05715841383994862
-anchorLog: 0.01526747213078838
-3.7438033847583045
-maxTicks: 1
-maxTicks_: 3
-1
-virtual: 1
-weight: 92
-jumpSize: 23
-minAnchorPrice: 88
-jumpLog: 0.0425596144187959
-anchorLog: 0.011299555253933466
-3.7664858007557918
-maxTicks: 1
-maxTicks_: 3
-1
-virtual: 9007199254740991
-weight: 1
-jumpSize: 1
-minAnchorPrice: 4503599627370495
-jumpLog: 0.6931471805599453
-anchorLog: 2.2204460492503128e-16
-3121657384082680
-maxTicks: 1
-maxTicks_: 3121657384082680
-1
 attempting Opening...
 Opening pool with 1 dirac utxos and 1 param utxos
 traces.length: 20
 Opening: 12
-Closing: 5
-Swapping: 3
+Swapping: 5
+Closing: 3
 --- DONE ---
 Opening: 12
-Closing: 5
-Swapping: 3
+Swapping: 5
+Closing: 3
 [0m[38;5;245m----- output end -----[0m
-emulator ... [0m[32mok[0m [0m[38;5;245m(5s)[0m
+emulator ... [0m[32mok[0m [0m[38;5;245m(8s)[0m
 [0m[38;5;245mrunning 0 tests from ./tests/types.test.ts[0m
 
-[0m[32mok[0m | 1 passed | 0 failed [0m[38;5;245m(6s)[0m
+[0m[32mok[0m | 1 passed | 0 failed [0m[38;5;245m(10s)[0m
 

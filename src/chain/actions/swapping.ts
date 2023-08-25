@@ -565,14 +565,27 @@ export class Swapping {
   // try to make it wrong with minimal changes
   public corruptAll = (): Swapping[] => {
     return [
-      this.corruptSoldAmnt(),
-      this.corruptBoughtAmnt(),
       this.corruptBoughtSpot(),
       this.corruptSoldSpot(),
+
+      this.corruptSoldAmnt(false),
+      this.corruptBoughtAmnt(false),
+      
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
+
     ].filter((s) => s !== undefined) as Swapping[];
   }
 
-  public corruptBoughtAmnt = (): Swapping | undefined => {
+  public corruptBoughtAmnt = (random: boolean): Swapping | undefined => {
     if (this.boughtAmount === this.maxBuying) return undefined;
     const boughtTooMuch = new Swapping(
       this.user,
@@ -580,7 +593,7 @@ export class Swapping {
       this.diracUtxo,
       this.boughtAsset,
       this.soldAsset,
-      this.boughtAmount + 1n,
+      this.boughtAmount + (random ? genPositive(this.maxBuying - this.boughtAmount) : 1n),
       this.soldAmount,
       this.boughtSpot,
       this.soldSpot,
@@ -594,7 +607,7 @@ export class Swapping {
     return boughtTooMuch;
   }
 
-  public corruptSoldAmnt = (): Swapping | undefined => {
+  public corruptSoldAmnt = (random: boolean): Swapping | undefined => {
     if (this.soldAmount === 1n) return undefined;
     const soldTooLittle = new Swapping(
       this.user,
@@ -603,7 +616,7 @@ export class Swapping {
       this.boughtAsset,
       this.soldAsset,
       this.boughtAmount,
-      this.soldAmount - 1n,
+      this.soldAmount - (random ? genPositive(this.soldAmount - 1n) : 1n),
       this.boughtSpot,
       this.soldSpot,
       this.boughtExp,
@@ -709,4 +722,26 @@ export class Swapping {
       return soldSpotTooLow;
     }
   }
+
+  // public corruptRandomAmnts = (): Swapping | undefined => {
+  //   for (let i = 0; i < 100; i++) {
+  //     const randomAmnts = new Swapping(
+  //       this.user,
+  //       this.paramUtxo,
+  //       this.diracUtxo,
+  //       this.boughtAsset,
+  //       this.soldAsset,
+  //       genPositive(this.maxBuying),
+  //       genPositive(this.soldAmount),
+  //       this.boughtSpot,
+  //       this.soldSpot,
+  //       this.boughtExp,
+  //       this.boughtSpot,
+  //       false,
+  //       this.maxBuying,
+  //     );
+  //     if (!randomAmnts.validates()) return randomAmnts;
+  //   }
+  //   return undefined;
+  // }
 }
