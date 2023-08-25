@@ -13,11 +13,12 @@ import { Param, PParam } from "../src/types/euclid/param.ts";
 import { KeyHash } from "../src/types/general/derived/hash/keyHash.ts";
 import { Data } from "../src/types/general/fundamental/type.ts";
 import { genPositive, randomChoice } from "../src/utils/generators.ts";
-import { randomIndexedChoice } from "../mod.ts";
+import { Asset, randomIndexedChoice } from "../mod.ts";
+import { coreToUtxo, utxoToCore, valueToAssets } from "../../lucid/src/mod.ts";
 
 Deno.test("emulator", async () => {
   // return;
-  let trials = 1;
+  let trials = 10;
   const actionCounts_ = new Map<string, number>();
   // const errors = [];
   while (trials > 0) {
@@ -54,7 +55,7 @@ Deno.test("emulator", async () => {
       //   }),
       // );
       // console.log(`users: ${users.length}`);
-      try {
+      // try {
         // for (const user of users) {
         const hashes = await user
           .generateActions()
@@ -65,27 +66,77 @@ Deno.test("emulator", async () => {
               const type = action.type;
 
               // corruption-tests
+              let corrupt = true;
               if (type === "Swapping") {
                 const swapping = action as Swapping;
                 const corrupted = swapping.corruptAll();
                 console.log(`attempting ${corrupted.length} corruptions...`);
                 for (const [t, c] of corrupted.entries()) {
-                //const [c, t] = randomIndexedChoice(corrupted);
+                  if (!corrupt) continue;
+                  console.log(`attempting corruption ${t}...`);
+                  //const [c, t] = randomIndexedChoice(corrupted);
+                  let ctx: {
+                    txHash: string | null;
+                    txSigned: Lucid.TxSigned;
+                  } | string;
                   try {
-                    const hash = await user.finalizeTx(c.tx(user.lucid.newTx()));
-                    console.log(`submitted type ${t} corruption: ${hash}`);
+                    ctx = await user.finalizeTx(c.tx(user.lucid.newTx()));
+                    console.log(`finalized corruption tx`)
+                    if (typeof ctx === 'string') throw ctx;
                   } catch (e) {
                     console.log(`type ${t} corruption failed successfully: ${e}`);
                     continue;
                   }
+
+                  // checking if ill-gotten gains are simply due to a reduction in utxo-size
+                  if ((c.boughtAmount !== swapping.boughtAmount || c.soldAmount !== swapping.soldAmount)
+                      && c.boughtAsset.equals(Asset.ADA)) {
+
+                    const outs = ctx.txSigned.txSigned.body().outputs();
+                    let out: Lucid.C.TransactionOutput | undefined = undefined;
+                    for (let i = 0; i < outs.len(); i++) {
+                      const o = outs.get(i);
+                      if (o.address().to_bech32(undefined) === user.contract.address) {
+                        assert(!out, "multiple outputs found");
+                        out = o;
+                        const assets = valueToAssets(o.amount())
+                        Object.entries(assets).forEach(([asset, amount]) => {
+                          console.log(`output: ${asset}: ${amount}`);
+                        })
+                      }
+                    }
+                    assert(out, "no output found");
+                    const newSize = BigInt(out.to_bytes().length);
+                    const oldSize = BigInt(utxoToCore(c.diracUtxo.utxo!).to_bytes().length);
+                    const diffSize = oldSize - newSize;
+                    const byteCoins = (await emulator.getProtocolParameters()).coinsPerUtxoByte;
+                    const adaValue = diffSize * byteCoins;
+                    console.log(`oldSize: ${oldSize} -> ${oldSize * byteCoins}`);
+                    console.log(`newSize: ${newSize} -> ${newSize * byteCoins}`);
+                    console.log(`extractable ADA: ${adaValue}`);
+                    const boughtA0 = (c.boughtAmount - adaValue) * c.soldSpot;
+                    const soldA0 = c.soldAmount * c.boughtSpot;
+                    const gainedA0 = boughtA0 - soldA0;
+                    console.log(`gainedA0: ${gainedA0}`);
+                    if (gainedA0 <= 0n) {
+                      console.log(`type ${t} corruption within bounds, this counts now as regular action exection`);
+                      actionCounts.set(type, (actionCounts.get(type) ?? 0) + 1);
+                      corrupt = false;
+                      continue;
+                    }
+                  }
+
                   // console.log(`type ${t} corruption succeeded: ${swapping.show()}\n~~~>\n${c.show()}`)
                   throw new Error(`type ${t} corruption succeeded: ${swapping.show()}\n~~~>\n${c.show()}`);
                 }
               } 
-              actionCounts.set(type, (actionCounts.get(type) ?? 0) + 1);
-              const { succ, fail } = await user.getTxSigned(action);
-              signed.push(...succ);
-              failed.push(...fail);
+              if (corrupt) {
+                console.log(`attempting ${type}...`);
+                actionCounts.set(type, (actionCounts.get(type) ?? 0) + 1);
+                const { succ, fail } = await user.getTxSigned(action);
+                signed.push(...succ);
+                failed.push(...fail);
+              }
             }
             const hashes_ = await Promise.all(
               signed.map(async (s) => await s.submit()),
@@ -111,15 +162,15 @@ Deno.test("emulator", async () => {
         // console.log(hashes);
         traces.push(...hashes.flat());
         // }
-      } catch (e) {
-        console.error(e);
-        throw e;
-        // if (e.toString().includes("TypeError: Cannot read properties of undefined (reading '__wbindgen_add_to_stack_pointer')")) {
-        //   console.error("caught:", e);
-        // } else {
-        //   throw e;
-        // }
-      }
+      // } catch (e) {
+      //   console.error(e);
+      //   throw e;
+      //   // if (e.toString().includes("TypeError: Cannot read properties of undefined (reading '__wbindgen_add_to_stack_pointer')")) {
+      //   //   console.error("caught:", e);
+      //   // } else {
+      //   //   throw e;
+      //   // }
+      // }
       user.resetMempool();
       emulator.awaitBlock(Number(genPositive(1000n))); // NOTE/TODO this arbitrary limit is a hotfix for block height overflow issue
     }

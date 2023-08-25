@@ -34,6 +34,7 @@ export class User {
 
   private constructor(
     public readonly lucid: Lucid.Lucid,
+    // public readonly protocolParameters: Lucid.ProtocolParameters,
     public readonly privateKey?: string, // for emulation
     public readonly address?: Lucid.Address,
     paymentKeyHash?: KeyHash,
@@ -165,27 +166,30 @@ export class User {
   public finalizeTx = async (
     tx: Lucid.Tx,
     submit = true,
-  ): Promise<string | Lucid.TxSigned | null> => {
+  ): Promise<{
+    txHash: string | null;
+    txSigned: Lucid.TxSigned;
+  } | string> => {
     try {
       // // console.log("min fee:", tx.txBuilder.min_fee().to_str()); // TODO figure this out (not working with chaining on emulator)
       return await tx
         .complete()
         .then(async (completed) => {
 
-
-          const outs = completed.txComplete.body().outputs();
-          console.log(`outs: ${outs.len()}`)
-          for (let i = 0; i < outs.len(); i++) {
-            const out = outs.get(i);
-            console.log(`${out.address().to_bech32(undefined)}`);
-            const assets = Lucid.valueToAssets(out.amount());
-            Object.entries(assets).forEach(([asset, amount]) => {
-              console.log(`  ${asset}: ${amount}`);
-            });
-          }
-
-
-
+          // const outs = completed.txComplete.body().outputs();
+          // console.log(`outs: ${outs.len()}`)
+          // for (let i = 0; i < outs.len(); i++) {
+          //   const out = outs.get(i);
+          //   const address: string = out.address().to_bech32(undefined);
+          //   if (address === this.contract.address) {
+          //     console.log(`${out.to_bytes().length}`)
+          //   }
+          //   // console.log(`${address}`);
+          //   // const assets = Lucid.valueToAssets(out.amount());
+          //   // Object.entries(assets).forEach(([asset, amount]) => {
+          //   //   console.log(`  ${asset}: ${amount}`);
+          //   // });
+          // }
 
           // // console.log("finalizeTx() - signing:", completed.txComplete.to_js_value());
           const signed = await completed
@@ -199,10 +203,15 @@ export class User {
           const txIns = txBody.inputs();
           const txOuts = txBody.outputs();
           const colls = txBody.collateral();
+          const spentUtxos: {
+            txHash: string;
+            outputIndex: number;
+          }[] = [];
+          const pendingUtxos: Lucid.UTxO[] = [];
 
           for (let i = 0; i < txIns.len(); i++) {
             const txIn = txIns.get(i);
-            this.spentUtxos.push({
+            spentUtxos.push({
               txHash: txIn.transaction_id().to_hex(),
               outputIndex: parseInt(txIn.index().to_str()),
             });
@@ -210,7 +219,7 @@ export class User {
           if (colls) {
             for (let i = 0; i < colls.len(); i++) {
               const txIn = colls.get(i);
-              this.spentUtxos.push({
+              spentUtxos.push({
                 txHash: txIn.transaction_id().to_hex(),
                 outputIndex: parseInt(txIn.index().to_str()),
               });
@@ -227,17 +236,17 @@ export class User {
               Lucid.C.BigNum.from_str(i.toString()),
             );
             const utxo = Lucid.C.TransactionUnspentOutput.new(txIn, txOut);
-            this.pendingUtxos.push(Lucid.coreToUtxo(utxo));
+            pendingUtxos.push(Lucid.coreToUtxo(utxo));
           }
 
-          if (submit) {
-            // // console.log("submitting", signed.txSigned.to_js_value());
-            const h = await signed.submit();
-            // console.log("txHash:", h);
-            return h;
-          } else {
-            return signed;
-          }
+          const h = submit ? await signed.submit() : null;
+
+          this.spentUtxos.push(...spentUtxos);
+          this.pendingUtxos.push(...pendingUtxos);
+          return {
+            txHash: h,
+            txSigned: signed,
+          };
         });
     } catch (e) { // TODO what then? try again after awaiting a new block?
       if (
@@ -248,7 +257,7 @@ export class User {
         console.warn(
           `catching ${e} in finalizeTx() after splitting`,
         );
-        return null;
+        return e.toString();
       } else {
         throw e;
       }
@@ -279,13 +288,14 @@ export class User {
     const tx = action.tx(this.lucid.newTx());
     try {
       const signed = await this.finalizeTx(tx, false);
-      if (signed === null) { // means mempool-related issue right now (TODO remove spaghette)
+      if (typeof signed === "string") { // means mempool-related issue right now (TODO remove spaghette)
         return {
           succ: [],
           fail: [action],
         };
-      } else {return {
-          succ: [signed as Lucid.TxSigned],
+      } else {
+        return {
+          succ: [signed.txSigned],
           fail: [],
         }; // NOTE/TODO this assumes the tx-builder checks if we are over tx size limit, following a lucid-comment
       }
@@ -322,6 +332,7 @@ export class User {
   ): Promise<User> {
     const address = await lucid.selectWallet(api).wallet
       .address();
+    // const protocolParameters = await lucid.provider.getProtocolParameters();
     return new User(lucid, undefined, address);
   }
 
@@ -331,6 +342,7 @@ export class User {
   ): Promise<User> {
     const address = await lucid.selectWalletFromPrivateKey(privateKey).wallet
       .address();
+    // const protocolParameters = await lucid.provider.getProtocolParameters();
     return new User(lucid, privateKey, address);
   }
 
@@ -341,6 +353,7 @@ export class User {
     const privateKey = Lucid.generatePrivateKey();
     const address = await lucid.selectWalletFromPrivateKey(privateKey).wallet
       .address();
+    // const protocolParameters = await lucid.provider.getProtocolParameters();
     const user = new User(lucid, privateKey, address);
     user.balance = PositiveValue.genOfAssets(
       allAssets.boundedSubset(1n),
@@ -354,6 +367,7 @@ export class User {
     lucid.utils = new Lucid.Utils(lucid);
     const privateKey = Lucid.generatePrivateKey();
     const paymentKeyHash = PKeyHash.ptype.genData();
+    // const protocolParameters = Lucid.PROTOCOL_PARAMETERS_DEFAULT;
     const user = new User(lucid, privateKey, undefined, paymentKeyHash);
     const assets = Assets.generate(2n);
     user.balance = PositiveValue.genOfAssets(assets);

@@ -18,6 +18,11 @@ import { ceilDiv, min } from "../utils/generators.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { Contract } from "./contract.ts";
 import { User } from "./user.ts";
+import { utxoToCore } from "https://deno.land/x/lucid@0.10.7/mod.ts";
+
+// TODO minimum deposit of 1 ADA is rather the guess
+const getMinAda = (asset: Asset): bigint => asset.equals(Asset.ADA) ? 1000000n : 0n;
+export const getMinBuying = (asset: Asset): bigint => getMinAda(asset) || 1n;
 
 export class ParamUtxo {
   private constructor(
@@ -174,11 +179,15 @@ export class DiracUtxo {
   public show = (tabs = ""): string => {
     const tt = tabs + t;
     const ttf = tt + f;
+    // const size = this.utxo ?
+    //   utxoToCore(this.utxo).to_bytes().length  // TODO very inefficent print 
+    // : undefined
     return `DiracUtxo (
   ${ttf}dirac: ${this.dirac.concise(ttf)},
   ${ttf}balance: ${this.balance?.concise(ttf) ?? "undefined"}
   ${tt})`;
-  };
+  // ${ttf}utxo size: ${size ?? "undefined"}
+};
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     const diracDatum = this.peuclidDatum.pconstant(new DiracDatum(this.dirac));
@@ -251,10 +260,11 @@ export class DiracUtxo {
       (a * ((j + 1n) ** e)) / (j ** e);
 
     param.assets.forEach((asset) => {
-      if (asset.equals(Asset.ADA)) return; // TODO for debugging, revert
+      // if (asset.equals(Asset.ADA)) return; // TODO for debugging, revert
       const buyable = buyable_.amountOf(asset, 0n);
       const sellable = sellable_?.amountOf(asset, 0n);
-      if (buyable <= 0n && sellable && sellable === 0n) return;
+      const minBuying = getMinBuying(asset);
+      if (buyable < minBuying && sellable && sellable === 0n) return;
 
       const virtual = param.virtual.amountOf(asset);
       const weight = param.weights.amountOf(asset); // NOTE: inverted
@@ -286,7 +296,7 @@ export class DiracUtxo {
 
       const delta_ = delta(weight, liquidity);
 
-      if (buyable > 0n) {
+      if (buyable >= minBuying) {
         while (spotBuying > 0n) {
           const d = delta_(spotBuying);
           const maxBuying = min(buyable, -d);
@@ -296,7 +306,7 @@ export class DiracUtxo {
           // maxBuying: ${maxBuying}
           // `);
 
-          if (maxBuying > 0n) {
+          if (maxBuying >= minBuying) {
             spotBuying_.initAmountOf(asset, spotBuying);
             expBuying_.initAmountOf(asset, expBuying + 1n); // NOTE/TODO +1n is a hack to fit zeroes into PositiveValue
             maxBuying_.initAmountOf(asset, maxBuying);
@@ -339,11 +349,9 @@ export class DiracUtxo {
 
     const sellableAssets = maxSelling_.assets.toList;
     const buyableAssets = maxBuying_.assets.toList;
+    
     buyableAssets.forEach((buyingAsset) => {
-      // NOTE if those ever have to be made changeable again, move them into the inner loop
-      const spotBuying = spotBuying_.amountOf(buyingAsset); // NOTE: inverted
-      const expBuying = expBuying_.amountOf(buyingAsset) - 1n; // NOTE the -1 is part of the hack to fit zeroes into PositiveValue (see above)
-      const maxBuying = maxBuying_.amountOf(buyingAsset);
+      const minBuying = getMinBuying(buyingAsset);
 
       sellableAssets.forEach((sellingAsset) => {
         if (sellingAsset.equals(buyingAsset)) return;
@@ -353,6 +361,10 @@ export class DiracUtxo {
         // sellingAsset: ${sellingAsset.show()}
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // `);
+        // NOTE if those ever have to be made changeable again, move them into the inner loop
+        let spotBuying = spotBuying_.amountOf(buyingAsset); // NOTE: inverted
+        let expBuying = expBuying_.amountOf(buyingAsset) - 1n; // NOTE the -1 is part of the hack to fit zeroes into PositiveValue (see above)
+        let maxBuying = maxBuying_.amountOf(buyingAsset);
         
         let spotSelling = spotSelling_.amountOf(sellingAsset); // NOTE: inverted
         let expSelling = expSelling_.amountOf(sellingAsset);
@@ -367,32 +379,33 @@ export class DiracUtxo {
         let maxBuyingA0 = maxBuying * spotSelling;
         let maxSellingA0 = maxSelling * spotBuying;
         let maxSwapA0 = min(maxSellingA0, maxBuyingA0);
+        let buyingAmount = maxSwapA0 / spotSelling;
 
         // if (maxSwapA0 < spotSelling) return; // TODO comment out again
-        if (maxSwapA0 < spotSelling) {
+        if (buyingAmount <= minBuying) {
           // console.log("looping")
           // TODO marginal efficiency gains possible here by initialzing only JIT
           const sellingAnchor = this.dirac.anchorPrices.amountOf(sellingAsset);
-          // const buyingAnchor = this.dirac.anchorPrices.amountOf(buyingAsset);
+          const buyingAnchor = this.dirac.anchorPrices.amountOf(buyingAsset);
 
           const sellingJumpSize = param.jumpSizes.amountOf(sellingAsset);
-          // const buyingJumpSize = param.jumpSizes.amountOf(buyingAsset);
+          const buyingJumpSize = param.jumpSizes.amountOf(buyingAsset);
 
           const buyable = buyable_.amountOf(buyingAsset, 0n);
           const sellable = sellable_?.amountOf(sellingAsset, 0n);
-          if (buyable <= 0n || (sellable && sellable === 0n)) return;
+          if (buyable < minBuying || (sellable && sellable === 0n)) return;
 
           const deltaSelling = delta(
             param.weights.amountOf(sellingAsset),
             liquidity_.amountOf(sellingAsset),
           );
-          // const deltaBuying = delta(
-          //   param.weights.amountOf(buyingAsset),
-          //   liquidity_.amountOf(buyingAsset),
-          // );
+          const deltaBuying = delta(
+            param.weights.amountOf(buyingAsset),
+            liquidity_.amountOf(buyingAsset),
+          );
 
           let limitReached = false;
-          while (maxSwapA0 < spotSelling) {
+          while (buyingAmount <= minBuying) {
             // const buyingAmount = maxSwapA0 / spotSelling;
             // const sellingAmount = ceilDiv(buyingAmount * spotSelling, spotBuying);
             // console.log(`
@@ -408,7 +421,7 @@ export class DiracUtxo {
             //   limitReached: ${limitReached}
             // `)
             if (limitReached) return;
-            if (maxSellingA0 <= maxBuyingA0) {
+            if (maxSellingA0 <= maxBuyingA0 || expBuying === 0n) { // TODO second half might cause issues, idk
               expSelling++;
               spotSelling = spot(sellingAnchor, sellingJumpSize, expSelling);
               const d = deltaSelling(spotSelling);
@@ -423,25 +436,25 @@ export class DiracUtxo {
                 maxSelling = d;
               }
             } else {
-              throw new Error("after all this branch is being visited!");
-              // TODO not sure if this branch adds value
-              // expBuying--;
-              // spotBuying = spot(buyingAnchor, buyingJumpSize, expBuying);
-              // const d = deltaBuying(spotBuying);
-              // maxBuying = min(buyable, -d);
+              // if (expBuying === 0n) return; // TODO is this the only option in this case?
+              // throw new Error("after all this branch is being visited!");
+              // this branch is only visited if buying ADA (because of the higher minBuying)
+              expBuying--;
+              spotBuying = spot(buyingAnchor, buyingJumpSize, expBuying);
+              const d = deltaBuying(spotBuying);
+              maxBuying = min(buyable, -d);
             }
 
             maxBuyingA0 = maxBuying * spotSelling;
             maxSellingA0 = maxSelling * spotBuying;
-            const maxSwapA0_ = min(maxSellingA0, maxBuyingA0);
+            maxSwapA0 = min(maxSellingA0, maxBuyingA0);
+            buyingAmount = maxSwapA0 / spotSelling;
             // TODO is this true?
             // assert(maxSwapA0_ <= maxSwapA0, `maxSwapA0 should be decreasing`);
             // assert(maxSwapA0_ < maxSwapA0, `maxSwapA0 should be strictly decreasing`);
-            maxSwapA0 = maxSwapA0_;
           }
         } //else console.log("not looping")
 
-        const buyingAmount = maxSwapA0 / spotSelling;
         const sellingAmount = ceilDiv(buyingAmount * spotSelling, spotBuying);
         // console.log(`
         //   ---------------------------
