@@ -18,7 +18,7 @@ import { coreToUtxo, utxoToCore, valueToAssets } from "../../lucid/src/mod.ts";
 
 Deno.test("emulator", async () => {
   // return;
-  let trials = 1;
+  let trials = 5;
   const actionCounts_ = new Map<string, number>();
   // const errors = [];
   while (trials > 0) {
