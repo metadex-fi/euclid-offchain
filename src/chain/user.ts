@@ -30,7 +30,7 @@ type TxResult = {
 export type ActionResults = {
   txHashes: string[];
   errors: Error[];
-}
+};
 
 export class User {
   public readonly contract: Contract;
@@ -244,8 +244,8 @@ export class User {
     } catch (e) {
       if (
         this.usedSplitting &&
-          (e.toString().includes("Insufficient input in transaction")) ||
-        e.toString().includes("InputsExhaustedError")
+        (e.toString().includes("Insufficient input in transaction") ||
+          e.toString().includes("InputsExhaustedError"))
       ) {
         console.warn(
           `catching ${e} in user.signAndSubmit() after splitting`,
@@ -285,7 +285,7 @@ export class User {
     }
   };
 
-  public execute = async (action: Action) : Promise<ActionResults> => {
+  public execute = async (action: Action): Promise<ActionResults> => {
     const txHashes: string[] = [];
     const errors: Error[] = [];
     const results = await this.execute_(action);
@@ -294,7 +294,7 @@ export class User {
       else txHashes.push(result.txHash);
     }
     return { txHashes, errors };
-  }
+  };
 
   static async fromWalletApi(
     lucid: Lucid.Lucid,
