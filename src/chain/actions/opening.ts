@@ -59,6 +59,8 @@ export class Opening {
     );
   };
 
+  public succeeded = (_txCore: Lucid.C.Transaction) => {};
+
   public pool = (): Pool => {
     if (this.poolCache) return this.poolCache;
     const assets = this.param.weights.assets;

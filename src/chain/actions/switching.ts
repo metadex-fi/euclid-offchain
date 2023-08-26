@@ -23,6 +23,8 @@ export class Switching {
     );
   };
 
+  public succeeded = (_txCore: Lucid.C.Transaction) => {};
+
   // TODO implement and test
   //   static genOfUser = (user: User): Switching | undefined => {
   //     // console.log(`attempting to switch`);

@@ -173,8 +173,9 @@ export class Swapping {
     return tx_;
   };
 
-  public setSubsequentUtxo = (txBody: Lucid.C.TransactionBody) => {
-    if (this.subsequent) { // TODO this is wrong, as it empties the tasks
+  private setSubsequentUtxo = (txCore: Lucid.C.Transaction) => {
+    if (this.subsequent) {
+      const txBody = txCore.body();
       const txHash = Lucid.C.hash_transaction(txBody);
       const txOuts = txBody.outputs();
       console.log(`dirac's address: ${this.diracUtxo.utxo!.address}`);
@@ -201,6 +202,8 @@ export class Swapping {
       console.log(`no subsequent`);
     }
   };
+
+  public succeeded = this.setSubsequentUtxo;
 
   public subsequents = (maxSubsequents?: number): Swapping[] => {
     console.log(`subsequents(${maxSubsequents})`);

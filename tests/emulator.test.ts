@@ -91,12 +91,14 @@ Deno.test("emulator", async () => {
               }
               console.log(`attempting ${type}...`);
               actionCounts.set(type, (actionCounts.get(type) ?? 0) + 1);
-              hashes_.push(...await user.execute(action));
+              const results = await user.execute(action);
+              hashes_.push(...results.txHashes);
             }
             while (user.wantsToRetry) {
-              console.warn(`failed: ${user.wantsToRetry}`);
+              console.warn(`wantsToRetry`);
               emulator.awaitBlock(1); // TODO this does not take into account the possibility that others do or attempt stuff in the meantime
-              hashes_.push(...await user.newBlock()); // TODO do this automatically in user.update() - requires checking blocks, however
+              const results = await user.newBlock();
+              results.forEach((r) => hashes.push(...r.txHashes)); // TODO do this automatically in user.update() - requires checking blocks, however
             }
             return hashes_;
           });

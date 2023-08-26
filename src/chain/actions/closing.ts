@@ -23,6 +23,8 @@ export class Closing {
     );
   };
 
+  public succeeded = (_txCore: Lucid.C.Transaction) => {};
+
   static genOfUser = (user: User): Closing | undefined => {
     // console.log(`attempting to close`);
     const enoughForFees = user.availableBalance;

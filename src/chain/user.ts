@@ -17,10 +17,20 @@ const forFeesEtc = PositiveValue.singleton(
 ); // costs in lovelace for fees etc. TODO excessive
 // const feesEtc = PositiveValue.singleton(Asset.ADA, feesEtcLovelace);
 
-export type TxIn = {
+type TxIn = {
   txHash: string;
   outputIndex: number;
 };
+
+type TxResult = {
+  txHash: string;
+  txCore: Lucid.C.Transaction;
+} | Error;
+
+export type ActionResults = {
+  txHashes: string[];
+  errors: Error[];
+}
 
 export class User {
   public readonly contract: Contract;
@@ -33,7 +43,7 @@ export class User {
   private spentUtxos: TxIn[] = [];
   private pendingUtxos: Lucid.UTxO[] = [];
 
-  private failedActions: Action[] = [];
+  private retrying: Action[] = [];
 
   private constructor(
     public readonly lucid: Lucid.Lucid,
@@ -117,7 +127,7 @@ export class User {
   }
 
   public get wantsToRetry(): boolean {
-    return this.failedActions.length > 0;
+    return this.retrying.length > 0;
   }
 
   // only needed for multiple actions within same iteration
@@ -170,20 +180,21 @@ export class User {
     this.usedSplitting = false;
   };
 
-  private retry = async (): Promise<string[]> => {
-    const hashes: string[] = [];
-    for (const action of this.failedActions.slice()) {
-      hashes.push(...await this.execute(action));
+  private retry = async (): Promise<ActionResults[]> => {
+    const results: ActionResults[] = [];
+    for (const action of this.retrying.slice()) {
+      results.push(await this.execute(action));
     }
-    return hashes;
+    return results;
   };
 
-  public newBlock = async (): Promise<string[]> => {
+  public newBlock = async (): Promise<ActionResults[]> => {
     this.resetMempool();
     return await this.retry();
   };
 
-  private updateMempool = (txBody: Lucid.C.TransactionBody) => {
+  private updateMempool = (txCore: Lucid.C.Transaction) => {
+    const txBody = txCore.body();
     const txHash_ = Lucid.C.hash_transaction(txBody);
     const txIns = txBody.inputs();
     const txOuts = txBody.outputs();
@@ -222,13 +233,14 @@ export class User {
 
   private signAndSubmit = async (
     tx: Lucid.Tx,
-  ): Promise<string | Error> => {
+  ): Promise<TxResult> => {
     try {
       const txCompleted = await tx.complete();
       const txSigned = await txCompleted.sign().complete();
       const txHash = await txSigned.submit();
-      this.updateMempool(txSigned.txSigned.body());
-      return txHash;
+      const txCore = txSigned.txSigned;
+      this.updateMempool(txCore);
+      return { txHash, txCore };
     } catch (e) {
       if (
         this.usedSplitting &&
@@ -245,36 +257,44 @@ export class User {
     }
   };
 
-  public execute = async (action: Action): Promise<string[]> => {
+  private execute_ = async (action: Action): Promise<TxResult[]> => {
     const tx = action.tx(this.lucid.newTx());
     try {
-      const txHash = await this.signAndSubmit(tx);
-      if (txHash instanceof Error) { // means mempool-related issue right now
-        this.failedActions.push(action);
-        return [];
-      } else {
-        return [txHash];
-      }
+      const result = await this.signAndSubmit(tx);
+      if (result instanceof Error) this.retrying.push(action); // means mempool-related issue right now
+      else action.succeeded(result.txCore);
+      return [result];
     } catch (e) {
       const e_ = e.toString();
       if (e_.includes("Maximum transaction size")) {
         console.log("splitting action...");
         const actions: Action[] = action.split();
-        // not using Promise.all here to ensure the mempool is handled correctly
-        const hashes: string[] = [];
+        const results: TxResult[] = [];
         let first = true;
+        // not using Promise.all here to ensure the mempool is handled correctly
         for (const action of actions) {
           console.log(`processing split action`);
           if (first) first = false;
           else this.usedSplitting = true;
-          hashes.push(...await this.execute(action));
+          results.push(...await this.execute_(action));
         }
-        return hashes;
+        return results;
       } else {
         throw e;
       }
     }
   };
+
+  public execute = async (action: Action) : Promise<ActionResults> => {
+    const txHashes: string[] = [];
+    const errors: Error[] = [];
+    const results = await this.execute_(action);
+    for (const result of results) {
+      if (result instanceof Error) errors.push(result);
+      else txHashes.push(result.txHash);
+    }
+    return { txHashes, errors };
+  }
 
   static async fromWalletApi(
     lucid: Lucid.Lucid,
