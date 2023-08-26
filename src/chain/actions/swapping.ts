@@ -9,7 +9,13 @@ import { DiracDatum } from "../../types/euclid/euclidDatum.ts";
 import { Swap } from "../../types/euclid/swap.ts";
 import { Asset } from "../../types/general/derived/asset/asset.ts";
 import { Data } from "../../types/general/fundamental/type.ts";
-import { ceilDiv, genNonNegative, genPositive, min, randomChoice } from "../../utils/generators.ts";
+import {
+  ceilDiv,
+  genNonNegative,
+  genPositive,
+  min,
+  randomChoice,
+} from "../../utils/generators.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
@@ -37,13 +43,24 @@ export class Swapping {
     runTests: boolean, // corruption-test-swappings don't run tests themselves.
     private readonly maxBuying: bigint, // for corruption-tests
   ) {
-    assert(boughtAmount <= maxBuying, `boughtAmount (${boughtAmount}) must be less than or equal to maxBuying (${maxBuying}`);
+    assert(
+      boughtAmount <= maxBuying,
+      `boughtAmount (${boughtAmount}) must be less than or equal to maxBuying (${maxBuying}`,
+    );
     assert(boughtAmount > 0n, `boughtAmount must be positive`);
     assert(soldAmount > 0n, `soldAmount must be positive`);
     assert(boughtSpot > 0n, `boughtSpot must be positive`);
     assert(soldSpot > 0n, `soldSpot must be positive`);
-    assert(boughtAmount <= diracUtxo.balance.amountOf(boughtAsset), `boughtAmount must be less than or equal to the balance`);
-    if (user) assert(soldAmount <= user.balance!.amountOf(soldAsset), `soldAmount must be less than or equal to the balance`);
+    assert(
+      boughtAmount <= diracUtxo.balance.amountOf(boughtAsset),
+      `boughtAmount must be less than or equal to the balance`,
+    );
+    if (user) {
+      assert(
+        soldAmount <= user.balance!.amountOf(soldAsset),
+        `soldAmount must be less than or equal to the balance`,
+      );
+    }
 
     this.spotPrice = Number(soldSpot) / Number(boughtSpot);
     this.effectivePrice = Number(soldAmount) / Number(boughtAmount);
@@ -51,9 +68,11 @@ export class Swapping {
     if (runTests) {
       // TODO ensure this does not fail when in fact the onchain-code would validate it
       // TODO hard assert again, once the above above is ensured. Or alternatively none at all, call it manually, for performance
-      if (!this.validates()) console.error(`Swapping does not validate: ${this.show()}`);
+      if (!this.validates()) {
+        console.error(`Swapping does not validate: ${this.show()}`);
+      }
       // assert(this.validates(), `Swapping does not validate:: ${this.show()}`);
-      
+
       // if (runCorruptionTests) this.corruptAll();
     }
   }
@@ -92,7 +111,7 @@ export class Swapping {
       this.boughtExp === other.boughtExp &&
       this.soldExp === other.soldExp
     );
-  }
+  };
 
   public split = (): Swapping[] => {
     throw new Error("Swapping-split not implemented");
@@ -108,7 +127,7 @@ export class Swapping {
     const funds = this.diracUtxo.balance.clone; // TODO cloning probably not required here
     // console.log(`funds before: ${funds.show()}`)
     funds.addAmountOf(this.boughtAsset, -this.boughtAmount);
-    funds.addAmountOf(this.soldAsset, this.soldAmount); 
+    funds.addAmountOf(this.soldAsset, this.soldAmount);
     // console.log(`funds after: ${funds.show()}`)
     const retour: Lucid.Assets = funds.toLucid;
     retour[this.diracUtxo.dirac.threadNFT.toLucid] = 1n;
@@ -226,7 +245,7 @@ export class Swapping {
     return swappings;
   };
 
-  // The idea behind this variant is the guess that with lower amounts we might 
+  // The idea behind this variant is the guess that with lower amounts we might
   // have a different optimum for exponents and prices
   // ~~> update: could not find a difference, which is quite remarkable if you think about it
   // TODO maybe investigate further, and compare performances. Note that the other variant is correct, this one wrong, regarding maxBuying
@@ -304,8 +323,10 @@ export class Swapping {
       const subSwap = this.subSwap(amount, amntIsSold);
       if (subSwap) return subSwap;
     }
-    throw new Error(`randomSubSwap(): failed to find a subSwap for ${this.show()}`);
-  }
+    throw new Error(
+      `randomSubSwap(): failed to find a subSwap for ${this.show()}`,
+    );
+  };
 
   // TODO should this rather be using subSwap for consistency?
   // private randomSubSwap = (): Swapping => {
@@ -434,7 +455,7 @@ export class Swapping {
     spotBuying: bigint,
     spotSelling: bigint,
     buyingAmm: bigint,
-    sellingAmm: bigint, 
+    sellingAmm: bigint,
     oldNew: string,
   ): boolean {
     const fitsBuying = spotBuying <= buyingAmm;
@@ -479,7 +500,6 @@ export class Swapping {
   }
 
   public validates(): boolean {
-
     // public readonly user: User | undefined, // TODO why can this be undefined again?
     // public readonly paramUtxo: ParamUtxo,
     // public readonly diracUtxo: DiracUtxo,
@@ -509,7 +529,6 @@ export class Swapping {
     const buyingLiquidity = balanceBuying + virtualBuying;
     const sellingLiquidity = balanceSelling + virtualSelling;
 
-    
     const oldBuyingAmm = buyingWeight * buyingLiquidity;
     const oldSellingAmm = sellingWeight * sellingLiquidity;
 
@@ -570,20 +589,19 @@ export class Swapping {
 
       this.corruptSoldAmnt(false),
       this.corruptBoughtAmnt(false),
-      
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
 
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
     ].filter((s) => s !== undefined) as Swapping[];
-  }
+  };
 
   public corruptBoughtAmnt = (random: boolean): Swapping | undefined => {
     if (this.boughtAmount === this.maxBuying) return undefined;
@@ -593,7 +611,8 @@ export class Swapping {
       this.diracUtxo,
       this.boughtAsset,
       this.soldAsset,
-      this.boughtAmount + (random ? genPositive(this.maxBuying - this.boughtAmount) : 1n),
+      this.boughtAmount +
+        (random ? genPositive(this.maxBuying - this.boughtAmount) : 1n),
       this.soldAmount,
       this.boughtSpot,
       this.soldSpot,
@@ -602,10 +621,13 @@ export class Swapping {
       false,
       this.maxBuying,
     );
-    assert(!boughtTooMuch.validates(), `buying more one should fail: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`);
+    assert(
+      !boughtTooMuch.validates(),
+      `buying more one should fail: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`,
+    );
     console.log(`returning corruptBoughtAmnt`);
     return boughtTooMuch;
-  }
+  };
 
   public corruptSoldAmnt = (random: boolean): Swapping | undefined => {
     if (this.soldAmount === 1n) return undefined;
@@ -624,10 +646,13 @@ export class Swapping {
       false,
       this.maxBuying,
     );
-    assert(!soldTooLittle.validates(), `selling one less should fail: ${this.show()}\n~~~>\n${soldTooLittle.show()}`);
+    assert(
+      !soldTooLittle.validates(),
+      `selling one less should fail: ${this.show()}\n~~~>\n${soldTooLittle.show()}`,
+    );
     console.log(`returning corruptSoldAmnt`);
     return soldTooLittle;
-  }
+  };
 
   public corruptBoughtSpot = (): Swapping | undefined => {
     const param = this.paramUtxo.param;
@@ -639,11 +664,15 @@ export class Swapping {
     let boughtSpot_ = this.boughtSpot;
     while (boughtSpot_ === this.boughtSpot) {
       boughtExp_++;
-      boughtSpot_ = (anchorBuying * ((jsBuying + 1n) ** boughtExp_)) / (jsBuying ** boughtExp_);
+      boughtSpot_ = (anchorBuying * ((jsBuying + 1n) ** boughtExp_)) /
+        (jsBuying ** boughtExp_);
     }
     // NOTE prices are inverted
-    assert(boughtSpot_ > this.boughtSpot, `seems like boughtExp is being changed in the wrong direction`);
-   
+    assert(
+      boughtSpot_ > this.boughtSpot,
+      `seems like boughtExp is being changed in the wrong direction`,
+    );
+
     if (boughtSpot_ > 0n) {
       const boughtSpotTooHigh = new Swapping(
         this.user,
@@ -660,18 +689,24 @@ export class Swapping {
         false,
         this.maxBuying,
       );
-      assert(!boughtSpotTooHigh.validates(), `raising buying price should fail: ${this.show()}\n~~~>\n${boughtSpotTooHigh.show()}`);
-      assert(Swapping.exponentsYieldPrice(
-        anchorBuying,
-        jsBuying,
-        boughtExp_,
-        boughtSpot_,
-        "buying",
-      ), `boughtSpotTooHigh should still yield the correct price: ${boughtSpotTooHigh.show()}`);
+      assert(
+        !boughtSpotTooHigh.validates(),
+        `raising buying price should fail: ${this.show()}\n~~~>\n${boughtSpotTooHigh.show()}`,
+      );
+      assert(
+        Swapping.exponentsYieldPrice(
+          anchorBuying,
+          jsBuying,
+          boughtExp_,
+          boughtSpot_,
+          "buying",
+        ),
+        `boughtSpotTooHigh should still yield the correct price: ${boughtSpotTooHigh.show()}`,
+      );
       console.log(`returning corruptBoughtSpot`);
       return boughtSpotTooHigh;
     } else return undefined;
-  }
+  };
 
   public corruptSoldSpot = (): Swapping | undefined => {
     const param = this.paramUtxo.param;
@@ -683,12 +718,15 @@ export class Swapping {
     let soldSpot_ = this.soldSpot;
     while (soldSpot_ === this.soldSpot) {
       soldExp_--;
-      soldSpot_ = (anchorSelling * ((jsSelling + 1n) ** soldExp_)) / (jsSelling ** soldExp_);
+      soldSpot_ = (anchorSelling * ((jsSelling + 1n) ** soldExp_)) /
+        (jsSelling ** soldExp_);
     }
     // NOTE prices are inverted
-    assert(soldSpot_ < this.soldSpot, `seems like soldExp is being changed in the wrong direction`);
+    assert(
+      soldSpot_ < this.soldSpot,
+      `seems like soldExp is being changed in the wrong direction`,
+    );
 
-    
     if (soldSpot_ > 0n) {
       const buyingA0 = this.boughtAmount * soldSpot_;
       const sellingA0 = this.soldAmount * this.boughtSpot;
@@ -710,18 +748,24 @@ export class Swapping {
         false,
         this.maxBuying,
       );
-      assert(!soldSpotTooLow.validates(), `lowering selling price should fail: ${this.show()}\n~~~>\n${soldSpotTooLow.show()}`);
-      assert(Swapping.exponentsYieldPrice(
-        anchorSelling,
-        jsSelling,
-        soldExp_,
-        soldSpot_,
-        "selling",
-      ), `soldSpotTooLow should still yield the correct price: ${soldSpotTooLow.show()}`);
+      assert(
+        !soldSpotTooLow.validates(),
+        `lowering selling price should fail: ${this.show()}\n~~~>\n${soldSpotTooLow.show()}`,
+      );
+      assert(
+        Swapping.exponentsYieldPrice(
+          anchorSelling,
+          jsSelling,
+          soldExp_,
+          soldSpot_,
+          "selling",
+        ),
+        `soldSpotTooLow should still yield the correct price: ${soldSpotTooLow.show()}`,
+      );
       console.log(`returning corruptSoldSpot`);
       return soldSpotTooLow;
     }
-  }
+  };
 
   // public corruptRandomAmnts = (): Swapping | undefined => {
   //   for (let i = 0; i < 100; i++) {

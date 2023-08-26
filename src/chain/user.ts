@@ -17,20 +17,23 @@ const forFeesEtc = PositiveValue.singleton(
 ); // costs in lovelace for fees etc. TODO excessive
 // const feesEtc = PositiveValue.singleton(Asset.ADA, feesEtcLovelace);
 
+export type TxIn = {
+  txHash: string;
+  outputIndex: number;
+};
+
 export class User {
   public readonly contract: Contract;
   public readonly paymentKeyHash: KeyHash;
   public balance?: PositiveValue;
   public usedSplitting = false;
   private lastIdNFT?: IdNFT;
-  private lastTxHash?: string;
 
   // for tx-chaining
-  public spentUtxos: {
-    txHash: string;
-    outputIndex: number;
-  }[] = [];
-  public pendingUtxos: Lucid.UTxO[] = [];
+  private spentUtxos: TxIn[] = [];
+  private pendingUtxos: Lucid.UTxO[] = [];
+
+  private failedActions: Action[] = [];
 
   private constructor(
     public readonly lucid: Lucid.Lucid,
@@ -113,6 +116,10 @@ export class User {
     else return new IdNFT(this.contract.policy, this.paymentKeyHash.hash());
   }
 
+  public get wantsToRetry(): boolean {
+    return this.failedActions.length > 0;
+  }
+
   // only needed for multiple actions within same iteration
   public setLastIdNFT = (idNFT: IdNFT): void => {
     this.lastIdNFT = idNFT;
@@ -154,7 +161,7 @@ export class User {
   };
 
   // TODO use this and/or make this automatic in update() for example (only when a new block happens though)
-  public resetMempool = (): void => {
+  private resetMempool = (): void => {
     // console.log(
     //   `resetting:\n\nspent utxos: ${this.spentUtxos}\n\npending utxos:${this.pendingUtxos}`,
     // );
@@ -163,163 +170,106 @@ export class User {
     this.usedSplitting = false;
   };
 
-  public finalizeTx = async (
-    tx: Lucid.Tx,
-    submit = true,
-  ): Promise<{
-    txHash: string | null;
-    txSigned: Lucid.TxSigned;
-  } | Error> => {
-    try {
-      // // console.log("min fee:", tx.txBuilder.min_fee().to_str()); // TODO figure this out (not working with chaining on emulator)
-      return await tx
-        .complete()
-        .then(async (completed) => {
+  private retry = async (): Promise<string[]> => {
+    const hashes: string[] = [];
+    for (const action of this.failedActions.slice()) {
+      hashes.push(...await this.execute(action));
+    }
+    return hashes;
+  };
 
-          // const outs = completed.txComplete.body().outputs();
-          // console.log(`outs: ${outs.len()}`)
-          // for (let i = 0; i < outs.len(); i++) {
-          //   const out = outs.get(i);
-          //   const address: string = out.address().to_bech32(undefined);
-          //   if (address === this.contract.address) {
-          //     console.log(`${out.to_bytes().length}`)
-          //   }
-          //   // console.log(`${address}`);
-          //   // const assets = Lucid.valueToAssets(out.amount());
-          //   // Object.entries(assets).forEach(([asset, amount]) => {
-          //   //   console.log(`  ${asset}: ${amount}`);
-          //   // });
-          // }
+  public newBlock = async (): Promise<string[]> => {
+    this.resetMempool();
+    return await this.retry();
+  };
 
-          // // console.log("finalizeTx() - signing:", completed.txComplete.to_js_value());
-          const signed = await completed
-            .sign()
-            .complete();
+  private updateMempool = (txBody: Lucid.C.TransactionBody) => {
+    const txHash_ = Lucid.C.hash_transaction(txBody);
+    const txIns = txBody.inputs();
+    const txOuts = txBody.outputs();
+    const colls = txBody.collateral();
 
-          // let is: number[] = [];
-          // if (chainingAddr) { // TODO un-hackify
-          const txBody = signed.txSigned.body();
-          const txHash = Lucid.C.hash_transaction(txBody);
-          const txIns = txBody.inputs();
-          const txOuts = txBody.outputs();
-          const colls = txBody.collateral();
-          const spentUtxos: {
-            txHash: string;
-            outputIndex: number;
-          }[] = [];
-          const pendingUtxos: Lucid.UTxO[] = [];
-
-          for (let i = 0; i < txIns.len(); i++) {
-            const txIn = txIns.get(i);
-            spentUtxos.push({
-              txHash: txIn.transaction_id().to_hex(),
-              outputIndex: parseInt(txIn.index().to_str()),
-            });
-          }
-          if (colls) {
-            for (let i = 0; i < colls.len(); i++) {
-              const txIn = colls.get(i);
-              spentUtxos.push({
-                txHash: txIn.transaction_id().to_hex(),
-                outputIndex: parseInt(txIn.index().to_str()),
-              });
-            }
-          }
-          for (let i = 0; i < txOuts.len(); i++) {
-            const txOut = txOuts.get(i);
-            const address = txOut.address().to_bech32(undefined); // NOTE simplified version which does not work in byron (lol)
-            if ((!this.userChaining) && (address !== this.contract.address)) {
-              continue;
-            }
-            const txIn = Lucid.C.TransactionInput.new(
-              txHash,
-              Lucid.C.BigNum.from_str(i.toString()),
-            );
-            const utxo = Lucid.C.TransactionUnspentOutput.new(txIn, txOut);
-            pendingUtxos.push(Lucid.coreToUtxo(utxo));
-          }
-
-          const h = submit ? await signed.submit() : null;
-
-          this.spentUtxos.push(...spentUtxos);
-          this.pendingUtxos.push(...pendingUtxos);
-          return {
-            txHash: h,
-            txSigned: signed,
-          };
+    for (let i = 0; i < txIns.len(); i++) {
+      const txIn = txIns.get(i);
+      this.spentUtxos.push({
+        txHash: txIn.transaction_id().to_hex(),
+        outputIndex: parseInt(txIn.index().to_str()),
+      });
+    }
+    if (colls) {
+      for (let i = 0; i < colls.len(); i++) {
+        const txIn = colls.get(i);
+        this.spentUtxos.push({
+          txHash: txIn.transaction_id().to_hex(),
+          outputIndex: parseInt(txIn.index().to_str()),
         });
-    } catch (e) { // TODO what then? try again after awaiting a new block?
+      }
+    }
+    for (let i = 0; i < txOuts.len(); i++) {
+      const txOut = txOuts.get(i);
+      const address = txOut.address().to_bech32(undefined); // NOTE simplified version which does not work in byron (lol)
+      if ((!this.userChaining) && (address !== this.contract.address)) {
+        continue;
+      }
+      const txIn = Lucid.C.TransactionInput.new(
+        txHash_,
+        Lucid.C.BigNum.from_str(i.toString()),
+      );
+      const utxo = Lucid.C.TransactionUnspentOutput.new(txIn, txOut);
+      this.pendingUtxos.push(Lucid.coreToUtxo(utxo));
+    }
+  };
+
+  private signAndSubmit = async (
+    tx: Lucid.Tx,
+  ): Promise<string | Error> => {
+    try {
+      const txCompleted = await tx.complete();
+      const txSigned = await txCompleted.sign().complete();
+      const txHash = await txSigned.submit();
+      this.updateMempool(txSigned.txSigned.body());
+      return txHash;
+    } catch (e) {
       if (
         this.usedSplitting &&
           (e.toString().includes("Insufficient input in transaction")) ||
         e.toString().includes("InputsExhaustedError")
       ) {
         console.warn(
-          `catching ${e} in finalizeTx() after splitting`,
+          `catching ${e} in user.signAndSubmit() after splitting`,
         );
         return new Error(e.toString());
       } else {
         throw e;
       }
     }
-    // TODO clean this up
-    //   } catch (e) {
-    //     if (this.proptesting) throw e;
-    //     const e_ = e === "Missing input or output for some native asset" ? `
-    // Error: ${e}
-
-    // This is likely due to transaction-chaining not being fully supported yet on Cardano, at the time of writing.
-    // The result often is only partial order execution.
-    // The cause likely is that your assets are spread across too few utxos, and the remedy would be to split them up.
-    // Alternatively, you can work with multiple smaller swaps, waiting for one block (~20s) in between each.
-    // Unfortunately little else we can do about this right now, as it would require hacking wallets ;)
-    // ` : e;
-    //     console.error(e_);
-    //     alert(e_);
-    //     return "failed";
-    //   }
   };
 
-  // NOTE/TODO this assumes the user is the same as in the action... maybe check that?
-  public getTxSigned = async (action: Action): Promise<{
-    succ: Lucid.TxSigned[];
-    fail: Action[];
-  }> => {
+  public execute = async (action: Action): Promise<string[]> => {
     const tx = action.tx(this.lucid.newTx());
     try {
-      const signed = await this.finalizeTx(tx, false);
-      if (signed instanceof Error) { // means mempool-related issue right now (TODO remove spaghette)
-        return {
-          succ: [],
-          fail: [action],
-        };
+      const txHash = await this.signAndSubmit(tx);
+      if (txHash instanceof Error) { // means mempool-related issue right now
+        this.failedActions.push(action);
+        return [];
       } else {
-        return {
-          succ: [signed.txSigned],
-          fail: [],
-        }; // NOTE/TODO this assumes the tx-builder checks if we are over tx size limit, following a lucid-comment
+        return [txHash];
       }
     } catch (e) {
       const e_ = e.toString();
       if (e_.includes("Maximum transaction size")) {
-        // console.log("splitting action...");
+        console.log("splitting action...");
         const actions: Action[] = action.split();
-        // NOTE not using Promise.all here to ensure the mempool is handled correctly
-        const signedTxes: Lucid.TxSigned[] = [];
-        const failed: Action[] = [];
+        // not using Promise.all here to ensure the mempool is handled correctly
+        const hashes: string[] = [];
         let first = true;
         for (const action of actions) {
-          // console.log(`handling split action`);
+          console.log(`processing split action`);
           if (first) first = false;
           else this.usedSplitting = true;
-          const { succ, fail } = await this.getTxSigned(action);
-          signedTxes.push(...succ);
-          failed.push(...fail);
+          hashes.push(...await this.execute(action));
         }
-        return {
-          succ: signedTxes,
-          fail: failed,
-        };
+        return hashes;
       } else {
         throw e;
       }

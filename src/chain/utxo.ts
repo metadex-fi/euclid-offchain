@@ -21,7 +21,8 @@ import { User } from "./user.ts";
 import { utxoToCore } from "https://deno.land/x/lucid@0.10.7/mod.ts";
 
 // TODO minimum ADA deposit is rather the guess
-export const getMinBalance = (asset: Asset): bigint => asset.equals(Asset.ADA) ? 5000000n : 0n;
+export const getMinBalance = (asset: Asset): bigint =>
+  asset.equals(Asset.ADA) ? 5000000n : 0n;
 
 export class ParamUtxo {
   private constructor(
@@ -179,14 +180,14 @@ export class DiracUtxo {
     const tt = tabs + t;
     const ttf = tt + f;
     // const size = this.utxo ?
-    //   utxoToCore(this.utxo).to_bytes().length  // TODO very inefficent print 
+    //   utxoToCore(this.utxo).to_bytes().length  // TODO very inefficent print
     // : undefined
     return `DiracUtxo (
   ${ttf}dirac: ${this.dirac.concise(ttf)},
   ${ttf}balance: ${this.balance?.concise(ttf) ?? "undefined"}
   ${tt})`;
-  // ${ttf}utxo size: ${size ?? "undefined"}
-};
+    // ${ttf}utxo size: ${size ?? "undefined"}
+  };
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     const diracDatum = this.peuclidDatum.pconstant(new DiracDatum(this.dirac));
@@ -347,7 +348,7 @@ export class DiracUtxo {
 
     const sellableAssets = maxSelling_.assets.toList;
     const buyableAssets = maxBuying_.assets.toList;
-    
+
     buyableAssets.forEach((buyingAsset) => {
       sellableAssets.forEach((sellingAsset) => {
         if (sellingAsset.equals(buyingAsset)) return;
@@ -361,7 +362,7 @@ export class DiracUtxo {
         let spotBuying = spotBuying_.amountOf(buyingAsset); // NOTE: inverted
         let expBuying = expBuying_.amountOf(buyingAsset) - 1n; // NOTE the -1 is part of the hack to fit zeroes into PositiveValue (see above)
         let maxBuying = maxBuying_.amountOf(buyingAsset);
-        
+
         let spotSelling = spotSelling_.amountOf(sellingAsset); // NOTE: inverted
         let expSelling = expSelling_.amountOf(sellingAsset);
         let maxSelling = maxSelling_.amountOf(sellingAsset);
@@ -508,7 +509,6 @@ export class DiracUtxo {
         );
 
         swappings.push(swapping);
-
       });
     });
 

@@ -40,7 +40,7 @@ Deno.test("emulator", async () => {
     const iterations = 20;
     for (let i = 0; i < iterations; i++) {
       console.log(
-        `\ntrials left: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`// - errors: ${errors.length}`,
+        `\ntrials left: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`, // - errors: ${errors.length}`,
       );
       const lucid = await Lucid.Lucid.new(emulator);
       const user = await User.fromPrivateKey(
@@ -60,8 +60,7 @@ Deno.test("emulator", async () => {
         const hashes = await user
           .generateActions()
           .then(async (actions) => {
-            const signed: Lucid.TxSigned[] = [];
-            let failed: Action[] = [];
+            const hashes_: string[] = [];
             for (const action of actions) {
               const type = action.type;
 
@@ -73,42 +72,31 @@ Deno.test("emulator", async () => {
                 for (const [t, c] of corrupted.entries()) {
                   console.log(`attempting corruption ${t}...`);
                   try {
-                    const ctx = await user.finalizeTx(c.tx(user.lucid.newTx()));
-                    console.log(`finalized corruption tx`)
-                    if (ctx instanceof Error) throw ctx;
+                    const hash = await user.execute(c);
+                    console.log(
+                      `successfully executed type ${i} corruption: ${hash}`,
+                    );
                   } catch (e) {
-                    console.log(`type ${t} corruption failed successfully: ${e}`);
+                    console.log(
+                      `type ${t} corruption failed successfully: ${e}`,
+                    );
                     continue;
                   }
 
                   // console.log(`type ${t} corruption succeeded: ${swapping.show()}\n~~~>\n${c.show()}`)
-                  throw new Error(`type ${t} corruption succeeded: ${swapping.show()}\n~~~>\n${c.show()}`);
+                  throw new Error(
+                    `type ${t} corruption succeeded: ${swapping.show()}\n~~~>\n${c.show()}`,
+                  );
                 }
-              } 
+              }
               console.log(`attempting ${type}...`);
               actionCounts.set(type, (actionCounts.get(type) ?? 0) + 1);
-              const { succ, fail } = await user.getTxSigned(action);
-              signed.push(...succ);
-              failed.push(...fail);
+              hashes_.push(...await user.execute(action));
             }
-            const hashes_ = await Promise.all(
-              signed.map(async (s) => await s.submit()),
-            );
-            while (failed.length) {
-              console.warn(`failed: ${failed.length}`);
-              user.resetMempool(); // TODO do this automatically in user.update() - requires checking blocks, however
+            while (user.wantsToRetry) {
+              console.warn(`failed: ${user.wantsToRetry}`);
               emulator.awaitBlock(1); // TODO this does not take into account the possibility that others do or attempt stuff in the meantime
-              const failed_ = [];
-              for (const action of failed) {
-                const { succ, fail } = await user.getTxSigned(action);
-                hashes_.push(
-                  ...(await Promise.all(
-                    succ.map(async (s) => await s.submit()), // TODO check somewhere that after all of this, the full action was successfully completed
-                  )),
-                );
-                failed_.push(...fail);
-              }
-              failed = failed_;
+              hashes_.push(...await user.newBlock()); // TODO do this automatically in user.update() - requires checking blocks, however
             }
             return hashes_;
           });
@@ -122,8 +110,10 @@ Deno.test("emulator", async () => {
           throw e;
         }
       }
-      user.resetMempool();
       emulator.awaitBlock(Number(genPositive(1000n))); // NOTE/TODO this arbitrary limit is a hotfix for block height overflow issue
+      assert(!user.wantsToRetry, `user wants to retry still`);
+      const hashes = await user.newBlock();
+      assert(hashes.length === 0, `unexpected unhandled actions: ${hashes}`);
     }
     console.log(`traces.length: ${traces.length}`);
     for (const [type, count] of actionCounts) {

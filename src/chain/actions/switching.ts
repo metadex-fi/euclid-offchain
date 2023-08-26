@@ -13,6 +13,10 @@ export class Switching {
     return "Switching";
   }
 
+  public split = (): Switching[] => {
+    throw new Error("Switching-split not implemented");
+  };
+
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
     return this.pool.switchingTx(tx, this.user.contract).addSigner(
       this.user.address!,

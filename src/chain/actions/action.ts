@@ -3,8 +3,9 @@ import { User } from "../user.ts";
 import { Closing } from "./closing.ts";
 import { Opening } from "./opening.ts";
 import { Swapping } from "./swapping.ts";
+import { Switching } from "./switching.ts";
 
-export type Action = Closing | Opening | Swapping;
+export type Action = Closing | Opening | Swapping | Switching; // TODO test Switching
 export const allActions = [Closing, Opening, Swapping];
 
 export class UserAction {
