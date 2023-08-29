@@ -19,6 +19,7 @@ import {
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
+import { Assets } from "../../types/general/derived/asset/assets.ts";
 
 // const compareSubSwaps = false;
 
@@ -222,7 +223,7 @@ export class Swapping {
         this.user,
         this.paramUtxo,
         Value.singleton(this.soldAsset, sellableAmount),
-        this.boughtAsset,
+        Assets.singleton(this.boughtAsset),
       );
       if (subsequents.length === 0) break;
       assert(

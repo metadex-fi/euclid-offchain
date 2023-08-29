@@ -98,7 +98,7 @@ Deno.test("emulator", async () => {
               console.warn(`wantsToRetry`);
               emulator.awaitBlock(1); // TODO this does not take into account the possibility that others do or attempt stuff in the meantime
               const results = await user.newBlock();
-              results.forEach((r) => hashes.push(...r.txHashes)); // TODO do this automatically in user.update() - requires checking blocks, however
+              results.forEach((r) => hashes_.push(...r.txHashes)); // TODO do this automatically in user.update() - requires checking blocks, however
             }
             return hashes_;
           });

@@ -190,9 +190,9 @@ export class Opening {
         param.weights.amountOf(asset),
         param.jumpSizes.amountOf(asset),
       );
-      console.log(`maxTicks: ${maxTicks}`);
-      console.log(`maxTicks_: ${maxTicks_}`);
-      console.log(`${min(min(gMaxLength, maxTicks_), maxTicks)}`);
+      // console.log(`maxTicks: ${maxTicks}`);
+      // console.log(`maxTicks_: ${maxTicks_}`);
+      // console.log(`${min(min(gMaxLength, maxTicks_), maxTicks)}`);
       const ticks = new PPositive(
         1n,
         min(min(gMaxLength, maxTicks_), maxTicks), // TODO what to do when maxTicks_ < 1n? Should this be possible..?
@@ -232,13 +232,13 @@ export class Opening {
     jumpLog = isFinite(jumpLog) ? jumpLog : Number(maxInteger);
     let anchorLog = Math.log(anchorMultiplier);
     anchorLog = isFinite(anchorLog) ? anchorLog : Number(maxInteger);
-    console.log(`virtual: ${virtual}`);
-    console.log(`weight: ${weight}`);
-    console.log(`jumpSize: ${jumpSize}`);
-    console.log(`minAnchorPrice: ${minAnchorPrice}`);
-    console.log(`jumpLog: ${jumpLog}`);
-    console.log(`anchorLog: ${anchorLog}`);
-    console.log(`${jumpLog / anchorLog}`);
+    // console.log(`virtual: ${virtual}`);
+    // console.log(`weight: ${weight}`);
+    // console.log(`jumpSize: ${jumpSize}`);
+    // console.log(`minAnchorPrice: ${minAnchorPrice}`);
+    // console.log(`jumpLog: ${jumpLog}`);
+    // console.log(`anchorLog: ${anchorLog}`);
+    // console.log(`${jumpLog / anchorLog}`);
     const maxTicks = Math.floor(jumpLog / anchorLog);
     assert(maxTicks > 0, `maxTicks must be > 0, but got ${maxTicks}`);
     if (isFinite(maxTicks)) return BigInt(maxTicks);

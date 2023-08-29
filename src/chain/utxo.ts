@@ -225,20 +225,21 @@ export class DiracUtxo {
     user: User | undefined,
     paramUtxo: ParamUtxo,
     sellable_?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
-    buyingAsset?: Asset, // for subsequent swappings we want only a single direction
-    //buyableAmnt?: bigint, // for the new subswap-calculator, in concert with buyingAsset. Unused rn
+    buyingAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
+    //buyableAmnt?: bigint, // for the new subswap-calculator, in concert with buyingAsset. Unused rn. And divergent with above now as well
   ): Swapping[] => {
     // console.log("swappingsFor()");
     const swappings = new Array<Swapping>();
     let buyable_ = this.balance;
-    if (buyingAsset) {
+    if (buyingAssets) {
+      buyable_ = buyable_.ofAssets(buyingAssets)
       // const buyableAmnt_ = buyableAmnt ?? this.balance.amountOf(buyingAsset, 0n);
-      const buyableAmnt_ = this.balance.amountOf(buyingAsset, 0n);
-      if (buyableAmnt_ > 0n) {
-        buyable_ = PositiveValue.singleton(buyingAsset, buyableAmnt_);
-      } else {
-        return [];
-      }
+      // const buyableAmnt_ = this.balance.amountOf(buyingAsset, 0n);
+      // if (buyableAmnt_ > 0n) {
+      //   buyable_ = PositiveValue.singleton(buyingAsset, buyableAmnt_);
+      // } else {
+      //   return [];
+      // }
     }
     const param = paramUtxo.param;
 

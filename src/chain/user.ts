@@ -182,7 +182,9 @@ export class User {
 
   private retry = async (): Promise<ActionResults[]> => {
     const results: ActionResults[] = [];
-    for (const action of this.retrying.slice()) {
+    const retrying_ = this.retrying.slice();
+    this.retrying = [];
+    for (const action of retrying_) {
       results.push(await this.execute(action));
     }
     return results;
