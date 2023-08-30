@@ -131,8 +131,8 @@ export class EuclidState {
     });
   }
 
-  // uninverted
-  public weightedPrice(denominator: Asset, numerator: Asset): number {
+  // TODO Rethink and fix this
+  public weightedPrice(denominator: Asset, numerator: Asset): [number, number] {
     const pools = this.listPools;
     const diracPrices = pools.filter((p) => {
       const assets = p.assets;
@@ -147,7 +147,7 @@ export class EuclidState {
       },
       [0, 0],
     );
-    return priceSum / valueSum;
+    return [priceSum, valueSum]; // uninverted price = priceSum / valueSum
   }
 
   public swappingsFor(user: User): Swapping[] {

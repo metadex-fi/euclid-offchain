@@ -11,7 +11,6 @@ import { Asset } from "../../types/general/derived/asset/asset.ts";
 import { Data } from "../../types/general/fundamental/type.ts";
 import {
   ceilDiv,
-  genNonNegative,
   genPositive,
   min,
   randomChoice,
