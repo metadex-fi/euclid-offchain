@@ -114,8 +114,8 @@ export class User {
       return undefined;
     }
     const available = this.balance.clone;
-    available.addAmountOf(Asset.ADA, -feesEtcLovelace);
-    // available.drop(Asset.ADA); // TODO don't drop ADA completely
+    // available.addAmountOf(Asset.ADA, -feesEtcLovelace);
+    available.drop(Asset.ADA); // TODO don't drop ADA completely
     return available;
   }
 

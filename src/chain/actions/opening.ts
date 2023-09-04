@@ -16,6 +16,7 @@ import { Pool } from "../pool.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import { maxInteger } from "../../mod.ts";
+import { Swapping } from "./mod.ts";
 
 // complete settings for opening a pool
 export class Opening {
@@ -83,12 +84,20 @@ export class Opening {
     // for each asset and for each existing dirac, "spread" that dirac
     // in that asset's dimension. "spread" means: add all other tick
     // offsets for that asset's lowest price.
+    // UPDATE: then, jump enough times to approximate the initial amm-price (TODO)
     assets.forEach((asset) => {
       const ticks = Number(this.numTicks.amountOf(asset));
       const jumpMultiplier = 1 +
         (1 / Number(this.param.jumpSizes.amountOf(asset)));
       const tickMultiplier = jumpMultiplier ** (1 / ticks);
       const diracs_ = new Array<Dirac>();
+
+      const weight = this.param.weights.amountOf(asset);
+      const balance = this.deposit.amountOf(asset, 0n);
+      const virtual = this.param.virtual.amountOf(asset);
+      const liquidity = balance + virtual;
+      const amm = weight * liquidity;
+      const jumpSize = this.param.jumpSizes.amountOf(asset);
 
       /* TODO important: assert everywhere that anchorPrices allow for the required tickSizes - consider:
 
@@ -124,8 +133,27 @@ export class Opening {
             }
             `,
           );
-          if (currentAnchor > maxInteger) break; // TODO instead ensure this does not happen in the first place
+          if (currentAnchor > maxInteger) break;
           anchorPrices.setAmountOf(asset, currentAnchor);
+          // const exp = Math.log(Number(amm) / Number(currentAnchor)) /
+          //   Math.log(jumpMultiplier);
+          // let exp_ = BigInt(Math.floor(exp));
+          // let finalAnchor = Swapping.spot(
+          //   currentAnchor,
+          //   jumpSize,
+          //   exp_,
+          // );
+          // while (finalAnchor > maxInteger) {
+          //   exp_--;
+          //   if (exp_ < 0) break;
+          //   finalAnchor = Swapping.spot(
+          //     currentAnchor,
+          //     jumpSize,
+          //     exp_,
+          //   );
+          // } // TODO general wonkyness here
+          // if (exp_ < 0) break;
+          // anchorPrices.setAmountOf(asset, finalAnchor);
           threadNFT = threadNFT.next();
           diracs_.push(
             new Dirac(
