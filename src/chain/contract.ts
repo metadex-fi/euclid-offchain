@@ -1,4 +1,4 @@
-import euclidValidator from "../../contract/euclidValidatorBakSorted.json" assert {
+import euclidValidator from "../../contract/euclidValidator.json" assert {
   type: "json",
 };
 import euclidMinting from "../../contract/euclidMinting.json" assert {

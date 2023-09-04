@@ -107,11 +107,15 @@ Deno.test("emulator", async () => {
         // }
       } catch (e) {
         // TODO FIXME
-        if (e.toString().includes("Not enough ADA leftover to cover minADA") || e.toString().includes("InputsExhaustedError")) { 
-          console.error("caught:", e);
-        } else {
-          throw e;
-        }
+        // if (
+        //   e.toString().includes("Not enough ADA leftover to cover minADA") //||
+        //   // e.toString().includes("InputsExhaustedError")
+        // ) {
+        //   console.error("caught:", e);
+        // } else {
+        console.error(e);
+        throw e;
+        // }
       }
       emulator.awaitBlock(Number(genPositive(1000n))); // NOTE/TODO this arbitrary limit is a hotfix for block height overflow issue
       assert(!user.wantsToRetry, `user wants to retry still`);

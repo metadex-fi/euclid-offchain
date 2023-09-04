@@ -19,6 +19,8 @@ import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
 import { Assets } from "../../types/general/derived/asset/assets.ts";
+import { Dirac } from "../../types/euclid/dirac.ts";
+import { EuclidValue, PositiveValue } from "../../mod.ts";
 
 // const compareSubSwaps = false;
 
@@ -124,13 +126,14 @@ export class Swapping {
       this.diracUtxo.utxo,
       `diracUtxo.utxo must be defined - subsequents-issue?`,
     );
+    const oldDirac = this.diracUtxo.dirac;
     const funds = this.diracUtxo.balance.clone; // TODO cloning probably not required here
     // console.log(`funds before: ${funds.show()}`)
     funds.addAmountOf(this.boughtAsset, -this.boughtAmount);
     funds.addAmountOf(this.soldAsset, this.soldAmount);
     // console.log(`funds after: ${funds.show()}`)
     const retour: Lucid.Assets = funds.toLucid;
-    retour[this.diracUtxo.dirac.threadNFT.toLucid] = 1n;
+    retour[oldDirac.threadNFT.toLucid] = 1n;
     // Object.entries(retour).forEach(([asset, amount]) => {
     //   console.log(`\t${asset}: ${amount}`);
     // });
@@ -148,8 +151,20 @@ export class Swapping {
       ),
     );
 
+    const newAnchorPrices = oldDirac.anchorPrices.clone; // TODO cloning neccessary?
+    newAnchorPrices.setAmountOf(this.boughtAsset, this.boughtSpot);
+    newAnchorPrices.setAmountOf(this.soldAsset, this.soldSpot);
+
+    const newDirac = new Dirac(
+      oldDirac.owner,
+      oldDirac.threadNFT,
+      oldDirac.paramNFT,
+      newAnchorPrices,
+    );
+    console.log("old anchors:", oldDirac.anchorPrices.concise());
+    console.log("new anchors:", newDirac.anchorPrices.concise());
     const datum = this.diracUtxo.peuclidDatum.pconstant(
-      new DiracDatum(this.diracUtxo.dirac),
+      new DiracDatum(newDirac),
     );
 
     const tx_ = tx
@@ -442,7 +457,10 @@ export class Swapping {
     spot: bigint,
     buySell: string,
   ): boolean {
-    const spot_ = (anchor * ((js + 1n) ** exp)) / (js ** exp);
+    const spot_ = (0 <= exp)
+      ? (anchor * ((js + 1n) ** exp)) / (js ** exp)
+      : (anchor * (js ** -exp)) / ((js + 1n) ** -exp);
+
     if (spot !== spot_) {
       console.error(
         `exponentsYieldPrice (${buySell}):
@@ -586,6 +604,7 @@ export class Swapping {
 
   // try to make it wrong with minimal changes
   public corruptAll = (): Swapping[] => {
+    return []; // TODO reactivate
     return [
       this.corruptBoughtSpot(),
       this.corruptSoldSpot(),

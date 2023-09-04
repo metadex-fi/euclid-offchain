@@ -63,7 +63,11 @@ export class PCurrency extends PWrapped<Currency> {
   }
 
   // custom showData for correct sorting (default compares stringified ByteStrings)
-  public showData = (data: Currency, _tabs = "", _maxDepth?: bigint): string => {
+  public showData = (
+    data: Currency,
+    _tabs = "",
+    _maxDepth?: bigint,
+  ): string => {
     return data.show();
   };
 

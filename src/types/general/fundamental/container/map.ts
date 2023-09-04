@@ -146,10 +146,10 @@ export class AssocMap<K, V> {
     return `AssocMap {
 ${ttf}sorted: ${this.sorted},
 ${
-  [...this.inner.values()].map(([key, value]) =>
-    `${ttf}${this.showKey(key, ttf)} => ${showValue(value, ttf)}`
-  ).join(",\n")
-}
+      [...this.inner.values()].map(([key, value]) =>
+        `${ttf}${this.showKey(key, ttf)} => ${showValue(value, ttf)}`
+      ).join(",\n")
+    }
 ${tt}}`;
   };
 }
@@ -407,7 +407,9 @@ ${tt})`;
     const keys: PLifted<PKey>[] | undefined = maybeNdef(() =>
       PMap.genKeys(pkey)
     )?.();
-    if (keys && sorted) keys.sort((a, b) => pkey.showData(a).localeCompare(pkey.showData(b)));
+    if (keys && sorted) {
+      keys.sort((a, b) => pkey.showData(a).localeCompare(pkey.showData(b)));
+    }
     const size = maybeNdef(
       BigInt(
         keys?.length ??

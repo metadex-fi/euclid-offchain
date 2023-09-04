@@ -65,8 +65,11 @@ export class PositiveValue {
   public intersect = (other: PositiveValue): PositiveValue => {
     return new PositiveValue(this.value.intersect(other.value));
   };
-  public setAmountOf = (asset: Asset, amount: bigint): void =>
+  public setAmountOf = (asset: Asset, amount: bigint): void => {
+    assert(amount > 0n, `setAmountOf: amount must be positive, got ${amount}`);
     this.value.setAmountOf(asset, amount);
+  };
+
   public get clone(): PositiveValue {
     return new PositiveValue(this.value.clone);
   }

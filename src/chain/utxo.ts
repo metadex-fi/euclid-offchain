@@ -18,6 +18,7 @@ import { ceilDiv, min } from "../utils/generators.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { Contract } from "./contract.ts";
 import { User } from "./user.ts";
+import { maxInteger } from "../mod.ts";
 
 // TODO minimum ADA deposit is rather the guess
 export const getMinBalance = (asset: Asset): bigint =>
@@ -248,8 +249,8 @@ export class DiracUtxo {
 
     const spotBuying_ = new PositiveValue();
     const spotSelling_ = new PositiveValue();
-    const expBuying_ = new PositiveValue();
-    const expSelling_ = new PositiveValue();
+    const expBuying_ = new Value();
+    const expSelling_ = new Value();
     const maxBuying_ = new PositiveValue();
     const maxSelling_ = new PositiveValue();
 
@@ -259,7 +260,9 @@ export class DiracUtxo {
     // const delta = (w: number, l: number) => (s: number) => (s / w) - l;
     // const delta = (s: number) => l * (((s / a) ** (w / (w + 1))) - 1);
     const spot = (a: bigint, j: bigint, e: bigint) =>
-      (a * ((j + 1n) ** e)) / (j ** e);
+      (0 <= e)
+        ? (a * ((j + 1n) ** e)) / (j ** e)
+        : (a * (j ** -e)) / ((j + 1n) ** -e);
 
     param.assets.forEach((asset) => {
       // if (asset.equals(Asset.ADA)) return; // TODO for debugging, revert
@@ -309,7 +312,7 @@ export class DiracUtxo {
 
           if (maxBuying > 0n) {
             spotBuying_.initAmountOf(asset, spotBuying);
-            expBuying_.initAmountOf(asset, expBuying + 1n); // NOTE/TODO +1n is a hack to fit zeroes into PositiveValue
+            expBuying_.initAmountOf(asset, expBuying);
             maxBuying_.initAmountOf(asset, maxBuying);
             break;
           } else {
@@ -362,7 +365,7 @@ export class DiracUtxo {
         `);
         // NOTE if those ever have to be made changeable again, move them into the inner loop
         let spotBuying = spotBuying_.amountOf(buyingAsset); // NOTE: inverted
-        let expBuying = expBuying_.amountOf(buyingAsset) - 1n; // NOTE the -1 is part of the hack to fit zeroes into PositiveValue (see above)
+        let expBuying = expBuying_.amountOf(buyingAsset);
         let maxBuying = maxBuying_.amountOf(buyingAsset);
 
         let spotSelling = spotSelling_.amountOf(sellingAsset); // NOTE: inverted
@@ -423,7 +426,7 @@ export class DiracUtxo {
               limitReached: ${limitReached}
             `);
             if (limitReached) return;
-            if (maxSellingA0 <= maxBuyingA0 || expBuying === 0n) { // TODO second half might cause issues, idk
+            if (maxSellingA0 <= maxBuyingA0) { // TODO second half might cause issues, idk
               expSelling++;
               spotSelling = spot(sellingAnchor, sellingJumpSize, expSelling);
               const d = deltaSelling(spotSelling);
@@ -498,6 +501,10 @@ export class DiracUtxo {
         // );
 
         // /// end logging/debugging
+
+        // TODO better solution than this
+        if (spotBuying > maxInteger) return;
+        if (spotSelling > maxInteger) return;
 
         const swapping = Swapping.boundary(
           user,
