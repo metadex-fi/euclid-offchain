@@ -564,7 +564,8 @@ export class PValue extends PWrapped<Value> {
     super(
       new PMap(
         PCurrency.ptype,
-        new PMap(PToken.ptype, pbounded),
+        new PMap(PToken.ptype, pbounded, true),
+        true,
       ),
       Value,
     );

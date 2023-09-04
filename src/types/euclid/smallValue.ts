@@ -1,4 +1,3 @@
-import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Assets } from "../general/derived/asset/assets.ts";
 import { PWrapped } from "../general/fundamental/container/wrapped.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
@@ -7,13 +6,16 @@ import { PPositive } from "../general/derived/bounded/positive.ts";
 import { Value } from "../general/derived/value/value.ts";
 import { Asset } from "../general/derived/asset/asset.ts";
 import { Lucid } from "../../../lucid.mod.ts";
+import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 
 export const maxSmallInteger = 100n;
 
 export class SmallValue {
   constructor(
     private readonly value: EuclidValue,
-  ) {}
+  ) {
+    SmallValue.asserts(this);
+  }
 
   public get assets(): Assets {
     return this.value.assets;
@@ -49,6 +51,13 @@ export class SmallValue {
   public setAmountOf = (asset: Asset, amount: bigint): void => {
     this.value.setAmountOf(asset, amount);
   };
+
+  static asserts(smallValue: SmallValue): void {
+    assert(
+      smallValue.unsigned.biggestAmount <= maxSmallInteger,
+      `smallValue too big: ${smallValue.concise()}`,
+    );
+  }
 
   static generate(): SmallValue {
     const assets = Assets.generate(2n);

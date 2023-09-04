@@ -5,6 +5,7 @@ import {
   gMaxLength,
   maybeNdef,
   min,
+  randomChoice,
 } from "../../../../utils/generators.ts";
 import { maxShowDepth } from "../../../../utils/proptests.ts";
 import { Data, f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
@@ -20,12 +21,22 @@ function census(numKeys: bigint, numValues: bigint, size: bigint): bigint {
 }
 
 export class AssocMap<K, V> {
-  private readonly inner = new Map<
+  private inner = new Map<
     string,
     [K, V]
   >();
 
+  private sorted = true;
+
   constructor(private readonly showKey: (k: K, tabs?: string) => string) {}
+
+  public sort(): void {
+    if (!this.sorted) {
+      this.inner = new Map([...this.inner.entries()]
+        .sort((a, b) => a[0].localeCompare(b[0])));
+      this.sorted = true;
+    }
+  }
 
   // TODO check this notation works
   public get size(): number {
@@ -46,6 +57,7 @@ export class AssocMap<K, V> {
 
   public set = (k: K, v: V): void => {
     this.inner.set(this.showKey(k), [k, v]);
+    this.sorted = false;
   };
 
   public get = (k: K): V | undefined => {
@@ -62,6 +74,7 @@ export class AssocMap<K, V> {
 
   public clear = (): void => {
     this.inner.clear();
+    this.sorted = true;
   };
 
   // TODO check this notation works
@@ -131,12 +144,13 @@ export class AssocMap<K, V> {
     const tt = t + tabs;
     const ttf = tt + f;
     return `AssocMap {
-      ${
-      [...this.inner.values()].map(([key, value]) =>
-        `${ttf}${this.showKey(key, ttf)} => ${showValue(value, ttf)}`
-      ).join(",\n")
-    }
-      ${tt}}`;
+${ttf}sorted: ${this.sorted},
+${
+  [...this.inner.values()].map(([key, value]) =>
+    `${ttf}${this.showKey(key, ttf)} => ${showValue(value, ttf)}`
+  ).join(",\n")
+}
+${tt}}`;
   };
 }
 
@@ -146,13 +160,14 @@ export class PMap<PKey extends PData, PValue extends PData> implements
     AssocMap<PLifted<PKey>, PLifted<PValue>>
   > {
   public readonly population: bigint | undefined;
+  private readonly dataKeys?: PConstanted<PKey>[];
 
   constructor(
     public readonly pkey: PKey,
     public readonly pvalue: PValue,
+    public readonly sorted = false, //NOTE this only refers to the onchain-data being sorted (used for "Value")
     public readonly size?: bigint,
     public readonly keys?: PLifted<PKey>[],
-    private readonly dataKeys?: PConstanted<PKey>[],
   ) {
     if (keys) {
       this.dataKeys = keys.map((k) => pkey.pconstant(k) as PConstanted<PKey>);
@@ -197,7 +212,7 @@ export class PMap<PKey extends PData, PValue extends PData> implements
       const k = this.pkey.plift(key) as PLifted<PKey>;
       assert(
         !this.dataKeys || Data.to(this.dataKeys[i++]) === Data.to(key),
-        `PMap.pconstant: wrong key of ptype
+        `PMap.plift: wrong key of ptype
         ${this.pkey.showPType("", maxShowDepth)}
         : ${key.toString()}`,
       );
@@ -219,13 +234,16 @@ export class PMap<PKey extends PData, PValue extends PData> implements
 
     const m = new Map<PConstanted<PKey>, PConstanted<PValue>>();
     let i = 0;
+    if (this.sorted) data.sort(); //NOTE this tricks our type-tests, but that's ok
     data.forEach((value, key) => {
       const k = this.pkey.pconstant(key);
       assert(
         !this.dataKeys ||
           Data.to(this.dataKeys[i++]) ===
             Data.to(k),
-        `PMap.plift: wrong key`,
+        `PMap.pconstant: wrong key of ptype
+        ${this.pkey.showPType("", maxShowDepth)}
+        : ${k.toString()}`,
       );
       m.set(
         k as PConstanted<PKey>,
@@ -343,6 +361,8 @@ ${t}pkey: ${pkey.showPType(t)}`,
     const tt = tabs + t;
     const ttf = tt + f;
 
+    // data.sort();
+
     return `AssocMap {
 ${
       [...data.entries()].map(([key, value]) =>
@@ -383,9 +403,11 @@ ${tt})`;
   ): PMap<PKey, PValue> { // additional maxDepth - 1n intentional
     const pkey: PKey = gen.generate(maxDepth - 1n) as PKey;
     const pvalue: PValue = gen.generate(maxDepth - 1n) as PValue;
+    const sorted = randomChoice([true, false, undefined]);
     const keys: PLifted<PKey>[] | undefined = maybeNdef(() =>
       PMap.genKeys(pkey)
     )?.();
+    if (keys && sorted) keys.sort((a, b) => pkey.showData(a).localeCompare(pkey.showData(b)));
     const size = maybeNdef(
       BigInt(
         keys?.length ??
@@ -395,6 +417,6 @@ ${tt})`;
       ),
     );
 
-    return new PMap<PKey, PValue>(pkey, pvalue, size, keys);
+    return new PMap<PKey, PValue>(pkey, pvalue, sorted, size, keys);
   }
 }

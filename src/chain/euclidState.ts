@@ -14,9 +14,7 @@ import { Swapping } from "./actions/swapping.ts";
 import { Pool, PrePool } from "./pool.ts";
 import { User } from "./user.ts";
 import { ParamUtxo, PreDiracUtxo } from "./utxo.ts";
-import { EuclidValue } from "../types/euclid/euclidValue.ts";
 import { Asset } from "../types/general/derived/asset/asset.ts";
-import { Assets } from "../types/general/derived/asset/assets.ts";
 
 type ErrorMessage = string;
 

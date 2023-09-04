@@ -109,10 +109,12 @@ export class User {
   public get availableBalance(): PositiveValue | undefined {
     assert(this.balance, "No balance");
     if (this.balance.amountOf(Asset.ADA, 0n) < feesEtcLovelace) {
+      console.warn(`not enough ada to pay fees etc.: ${this.balance.concise()}
+      (current arbitrary & excessive minimum: ${feesEtcLovelace} lovelaces)`);
       return undefined;
     }
     const available = this.balance.clone;
-    available.drop(Asset.ADA); // TODO don't drop ADA completely
+    // available.drop(Asset.ADA); // TODO don't drop ADA completely
     return available;
     // return this.balance.normedMinus(feesEtc);
   }
