@@ -259,10 +259,6 @@ export class DiracUtxo {
     const delta = (w: bigint, l: bigint) => (s: bigint) => (s - l * w) / w;
     // const delta = (w: number, l: number) => (s: number) => (s / w) - l;
     // const delta = (s: number) => l * (((s / a) ** (w / (w + 1))) - 1);
-    const spot = (a: bigint, j: bigint, e: bigint) =>
-      (0 <= e)
-        ? (a * ((j + 1n) ** e)) / (j ** e)
-        : (a * (j ** -e)) / ((j + 1n) ** -e);
 
     param.assets.forEach((asset) => {
       // if (asset.equals(Asset.ADA)) return; // TODO for debugging, revert
@@ -289,8 +285,8 @@ export class DiracUtxo {
       let expBuying = BigInt(Math.floor(exp));
       let expSelling = BigInt(Math.ceil(exp));
 
-      let spotBuying = spot(anchor, jumpSize, expBuying);
-      let spotSelling = spot(anchor, jumpSize, expSelling);
+      let spotBuying = Swapping.spot(anchor, jumpSize, expBuying);
+      let spotSelling = Swapping.spot(anchor, jumpSize, expSelling);
 
       // TODO what about this?
       // NOTE: inverted
@@ -317,7 +313,7 @@ export class DiracUtxo {
             break;
           } else {
             expBuying--;
-            spotBuying = spot(anchor, jumpSize, expBuying);
+            spotBuying = Swapping.spot(anchor, jumpSize, expBuying);
             // if maxBuying is 0, then d is too low, which means that
             // we are too close at the amm-price. So we ~increase~ the
             // (uninverted) price we are willing to ~buy~ at stepwise
@@ -338,7 +334,7 @@ export class DiracUtxo {
             break;
           } else {
             expSelling++;
-            spotSelling = spot(anchor, jumpSize, expSelling);
+            spotSelling = Swapping.spot(anchor, jumpSize, expSelling);
             // if maxSelling is 0, then d is too low, which means that
             // we are too close at the amm-price. So we ~decrease~ the
             // (uninverted) price we are willing to ~sell~ at stepwise
@@ -428,7 +424,11 @@ export class DiracUtxo {
             if (limitReached) return;
             if (maxSellingA0 <= maxBuyingA0) { // TODO second half might cause issues, idk
               expSelling++;
-              spotSelling = spot(sellingAnchor, sellingJumpSize, expSelling);
+              spotSelling = Swapping.spot(
+                sellingAnchor,
+                sellingJumpSize,
+                expSelling,
+              );
               const d = deltaSelling(spotSelling);
               if (sellable && sellable > 0n) {
                 if (sellable <= d) {
@@ -445,7 +445,11 @@ export class DiracUtxo {
               // throw new Error("after all this branch is being visited!");
               // this branch is only visited if buying ADA (because of the higher minBuying)
               expBuying--;
-              spotBuying = spot(buyingAnchor, buyingJumpSize, expBuying);
+              spotBuying = Swapping.spot(
+                buyingAnchor,
+                buyingJumpSize,
+                expBuying,
+              );
               const d = deltaBuying(spotBuying);
               maxBuying = min(buyable, -d);
             }

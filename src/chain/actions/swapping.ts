@@ -450,6 +450,11 @@ export class Swapping {
   //   return fitBuying && fitSelling;
   // }
 
+  static spot = (a: bigint, j: bigint, e: bigint) =>
+    (0 <= e)
+      ? (a * ((j + 1n) ** e)) / (j ** e)
+      : (a * (j ** -e)) / ((j + 1n) ** -e);
+
   static exponentsYieldPrice(
     anchor: bigint,
     js: bigint,
@@ -457,9 +462,7 @@ export class Swapping {
     spot: bigint,
     buySell: string,
   ): boolean {
-    const spot_ = (0 <= exp)
-      ? (anchor * ((js + 1n) ** exp)) / (js ** exp)
-      : (anchor * (js ** -exp)) / ((js + 1n) ** -exp);
+    const spot_ = Swapping.spot(anchor, js, exp);
 
     if (spot !== spot_) {
       console.error(
@@ -604,7 +607,7 @@ export class Swapping {
 
   // try to make it wrong with minimal changes
   public corruptAll = (): Swapping[] => {
-    return []; // TODO reactivate
+    // return []; // TODO reactivate
     return [
       this.corruptBoughtSpot(),
       this.corruptSoldSpot(),
@@ -686,8 +689,7 @@ export class Swapping {
     let boughtSpot_ = this.boughtSpot;
     while (boughtSpot_ === this.boughtSpot) {
       boughtExp_++;
-      boughtSpot_ = (anchorBuying * ((jsBuying + 1n) ** boughtExp_)) /
-        (jsBuying ** boughtExp_);
+      boughtSpot_ = Swapping.spot(anchorBuying, jsBuying, boughtExp_);
     }
     // NOTE prices are inverted
     assert(
@@ -740,8 +742,7 @@ export class Swapping {
     let soldSpot_ = this.soldSpot;
     while (soldSpot_ === this.soldSpot) {
       soldExp_--;
-      soldSpot_ = (anchorSelling * ((jsSelling + 1n) ** soldExp_)) /
-        (jsSelling ** soldExp_);
+      soldSpot_ = Swapping.spot(anchorSelling, jsSelling, soldExp_);
     }
     // NOTE prices are inverted
     assert(
