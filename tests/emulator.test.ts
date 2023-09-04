@@ -34,7 +34,7 @@ Deno.test("emulator", async () => {
     }
     const accounts = allUsers.map((u) => u.account);
     console.log(`accounts: ${accounts.length}`);
-    const emulator = new Lucid.Emulator(accounts);// TODO get actual exBudget from Chain - the one in the emulator seems too low
+    const emulator = new Lucid.Emulator(accounts); // TODO get actual exBudget from Chain - the one in the emulator seems too low
     const traces: string[] = [];
     const actionCounts = new Map<string, number>();
     const iterations = 20;
@@ -113,8 +113,8 @@ Deno.test("emulator", async () => {
         ) {
           console.error("caught:", e);
         } else {
-        console.error(e);
-        throw e;
+          console.error(e);
+          throw e;
         }
       }
       emulator.awaitBlock(Number(genPositive(1000n))); // NOTE/TODO this arbitrary limit is a hotfix for block height overflow issue

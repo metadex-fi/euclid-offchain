@@ -15,7 +15,7 @@ import {
 import { Pool } from "../pool.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
-import { maxInteger } from "../../mod.ts";
+import { IdNFT, maxInteger } from "../../mod.ts";
 import { Swapping } from "./mod.ts";
 
 // complete settings for opening a pool
@@ -71,106 +71,119 @@ export class Opening {
     const paramNFT = this.user.nextParamNFT.next(); // TODO remove next()
     const paramUtxo = ParamUtxo.open(this.param, paramNFT);
 
-    let threadNFT = paramNFT.next();
-    let diracs = [
-      new Dirac(
-        this.user.paymentKeyHash,
-        threadNFT,
-        paramNFT,
-        minAnchorPrices,
-      ),
-    ];
+    let numDiracs = this.numTicks.unsigned.mulAmounts();
+    let diracs: Dirac[];
+    let threadNFT: IdNFT;
+    while (true) {
+      threadNFT = paramNFT.next();
+      diracs = [
+        new Dirac(
+          this.user.paymentKeyHash,
+          threadNFT,
+          paramNFT,
+          minAnchorPrices,
+        ),
+      ];
 
-    // for each asset and for each existing dirac, "spread" that dirac
-    // in that asset's dimension. "spread" means: add all other tick
-    // offsets for that asset's lowest price.
-    // UPDATE: then, jump enough times to approximate the initial amm-price (TODO)
-    assets.forEach((asset) => {
-      const ticks = Number(this.numTicks.amountOf(asset));
-      const jumpMultiplier = 1 +
-        (1 / Number(this.param.jumpSizes.amountOf(asset)));
-      const tickMultiplier = jumpMultiplier ** (1 / ticks);
-      const diracs_ = new Array<Dirac>();
+      // for each asset and for each existing dirac, "spread" that dirac
+      // in that asset's dimension. "spread" means: add all other tick
+      // offsets for that asset's lowest price.
+      // UPDATE: then, jump enough times to approximate the initial amm-price (TODO)
+      assets.forEach((asset) => {
+        const ticks = Number(this.numTicks.amountOf(asset));
+        const jumpMultiplier = 1 +
+          (1 / Number(this.param.jumpSizes.amountOf(asset)));
+        const tickMultiplier = jumpMultiplier ** (1 / ticks);
+        const diracs_ = new Array<Dirac>();
 
-      const weight = this.param.weights.amountOf(asset);
-      const balance = this.deposit.amountOf(asset, 0n);
-      const virtual = this.param.virtual.amountOf(asset);
-      const liquidity = balance + virtual;
-      const amm = weight * liquidity;
-      const jumpSize = this.param.jumpSizes.amountOf(asset);
+        const weight = this.param.weights.amountOf(asset);
+        const balance = this.deposit.amountOf(asset, 0n) / numDiracs;
+        const virtual = this.param.virtual.amountOf(asset);
+        const liquidity = balance + virtual;
+        const amm = weight * liquidity;
+        const jumpSize = this.param.jumpSizes.amountOf(asset);
 
-      /* TODO important: assert everywhere that anchorPrices allow for the required tickSizes - consider:
+        /* TODO important: assert everywhere that anchorPrices allow for the required tickSizes - consider:
 
-- tickMultiplier must be >= 1 + (1 / anchor0), otherwise different anchors will round to the same price
-- -> tickSize must be <= anchor0, which unfortunately is not a used parameter, but can be deduced via
-- tickSize = 1 / (calcTic)
+  - tickMultiplier must be >= 1 + (1 / anchor0), otherwise different anchors will round to the same price
+  - -> tickSize must be <= anchor0, which unfortunately is not a used parameter, but can be deduced via
+  - tickSize = 1 / (calcTic)
 
-      */
+        */
 
-      diracs.forEach((dirac) => {
-        for (let i = 1; i < ticks; i++) {
-          const anchorPrices = dirac.anchorPrices.clone;
-          const firstAnchor = anchorPrices.amountOf(asset);
-          const currentAnchor = BigInt(
-            Math.floor(Number(firstAnchor) * (tickMultiplier ** i)),
-          );
-          assert(
-            firstAnchor < currentAnchor,
-            `anchor price collision - first: ${firstAnchor} >= current: ${currentAnchor};
-            tickMultiplier: ${tickMultiplier}
-            i: ${i}
-            ticks: ${ticks}
-            jumpMultiplier: ${jumpMultiplier}
-            virtual: ${this.param.virtual.amountOf(asset)}
-            weights: ${this.param.weights.amountOf(asset)}
-            jumpSizes: ${this.param.jumpSizes.amountOf(asset)}
-            maxTicks: ${
-              Opening.maxTicks(
-                this.param.virtual.amountOf(asset),
-                this.param.weights.amountOf(asset),
-                this.param.jumpSizes.amountOf(asset),
-              )
-            }
-            `,
-          );
-          if (currentAnchor > maxInteger) break;
-          anchorPrices.setAmountOf(asset, currentAnchor);
-          // const exp = Math.log(Number(amm) / Number(currentAnchor)) /
-          //   Math.log(jumpMultiplier);
-          // let exp_ = BigInt(Math.floor(exp));
-          // let finalAnchor = Swapping.spot(
-          //   currentAnchor,
-          //   jumpSize,
-          //   exp_,
-          // );
-          // while (finalAnchor > maxInteger) {
-          //   exp_--;
-          //   if (exp_ < 0) break;
-          //   finalAnchor = Swapping.spot(
-          //     currentAnchor,
-          //     jumpSize,
-          //     exp_,
-          //   );
-          // } // TODO general wonkyness here
-          // if (exp_ < 0) break;
-          // anchorPrices.setAmountOf(asset, finalAnchor);
-          threadNFT = threadNFT.next();
-          diracs_.push(
-            new Dirac(
-              this.user.paymentKeyHash,
-              threadNFT,
-              paramNFT,
-              anchorPrices,
-            ),
-          );
-        }
+        diracs.forEach((dirac) => {
+          for (let i = 1; i < ticks; i++) {
+            const anchorPrices = dirac.anchorPrices.clone;
+            const firstAnchor = anchorPrices.amountOf(asset);
+            const baseAnchor = BigInt(
+              Math.floor(Number(firstAnchor) * (tickMultiplier ** i)),
+            );
+            assert(
+              firstAnchor < baseAnchor,
+              `anchor price collision - first: ${firstAnchor} >= current: ${baseAnchor};
+              tickMultiplier: ${tickMultiplier}
+              i: ${i}
+              ticks: ${ticks}
+              jumpMultiplier: ${jumpMultiplier}
+              virtual: ${this.param.virtual.amountOf(asset)}
+              weights: ${this.param.weights.amountOf(asset)}
+              jumpSizes: ${this.param.jumpSizes.amountOf(asset)}
+              maxTicks: ${
+                Opening.maxTicks(
+                  this.param.virtual.amountOf(asset),
+                  this.param.weights.amountOf(asset),
+                  this.param.jumpSizes.amountOf(asset),
+                )
+              }
+              `,
+            );
+            // if (baseAnchor > maxInteger) break;
+            // anchorPrices.setAmountOf(asset, baseAnchor);
+            const exp = Math.log(Number(amm) / Number(baseAnchor)) /
+              Math.log(jumpMultiplier);
+            let exp_ = BigInt(Math.floor(exp));
+            assert(exp_ >= 0n, `Opening.pool: exp must be >= 0, but got ${exp_}`);
+            let finalAnchor = Swapping.spot(
+              baseAnchor,
+              jumpSize,
+              exp_,
+            );
+            while (finalAnchor > maxInteger && finalAnchor >= firstAnchor) {
+              exp_--;
+              finalAnchor = Swapping.spot(
+                baseAnchor,
+                jumpSize,
+                exp_,
+              );
+            } // TODO general wonkyness here
+            if (finalAnchor < firstAnchor) break;
+            anchorPrices.setAmountOf(asset, finalAnchor);
+            threadNFT = threadNFT.next();
+            diracs_.push(
+              new Dirac(
+                this.user.paymentKeyHash,
+                threadNFT,
+                paramNFT,
+                anchorPrices,
+              ),
+            );
+          }
+        });
+        diracs = diracs.concat(diracs_);
       });
-      diracs = diracs.concat(diracs_);
-    });
+      const numDiracs_ = BigInt(diracs.length);
+      if (numDiracs_ === numDiracs) break; // TODO ensure there's no infinite loop here
+      else {
+        console.log(
+          `Opening.pool: unexpected number of diracs, retrying: ${numDiracs_} vs. ${numDiracs}`,
+        );
+        numDiracs = numDiracs_;
+      }
+    }
 
     // TODO consider checking if balance has assets left over
     const balance = PositiveValue.normed(
-      this.deposit.unsigned.divideByScalar(BigInt(diracs.length)),
+      this.deposit.unsigned.divideByScalar(numDiracs),
     );
     assert(
       balance.size === this.deposit.size,
