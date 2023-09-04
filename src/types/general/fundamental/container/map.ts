@@ -231,10 +231,10 @@ export class PMap<PKey extends PData, PValue extends PData> implements
         this.showData(data, "", maxShowDepth)
       }`,
     );
+    if (this.sorted) data.sort(); //NOTE this tricks our type-tests, but that's ok
 
     const m = new Map<PConstanted<PKey>, PConstanted<PValue>>();
     let i = 0;
-    if (this.sorted) data.sort(); //NOTE this tricks our type-tests, but that's ok
     data.forEach((value, key) => {
       const k = this.pkey.pconstant(key);
       assert(

@@ -2,6 +2,8 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
 import { PWrapped } from "../../fundamental/container/wrapped.ts";
 import { PByteString } from "../../fundamental/primitive/bytestring.ts";
+import { f, t } from "../../fundamental/type.ts";
+import { filterFunctions } from "../../fundamental/container/object.ts";
 
 export class Currency {
   constructor(public readonly symbol: Uint8Array) {
@@ -59,6 +61,11 @@ export class PCurrency extends PWrapped<Currency> {
       Currency,
     );
   }
+
+  // custom showData for correct sorting (default compares stringified ByteStrings)
+  public showData = (data: Currency, _tabs = "", _maxDepth?: bigint): string => {
+    return data.show();
+  };
 
   static ptype = new PCurrency();
   static genPType(): PWrapped<Currency> {
