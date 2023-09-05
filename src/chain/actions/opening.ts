@@ -65,20 +65,19 @@ export class Opening {
 
   // adjust the baseline anchor price for a single asset, in order to reduce required exponents when swapping
   private static adjustAnchorPrice = (
-    baseAnchor: bigint, 
-    balance: bigint, 
+    baseAnchor: bigint,
+    balance: bigint,
     virtual: bigint,
     weight: bigint,
     jumpSize: bigint,
   ): bigint | undefined => {
-
     const amm = weight * (balance + virtual);
     const jumpMultiplier = 1 + (1 / Number(jumpSize));
     let exp = BigInt(Math.round(Swapping.exp(
-      Number(baseAnchor), 
-      Number(amm), 
-      jumpMultiplier
-      )));
+      Number(baseAnchor),
+      Number(amm),
+      jumpMultiplier,
+    )));
     let finalAnchor = baseAnchor;
     const upperLimit = min(amm, maxInteger);
     console.log("initial exp:", exp, "finalAnchor:", finalAnchor);
@@ -108,7 +107,7 @@ export class Opening {
     }
     console.log(`returning finalAnchor: ${finalAnchor}`);
     return finalAnchor;
-  }
+  };
 
   // get the adjusted anchor price for the first dirac, for a single asset
   private static firstAnchorPrice = (
@@ -119,14 +118,14 @@ export class Opening {
   ): bigint => {
     const baseAnchor = Param.minAnchorPrice(virtual, weight, jumpSize);
     const finalAnchor = Opening.adjustAnchorPrice(
-      baseAnchor, 
-      balance, 
+      baseAnchor,
+      balance,
       virtual,
       weight,
-      jumpSize
+      jumpSize,
     );
     return finalAnchor ?? baseAnchor;
-  }
+  };
 
   // get the adjusted anchor prices for the first dirac, for all assets
   private static firstAnchorPrices = (
@@ -139,8 +138,7 @@ export class Opening {
     return EuclidValue.fromValue(
       f(balance, virtual, weights, jumpSizes),
     );
-
-  }
+  };
 
   public pool = (): Pool => {
     if (this.poolCache) return this.poolCache;
@@ -151,7 +149,7 @@ export class Opening {
     const jumpSizes = this.param.jumpSizes.unsigned;
     const paramNFT = this.user.nextParamNFT.next(); // TODO remove next()
     const paramUtxo = ParamUtxo.open(this.param, paramNFT);
-    
+
     const numDiracs = this.numTicks.unsigned.mulAmounts();
     const balance = deposit.divideByScalar(numDiracs);
     const firstAnchorPrices = Opening.firstAnchorPrices(
@@ -212,8 +210,8 @@ export class Opening {
             `anchor price collision - first: ${firstAnchor} >= current: ${baseAnchor}`,
           );
           const finalAnchor = Opening.adjustAnchorPrice(
-            baseAnchor, 
-            balance_, 
+            baseAnchor,
+            balance_,
             virtual_,
             weight,
             jumpSize,
