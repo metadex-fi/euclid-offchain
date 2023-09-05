@@ -240,6 +240,37 @@ export class User {
   ): Promise<TxResult> => {
     try {
       const txCompleted = await tx.complete();
+
+      // // begin logging
+      // const txBody = txCompleted.txComplete.body();
+      // const txHash_ = Lucid.C.hash_transaction(txBody);
+      // const txOuts = txBody.outputs();
+      // for (let i = 0; i < txOuts.len(); i++) {
+      //   const txOut = txOuts.get(i);
+      //   const address = txOut.address().to_bech32(undefined); // NOTE simplified version which does not work in byron (lol)
+      //   if (address !== this.contract.address) {
+      //     continue;
+      //   }
+      //   const txIn = Lucid.C.TransactionInput.new(
+      //     txHash_,
+      //     Lucid.C.BigNum.from_str(i.toString()),
+      //   );
+      //   const utxo = Lucid.C.TransactionUnspentOutput.new(txIn, txOut);
+      //   const bytes = BigInt(utxo.to_bytes().length);
+      //   const coinsPerByte =
+      //     (await this.lucid.provider.getProtocolParameters()).coinsPerUtxoByte;
+      //   const lockedAda = bytes * coinsPerByte;
+      //   console.log(
+      //     "new - coinsPerByte:",
+      //     coinsPerByte,
+      //     "\tbytes:",
+      //     bytes,
+      //     "\tlockedAda:",
+      //     lockedAda,
+      //   );
+      // }
+      // // end logging
+
       const txSigned = await txCompleted.sign().complete();
       const txHash = await txSigned.submit();
       const txCore = txSigned.txSigned;

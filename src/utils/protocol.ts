@@ -1,3 +1,5 @@
+// fetched from blockfrost preview testnet
+
 export const parameters = {
   minFeeA: 44,
   minFeeB: 155381,

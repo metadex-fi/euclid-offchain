@@ -95,12 +95,12 @@ Deno.test("emulator", async () => {
                   }
 
                   // TODO FIXME
-                  if (c.soldAsset.equals(Asset.ADA)) {
-                    console.error(
-                      `type ${t} corruption succeeded, but skipping due to ADA sold: ${swapping.show()}\n~~~>\n${c.show()}`,
-                    );
-                    break;
-                  }
+                  // if (c.soldAsset.equals(Asset.ADA)) {
+                  //   console.error(
+                  //     `type ${t} corruption succeeded, but skipping due to ADA sold: ${swapping.show()}\n~~~>\n${c.show()}`,
+                  //   );
+                  //   break;
+                  // }
 
                   // console.log(`type ${t} corruption succeeded: ${swapping.show()}\n~~~>\n${c.show()}`)
                   throw new Error(
@@ -131,7 +131,7 @@ Deno.test("emulator", async () => {
         // ) {
         //   console.error("caught:", e);
         // } else {
-        console.error(e);
+        // console.error(e);
         throw e;
         // }
       }
