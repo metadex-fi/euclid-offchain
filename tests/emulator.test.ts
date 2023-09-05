@@ -17,7 +17,6 @@ import { parameters } from "../src/utils/protocol.ts";
 import { Asset } from "../src/types/general/derived/asset/asset.ts";
 
 Deno.test("emulator", async () => {
-
   // const blockfrostUrl = "https://cardano-preview.blockfrost.io/api/v0";
   // const projectId = ""; // TODO un-hardcode
 
@@ -96,8 +95,10 @@ Deno.test("emulator", async () => {
                   }
 
                   // TODO FIXME
-                  if (c.soldAsset.equals(Asset.ADA)){
-                    console.error(`type ${t} corruption succeeded, but skipping due to ADA sold: ${swapping.show()}\n~~~>\n${c.show()}`)
+                  if (c.soldAsset.equals(Asset.ADA)) {
+                    console.error(
+                      `type ${t} corruption succeeded, but skipping due to ADA sold: ${swapping.show()}\n~~~>\n${c.show()}`,
+                    );
                     break;
                   }
 
@@ -130,8 +131,8 @@ Deno.test("emulator", async () => {
         // ) {
         //   console.error("caught:", e);
         // } else {
-          console.error(e);
-          throw e;
+        console.error(e);
+        throw e;
         // }
       }
       emulator.awaitBlock(Number(genPositive(1000n))); // NOTE/TODO this arbitrary limit is a hotfix for block height overflow issue

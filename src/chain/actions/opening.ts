@@ -137,26 +137,55 @@ export class Opening {
               }
               `,
             );
-            // if (baseAnchor > maxInteger) break;
-            // anchorPrices.setAmountOf(asset, baseAnchor);
-            const exp = Math.log(Number(amm) / Number(baseAnchor)) /
-              Math.log(jumpMultiplier);
-            let exp_ = BigInt(Math.floor(exp));
-            assert(exp_ >= 0n, `Opening.pool: exp must be >= 0, but got ${exp_}`);
-            let finalAnchor = Swapping.spot(
-              baseAnchor,
-              jumpSize,
-              exp_,
-            );
-            while (finalAnchor > maxInteger && finalAnchor >= firstAnchor) {
-              exp_--;
+
+            let exp = 0n;
+            let finalAnchor = baseAnchor;
+            const upperLimit = min(amm, maxInteger);
+            while (finalAnchor <= upperLimit) {
+              exp++;
               finalAnchor = Swapping.spot(
                 baseAnchor,
                 jumpSize,
-                exp_,
+                exp,
               );
-            } // TODO general wonkyness here
+            }
+            while (finalAnchor > upperLimit && finalAnchor >= firstAnchor) {
+              exp--;
+              finalAnchor = Swapping.spot(
+                baseAnchor,
+                jumpSize,
+                exp,
+              );
+            }
+
             if (finalAnchor < firstAnchor) break;
+
+            // // anchorPrices.setAmountOf(asset, baseAnchor);
+            // const exp = Swapping.exp(
+            //   Number(baseAnchor),
+            //   Number(amm),
+            //   Number(jumpMultiplier),
+            // );
+            // let exp_ = BigInt(Math.floor(exp));
+            // assert(
+            //   exp_ >= 0n,
+            //   `Opening.pool: exp must be >= 0, but got ${exp_}`,
+            // );
+            // let finalAnchor = Swapping.spot(
+            //   baseAnchor,
+            //   jumpSize,
+            //   exp_,
+            // );
+            // while (finalAnchor > maxInteger && finalAnchor >= firstAnchor) {
+            //   exp_--;
+            //   finalAnchor = Swapping.spot(
+            //     baseAnchor,
+            //     jumpSize,
+            //     exp_,
+            //   );
+            // } // TODO general wonkyness here
+            if (finalAnchor < firstAnchor) break;
+
             anchorPrices.setAmountOf(asset, finalAnchor);
             threadNFT = threadNFT.next();
             diracs_.push(

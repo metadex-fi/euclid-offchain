@@ -279,8 +279,7 @@ export class DiracUtxo {
       assert(amm > 0n, `amm <= 0n`);
 
       const jumpMultiplier = (Number(jumpSize) + 1) / Number(jumpSize);
-      const exp = Math.log(Number(amm) / Number(anchor)) /
-        Math.log(jumpMultiplier);
+      const exp = Swapping.exp(Number(anchor), Number(amm), jumpMultiplier);
 
       let expBuying = BigInt(Math.floor(exp));
       let expSelling = BigInt(Math.ceil(exp));

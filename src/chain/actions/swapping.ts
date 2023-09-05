@@ -16,7 +16,7 @@ import {
   randomChoice,
 } from "../../utils/generators.ts";
 import { User } from "../user.ts";
-import { DiracUtxo, ParamUtxo, getMinBalance } from "../utxo.ts";
+import { DiracUtxo, getMinBalance, ParamUtxo } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
 import { Assets } from "../../types/general/derived/asset/assets.ts";
 import { Dirac } from "../../types/euclid/dirac.ts";
@@ -453,6 +453,10 @@ export class Swapping {
     (0 <= e)
       ? (a * ((j + 1n) ** e)) / (j ** e)
       : (a * (j ** -e)) / ((j + 1n) ** -e);
+
+  static exp = (anchor: number, amm: number, jumpMultiplier: number) =>
+    Math.log(amm / anchor) /
+    Math.log(jumpMultiplier);
 
   static exponentsYieldPrice(
     anchor: bigint,

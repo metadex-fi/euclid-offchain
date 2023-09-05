@@ -1,4 +1,4 @@
-export const parameters ={
+export const parameters = {
   minFeeA: 44,
   minFeeB: 155381,
   maxTxSize: 16384,
@@ -179,7 +179,7 @@ export const parameters ={
       "unMapData-memory-arguments": 32,
       "verifyEd25519Signature-cpu-arguments-intercept": 57996947,
       "verifyEd25519Signature-cpu-arguments-slope": 18975,
-      "verifyEd25519Signature-memory-arguments": 10
+      "verifyEd25519Signature-memory-arguments": 10,
     },
     PlutusV2: {
       "addInteger-cpu-arguments-intercept": 205665,
@@ -356,7 +356,7 @@ export const parameters ={
       "verifyEd25519Signature-memory-arguments": 10,
       "verifySchnorrSecp256k1Signature-cpu-arguments-intercept": 38887044,
       "verifySchnorrSecp256k1Signature-cpu-arguments-slope": 32947,
-      "verifySchnorrSecp256k1Signature-memory-arguments": 10
-    }
-  }
-}
+      "verifySchnorrSecp256k1Signature-memory-arguments": 10,
+    },
+  },
+};
