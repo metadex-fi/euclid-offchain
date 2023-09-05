@@ -2,7 +2,7 @@
 
 rm -rf test_logs
 mkdir -p test_logs
-N=20
+N=10
 pipe=$(mktemp -u)
 mkfifo $pipe
 
