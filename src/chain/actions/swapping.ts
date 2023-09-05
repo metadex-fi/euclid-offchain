@@ -16,11 +16,10 @@ import {
   randomChoice,
 } from "../../utils/generators.ts";
 import { User } from "../user.ts";
-import { DiracUtxo, ParamUtxo } from "../utxo.ts";
+import { DiracUtxo, ParamUtxo, getMinBalance } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
 import { Assets } from "../../types/general/derived/asset/assets.ts";
 import { Dirac } from "../../types/euclid/dirac.ts";
-import { EuclidValue, PositiveValue } from "../../mod.ts";
 
 // const compareSubSwaps = false;
 
@@ -407,7 +406,7 @@ export class Swapping {
       boughtExp,
       soldExp,
       true,
-      diracUtxo.balance.amountOf(boughtAsset),
+      diracUtxo.balance.amountOf(boughtAsset) - getMinBalance(boughtAsset),
     );
   }
 

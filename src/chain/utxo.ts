@@ -22,7 +22,7 @@ import { maxInteger } from "../mod.ts";
 
 // TODO minimum ADA deposit is rather the guess
 export const getMinBalance = (asset: Asset): bigint =>
-  asset.equals(Asset.ADA) ? 5000000n : 0n;
+  asset.equals(Asset.ADA) ? 25000000n : 0n; // TODO excessive
 
 export class ParamUtxo {
   private constructor(
