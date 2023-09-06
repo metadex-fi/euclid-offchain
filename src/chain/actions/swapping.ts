@@ -24,6 +24,7 @@ import { genNonNegative } from "../../mod.ts";
 import { getMinSelling } from "../mod.ts";
 
 // const compareSubSwaps = true;
+const sellingADAtolerance = 0;
 
 export class Swapping {
   public readonly spotPrice: number; // uninverted
@@ -357,9 +358,9 @@ export class Swapping {
       this.paramUtxo,
       Value.singleton(this.soldAsset, amntIsSold ? amount : this.soldAmount),
       Assets.singleton(this.boughtAsset),
+      // TODO what
       // adding minBalance here because we are removing it again in swappingsFor
-      (amntIsSold ? this.boughtAmount : amount) +
-        getMinBalance(this.boughtAsset),
+      amntIsSold ? this.boughtAmount : amount, //+ getMinBalance(this.boughtAsset),
     );
     assert(
       swappings.length <= 1,
@@ -502,6 +503,7 @@ export class Swapping {
     if (swappings.length < 1) return undefined;
     // console.log(`Swapping`);
     const choice = randomChoice(swappings);
+    // return choice; // TODO revert
     if (Math.random() < 0.5) return choice;
     else return choice.randomSubSwap();
   }
@@ -696,7 +698,6 @@ export class Swapping {
 
   // try to make it wrong with minimal changes
   public corruptAll = (): Swapping[] => {
-    // return []; // TODO reactivate
     return [
       this.corruptBoughtSpot(),
       this.corruptSoldSpot(),
@@ -738,7 +739,7 @@ export class Swapping {
     );
     assert(
       !boughtTooMuch.validates(),
-      `buying more one should fail: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`,
+      `buying more should fail: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`,
     );
     console.log(`returning corruptBoughtAmnt`);
     return boughtTooMuch;
@@ -766,13 +767,13 @@ export class Swapping {
     );
     assert(
       !soldTooLittle.validates(),
-      `selling one less should fail: ${this.show()}\n~~~>\n${soldTooLittle.show()}`,
+      `selling less should fail: ${this.show()}\n~~~>\n${soldTooLittle.show()}`,
     );
     console.log(`returning corruptSoldAmnt`);
     return soldTooLittle;
   };
 
-  public corruptBoughtSpot = (): Swapping | undefined => {
+  public corruptBoughtSpot = (nested = 0): Swapping | undefined => {
     console.log("corrupting bought spot...");
     const param = this.paramUtxo.param;
     const dirac = this.diracUtxo.dirac;
@@ -807,10 +808,19 @@ export class Swapping {
         false,
         this.maxBuying,
       );
-      assert(
-        !boughtSpotTooHigh.validates(),
-        `raising inverted buying price should fail: ${this.show()}\n~~~>\n${boughtSpotTooHigh.show()}`,
-      );
+
+      if (boughtSpotTooHigh.validates()) {
+        console.log(`bought spot corruption succeeded: ${nested}`);
+        boughtSpotTooHigh.corruptBoughtSpot(nested + 1);
+        if (
+          !this.soldAsset.equals(Asset.ADA) || nested >= sellingADAtolerance
+        ) {
+          throw new Error(
+            `raising inverted buying price should fail: ${this.show()}\n~~~>\n${boughtSpotTooHigh.show()}`,
+          );
+        }
+      } else console.log(`bought spot corruption failed: ${nested}`);
+
       assert(
         Swapping.exponentsYieldPrice(
           anchorBuying,
@@ -826,7 +836,7 @@ export class Swapping {
     } else return undefined;
   };
 
-  public corruptSoldSpot = (): Swapping | undefined => {
+  public corruptSoldSpot = (nested = 0): Swapping | undefined => {
     console.log("corrupting sold spot...");
     const param = this.paramUtxo.param;
     const dirac = this.diracUtxo.dirac;
@@ -866,10 +876,19 @@ export class Swapping {
         false,
         this.maxBuying,
       );
-      assert(
-        !soldSpotTooLow.validates(),
-        `lowering inverted selling price should fail: ${this.show()}\n~~~>\n${soldSpotTooLow.show()}`,
-      );
+
+      if (soldSpotTooLow.validates()) {
+        console.log(`sold spot corruption succeeded: ${nested}`);
+        soldSpotTooLow.corruptSoldSpot(nested + 1);
+        if (
+          !this.soldAsset.equals(Asset.ADA) || nested >= sellingADAtolerance
+        ) {
+          throw new Error(
+            `lowering inverted selling price should fail: ${this.show()}\n~~~>\n${soldSpotTooLow.show()}`,
+          );
+        }
+      } else console.log(`sold spot corruption failed: ${nested}`);
+
       assert(
         Swapping.exponentsYieldPrice(
           anchorSelling,

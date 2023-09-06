@@ -1,0 +1,898 @@
+[0m[32mTask[0m [0m[36mtest[0m deno test --allow-env --allow-read --allow-net tests
+[0m[32mCheck[0m file:///Users/ChrisHiatt/Projects/adaswap/vasil_2022Q3/euclid-offchain/tests/emulator.test.ts
+[0m[32mCheck[0m file:///Users/ChrisHiatt/Projects/adaswap/vasil_2022Q3/euclid-offchain/tests/types.test.ts
+[0m[38;5;245mrunning 1 test from ./tests/emulator.test.ts[0m
+emulator ...
+[0m[38;5;245m------- output -------[0m
+trials left: 5
+accounts: 10
+
+trials left: 5 - iteration: 0 - block: 0
+attempting Opening...
+initial exp: 3483n finalAnchor: 184n
+exp increased: 3484n finalAnchor: 209162624099329222n
+exp decreased: 3483n finalAnchor: 207091707029038834n
+exp decreased: 3482n finalAnchor: 205041294088157261n
+exp decreased: 3481n finalAnchor: 203011182265502239n
+exp decreased: 3480n finalAnchor: 201001170559903207n
+exp decreased: 3479n finalAnchor: 199011059960300205n
+exp decreased: 3478n finalAnchor: 197040653426039807n
+exp decreased: 3477n finalAnchor: 195089755867366145n
+exp decreased: 3476n finalAnchor: 193158174126105094n
+exp decreased: 3475n finalAnchor: 191245716956539697n
+exp decreased: 3474n finalAnchor: 189352195006474948n
+exp decreased: 3473n finalAnchor: 187477420798490047n
+exp decreased: 3472n finalAnchor: 185621208711376285n
+exp decreased: 3471n finalAnchor: 183783374961758698n
+exp decreased: 3470n finalAnchor: 181963737585899701n
+exp decreased: 3469n finalAnchor: 180162116421682872n
+exp decreased: 3468n finalAnchor: 178378333090775121n
+exp decreased: 3467n finalAnchor: 176612210980965466n
+exp decreased: 3466n finalAnchor: 174863575228678679n
+exp decreased: 3465n finalAnchor: 173132252701662059n
+exp decreased: 3464n finalAnchor: 171418071981843622n
+exp decreased: 3463n finalAnchor: 169720863348360022n
+exp decreased: 3462n finalAnchor: 168040458760752497n
+exp decreased: 3461n finalAnchor: 166376691842329205n
+exp decreased: 3460n finalAnchor: 164729397863692282n
+exp decreased: 3459n finalAnchor: 163098413726428002n
+exp decreased: 3458n finalAnchor: 161483577946958418n
+exp decreased: 3457n finalAnchor: 159884730640552889n
+exp decreased: 3456n finalAnchor: 158301713505497910n
+exp decreased: 3455n finalAnchor: 156734369807423673n
+exp decreased: 3454n finalAnchor: 155182544363785815n
+exp decreased: 3453n finalAnchor: 153646083528500807n
+exp decreased: 3452n finalAnchor: 152124835176733472n
+exp decreased: 3451n finalAnchor: 150618648689835121n
+exp decreased: 3450n finalAnchor: 149127374940430813n
+exp decreased: 3449n finalAnchor: 147650866277654270n
+exp decreased: 3448n finalAnchor: 146188976512528980n
+exp decreased: 3447n finalAnchor: 144741560903494040n
+exp decreased: 3446n finalAnchor: 143308476142073307n
+exp decreased: 3445n finalAnchor: 141889580338686443n
+exp decreased: 3444n finalAnchor: 140484733008600438n
+exp decreased: 3443n finalAnchor: 139093795058020236n
+exp decreased: 3442n finalAnchor: 137716628770317065n
+exp decreased: 3441n finalAnchor: 136353097792393134n
+exp decreased: 3440n finalAnchor: 135003067121181321n
+exp decreased: 3439n finalAnchor: 133666403090278535n
+exp decreased: 3438n finalAnchor: 132342973356711421n
+exp decreased: 3437n finalAnchor: 131032646887833090n
+exp decreased: 3436n finalAnchor: 129735293948349594n
+exp decreased: 3435n finalAnchor: 128450786087474846n
+exp decreased: 3434n finalAnchor: 127178996126212719n
+exp decreased: 3433n finalAnchor: 125919798144765068n
+exp decreased: 3432n finalAnchor: 124673067470064424n
+exp decreased: 3431n finalAnchor: 123438680663430122n
+exp decreased: 3430n finalAnchor: 122216515508346656n
+exp decreased: 3429n finalAnchor: 121006450998363026n
+exp decreased: 3428n finalAnchor: 119808367325111906n
+exp decreased: 3427n finalAnchor: 118622145866447432n
+exp decreased: 3426n finalAnchor: 117447669174700428n
+exp decreased: 3425n finalAnchor: 116284820965049929n
+exp decreased: 3424n finalAnchor: 115133486104009830n
+exp decreased: 3423n finalAnchor: 113993550598029535n
+exp decreased: 3422n finalAnchor: 112864901582207460n
+exp decreased: 3421n finalAnchor: 111747427309116297n
+exp decreased: 3420n finalAnchor: 110641017137738908n
+exp decreased: 3419n finalAnchor: 109545561522513771n
+exp decreased: 3418n finalAnchor: 108460952002488882n
+exp decreased: 3417n finalAnchor: 107387081190583051n
+exp decreased: 3416n finalAnchor: 106323842762953516n
+exp decreased: 3415n finalAnchor: 105271131448468828n
+exp decreased: 3414n finalAnchor: 104228843018285968n
+exp decreased: 3413n finalAnchor: 103196874275530661n
+exp decreased: 3412n finalAnchor: 102175123045079863n
+exp decreased: 3411n finalAnchor: 101163488163445409n
+exp decreased: 3410n finalAnchor: 100161869468757830n
+exp decreased: 3409n finalAnchor: 99170167790849337n
+exp decreased: 3408n finalAnchor: 98188284941434987n
+exp decreased: 3407n finalAnchor: 97216123704391076n
+exp decreased: 3406n finalAnchor: 96253587826129779n
+exp decreased: 3405n finalAnchor: 95300582006069088n
+exp decreased: 3404n finalAnchor: 94357011887197117n
+exp decreased: 3403n finalAnchor: 93422784046729818n
+exp decreased: 3402n finalAnchor: 92497805986861206n
+exp decreased: 3401n finalAnchor: 91581986125605155n
+exp decreased: 3400n finalAnchor: 90675233787727876n
+exp decreased: 3399n finalAnchor: 89777459195770174n
+exp decreased: 3398n finalAnchor: 88888573461158588n
+exp decreased: 3397n finalAnchor: 88008488575404543n
+exp decreased: 3396n finalAnchor: 87137117401390637n
+exp decreased: 3395n finalAnchor: 86274373664743204n
+exp decreased: 3394n finalAnchor: 85420171945290301n
+exp decreased: 3393n finalAnchor: 84574427668604259n
+exp decreased: 3392n finalAnchor: 83737057097627979n
+exp decreased: 3391n finalAnchor: 82907977324384138n
+exp decreased: 3390n finalAnchor: 82087106261766473n
+exp decreased: 3389n finalAnchor: 81274362635412349n
+exp decreased: 3388n finalAnchor: 80469665975655792n
+exp decreased: 3387n finalAnchor: 79672936609560190n
+exp decreased: 3386n finalAnchor: 78884095653029891n
+exp decreased: 3385n finalAnchor: 78103065002999892n
+exp decreased: 3384n finalAnchor: 77329767329702863n
+exp decreased: 3383n finalAnchor: 76564126069012736n
+exp decreased: 3382n finalAnchor: 75806065414864095n
+exp decreased: 3381n finalAnchor: 75055510311746629n
+exp decreased: 3380n finalAnchor: 74312386447273890n
+exp decreased: 3379n finalAnchor: 73576620244825633n
+exp decreased: 3378n finalAnchor: 72848138856263003n
+exp decreased: 3377n finalAnchor: 72126870154715845n
+exp decreased: 3376n finalAnchor: 71412742727441431n
+exp decreased: 3375n finalAnchor: 70705685868753892n
+exp decreased: 3374n finalAnchor: 70005629573023655n
+exp decreased: 3373n finalAnchor: 69312504527746193n
+exp decreased: 3372n finalAnchor: 68626242106679399n
+exp decreased: 3371n finalAnchor: 67946774363048910n
+exp decreased: 3370n finalAnchor: 67274034022820703n
+exp decreased: 3369n finalAnchor: 66607954478040300n
+exp decreased: 3368n finalAnchor: 65948469780237921n
+exp decreased: 3367n finalAnchor: 65295514633898931n
+exp decreased: 3366n finalAnchor: 64649024389998942n
+exp decreased: 3365n finalAnchor: 64008935039602913n
+exp decreased: 3364n finalAnchor: 63375183207527637n
+exp decreased: 3363n finalAnchor: 62747706146066967n
+exp decreased: 3362n finalAnchor: 62126441728779175n
+exp decreased: 3361n finalAnchor: 61511328444335817n
+exp decreased: 3360n finalAnchor: 60902305390431502n
+exp decreased: 3359n finalAnchor: 60299312267753962n
+exp decreased: 3358n finalAnchor: 59702289374013824n
+exp decreased: 3357n finalAnchor: 59111177598033489n
+exp decreased: 3356n finalAnchor: 58525918413894544n
+exp decreased: 3355n finalAnchor: 57946453875143113n
+exp decreased: 3354n finalAnchor: 57372726609052587n
+exp decreased: 3353n finalAnchor: 56804679810943155n
+exp decreased: 3352n finalAnchor: 56242257238557579n
+exp decreased: 3351n finalAnchor: 55685403206492653n
+exp decreased: 3350n finalAnchor: 55134062580685795n
+exp decreased: 3349n finalAnchor: 54588180772956232n
+exp decreased: 3348n finalAnchor: 54047703735600230n
+exp decreased: 3347n finalAnchor: 53512577956039832n
+exp decreased: 3346n finalAnchor: 52982750451524586n
+exp decreased: 3345n finalAnchor: 52458168763885729n
+exp decreased: 3344n finalAnchor: 51938780954342306n
+exp decreased: 3343n finalAnchor: 51424535598358718n
+exp decreased: 3342n finalAnchor: 50915381780553187n
+exp decreased: 3341n finalAnchor: 50411269089656620n
+exp decreased: 3340n finalAnchor: 49912147613521406n
+exp decreased: 3339n finalAnchor: 49417967934179610n
+exp decreased: 3338n finalAnchor: 48928681122950109n
+exp decreased: 3337n finalAnchor: 48444238735594167n
+exp decreased: 3336n finalAnchor: 47964592807518978n
+exp decreased: 3335n finalAnchor: 47489695849028691n
+exp decreased: 3334n finalAnchor: 47019500840622466n
+exp decreased: 3333n finalAnchor: 46553961228339075n
+exp decreased: 3332n finalAnchor: 46093030919147599n
+exp decreased: 3331n finalAnchor: 45636664276383762n
+exp decreased: 3330n finalAnchor: 45184816115231447n
+exp decreased: 3329n finalAnchor: 44737441698248958n
+exp decreased: 3328n finalAnchor: 44294496730939562n
+exp decreased: 3327n finalAnchor: 43855937357365903n
+exp decreased: 3326n finalAnchor: 43421720155807825n
+exp decreased: 3325n finalAnchor: 42991802134463193n
+exp decreased: 3324n finalAnchor: 42566140727191280n
+exp decreased: 3323n finalAnchor: 42144693789298297n
+exp decreased: 3322n finalAnchor: 41727419593364650n
+exp decreased: 3321n finalAnchor: 41314276825113515n
+exp decreased: 3320n finalAnchor: 40905224579320312n
+exp decreased: 3319n finalAnchor: 40500222355762685n
+exp decreased: 3318n finalAnchor: 40099230055210580n
+exp decreased: 3317n finalAnchor: 39702207975456019n
+exp decreased: 3316n finalAnchor: 39309116807382197n
+exp decreased: 3315n finalAnchor: 38919917631071483n
+exp decreased: 3314n finalAnchor: 38534571911951963n
+exp decreased: 3313n finalAnchor: 38153041496982141n
+exp decreased: 3312n finalAnchor: 37775288610873407n
+exp decreased: 3311n finalAnchor: 37401275852349908n
+exp decreased: 3310n finalAnchor: 37030966190445454n
+exp decreased: 3309n finalAnchor: 36664322960837083n
+exp decreased: 3308n finalAnchor: 36301309862214934n
+exp decreased: 3307n finalAnchor: 35941890952688053n
+exp decreased: 3306n finalAnchor: 35586030646225795n
+exp decreased: 3305n finalAnchor: 35233693709134451n
+exp decreased: 3304n finalAnchor: 34884845256568763n
+exp decreased: 3303n finalAnchor: 34539450749077983n
+exp decreased: 3302n finalAnchor: 34197475989186122n
+exp decreased: 3301n finalAnchor: 33858887118006061n
+exp decreased: 3300n finalAnchor: 33523650611887189n
+exp decreased: 3299n finalAnchor: 33191733279096227n
+exp decreased: 3298n finalAnchor: 32863102256530918n
+exp decreased: 3297n finalAnchor: 32537725006466255n
+exp decreased: 3296n finalAnchor: 32215569313332926n
+exp decreased: 3295n finalAnchor: 31896603280527650n
+exp decreased: 3294n finalAnchor: 31580795327255099n
+exp decreased: 3293n finalAnchor: 31268114185401088n
+exp decreased: 3292n finalAnchor: 30958528896436721n
+exp decreased: 3291n finalAnchor: 30652008808353189n
+exp decreased: 3290n finalAnchor: 30348523572626919n
+exp decreased: 3289n finalAnchor: 30048043141214772n
+exp decreased: 3288n finalAnchor: 29750537763578982n
+exp decreased: 3287n finalAnchor: 29455977983741566n
+exp decreased: 3286n finalAnchor: 29164334637367887n
+exp decreased: 3285n finalAnchor: 28875578848879096n
+exp decreased: 3284n finalAnchor: 28589682028593165n
+exp decreased: 3283n finalAnchor: 28306615869894222n
+exp decreased: 3282n finalAnchor: 28026352346429923n
+exp decreased: 3281n finalAnchor: 27748863709336558n
+exp decreased: 3280n finalAnchor: 27474122484491641n
+exp decreased: 3279n finalAnchor: 27202101469793704n
+exp decreased: 3278n finalAnchor: 26932773732469014n
+exp decreased: 3277n finalAnchor: 26666112606404964n
+exp decreased: 3276n finalAnchor: 26402091689509866n
+exp decreased: 3275n finalAnchor: 26140684841098877n
+exp decreased: 3274n finalAnchor: 25881866179305819n
+exp decreased: 3273n finalAnchor: 25625610078520613n
+exp decreased: 3272n finalAnchor: 25371891166852092n
+exp decreased: 3271n finalAnchor: 25120684323615932n
+exp decreased: 3270n finalAnchor: 24871964676847458n
+exp decreased: 3269n finalAnchor: 24625707600839067n
+exp decreased: 3268n finalAnchor: 24381888713702047n
+exp decreased: 3267n finalAnchor: 24140483874952521n
+exp decreased: 3266n finalAnchor: 23901469183121308n
+exp decreased: 3265n finalAnchor: 23664820973387434n
+exp decreased: 3264n finalAnchor: 23430515815235083n
+exp decreased: 3263n finalAnchor: 23198530510133746n
+exp decreased: 3262n finalAnchor: 22968842089241332n
+exp decreased: 3261n finalAnchor: 22741427811130032n
+exp decreased: 3260n finalAnchor: 22516265159534685n
+exp decreased: 3259n finalAnchor: 22293331841123451n
+exp decreased: 3258n finalAnchor: 22072605783290545n
+exp decreased: 3257n finalAnchor: 21854065131970837n
+exp decreased: 3256n finalAnchor: 21637688249476076n
+exp decreased: 3255n finalAnchor: 21423453712352551n
+exp decreased: 3254n finalAnchor: 21211340309259951n
+exp decreased: 3253n finalAnchor: 21001327038871239n
+exp decreased: 3252n finalAnchor: 20793393107793306n
+exp decreased: 3251n finalAnchor: 20587517928508223n
+exp decreased: 3250n finalAnchor: 20383681117334875n
+exp decreased: 3249n finalAnchor: 20181862492410767n
+exp decreased: 3248n finalAnchor: 19982042071693829n
+exp decreased: 3247n finalAnchor: 19784200070983989n
+exp decreased: 3246n finalAnchor: 19588316901964345n
+exp decreased: 3245n finalAnchor: 19394373170261728n
+exp decreased: 3244n finalAnchor: 19202349673526463n
+exp decreased: 3243n finalAnchor: 19012227399531152n
+exp decreased: 3242n finalAnchor: 18823987524288269n
+exp decreased: 3241n finalAnchor: 18637611410186405n
+exp decreased: 3240n finalAnchor: 18453080604144956n
+exp decreased: 3239n finalAnchor: 18270376835787085n
+exp decreased: 3238n finalAnchor: 18089482015630777n
+exp decreased: 3237n finalAnchor: 17910378233297799n
+exp decreased: 3236n finalAnchor: 17733047755740395n
+exp decreased: 3235n finalAnchor: 17557473025485540n
+exp decreased: 3234n finalAnchor: 17383636658896574n
+exp decreased: 3233n finalAnchor: 17211521444452053n
+exp decreased: 3232n finalAnchor: 17041110341041637n
+exp decreased: 3231n finalAnchor: 16872386476278848n
+exp decreased: 3230n finalAnchor: 16705333144830543n
+exp decreased: 3229n finalAnchor: 16539933806762914n
+exp decreased: 3228n finalAnchor: 16376172085903875n
+exp decreased: 3227n finalAnchor: 16214031768221659n
+exp decreased: 3226n finalAnchor: 16053496800219464n
+exp decreased: 3225n finalAnchor: 15894551287346004n
+exp decreased: 3224n finalAnchor: 15737179492421786n
+exp decreased: 3223n finalAnchor: 15581365834080976n
+exp decreased: 3222n finalAnchor: 15427094885228689n
+exp decreased: 3221n finalAnchor: 15274351371513554n
+exp decreased: 3220n finalAnchor: 15123120169815400n
+exp decreased: 3219n finalAnchor: 14973386306747921n
+exp decreased: 3218n finalAnchor: 14825134957176159n
+exp decreased: 3217n finalAnchor: 14678351442748672n
+exp decreased: 3216n finalAnchor: 14533021230444230n
+exp decreased: 3215n finalAnchor: 14389129931132901n
+exp decreased: 3214n finalAnchor: 14246663298151387n
+exp decreased: 3213n finalAnchor: 14105607225892462n
+exp decreased: 3212n finalAnchor: 13965947748408379n
+exp decreased: 3211n finalAnchor: 13827671038028098n
+exp decreased: 3210n finalAnchor: 13690763403988215n
+exp decreased: 3209n finalAnchor: 13555211291077441n
+exp decreased: 3208n finalAnchor: 13421001278294496n
+exp decreased: 3207n finalAnchor: 13288120077519303n
+exp decreased: 3206n finalAnchor: 13156554532197330n
+exp decreased: 3205n finalAnchor: 13026291616036960n
+exp decreased: 3204n finalAnchor: 12897318431719762n
+exp decreased: 3203n finalAnchor: 12769622209623527n
+exp decreased: 3202n finalAnchor: 12643190306557948n
+exp decreased: 3201n finalAnchor: 12518010204512820n
+exp decreased: 3200n finalAnchor: 12394069509418633n
+exp decreased: 3199n finalAnchor: 12271355949919439n
+exp decreased: 3198n finalAnchor: 12149857376157860n
+exp decreased: 3197n finalAnchor: 12029561758572139n
+exp decreased: 3196n finalAnchor: 11910457186705088n
+exp decreased: 3195n finalAnchor: 11792531868024840n
+exp decreased: 3194n finalAnchor: 11675774126757267n
+exp decreased: 3193n finalAnchor: 11560172402729967n
+exp decreased: 3192n finalAnchor: 11445715250227690n
+exp decreased: 3191n finalAnchor: 11332391336859099n
+exp decreased: 3190n finalAnchor: 11220189442434752n
+exp decreased: 3189n finalAnchor: 11109098457856190n
+exp decreased: 3188n finalAnchor: 10999107384016030n
+exp decreased: 3187n finalAnchor: 10890205330708940n
+exp decreased: 3186n finalAnchor: 10782381515553406n
+exp decreased: 3185n finalAnchor: 10675625262924164n
+exp decreased: 3184n finalAnchor: 10569926002895212n
+exp decreased: 3183n finalAnchor: 10465273270193279n
+exp decreased: 3182n finalAnchor: 10361656703161663n
+exp decreased: 3181n finalAnchor: 10259066042734320n
+exp decreased: 3180n finalAnchor: 10157491131420118n
+exp decreased: 3179n finalAnchor: 10056921912297147n
+exp decreased: 3178n finalAnchor: 9957348428016977n
+exp decreased: 3177n finalAnchor: 9858760819818789n
+exp decreased: 3176n finalAnchor: 9761149326553257n
+exp decreased: 3175n finalAnchor: 9664504283716096n
+exp decreased: 3174n finalAnchor: 9568816122491184n
+exp decreased: 3173n finalAnchor: 9474075368803152n
+exp decreased: 3172n finalAnchor: 9380272642379359n
+exp decreased: 3171n finalAnchor: 9287398655821147n
+exp decreased: 3170n finalAnchor: 9195444213684304n
+exp decreased: 3169n finalAnchor: 9104400211568618n
+exp decreased: 3168n finalAnchor: 9014257635216454n
+exp decreased: 3167n finalAnchor: 8925007559620251n
+finalAnchor: 8925007559620251 vs. baseAnchor: 184
+returning finalAnchor: 8925007559620251
+initial exp: 1n finalAnchor: 4503599627370495n
+exp increased: 2n finalAnchor: 18014398509481980n
+exp decreased: 1n finalAnchor: 9007199254740990n
+finalAnchor: 9007199254740990 vs. baseAnchor: 4503599627370495
+returning finalAnchor: 9007199254740990
+initial exp: 52n finalAnchor: 7566954299535448n
+exp increased: 53n finalAnchor: 12821945351522482n
+exp decreased: 52n finalAnchor: 12694995397547012n
+exp decreased: 51n finalAnchor: 12569302373808922n
+exp decreased: 50n finalAnchor: 12444853835454379n
+exp decreased: 49n finalAnchor: 12321637460845919n
+exp decreased: 48n finalAnchor: 12199641050342494n
+exp decreased: 47n finalAnchor: 12078852525091579n
+exp decreased: 46n finalAnchor: 11959259925833246n
+exp decreased: 45n finalAnchor: 11840851411716085n
+exp decreased: 44n finalAnchor: 11723615259124837n
+exp decreased: 43n finalAnchor: 11607539860519641n
+exp decreased: 42n finalAnchor: 11492613723286773n
+exp decreased: 41n finalAnchor: 11378825468600765n
+exp decreased: 40n finalAnchor: 11266163830297787n
+exp decreased: 39n finalAnchor: 11154617653760185n
+exp decreased: 38n finalAnchor: 11044175894812065n
+exp decreased: 37n finalAnchor: 10934827618625807n
+exp decreased: 36n finalAnchor: 10826561998639413n
+exp decreased: 35n finalAnchor: 10719368315484567n
+exp decreased: 34n finalAnchor: 10613235955925314n
+exp decreased: 33n finalAnchor: 10508154411807241n
+exp decreased: 32n finalAnchor: 10404113279017071n
+exp decreased: 31n finalAnchor: 10301102256452545n
+exp decreased: 30n finalAnchor: 10199111145002520n
+exp decreased: 29n finalAnchor: 10098129846537148n
+exp decreased: 28n finalAnchor: 9998148362908068n
+exp decreased: 27n finalAnchor: 9899156794958483n
+exp decreased: 26n finalAnchor: 9801145341543052n
+exp decreased: 25n finalAnchor: 9704104298557478n
+exp decreased: 24n finalAnchor: 9608024057977701n
+exp decreased: 23n finalAnchor: 9512895106908614n
+exp decreased: 22n finalAnchor: 9418708026642193n
+exp decreased: 21n finalAnchor: 9325453491724943n
+exp decreased: 20n finalAnchor: 9233122269034597n
+exp decreased: 19n finalAnchor: 9141705216865938n
+exp decreased: 18n finalAnchor: 9051193284025681n
+exp decreased: 17n finalAnchor: 8961577508936318n
+finalAnchor: 8961577508936318 vs. baseAnchor: 7566954299535448
+returning finalAnchor: 8961577508936318
+initial exp: 34n finalAnchor: 9006273933384437n
+exp increased: 35n finalAnchor: 12758312475604960n
+exp decreased: 34n finalAnchor: 12631992550103921n
+exp decreased: 33n finalAnchor: 12506923316934575n
+exp decreased: 32n finalAnchor: 12383092393004530n
+exp decreased: 31n finalAnchor: 12260487517826267n
+exp decreased: 30n finalAnchor: 12139096552303235n
+exp decreased: 29n finalAnchor: 12018907477527955n
+exp decreased: 28n finalAnchor: 11899908393592035n
+exp decreased: 27n finalAnchor: 11782087518407955n
+exp decreased: 26n finalAnchor: 11665433186542530n
+exp decreased: 25n finalAnchor: 11549933848061911n
+exp decreased: 24n finalAnchor: 11435578067388030n
+exp decreased: 23n finalAnchor: 11322354522166367n
+exp decreased: 22n finalAnchor: 11210252002144918n
+exp decreased: 21n finalAnchor: 11099259408064275n
+exp decreased: 20n finalAnchor: 10989365750558688n
+exp decreased: 19n finalAnchor: 10880560149068008n
+exp decreased: 18n finalAnchor: 10772831830760404n
+exp decreased: 17n finalAnchor: 10666170129465746n
+exp decreased: 16n finalAnchor: 10560564484619551n
+exp decreased: 15n finalAnchor: 10456004440217377n
+exp decreased: 14n finalAnchor: 10352479643779581n
+exp decreased: 13n finalAnchor: 10249979845326318n
+exp decreased: 12n finalAnchor: 10148494896362691n
+exp decreased: 11n finalAnchor: 10048014748873952n
+exp decreased: 10n finalAnchor: 9948529454330645n
+exp decreased: 9n finalAnchor: 9850029162703609n
+exp decreased: 8n finalAnchor: 9752504121488722n
+exp decreased: 7n finalAnchor: 9655944674741309n
+exp decreased: 6n finalAnchor: 9560341262120108n
+exp decreased: 5n finalAnchor: 9465684417940701n
+exp decreased: 4n finalAnchor: 9371964770238318n
+exp decreased: 3n finalAnchor: 9279173039839918n
+exp decreased: 2n finalAnchor: 9187300039445464n
+exp decreased: 1n finalAnchor: 9096336672718281n
+exp decreased: 0n finalAnchor: 9006273933384437n
+finalAnchor: 9006273933384437 vs. baseAnchor: 9006273933384437
+returning finalAnchor: 9006273933384437
+updated anchors: +[
++  d111d0aee1e3e3423b06e6a7ba5a94b0a8a3d36d521dfc9533493408_mqTtUrFRxUNZg3KJJqQkdLHQ5KLKiegg: 8925007559620251,
++  _: 9007199254740990,
++  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 9006273933384437
+]
+Opening pool with 2 dirac utxos and 1 param utxos
+
+trials left: 5 - iteration: 1 - block: 1000
+pool.swappingsFor balance +[
++  _: 236076042,
++  028bc6aecfd772c0c31b4887ab3a6342792439d0259f7fcd056956e5_: 9007199254740991,
++  660d4c635e46108cba37580be458addd8a08bbbed7cd587f1f362261_: 4683367603124854,
++  d111d0aee1e3e3423b06e6a7ba5a94b0a8a3d36d521dfc9533493408_mqTtUrFRxUNZg3KJJqQkdLHQ5KLKiegg: 4570081404200697
+]
+pool.swappingsFor sellableBalance +[
++  _: 236076042,
++  d111d0aee1e3e3423b06e6a7ba5a94b0a8a3d36d521dfc9533493408_mqTtUrFRxUNZg3KJJqQkdLHQ5KLKiegg: 4570081404200697
+]
+swappingsFor()
+buyable_: +[
++  _: 316023641,
++  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 1666247298405597,
++  d111d0aee1e3e3423b06e6a7ba5a94b0a8a3d36d521dfc9533493408_mqTtUrFRxUNZg3KJJqQkdLHQ5KLKiegg: 2218558925270147
+]
+sellable_: [
++  _: 236076042,
++  d111d0aee1e3e3423b06e6a7ba5a94b0a8a3d36d521dfc9533493408_mqTtUrFRxUNZg3KJJqQkdLHQ5KLKiegg: 4570081404200697
+]
+
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          buyingAsset: Asset(76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57, n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0)
+          sellingAsset: Asset(, )
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+
+          ---------------------------
+          maxBuying:     24021121312890
+          maxSelling:    236076042
+          maxBuyingA0:   432726051975011438531396722200
+          maxSellingA0:  2967311155110014770046724
+          maxSwapA0:     2967311155110014770046724
+          spotBuying:    12569302373808922
+          spotSelling:   18014398509481980
+          expBuying:     34
+          expSelling:    1
+          buyingAmount:  164718858
+          sellingAmount: 236076042
+          ---------------------------
+        
+
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          buyingAsset: Asset(d111d0aee1e3e3423b06e6a7ba5a94b0a8a3d36d521dfc9533493408, mqTtUrFRxUNZg3KJJqQkdLHQ5KLKiegg)
+          sellingAsset: Asset(, )
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+
+          ---------------------------
+          maxBuying:     13813827548028
+          maxSelling:    236076042
+          maxBuyingA0:   248847794391436717691850535440
+          maxSellingA0:  48405337154890162417528458
+          maxSwapA0:     48405337154890162417528458
+          spotBuying:    205041294088157249
+          spotSelling:   18014398509481980
+          expBuying:     315
+          expSelling:    1
+          buyingAmount:  2687035991
+          sellingAmount: 236076042
+          ---------------------------
+        
+
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          buyingAsset: Asset(, )
+          sellingAsset: Asset(d111d0aee1e3e3423b06e6a7ba5a94b0a8a3d36d521dfc9533493408, mqTtUrFRxUNZg3KJJqQkdLHQ5KLKiegg)
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+
+          ---------------------------
+          maxBuying:     306023641
+          maxSelling:    8233623429193
+          maxBuyingA0:   63374958205931752732767261
+          maxSellingA0:  74161886815245144046819721070
+          maxSwapA0:     63374958205931752732767261
+          spotBuying:    9007199254740990
+          spotSelling:   207091707029038821
+          expBuying:     0
+          expSelling:    316
+          buyingAmount:  306023641
+          sellingAmount: 7036033779
+          ---------------------------
+        
+
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          buyingAsset: Asset(76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57, n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0)
+          sellingAsset: Asset(d111d0aee1e3e3423b06e6a7ba5a94b0a8a3d36d521dfc9533493408, mqTtUrFRxUNZg3KJJqQkdLHQ5KLKiegg)
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+
+          ---------------------------
+          maxBuying:     24021121312890
+          maxSelling:    8233623429193
+          maxBuyingA0:   4974575017438016245254297702690
+          maxSellingA0:  103490902513604331506578659946
+          maxSwapA0:     103490902513604331506578659946
+          spotBuying:    12569302373808922
+          spotSelling:   207091707029038821
+          expBuying:     34
+          expSelling:    316
+          buyingAmount:  499734653783
+          sellingAmount: 8233623429184
+          ---------------------------
+        
+swappingsFor()
+buyable_: +[
++  _: 316023641,
++  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 1666247298405597,
++  d111d0aee1e3e3423b06e6a7ba5a94b0a8a3d36d521dfc9533493408_mqTtUrFRxUNZg3KJJqQkdLHQ5KLKiegg: 2218558925270147
+]
+sellable_: [
++  _: 236076042,
++  d111d0aee1e3e3423b06e6a7ba5a94b0a8a3d36d521dfc9533493408_mqTtUrFRxUNZg3KJJqQkdLHQ5KLKiegg: 4570081404200697
+]
+
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          buyingAsset: Asset(76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57, n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0)
+          sellingAsset: Asset(, )
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+
+          ---------------------------
+          maxBuying:     3124395881224
+          maxSelling:    236076042
+          maxBuyingA0:   56284112505753263021848343520
+          maxSellingA0:  2982110803802020358360682
+          maxSwapA0:     2982110803802020358360682
+          spotBuying:    12631992550103921
+          spotSelling:   18014398509481980
+          expBuying:     34
+          expSelling:    1
+          buyingAmount:  165540403
+          sellingAmount: 236076041
+          ---------------------------
+        
+
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          buyingAsset: Asset(d111d0aee1e3e3423b06e6a7ba5a94b0a8a3d36d521dfc9533493408, mqTtUrFRxUNZg3KJJqQkdLHQ5KLKiegg)
+          sellingAsset: Asset(, )
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+
+          ---------------------------
+          maxBuying:     13813827548028
+          maxSelling:    236076042
+          maxBuyingA0:   248847794391436717691850535440
+          maxSellingA0:  48405337154890162417528458
+          maxSwapA0:     48405337154890162417528458
+          spotBuying:    205041294088157249
+          spotSelling:   18014398509481980
+          expBuying:     315
+          expSelling:    1
+          buyingAmount:  2687035991
+          sellingAmount: 236076042
+          ---------------------------
+        
+
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          buyingAsset: Asset(, )
+          sellingAsset: Asset(d111d0aee1e3e3423b06e6a7ba5a94b0a8a3d36d521dfc9533493408, mqTtUrFRxUNZg3KJJqQkdLHQ5KLKiegg)
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+
+          ---------------------------
+          maxBuying:     306023641
+          maxSelling:    8233623429193
+          maxBuyingA0:   63374958205931752732767261
+          maxSellingA0:  74161886815245144046819721070
+          maxSwapA0:     63374958205931752732767261
+          spotBuying:    9007199254740990
+          spotSelling:   207091707029038821
+          expBuying:     0
+          expSelling:    316
+          buyingAmount:  306023641
+          sellingAmount: 7036033779
+          ---------------------------
+        
+
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          buyingAsset: Asset(76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57, n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0)
+          sellingAsset: Asset(d111d0aee1e3e3423b06e6a7ba5a94b0a8a3d36d521dfc9533493408, mqTtUrFRxUNZg3KJJqQkdLHQ5KLKiegg)
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+
+          ---------------------------
+          maxBuying:     3124395881224
+          maxSelling:    8233623429193
+          maxBuyingA0:   647036476477176182096000996904
+          maxSellingA0:  104007069817927074892535165753
+          maxSwapA0:     104007069817927074892535165753
+          spotBuying:    12631992550103921
+          spotSelling:   207091707029038821
+          expBuying:     34
+          expSelling:    316
+          buyingAmount:  502227111408
+          sellingAmount: 8233623429179
+          ---------------------------
+        
+attempting Closing...
+
+trials left: 5 - iteration: 2 - block: 2000
+attempting Opening...
+initial exp: 1n finalAnchor: 8822465829509980n
+exp increased: 2n finalAnchor: 8999797392683130n
+exp decreased: 1n finalAnchor: 8910690487805079n
+finalAnchor: 8910690487805079 vs. baseAnchor: 8822465829509980
+returning finalAnchor: 8910690487805079
+initial exp: 43n finalAnchor: 100n
+exp increased: 44n finalAnchor: 154n
+exp decreased: 43n finalAnchor: 153n
+finalAnchor: 153 vs. baseAnchor: 100
+returning finalAnchor: 153
+initial exp: 1n finalAnchor: 7220700316233479n
+exp increased: 2n finalAnchor: 8474294121135124n
+exp decreased: 1n finalAnchor: 7822425342586268n
+finalAnchor: 7822425342586268 vs. baseAnchor: 7220700316233479
+returning finalAnchor: 7822425342586268
+Opening pool with 1 dirac utxos and 1 param utxos
+
+trials left: 5 - iteration: 3 - block: 2001
+pool.swappingsFor balance +[
++  _: 899125870,
++  028bc6aecfd772c0c31b4887ab3a6342792439d0259f7fcd056956e5_: 9007199254740991,
++  660d4c635e46108cba37580be458addd8a08bbbed7cd587f1f362261_: 4683367603124854,
++  d111d0aee1e3e3423b06e6a7ba5a94b0a8a3d36d521dfc9533493408_mqTtUrFRxUNZg3KJJqQkdLHQ5KLKiegg: 9007199254740991,
++  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 3332494596811194
+]
+pool.swappingsFor sellableBalance +[
++  _: 899125870,
++  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 3332494596811194
+]
+swappingsFor()
+buyable_: +[
++  _: 900000000,
++  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 1
+]
+sellable_: [
++  _: 899125870,
++  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 3332494596811194
+]
+
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          buyingAsset: Asset(76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57, n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0)
+          sellingAsset: Asset(, )
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+looping
+
+              maxBuying:     1
+              maxSelling:    899125870
+              maxBuyingA0:   8999797392683129
+              maxSellingA0:  91710838740
+              maxSwapA0:     91710838740
+              spotBuying:    102
+              spotSelling:   8999797392683129
+              expBuying:     -40
+              expSelling:    1
+              buyingAmount:  0
+              sellingAmount: 0
+              sellingLimit:  false
+              buyingLimit:   false
+              sellingADA:    true
+            
+
+              maxBuying:     1
+              maxSelling:    899125870
+              maxBuyingA0:   9089795366609961
+              maxSellingA0:  91710838740
+              maxSwapA0:     91710838740
+              spotBuying:    102
+              spotSelling:   9089795366609961
+              expBuying:     -40
+              expSelling:    2
+              buyingAmount:  0
+              sellingAmount: 0
+              sellingLimit:  true
+              buyingLimit:   false
+              sellingADA:    true
+            
+
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          buyingAsset: Asset(, )
+          sellingAsset: Asset(76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57, n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0)
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+
+          ---------------------------
+          maxBuying:     890000000
+          maxSelling:    1
+          maxBuyingA0:   181560000000
+          maxSellingA0:  8910690487805079
+          maxSwapA0:     181560000000
+          spotBuying:    8910690487805079
+          spotSelling:   204
+          expBuying:     0
+          expSelling:    29
+          buyingAmount:  890000000
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+subSwapA: 672461650 bought
+swappingsFor()
+buyable_: +[
++  _: 672461650
+]
+sellable_: [
++  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 1
+]
+
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          buyingAsset: Asset(, )
+          sellingAsset: Asset(76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57, n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0)
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+
+          ---------------------------
+          maxBuying:     662461650
+          maxSelling:    1
+          maxBuyingA0:   135142176600
+          maxSellingA0:  8910690487805079
+          maxSwapA0:     135142176600
+          spotBuying:    8910690487805079
+          spotSelling:   204
+          expBuying:     0
+          expSelling:    29
+          buyingAmount:  662461650
+          sellingAmount: 1
+          ---------------------------
+        
+Swapping.boundary()
+corrupting bought spot...
+boughtAssetForSale (old): 
+        buyingAmm  8910697687805080 > 
+        spotBuying 8999797392683129
+bought spot corruption failed: 0
+returning corruptBoughtSpot
+corrupting sold spot...
+boughtAssetForSale (new):
+        sellingAmm  204 > 
+        spotSelling 202
+sold spot corruption failed: 0
+returning corruptSoldSpot
+corrupting sold amount... randomly? false
+corrupting bought amount... randomly? false
+[0m[38;5;245m----- output end -----[0m
+emulator ... [0m[31mFAILED[0m [0m[38;5;245m(1s)[0m
+[0m[38;5;245mrunning 0 tests from ./tests/types.test.ts[0m
+
+[0m[1m[37m[41m ERRORS [0m
+
+emulator [0m[38;5;245m=> ./tests/emulator.test.ts:19:6[0m
+[0m[1m[31merror[0m: AssertionError: buying more should fail: Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 7e41e8ae653acb2fbe8cd9bdd38914cda2b30944487cd1592d0de0f5, 
+   +     +  virtual: +[
+   +     +  +  _: 1113836310975635,
+   +     +  +  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 2,
+   +     +  +  797af673fa493f59d14698a729277d3d6b4d8fb6b05f8b8b9b1b8a99_: 7822425342586269
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  _: 8,
+   +     +  +  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 51,
+   +     +  +  797af673fa493f59d14698a729277d3d6b4d8fb6b05f8b8b9b1b8a99_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  _: 100,
+   +     +  +  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 100,
+   +     +  +  797af673fa493f59d14698a729277d3d6b4d8fb6b05f8b8b9b1b8a99_: 12
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 7e41e8ae653acb2fbe8cd9bdd38914cda2b30944487cd1592d0de0f5,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: ff8ca32429590edef7c2e4d4ff15c3f6c9115cc2a6c6aab810616b8271fba535),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 8428acbb06039af70c75fc9fbee9b0fc795605aeffc1f275ded27400d8c1e375),
+   +     +  anchorPrices: +[
+   +     +  +  _: 8910690487805079,
+   +     +  +  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 153,
+   +     +  +  797af673fa493f59d14698a729277d3d6b4d8fb6b05f8b8b9b1b8a99_: 7822425342586268
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 900000000,
+   +  +  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 1
+   +  ]
+     )
+  boughtAsset:  Asset(, )
+  soldAsset:    Asset(76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57, n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0)
+  boughtAmount: 662461650
+  soldAmount:   1
+  boughtSpot:   8910690487805079
+  soldSpot:     204
+  (boughtA0:    135142176600)
+  (soldA0:      8910690487805079)
+  boughtExp:    0
+  soldExp:      29
+  spotPrice:    2.2893848717917952e-14
+  eff.Price:    1.5095213436128717e-9
+  maxBuying:    672461650
+  (maxBuyingA0: 137182176600)
+)
+~~~>
+Swapping (
+  paramUtxo: ParamUtxo (
+     +  param: Param (
+   +     +  owner: 7e41e8ae653acb2fbe8cd9bdd38914cda2b30944487cd1592d0de0f5, 
+   +     +  virtual: +[
+   +     +  +  _: 1113836310975635,
+   +     +  +  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 2,
+   +     +  +  797af673fa493f59d14698a729277d3d6b4d8fb6b05f8b8b9b1b8a99_: 7822425342586269
+   +     +  ], 
+   +     +  weights: +[
+   +     +  +  _: 8,
+   +     +  +  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 51,
+   +     +  +  797af673fa493f59d14698a729277d3d6b4d8fb6b05f8b8b9b1b8a99_: 1
+   +     +  ]
+   +     +  jumpSizes: +[
+   +     +  +  _: 100,
+   +     +  +  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 100,
+   +     +  +  797af673fa493f59d14698a729277d3d6b4d8fb6b05f8b8b9b1b8a99_: 12
+   +     +  ], 
+   +     +  active: 1
+   +     )
+     )
+  diracUtxo: DiracUtxo (
+     +  dirac: Dirac(
+   +     +  owner: 7e41e8ae653acb2fbe8cd9bdd38914cda2b30944487cd1592d0de0f5,
+   +     +  threadNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: ff8ca32429590edef7c2e4d4ff15c3f6c9115cc2a6c6aab810616b8271fba535),
+   +     +  paramNFT: IdNFT (Currency(49a0b0e032416036152977ff1fac1aed683512166af02b36f2eb1851), Hash: 8428acbb06039af70c75fc9fbee9b0fc795605aeffc1f275ded27400d8c1e375),
+   +     +  anchorPrices: +[
+   +     +  +  _: 8910690487805079,
+   +     +  +  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 153,
+   +     +  +  797af673fa493f59d14698a729277d3d6b4d8fb6b05f8b8b9b1b8a99_: 7822425342586268
+   +     +  ],
+   +     ),
+     +  balance: +[
+   +  +  _: 900000000,
+   +  +  76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57_n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0: 1
+   +  ]
+     )
+  boughtAsset:  Asset(, )
+  soldAsset:    Asset(76624f1e02e238cec51ace296201cb8469addb41e55b4fb788653b57, n0QeAamH409ZaBzLpZBuq9Xcsr7fdqv0)
+  boughtAmount: 662461651
+  soldAmount:   1
+  boughtSpot:   8910690487805079
+  soldSpot:     204
+  (boughtA0:    135142176804)
+  (soldA0:      8910690487805079)
+  boughtExp:    0
+  soldExp:      29
+  spotPrice:    2.2893848717917952e-14
+  eff.Price:    1.509521341334217e-9
+  maxBuying:    672461650
+  (maxBuyingA0: 137182176600)
+)
+    throw new AssertionError(msg);
+[0m[31m          ^[0m
+    at [0m[1m[3massert[0m ([0m[36mhttps://deno.land/std@0.167.0/testing/asserts.ts[0m:[0m[33m141[0m:[0m[33m11[0m)
+    at [0m[1m[3mSwapping.corruptBoughtAmnt[0m ([0m[36mfile:///Users/ChrisHiatt/Projects/adaswap/vasil_2022Q3/euclid-offchain/src/chain/actions/swapping.ts[0m:[0m[33m740[0m:[0m[33m5[0m)
+    at [0m[1m[3mSwapping.corruptAll[0m ([0m[36mfile:///Users/ChrisHiatt/Projects/adaswap/vasil_2022Q3/euclid-offchain/src/chain/actions/swapping.ts[0m:[0m[33m706[0m:[0m[33m12[0m)
+    at [0m[36mfile:///Users/ChrisHiatt/Projects/adaswap/vasil_2022Q3/euclid-offchain/tests/emulator.test.ts[0m:[0m[33m81[0m:[0m[33m44[0m
+    at async [0m[36mfile:///Users/ChrisHiatt/Projects/adaswap/vasil_2022Q3/euclid-offchain/tests/emulator.test.ts[0m:[0m[33m71[0m:[0m[33m24[0m
+
+[0m[1m[37m[41m FAILURES [0m
+
+emulator [0m[38;5;245m=> ./tests/emulator.test.ts:19:6[0m
+
+[0m[31mFAILED[0m | 0 passed | 1 failed [0m[38;5;245m(5s)[0m
+
+[0m[1m[31merror[0m: Test failed
