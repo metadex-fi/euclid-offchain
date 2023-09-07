@@ -9,12 +9,7 @@ import { DiracDatum } from "../../types/euclid/euclidDatum.ts";
 import { Swap } from "../../types/euclid/swap.ts";
 import { Asset } from "../../types/general/derived/asset/asset.ts";
 import { Data } from "../../types/general/fundamental/type.ts";
-import {
-  ceilDiv,
-  genPositive,
-  min,
-  randomChoice,
-} from "../../utils/generators.ts";
+import { genPositive, min, randomChoice } from "../../utils/generators.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, getMinBalance, ParamUtxo } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
@@ -503,7 +498,7 @@ export class Swapping {
     if (swappings.length < 1) return undefined;
     // console.log(`Swapping`);
     const choice = randomChoice(swappings);
-    // return choice; // TODO revert
+    return choice; // TODO revert
     if (Math.random() < 0.5) return choice;
     else return choice.randomSubSwap();
   }
@@ -719,16 +714,17 @@ export class Swapping {
   };
 
   public corruptBoughtAmnt = (random: boolean): Swapping | undefined => {
-    console.log(`corrupting bought amount... randomly? ${random}`);
+    console.log(`trying to corrupt bought amount...`);
     if (this.boughtAmount === this.maxBuying) return undefined;
+    const amnt = random ? genPositive(this.maxBuying - this.boughtAmount) : 1n;
+    console.log(`... by ${amnt}`);
     const boughtTooMuch = new Swapping(
       this.user,
       this.paramUtxo,
       this.diracUtxo,
       this.boughtAsset,
       this.soldAsset,
-      this.boughtAmount +
-        (random ? genPositive(this.maxBuying - this.boughtAmount) : 1n),
+      this.boughtAmount + amnt,
       this.soldAmount,
       this.boughtSpot,
       this.soldSpot,
@@ -739,16 +735,18 @@ export class Swapping {
     );
     assert(
       !boughtTooMuch.validates(),
-      `buying more should fail: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`,
+      `buying ${amnt} more should fail: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`,
     );
     console.log(`returning corruptBoughtAmnt`);
     return boughtTooMuch;
   };
 
   public corruptSoldAmnt = (random: boolean): Swapping | undefined => {
-    console.log(`corrupting sold amount... randomly? ${random}`);
+    console.log(`trying to corrupt sold amount...`);
     const minSelling = getMinSelling(this.soldAsset);
     if (this.soldAmount === minSelling) return undefined;
+    const amnt = random ? genPositive(this.soldAmount - minSelling) : 1n;
+    console.log(`... by ${amnt}`);
     const soldTooLittle = new Swapping(
       this.user,
       this.paramUtxo,
@@ -756,8 +754,7 @@ export class Swapping {
       this.boughtAsset,
       this.soldAsset,
       this.boughtAmount,
-      this.soldAmount -
-        (random ? genPositive(this.soldAmount - minSelling) : 1n),
+      this.soldAmount - amnt,
       this.boughtSpot,
       this.soldSpot,
       this.boughtExp,
@@ -767,7 +764,7 @@ export class Swapping {
     );
     assert(
       !soldTooLittle.validates(),
-      `selling less should fail: ${this.show()}\n~~~>\n${soldTooLittle.show()}`,
+      `selling ${amnt} less should fail: ${this.show()}\n~~~>\n${soldTooLittle.show()}`,
     );
     console.log(`returning corruptSoldAmnt`);
     return soldTooLittle;

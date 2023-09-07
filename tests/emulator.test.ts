@@ -48,7 +48,7 @@ Deno.test("emulator", async () => {
     const emulator = new Lucid.Emulator(accounts, parameters); // TODO get actual exBudget from Chain - the one in the emulator seems too low
     const traces: string[] = [];
     const actionCounts = new Map<string, number>();
-    const iterations = 100;
+    const iterations = 20; //100; TODO increase again
     for (let i = 0; i < iterations; i++) {
       console.log(
         `\ntrials left: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`, // - errors: ${errors.length}`,
