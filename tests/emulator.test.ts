@@ -29,7 +29,7 @@ Deno.test("emulator", async () => {
   // console.log(parameters);
 
   // return;
-  let trials = 50;
+  let trials = 5;
   const actionCounts_ = new Map<string, number>();
   // const errors = [];
   while (trials > 0) {

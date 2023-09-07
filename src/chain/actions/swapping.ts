@@ -9,7 +9,12 @@ import { DiracDatum } from "../../types/euclid/euclidDatum.ts";
 import { Swap } from "../../types/euclid/swap.ts";
 import { Asset } from "../../types/general/derived/asset/asset.ts";
 import { Data } from "../../types/general/fundamental/type.ts";
-import { genPositive, min, randomChoice } from "../../utils/generators.ts";
+import {
+  ceilDiv,
+  genPositive,
+  min,
+  randomChoice,
+} from "../../utils/generators.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, getMinBalance, ParamUtxo } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
@@ -18,7 +23,7 @@ import { Dirac } from "../../types/euclid/dirac.ts";
 import { genNonNegative } from "../../mod.ts";
 import { getMinSelling } from "../mod.ts";
 
-// const compareSubSwaps = true;
+const compareSubSwaps = true;
 const sellingADAtolerance = 0;
 
 export class Swapping {
@@ -356,7 +361,8 @@ export class Swapping {
       Assets.singleton(this.boughtAsset),
       // TODO what
       // adding minBalance here because we are removing it again in swappingsFor
-      amntIsSold ? this.boughtAmount : amount, //+ getMinBalance(this.boughtAsset),
+      (amntIsSold ? this.boughtAmount : amount) +
+        getMinBalance(this.boughtAsset),
     );
     assert(
       swappings.length <= 1,
@@ -366,75 +372,87 @@ export class Swapping {
     );
     const subSwapA = swappings.length > 0 ? swappings[0] : undefined;
     if (subSwapA) subSwapA.setMaxBuying(amntIsSold ? this.maxBuying : amount); // per definition of a subSwap
-    // if (compareSubSwaps) {
-    //   const subSwapB = this.subSwapB(amount, amntIsSold);
-    //   if (subSwapA) {
-    //     assert(subSwapB, `subSwapB must be defined, but got undefined`);
-    //     assert(subSwapA.equalNumbers(subSwapB), `SUCCESS! subSwap-thesis confirmed:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
-    //     // assert(subSwapA.show() === subSwapB.show(), `SUCCESS! ... but only show()-difference:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
-    //     // the above detects only a difference in maxBuying, so we're not using it. TODO/NOTE the other variant is correct, this one wrong
-    //   } else assert(subSwapB === undefined, `subSwapB must be undefined, but got:\n${subSwapB?.show()}`);
-    //   return subSwapB;
-    // }
+    console.log(`to (A): ${subSwapA?.show()}`);
+    if (compareSubSwaps) {
+      const subSwapB = this.subSwapB(amount, amntIsSold);
+      if (subSwapA) {
+        assert(subSwapB, `subSwapB must be defined, but got undefined`);
+        assert(
+          subSwapA.equalNumbers(subSwapB),
+          `found difference in subSwap-functions:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`,
+        );
+        // assert(subSwapA.show() === subSwapB.show(), `SUCCESS! ... but only show()-difference:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
+        // the above detects only a difference in maxBuying, so we're not using it. TODO/NOTE the other variant is correct, this one wrong
+      } else {assert(
+          subSwapB === undefined,
+          `subSwapB must be undefined, but got:\n${subSwapB?.show()}`,
+        );}
+      if (subSwapB) {
+        console.log(`equalNumbers: ${subSwapA?.equalNumbers(subSwapB)}`);
+      }
+      return subSwapB;
+    }
 
-    console.log(`to: ${subSwapA?.show()}`);
-    console.log(`equalNumbers: ${subSwapA?.equalNumbers(this)}`);
     return subSwapA;
   };
 
-  // private subSwapB = (
-  //   amount: bigint,
-  //   amntIsSold: boolean,
-  // ): Swapping | undefined => {
-  //   console.log(`subSwapB: ${amount} ${amntIsSold ? "sold" : "bought"}`);
-  //   const boughtA0 = (amntIsSold ? this.boughtAmount : amount) * this.soldSpot;
-  //   const soldA0 = (amntIsSold ? amount : this.soldAmount) * this.boughtSpot;
-  //   const swapA0 = min(boughtA0, soldA0);
-  //   const boughtAmount = swapA0 / this.soldSpot;
+  private subSwapB = (
+    amount: bigint,
+    amntIsSold: boolean,
+  ): Swapping | undefined => {
+    console.log(`subSwapB: ${amount} ${amntIsSold ? "sold" : "bought"}`);
+    const maxBuying = amntIsSold ? this.boughtAmount : amount;
+    const maxSelling = amntIsSold ? amount : this.soldAmount;
+    const boughtA0 = maxBuying * this.soldSpot;
+    const soldA0 = maxSelling * this.boughtSpot;
+    const swapA0 = min(boughtA0, soldA0);
+    const boughtAmount = swapA0 / this.soldSpot;
 
-  //   console.log(`"maxBuying": ${(amntIsSold ? this.boughtAmount : amount)}`);
-  //   console.log(`"maxSelling": ${(amntIsSold ? amount : this.soldAmount)}`);
-  //   console.log(`this.boughtSpot: ${this.boughtSpot}`);
-  //   console.log(`this.soldSpot: ${this.soldSpot}`);
-  //   console.log(`boughtA0: ${boughtA0}`);
-  //   console.log(`soldA0: ${soldA0}`);
-  //   console.log(`swapA0: ${swapA0}`);
-  //   console.log(`boughtAmount: ${boughtAmount}`);
+    console.log(`"maxBuying": ${maxBuying}`);
+    console.log(`"maxSelling": ${maxSelling}`);
+    console.log(`this.boughtSpot: ${this.boughtSpot}`);
+    console.log(`this.soldSpot: ${this.soldSpot}`);
+    console.log(`boughtA0: ${boughtA0}`);
+    console.log(`soldA0: ${soldA0}`);
+    console.log(`swapA0: ${swapA0}`);
+    console.log(`boughtAmount: ${boughtAmount}`);
 
-  //   if (!boughtAmount) return undefined;
-  //   const soldAmount = ceilDiv(boughtAmount * this.soldSpot, this.boughtSpot);
-  //   console.log(`soldAmount: ${soldAmount}`);
-  //   if (soldAmount < getMinSelling(this.soldAsset)) return undefined;
-  //   // maxBuyingA0 = maxBuying * spotSelling;
-  //   // maxSellingA0 = maxSelling * spotBuying;
-  //   // maxSwapA0 = min(maxSellingA0, maxBuyingA0);
-  //   // buyingAmount = maxSwapA0 / spotSelling;
-  //   // sellingAmount = ceilDiv(buyingAmount * spotSelling, spotBuying);
-  //   assert(
-  //     soldAmount <= this.soldAmount,
-  //     `soldAmount cannot increase: ${soldAmount} > ${this.soldAmount}`,
-  //   );
-  //   assert(
-  //     boughtAmount <= this.boughtAmount,
-  //     `boughtAmount cannot increase: ${boughtAmount} > ${this.boughtAmount}`,
-  //   );
+    if (!boughtAmount) return undefined;
+    let soldAmount = ceilDiv(boughtAmount * this.soldSpot, this.boughtSpot);
+    const minSelling = getMinSelling(this.soldAsset);
+    if (soldAmount < minSelling && minSelling <= maxSelling) {
+      soldAmount = minSelling;
+    }
+    console.log(`soldAmount: ${soldAmount}`);
+    if (soldAmount < minSelling) return undefined;
+    assert(
+      soldAmount <= this.soldAmount,
+      `soldAmount cannot increase: ${soldAmount} > ${this.soldAmount}`,
+    );
+    assert(
+      boughtAmount <= this.boughtAmount,
+      `boughtAmount cannot increase: ${boughtAmount} > ${this.boughtAmount}`,
+    );
 
-  //   return new Swapping(
-  //     this.user,
-  //     this.paramUtxo,
-  //     this.diracUtxo,
-  //     this.boughtAsset,
-  //     this.soldAsset,
-  //     boughtAmount,
-  //     soldAmount,
-  //     this.boughtSpot,
-  //     this.soldSpot,
-  //     this.boughtExp,
-  //     this.soldExp,
-  //     true,
-  //     amntIsSold ? this.maxBuying : amount, // per definition of a subSwap
-  //   );
-  // };
+    const subSwap = new Swapping(
+      this.user,
+      this.paramUtxo,
+      this.diracUtxo,
+      this.boughtAsset,
+      this.soldAsset,
+      boughtAmount,
+      soldAmount,
+      this.boughtSpot,
+      this.soldSpot,
+      this.boughtExp,
+      this.soldExp,
+      true,
+      amntIsSold ? this.maxBuying : amount, // per definition of a subSwap
+    );
+
+    console.log(`to (B): ${subSwap.show()}`);
+    return subSwap;
+  };
 
   // NOTE subSwapA is wrong regarding maxBuying, and regarding prices when handling ADA
   public subSwap = this.subSwapA; // TODO profile both and pick the better one (later)
