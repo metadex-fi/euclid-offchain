@@ -348,6 +348,7 @@ export class Swapping {
     amntIsSold: boolean,
   ): Swapping | undefined => {
     console.log(`subSwapA: ${amount} ${amntIsSold ? "sold" : "bought"}`);
+    console.log(`from: ${this.show()}`);
     const swappings = this.diracUtxo.swappingsFor(
       this.user,
       this.paramUtxo,
@@ -375,6 +376,9 @@ export class Swapping {
     //   } else assert(subSwapB === undefined, `subSwapB must be undefined, but got:\n${subSwapB?.show()}`);
     //   return subSwapB;
     // }
+
+    console.log(`to: ${subSwapA?.show()}`);
+    console.log(`equalNumbers: ${subSwapA?.equalNumbers(this)}`);
     return subSwapA;
   };
 
@@ -498,7 +502,7 @@ export class Swapping {
     if (swappings.length < 1) return undefined;
     // console.log(`Swapping`);
     const choice = randomChoice(swappings);
-    return choice; // TODO revert
+    // return choice; // TODO revert
     if (Math.random() < 0.5) return choice;
     else return choice.randomSubSwap();
   }
@@ -735,7 +739,7 @@ export class Swapping {
     );
     assert(
       !boughtTooMuch.validates(),
-      `buying ${amnt} more should fail: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`,
+      `buying ${amnt} more should fail offchain validation: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`,
     );
     console.log(`returning corruptBoughtAmnt`);
     return boughtTooMuch;
@@ -764,7 +768,7 @@ export class Swapping {
     );
     assert(
       !soldTooLittle.validates(),
-      `selling ${amnt} less should fail: ${this.show()}\n~~~>\n${soldTooLittle.show()}`,
+      `selling ${amnt} less should fail offchain validation: ${this.show()}\n~~~>\n${soldTooLittle.show()}`,
     );
     console.log(`returning corruptSoldAmnt`);
     return soldTooLittle;
@@ -813,7 +817,7 @@ export class Swapping {
           !this.soldAsset.equals(Asset.ADA) || nested >= sellingADAtolerance
         ) {
           throw new Error(
-            `raising inverted buying price should fail: ${this.show()}\n~~~>\n${boughtSpotTooHigh.show()}`,
+            `raising inverted buying price should fail offchain validation: ${this.show()}\n~~~>\n${boughtSpotTooHigh.show()}`,
           );
         }
       } else console.log(`bought spot corruption failed: ${nested}`);
@@ -881,7 +885,7 @@ export class Swapping {
           !this.soldAsset.equals(Asset.ADA) || nested >= sellingADAtolerance
         ) {
           throw new Error(
-            `lowering inverted selling price should fail: ${this.show()}\n~~~>\n${soldSpotTooLow.show()}`,
+            `lowering inverted selling price should fail offchain validation: ${this.show()}\n~~~>\n${soldSpotTooLow.show()}`,
           );
         }
       } else console.log(`sold spot corruption failed: ${nested}`);
