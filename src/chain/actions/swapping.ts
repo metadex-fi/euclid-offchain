@@ -23,8 +23,7 @@ import { Dirac } from "../../types/euclid/dirac.ts";
 import { genNonNegative } from "../../mod.ts";
 import { getMinSelling } from "../mod.ts";
 
-const compareSubSwaps = true;
-const sellingADAtolerance = 0;
+// const sellingADAtolerance = 0;
 
 export class Swapping {
   public readonly spotPrice: number; // uninverted
@@ -109,7 +108,10 @@ export class Swapping {
 )`;
   };
 
-  public equalNumbers = (other: Swapping): boolean => {
+  public equalNumbers = (
+    other: Swapping,
+    compareMaxBuying: boolean,
+  ): boolean => {
     return (
       this.boughtAmount === other.boughtAmount &&
       this.soldAmount === other.soldAmount &&
@@ -117,7 +119,7 @@ export class Swapping {
       this.soldSpot === other.soldSpot &&
       this.boughtExp === other.boughtExp &&
       this.soldExp === other.soldExp &&
-      this.maxBuying === other.maxBuying
+      (!compareMaxBuying || this.maxBuying === other.maxBuying)
     );
   };
 
@@ -346,7 +348,7 @@ export class Swapping {
 
   // The idea behind this variant is the guess that with lower amounts we might
   // have a different optimum for exponents and prices
-  // ~~> update: there is a difference - besides maxBuying - when selling ADA, and this affects prices
+  // ~~> update: as we're not touching buyingExps in the swappingsFor loop anymore, only diff in maxBuying
   // TODO maybe investigate further, and compare performances. Note that the other variant is correct, this one wrong, regarding maxBuying
   private subSwapA = (
     amount: bigint,
@@ -373,12 +375,13 @@ export class Swapping {
     const subSwapA = swappings.length > 0 ? swappings[0] : undefined;
     if (subSwapA) subSwapA.setMaxBuying(amntIsSold ? this.maxBuying : amount); // per definition of a subSwap
     console.log(`to (A): ${subSwapA?.show()}`);
+    const compareSubSwaps = true;
     if (compareSubSwaps) {
       const subSwapB = this.subSwapB(amount, amntIsSold);
       if (subSwapA) {
         assert(subSwapB, `subSwapB must be defined, but got undefined`);
         assert(
-          subSwapA.equalNumbers(subSwapB),
+          subSwapA.equalNumbers(subSwapB, true),
           `found difference in subSwap-functions:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`,
         );
         // assert(subSwapA.show() === subSwapB.show(), `SUCCESS! ... but only show()-difference:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
@@ -388,7 +391,7 @@ export class Swapping {
           `subSwapB must be undefined, but got:\n${subSwapB?.show()}`,
         );}
       if (subSwapB) {
-        console.log(`equalNumbers: ${subSwapA?.equalNumbers(subSwapB)}`);
+        console.log(`equalNumbers: ${subSwapA?.equalNumbers(subSwapB, true)}`);
       }
       return subSwapB;
     }
@@ -454,31 +457,42 @@ export class Swapping {
     return subSwap;
   };
 
-  // NOTE subSwapA is wrong regarding maxBuying, and regarding prices when handling ADA
-  public subSwap = this.subSwapA; // TODO profile both and pick the better one (later)
+  // NOTE subSwapA is only wrong regarding maxBuying
+  public subSwap = this.subSwapB; // TODO profile both and pick the better one (later)
 
   private randomSubSwap = (): Swapping => {
-    for (let i = 0; i < 100; i++) {
-      const amntIsSold = Math.random() < 0.5;
-      const maxAmnt = amntIsSold ? this.soldAmount : this.boughtAmount;
-      const minAmnt = amntIsSold ? getMinSelling(this.soldAsset) : 1n;
-      const amount = minAmnt + genNonNegative(maxAmnt - minAmnt);
-      const subSwap = this.subSwap(amount, amntIsSold);
-      if (subSwap) return subSwap;
+    const minSelling = getMinSelling(this.soldAsset);
+    const minBuying = 1n;
+    const maxSelling = this.soldAmount - 1n;
+    const maxBuying = this.boughtAmount - 1n;
+    const sellingOption = maxSelling >= minSelling;
+    const buyingOption = maxBuying >= minBuying;
+    if (sellingOption || buyingOption) {
+      for (let i = 0; i < 100; i++) {
+        const amntIsSold = randomChoice([sellingOption, !buyingOption]);
+        const maxAmnt = amntIsSold ? maxSelling : maxBuying;
+        const minAmnt = amntIsSold ? minSelling : minBuying;
+        const amount = minAmnt + genNonNegative(maxAmnt - minAmnt);
+        const subSwap = this.subSwap(amount, amntIsSold);
+        if (subSwap) return subSwap;
+      }
     }
-    console.warn(
+    console.log(
+      `randomSubSwap(): failed to find a smaller subSwap for ${this.show()}`,
+    );
+    // this is to test the subSwap-function
+    const subSwap = Math.random() < 0.5
+      ? this.subSwap(this.boughtAmount, false)
+      : this.subSwap(this.soldAmount, true);
+    assert(
+      subSwap,
       `randomSubSwap(): failed to find a subSwap for ${this.show()}`,
     );
-    return this;
-    // TODO FIXME
-    // this is to test the subSwap-function
-    // const subSwap = Math.random() < 0.5
-    //   ? this.subSwap(this.boughtAmount, false)
-    //   : this.subSwap(this.soldAmount, true);
-    // if (subSwap) return subSwap;
-    // throw new Error(
-    //   `randomSubSwap(): failed to find a subSwap for ${this.show()}`,
-    // );
+    assert(
+      this.equalNumbers(subSwap, false),
+      `subSwap with unchanged amounts should result in same Swapping, but got:\n${subSwap.show()}\nfrom\n${this.show()}`,
+    );
+    return subSwap;
   };
 
   static boundary(
@@ -830,14 +844,14 @@ export class Swapping {
 
       if (boughtSpotTooHigh.validates()) {
         console.log(`bought spot corruption succeeded: ${nested}`);
-        boughtSpotTooHigh.corruptBoughtSpot(nested + 1);
-        if (
-          !this.soldAsset.equals(Asset.ADA) || nested >= sellingADAtolerance
-        ) {
-          throw new Error(
-            `raising inverted buying price should fail offchain validation: ${this.show()}\n~~~>\n${boughtSpotTooHigh.show()}`,
-          );
-        }
+        // boughtSpotTooHigh.corruptBoughtSpot(nested + 1);
+        // if (
+        //   !this.soldAsset.equals(Asset.ADA) || nested >= sellingADAtolerance
+        // ) {
+        throw new Error(
+          `raising inverted buying price should fail offchain validation: ${this.show()}\n~~~>\n${boughtSpotTooHigh.show()}`,
+        );
+        // }
       } else console.log(`bought spot corruption failed: ${nested}`);
 
       assert(
@@ -898,14 +912,14 @@ export class Swapping {
 
       if (soldSpotTooLow.validates()) {
         console.log(`sold spot corruption succeeded: ${nested}`);
-        soldSpotTooLow.corruptSoldSpot(nested + 1);
-        if (
-          !this.soldAsset.equals(Asset.ADA) || nested >= sellingADAtolerance
-        ) {
-          throw new Error(
-            `lowering inverted selling price should fail offchain validation: ${this.show()}\n~~~>\n${soldSpotTooLow.show()}`,
-          );
-        }
+        // soldSpotTooLow.corruptSoldSpot(nested + 1);
+        // if (
+        //   !this.soldAsset.equals(Asset.ADA) || nested >= sellingADAtolerance
+        // ) {
+        throw new Error(
+          `lowering inverted selling price should fail offchain validation: ${this.show()}\n~~~>\n${soldSpotTooLow.show()}`,
+        );
+        // }
       } else console.log(`sold spot corruption failed: ${nested}`);
 
       assert(
