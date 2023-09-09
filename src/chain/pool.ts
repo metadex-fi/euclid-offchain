@@ -253,7 +253,10 @@ export class Pool {
       );
   };
 
-  public swappingsFor(user: User): Swapping[] {
+  public swappingsFor(
+    user: User,
+    granularity?: bigint,
+  ): Swapping[] {
     if (this.paramUtxo.param.active === 0n) return [];
     const balance = user.availableBalance;
     console.log("pool.swappingsFor balance", balance?.concise());
@@ -262,7 +265,12 @@ export class Pool {
     console.log("pool.swappingsFor sellableBalance", sellableBalance.concise());
     if (!sellableBalance.size) return [];
     return this.diracUtxos.flatMap((d) =>
-      d.swappingsFor(user, this.paramUtxo, sellableBalance.unsigned)
+      d.swappingsFor(
+        user,
+        this.paramUtxo,
+        granularity,
+        sellableBalance.unsigned,
+      )
     );
   }
 

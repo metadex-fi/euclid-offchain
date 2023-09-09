@@ -148,13 +148,16 @@ export class EuclidState {
     return [priceSum, valueSum]; // uninverted price = priceSum / valueSum
   }
 
-  public swappingsFor(user: User): Swapping[] {
+  public swappingsFor(
+    user: User,
+    granularity?: bigint,
+  ): Swapping[] {
     // TODO consider removing the user's own pools beforehand
     const pools = [...this.pools.values()].flatMap((p) => [...p.values()]);
     // console.log("euclidState.swappingsFor pools", pools)
     // if (pools.length) {
     //   console.log(`\t\tpools: ${pools.length}`);
     // }
-    return pools.flatMap((pool) => pool.swappingsFor(user));
+    return pools.flatMap((pool) => pool.swappingsFor(user, granularity));
   }
 }

@@ -25,8 +25,10 @@ export const getMinBalance = (asset: Asset): bigint =>
 
 // this is supposed to account for potential differences in minAda, which sometimes
 // yields more than a few lovelaces, which in turn fucks with the new-Amm-comparison onchain
-export const getMinSelling = (asset: Asset): bigint =>
-  asset.equals(Asset.ADA) ? 1000000n : 1n; // TODO arbitary aka both excessive and edge-casing
+export const getMinSelling = (
+  asset: Asset,
+  granularity: bigint | null,
+): bigint => max(granularity ?? 1n, asset.equals(Asset.ADA) ? 1000000n : 1n); // TODO arbitary aka both excessive and edge-casing
 
 export class ParamUtxo {
   private constructor(
@@ -228,11 +230,13 @@ export class DiracUtxo {
   public swappingsFor = (
     user: User | undefined,
     paramUtxo: ParamUtxo,
+    granularity = 1n,
     sellable_?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
     buyingAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
     buyableAmnt?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
   ): Swapping[] => {
     console.log("swappingsFor()");
+    assert(granularity > 0n, `granularity <= 0n: ${granularity}`);
     const swappings = new Array<Swapping>();
     let buyable_: PositiveValue;
     if (buyingAssets) {
@@ -271,7 +275,9 @@ export class DiracUtxo {
       // if (asset.equals(Asset.ADA)) return; // TODO for debugging, revert
       const buyable = buyable_.amountOf(asset, 0n) - getMinBalance(asset);
       const sellable = sellable_?.amountOf(asset, 0n);
-      if (buyable <= 0n && sellable && sellable === 0n) return;
+      const minBuying = granularity ?? 1n;
+      const minSelling = getMinSelling(asset, granularity ?? 1n);
+      if (buyable < minBuying && sellable && sellable < minSelling) return;
 
       const virtual = param.virtual.amountOf(asset);
       const weight = param.weights.amountOf(asset); // NOTE: inverted
@@ -302,7 +308,7 @@ export class DiracUtxo {
 
       const delta_ = delta(weight, liquidity);
 
-      if (buyable > 0n) {
+      if (buyable >= minBuying) {
         while (spotBuying > 0n) {
           const d = delta_(spotBuying);
           const maxBuying = min(buyable, -d);
@@ -312,7 +318,7 @@ export class DiracUtxo {
           //   maxBuying: ${maxBuying}
           // `);
 
-          if (maxBuying > 0n) {
+          if (maxBuying >= minBuying) {
             spotBuying_.initAmountOf(asset, spotBuying);
             expBuying_.initAmountOf(asset, expBuying);
             maxBuying_.initAmountOf(asset, maxBuying);
@@ -328,12 +334,14 @@ export class DiracUtxo {
         }
       }
 
-      if ((sellable === undefined || sellable != 0n) && spotSelling > 0n) {
+      if (
+        (sellable === undefined || sellable >= minSelling) && spotSelling > 0n
+      ) {
         while (true) {
           const d = delta_(spotSelling);
           const maxSelling = sellable && sellable > 0n ? min(sellable, d) : d;
 
-          if (maxSelling > 0n) {
+          if (maxSelling >= minSelling) {
             spotSelling_.initAmountOf(asset, spotSelling);
             expSelling_.initAmountOf(asset, expSelling);
             maxSelling_.initAmountOf(asset, maxSelling);
@@ -356,14 +364,16 @@ export class DiracUtxo {
     const sellableAssets = maxSelling_.assets.toList;
     const buyableAssets = maxBuying_.assets.toList;
 
-    sellableAssets.forEach((sellingAsset) => {
-      const minSelling = getMinSelling(sellingAsset);
-      const sellingADA = sellingAsset.equals(Asset.ADA);
-      buyableAssets.forEach((buyingAsset) => {
-        // NOTE if those become non-const again, move them into the inner loop again
-        // const spotBuying = spotBuying_.amountOf(buyingAsset); // NOTE: inverted
-        // const expBuying = expBuying_.amountOf(buyingAsset);
-        // const maxBuying = maxBuying_.amountOf(buyingAsset);
+    buyableAssets.forEach((buyingAsset) => {
+      const minBuying = granularity ?? 1n;
+      // NOTE if those become non-const again, move them into the inner loop again
+      // const spotBuying = spotBuying_.amountOf(buyingAsset); // NOTE: inverted
+      // const expBuying = expBuying_.amountOf(buyingAsset);
+      // const maxBuying = maxBuying_.amountOf(buyingAsset);
+
+      sellableAssets.forEach((sellingAsset) => {
+        const minSelling = getMinSelling(sellingAsset, granularity);
+        // const sellingADA = sellingAsset.equals(Asset.ADA); // NOTE this is no longer only ADA, but all minSelling > 0
 
         if (sellingAsset.equals(buyingAsset)) return;
         console.log(`
@@ -387,17 +397,87 @@ export class DiracUtxo {
         //  const maxSellingA0 = (maxSelling / spotSelling) * (spotSelling * spotBuying);
         //  (spotSelling * spotBuying) are the same for both and added so we can remove divisions.
 
-        let maxBuyingA0 = maxBuying * spotSelling;
-        let maxSellingA0 = maxSelling * spotBuying;
-        let maxSwapA0 = min(maxSellingA0, maxBuyingA0);
-        let buyingAmount = maxSwapA0 / spotSelling;
-        let sellingAmount = ceilDiv(buyingAmount * spotSelling, spotBuying);
+        let maxBuyingA0 = -1n;
+        let maxSellingA0 = -1n;
+        let maxSwapA0 = -1n;
+        let buyingAmount = -1n;
+        let sellingAmount = -1n;
+        let limitReached = "none";
+        let increaseExpSelling = (_by: bigint) => {};
+        let increaseExpBuying = (_by: bigint) => {};
 
-        if (sellingAmount < minSelling && minSelling <= maxSelling) {
-          sellingAmount = minSelling;
-        }
+        const updateValues = () => {
+          const newMaxBuyingA0 = maxBuying * spotSelling;
+          const newMaxSellingA0 = maxSelling * spotBuying;
+          const newMaxSwapA0 = min(newMaxSellingA0, newMaxBuyingA0);
 
-        if (buyingAmount <= 0n || sellingAmount < minSelling) {
+          assert(
+            newMaxSwapA0 >= maxSwapA0,
+            `maxSwapA0 was decreased:
+                ${newMaxSwapA0} < ${maxSwapA0}
+                diff: ${newMaxSwapA0 - maxSwapA0}`,
+          );
+
+          const newBuyingAmount = newMaxSwapA0 / spotSelling;
+          let newSellingAmount = ceilDiv(
+            newBuyingAmount * spotSelling,
+            spotBuying,
+          );
+
+          if (newSellingAmount < minSelling && minSelling <= maxSelling) {
+            newSellingAmount = minSelling;
+          }
+
+          // if (newSellingAmount < sellingAmount) {
+          //   switch (limitReached) {
+          //     case "none":
+          //       throw new Error(`sellingAmount was decreased:
+          //       ${newSellingAmount} < ${sellingAmount}
+          //       diff: ${newSellingAmount - sellingAmount}`);
+          //     case "selling":
+          //       increaseExpSelling(-1n);
+          //       limitReached = "none";
+          //       return;
+          //     case "buying":
+          //       // TODO is this being visited?
+          //       increaseExpBuying(1n);
+          //       limitReached = "none";
+          //       return;
+          //     default:
+          //       throw new Error(`unknown limitReached: ${limitReached}`);
+          //   }
+          // }
+
+          // if (newBuyingAmount < buyingAmount) {
+          //   switch (limitReached) {
+          //     case "none":
+          //       throw new Error(`buyingAmount was decreased:
+          //       ${newBuyingAmount} < ${buyingAmount}
+          //       diff: ${newBuyingAmount - buyingAmount}`);
+          //     case "selling":
+          //       increaseExpSelling(-1n);
+          //       limitReached = "none";
+          //       return;
+          //     case "buying":
+          //       // TODO is this being visited?
+          //       increaseExpBuying(1n);
+          //       limitReached = "none";
+          //       return;
+          //     default:
+          //       throw new Error(`unknown limitReached: ${limitReached}`);
+          //   }
+          // }
+
+          maxSwapA0 = newMaxSwapA0;
+          maxBuyingA0 = newMaxBuyingA0;
+          maxSellingA0 = newMaxSellingA0;
+          buyingAmount = newBuyingAmount;
+          sellingAmount = newSellingAmount;
+        };
+
+        updateValues();
+
+        if (buyingAmount < minBuying || sellingAmount < minSelling) {
           console.log("looping");
           // return;
           // TODO marginal efficiency gains possible here by initialzing only JIT
@@ -421,7 +501,7 @@ export class DiracUtxo {
             liquidity_.amountOf(buyingAsset),
           );
 
-          const increaseExpSelling = (by: bigint) => {
+          increaseExpSelling = (by: bigint) => {
             expSelling += by;
             const newSpotSelling = Swapping.spot(
               sellingAnchor,
@@ -435,7 +515,7 @@ export class DiracUtxo {
             spotSelling = newSpotSelling;
           };
 
-          const increaseExpBuying = (by: bigint) => {
+          increaseExpBuying = (by: bigint) => {
             expBuying += by;
             const newSpotBuying = Swapping.spot(
               buyingAnchor,
@@ -451,8 +531,10 @@ export class DiracUtxo {
 
           let sellingLimit = false;
           let buyingLimit = false;
-          while (buyingAmount <= 0n || sellingAmount < minSelling) {
+          while (buyingAmount < minBuying || sellingAmount < minSelling) {
             console.log(`
+              minBuying:     ${minBuying}
+              minSelling:    ${minSelling}
               maxBuying:     ${maxBuying}
               maxSelling:    ${maxSelling}
               maxBuyingA0:   ${maxBuyingA0}
@@ -466,116 +548,74 @@ export class DiracUtxo {
               sellingAmount: ${sellingAmount}
               sellingLimit:  ${sellingLimit}
               buyingLimit:   ${buyingLimit}
-              sellingADA:    ${sellingADA}
-            `);
+              limitReached:  ${limitReached}
+              `);
+            // sellingADA:    ${sellingADA}
+
             // if (sellingLimit && (buyingLimit || !sellingADA)) return;
             // TODO comment below out if current trial succeeds
             // if (sellingLimit || buyingLimit) return; // TODO not sure this does not quit prematurely
             // NOTE second branch only comes in effect when selling ADA, and enables corruption then. This way doens't work either though
             // if ((maxSellingA0 <= maxBuyingA0 || buyingLimit) && !sellingLimit) {
-            // if (maxSellingA0 <= maxBuyingA0) {
-            if (sellingLimit) return;
-            // assert(!sellingLimit, `sellingLimit reached already`);
-            increaseExpSelling(1n);
-            const d = deltaSelling(spotSelling);
-            console.log(`deltaSelling: ${d}`);
-            let newMaxSelling;
-            if (sellable && sellable > 0n) {
-              if (sellable <= d) {
-                newMaxSelling = sellable;
-                console.log(
-                  `sellingLimit reached - sellable <= d: ${sellable} <= ${d}`,
-                );
-                sellingLimit = true;
-                if (newMaxSelling === maxSelling) {
-                  console.log(`no effect, quitting`);
-                  return;
-                  increaseExpSelling(-1n);
-                  continue;
+            if (maxSellingA0 <= maxBuyingA0) {
+              if (sellingLimit) return;
+              // assert(!sellingLimit, `sellingLimit reached already`);
+              increaseExpSelling(1n);
+              const d = deltaSelling(spotSelling);
+              console.log(`deltaSelling: ${d}`);
+              let newMaxSelling;
+              if (sellable && sellable > 0n) {
+                if (sellable <= d) {
+                  newMaxSelling = sellable;
+                  console.log(
+                    `sellingLimit reached - sellable <= d: ${sellable} <= ${d}`,
+                  );
+                  sellingLimit = true;
+                  limitReached = "selling";
+                } else {
+                  newMaxSelling = d;
                 }
               } else {
                 newMaxSelling = d;
               }
-            } else {
-              newMaxSelling = d;
-            }
-            assert(
-              newMaxSelling >= maxSelling,
-              `maxSelling was decreased: 
+              assert(
+                newMaxSelling >= maxSelling,
+                `maxSelling was decreased: 
                 ${newMaxSelling} < ${maxSelling}
                 diff: ${newMaxSelling - maxSelling}`,
-            );
-            maxSelling = newMaxSelling;
-            // } else {
-            //   if (buyingLimit) return;
-            //   // assert(!buyingLimit, `buyingLimit reached already`);
-            //   assert(sellingADA, `only expecting this branch when selling ADA`);
-            //   increaseExpBuying(-1n);
-            //   const d = -deltaBuying(spotBuying);
-            //   console.log(`-deltaBuying: ${d}`);
-            //   let newMaxBuying;
-            //   if (buyable <= d) {
-            //     newMaxBuying = buyable;
-            //     console.log(
-            //       `buyingLimit reached - buyable <= d: ${buyable} <= ${d}`,
-            //     );
-            //     buyingLimit = true;
-            //     // if (newMaxBuying === maxBuying) {
-            //     //   console.log(`no effect, reverting`);
-            //     //   increaseExpBuying(1n);
-            //     //   continue;
-            //     // }
-            //     return; // TODO revert
-            //   } else {
-            //     newMaxBuying = d;
-            //   }
-            //   assert(
-            //     newMaxBuying >= maxBuying,
-            //     `maxBuying was decreased:
-            //     ${newMaxBuying} <= ${maxBuying}
-            //     diff: ${newMaxBuying - maxBuying}`,
-            //   );
-            //   maxBuying = newMaxBuying;
-            // }
-
-            maxBuyingA0 = maxBuying * spotSelling;
-            maxSellingA0 = maxSelling * spotBuying;
-            const newMaxSwapA0 = min(maxSellingA0, maxBuyingA0);
-
-            assert(
-              newMaxSwapA0 >= maxSwapA0,
-              `maxSwapA0 was decreased:
-               ${newMaxSwapA0} < ${maxSwapA0}
-               diff: ${newMaxSwapA0 - maxSwapA0}`,
-            );
-
-            maxSwapA0 = newMaxSwapA0;
-            const newBuyingAmount = maxSwapA0 / spotSelling;
-            let newSellingAmount = ceilDiv(
-              newBuyingAmount * spotSelling,
-              spotBuying,
-            );
-
-            if (newSellingAmount < minSelling && minSelling <= maxSelling) {
-              newSellingAmount = minSelling;
+              );
+              maxSelling = newMaxSelling;
+            } else {
+              if (buyingLimit) return;
+              // assert(!buyingLimit, `buyingLimit reached already`);
+              assert(
+                minSelling > 1n,
+                `only expecting this branch when minSelling > 1n`,
+              );
+              increaseExpBuying(-1n);
+              const d = -deltaBuying(spotBuying);
+              console.log(`-deltaBuying: ${d}`);
+              let newMaxBuying;
+              if (buyable <= d) {
+                newMaxBuying = buyable;
+                console.log(
+                  `buyingLimit reached - buyable <= d: ${buyable} <= ${d}`,
+                );
+                buyingLimit = true;
+                limitReached = "buying";
+              } else {
+                newMaxBuying = d;
+              }
+              assert(
+                newMaxBuying >= maxBuying,
+                `maxBuying was decreased:
+                ${newMaxBuying} <= ${maxBuying}
+                diff: ${newMaxBuying - maxBuying}`,
+              );
+              maxBuying = newMaxBuying;
             }
 
-            assert(
-              newBuyingAmount >= buyingAmount,
-              `buyingAmount was decreased: 
-              ${newBuyingAmount} < ${buyingAmount}
-              diff: ${newBuyingAmount - buyingAmount}`,
-            );
-
-            assert(
-              newSellingAmount >= sellingAmount,
-              `sellingAmount was decreased:
-              ${newSellingAmount} < ${sellingAmount}
-              diff: ${newSellingAmount - sellingAmount}`,
-            );
-
-            buyingAmount = newBuyingAmount;
-            sellingAmount = newSellingAmount;
+            updateValues();
           }
         } //else console.log("not looping")
 
@@ -638,6 +678,7 @@ export class DiracUtxo {
           spotSelling,
           expBuying,
           expSelling,
+          granularity,
         );
 
         swappings.push(swapping);
