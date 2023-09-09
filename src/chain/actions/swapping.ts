@@ -45,18 +45,19 @@ export class Swapping {
     public readonly soldExp: bigint,
     runTests: boolean, // corruption-test-swappings don't run tests themselves.
     private maxBuying: bigint, // for corruption-tests
-    private granularity: bigint | null,
+    private minBuying: bigint | null,
+    private minSelling: bigint | null,
   ) {
     assert(
       boughtAmount <= maxBuying,
       `boughtAmount must be less than or equal to maxBuying: ${this.show()}`,
     );
     assert(
-      boughtAmount >= (granularity ?? 1n),
+      boughtAmount >= (minBuying ?? 1n),
       `boughtAmount too low: ${this.show()}`,
     );
     assert(
-      soldAmount >= getMinSelling(soldAsset, granularity),
+      soldAmount >= getMinSelling(soldAsset, minSelling),
       `soldAmount too low: ${this.show()}`,
     );
     assert(
@@ -72,8 +73,12 @@ export class Swapping {
       `boughtAmount must be less than or equal to the balance: ${this.show()}`,
     );
     assert(
-      granularity === null || granularity > 0n,
-      `granularity must be positive: ${this.show()}`,
+      minBuying === null || minBuying > 0n,
+      `minBuying must be positive: ${this.show()}`,
+    );
+    assert(
+      minSelling === null || minSelling > 0n,
+      `minSelling must be positive: ${this.show()}`,
     );
     if (user) {
       assert(
@@ -119,7 +124,8 @@ export class Swapping {
   eff.Price:    ${this.effectivePrice}
   maxBuying:    ${this.maxBuying}
   (maxBuyingA0: ${this.maxBuying * this.soldSpot})
-  granularity:  ${this.granularity}
+  minBuying:    ${this.minBuying}
+  minSelling:   ${this.minSelling}
 )`;
   };
 
@@ -330,7 +336,8 @@ export class Swapping {
       const subsequents = diracUtxo.swappingsFor(
         this.user,
         this.paramUtxo,
-        this.granularity ?? undefined,
+        this.minBuying ?? undefined,
+        this.minSelling ?? undefined,
         Value.singleton(this.soldAsset, sellableAmount),
         Assets.singleton(this.boughtAsset),
       );
@@ -438,11 +445,11 @@ export class Swapping {
     // console.log(`swapA0: ${swapA0}`);
     // console.log(`boughtAmount: ${boughtAmount}`);
 
-    const minBuying = this.granularity ?? 1n;
+    const minBuying = this.minBuying ?? 1n;
     if (boughtAmount < minBuying) return undefined;
 
     let soldAmount = ceilDiv(boughtAmount * this.soldSpot, this.boughtSpot);
-    const minSelling = getMinSelling(this.soldAsset, this.granularity);
+    const minSelling = getMinSelling(this.soldAsset, this.minSelling);
     if (soldAmount < minSelling && minSelling <= maxSelling) {
       soldAmount = minSelling;
     }
@@ -471,7 +478,8 @@ export class Swapping {
       this.soldExp,
       true,
       amntIsSold ? this.maxBuying : amount, // per definition of a subSwap
-      this.granularity,
+      this.minBuying,
+      this.minSelling,
     );
 
     // console.log(`to (B): ${subSwap.show()}`);
@@ -482,8 +490,8 @@ export class Swapping {
   public subSwap = this.subSwapB; // TODO profile both and pick the better one (later)
 
   private randomSubSwap = (): Swapping => {
-    const minSelling = getMinSelling(this.soldAsset, this.granularity);
-    const minBuying = this.granularity ?? 1n;
+    const minSelling = getMinSelling(this.soldAsset, this.minSelling);
+    const minBuying = this.minBuying ?? 1n;
     const maxSelling = this.soldAmount - 1n;
     const maxBuying = this.boughtAmount - 1n;
     const sellingOption = maxSelling >= minSelling;
@@ -528,7 +536,8 @@ export class Swapping {
     soldSpot: bigint,
     boughtExp: bigint,
     soldExp: bigint,
-    granularity: bigint | null,
+    minBuying: bigint | null,
+    minSelling: bigint | null,
   ): Swapping {
     console.log(`Swapping.boundary()`);
     return new Swapping(
@@ -545,7 +554,8 @@ export class Swapping {
       soldExp,
       true,
       diracUtxo.balance.amountOf(boughtAsset) - getMinBalance(boughtAsset),
-      granularity,
+      minBuying,
+      minSelling,
     );
   }
 
@@ -557,6 +567,7 @@ export class Swapping {
     for (let i = maxInteger; i > 1n; i /= 10n) {
       swappings = user.contract!.state!.swappingsFor(
         user,
+        maybeNdef(genPositive(i)),
         maybeNdef(genPositive(i)),
       );
       if (swappings.length > 0) break;
@@ -799,7 +810,8 @@ export class Swapping {
       this.soldExp,
       false,
       this.maxBuying,
-      this.granularity,
+      this.minBuying,
+      this.minSelling,
     );
     assert(
       !boughtTooMuch.validates(),
@@ -811,7 +823,7 @@ export class Swapping {
 
   public corruptSoldAmnt = (random: boolean): Swapping | undefined => {
     console.log(`trying to corrupt sold amount...`);
-    const minSelling = getMinSelling(this.soldAsset, this.granularity);
+    const minSelling = getMinSelling(this.soldAsset, this.minSelling);
     if (this.soldAmount === minSelling) return undefined;
     const amnt = random ? genPositive(this.soldAmount - minSelling) : 1n;
     console.log(`... by ${amnt}`);
@@ -829,7 +841,8 @@ export class Swapping {
       this.soldExp,
       false,
       this.maxBuying,
-      this.granularity,
+      this.minBuying,
+      this.minSelling,
     );
     assert(
       !soldTooLittle.validates(),
@@ -873,7 +886,8 @@ export class Swapping {
         this.soldExp,
         false,
         this.maxBuying,
-        this.granularity,
+        this.minBuying,
+        this.minSelling,
       );
 
       if (boughtSpotTooHigh.validates()) {
@@ -942,7 +956,8 @@ export class Swapping {
         soldExp_,
         false,
         this.maxBuying,
-        this.granularity,
+        this.minBuying,
+        this.minSelling,
       );
 
       if (soldSpotTooLow.validates()) {

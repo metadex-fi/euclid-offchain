@@ -27,8 +27,8 @@ export const getMinBalance = (asset: Asset): bigint =>
 // yields more than a few lovelaces, which in turn fucks with the new-Amm-comparison onchain
 export const getMinSelling = (
   asset: Asset,
-  granularity: bigint | null,
-): bigint => max(granularity ?? 1n, asset.equals(Asset.ADA) ? 1000000n : 1n); // TODO arbitary aka both excessive and edge-casing
+  minSelling: bigint | null,
+): bigint => max(minSelling ?? 1n, asset.equals(Asset.ADA) ? 1000000n : 1n); // TODO arbitary aka both excessive and edge-casing
 
 export class ParamUtxo {
   private constructor(
@@ -230,13 +230,15 @@ export class DiracUtxo {
   public swappingsFor = (
     user: User | undefined,
     paramUtxo: ParamUtxo,
-    granularity = 1n,
+    minBuying = 1n,
+    minSelling_ = 1n,
     sellable_?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
     buyingAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
     buyableAmnt?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
   ): Swapping[] => {
     console.log("swappingsFor()");
-    assert(granularity > 0n, `granularity <= 0n: ${granularity}`);
+    assert(minBuying > 0n, `minBuying <= 0n: ${minBuying}`);
+    assert(minSelling_ > 0n, `minSelling_ <= 0n: ${minSelling_}`);
     const swappings = new Array<Swapping>();
     let buyable_: PositiveValue;
     if (buyingAssets) {
@@ -275,8 +277,7 @@ export class DiracUtxo {
       // if (asset.equals(Asset.ADA)) return; // TODO for debugging, revert
       const buyable = buyable_.amountOf(asset, 0n) - getMinBalance(asset);
       const sellable = sellable_?.amountOf(asset, 0n);
-      const minBuying = granularity ?? 1n;
-      const minSelling = getMinSelling(asset, granularity ?? 1n);
+      const minSelling = getMinSelling(asset, minSelling_);
       if (buyable < minBuying && sellable && sellable < minSelling) return;
 
       const virtual = param.virtual.amountOf(asset);
@@ -365,14 +366,13 @@ export class DiracUtxo {
     const buyableAssets = maxBuying_.assets.toList;
 
     buyableAssets.forEach((buyingAsset) => {
-      const minBuying = granularity ?? 1n;
       // NOTE if those become non-const again, move them into the inner loop again
       // const spotBuying = spotBuying_.amountOf(buyingAsset); // NOTE: inverted
       // const expBuying = expBuying_.amountOf(buyingAsset);
       // const maxBuying = maxBuying_.amountOf(buyingAsset);
 
       sellableAssets.forEach((sellingAsset) => {
-        const minSelling = getMinSelling(sellingAsset, granularity);
+        const minSelling = getMinSelling(sellingAsset, minSelling_);
         // const sellingADA = sellingAsset.equals(Asset.ADA); // NOTE this is no longer only ADA, but all minSelling > 0
 
         if (sellingAsset.equals(buyingAsset)) return;
@@ -678,7 +678,8 @@ export class DiracUtxo {
           spotSelling,
           expBuying,
           expSelling,
-          granularity,
+          minBuying,
+          minSelling,
         );
 
         swappings.push(swapping);

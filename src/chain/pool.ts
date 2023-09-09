@@ -255,7 +255,8 @@ export class Pool {
 
   public swappingsFor(
     user: User,
-    granularity?: bigint,
+    minBuying?: bigint,
+    minSelling?: bigint,
   ): Swapping[] {
     if (this.paramUtxo.param.active === 0n) return [];
     const balance = user.availableBalance;
@@ -268,7 +269,8 @@ export class Pool {
       d.swappingsFor(
         user,
         this.paramUtxo,
-        granularity,
+        minBuying,
+        minSelling,
         sellableBalance.unsigned,
       )
     );
