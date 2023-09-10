@@ -320,7 +320,10 @@ export class Swapping {
 
   public succeeded = this.setSubsequentUtxo;
 
-  public subsequents = (maxSubsequents?: number): Swapping[] => {
+  public subsequents = (
+    maxSubsequents?: number,
+    applyMinAmounts = true, // TODO test false
+    ): Swapping[] => {
     console.log(`subsequents(${maxSubsequents})`);
     const swappings: Swapping[] = [this];
     let previous = swappings[0];
@@ -336,8 +339,8 @@ export class Swapping {
       const subsequents = diracUtxo.swappingsFor(
         this.user,
         this.paramUtxo,
-        this.minBuying ?? undefined,
-        this.minSelling ?? undefined,
+        applyMinAmounts ? this.minBuying ?? undefined : undefined,
+        applyMinAmounts ? this.minSelling ?? undefined : undefined,
         Value.singleton(this.soldAsset, sellableAmount),
         Assets.singleton(this.boughtAsset),
       );
@@ -426,6 +429,7 @@ export class Swapping {
   private subSwapB = (
     amount: bigint,
     amntIsSold: boolean,
+    applyMinAmounts = true // TODO test false, TODO add to subSwapA (not important)
   ): Swapping | undefined => {
     console.log(`subSwapB: ${amount} ${amntIsSold ? "sold" : "bought"}`);
 
@@ -445,11 +449,11 @@ export class Swapping {
     // console.log(`swapA0: ${swapA0}`);
     // console.log(`boughtAmount: ${boughtAmount}`);
 
-    const minBuying = this.minBuying ?? 1n;
+    const minBuying = applyMinAmounts ? this.minBuying ?? 1n : 1n;
     if (boughtAmount < minBuying) return undefined;
 
     let soldAmount = ceilDiv(boughtAmount * this.soldSpot, this.boughtSpot);
-    const minSelling = getMinSelling(this.soldAsset, this.minSelling);
+    const minSelling = applyMinAmounts ? getMinSelling(this.soldAsset, this.minSelling) : 1n;
     if (soldAmount < minSelling && minSelling <= maxSelling) {
       soldAmount = minSelling;
     }
