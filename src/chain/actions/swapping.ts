@@ -148,6 +148,21 @@ export class Swapping {
     throw new Error("Swapping-split not implemented");
   };
 
+  public get posteriorDirac(): Dirac {
+    const oldDirac = this.diracUtxo.dirac;
+
+    const newAnchorPrices = oldDirac.anchorPrices.clone; // TODO cloning neccessary?
+    newAnchorPrices.setAmountOf(this.boughtAsset, this.boughtSpot);
+    newAnchorPrices.setAmountOf(this.soldAsset, this.soldSpot);
+
+    return new Dirac(
+      oldDirac.owner,
+      oldDirac.threadNFT,
+      oldDirac.paramNFT,
+      newAnchorPrices,
+    );
+  }
+
   // TODO set subsequent's diracUtxo's utxo to the one resulting from this tx
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
     console.log(`compiling tx for ${this.show()}`);
@@ -180,16 +195,7 @@ export class Swapping {
       ),
     );
 
-    const newAnchorPrices = oldDirac.anchorPrices.clone; // TODO cloning neccessary?
-    newAnchorPrices.setAmountOf(this.boughtAsset, this.boughtSpot);
-    newAnchorPrices.setAmountOf(this.soldAsset, this.soldSpot);
-
-    const newDirac = new Dirac(
-      oldDirac.owner,
-      oldDirac.threadNFT,
-      oldDirac.paramNFT,
-      newAnchorPrices,
-    );
+    const newDirac = this.posteriorDirac;
     const datum = this.diracUtxo.peuclidDatum.pconstant(
       new DiracDatum(newDirac),
     );
@@ -323,7 +329,7 @@ export class Swapping {
   public subsequents = (
     maxSubsequents?: number,
     applyMinAmounts = true, // TODO test false
-    ): Swapping[] => {
+  ): Swapping[] => {
     console.log(`subsequents(${maxSubsequents})`);
     const swappings: Swapping[] = [this];
     let previous = swappings[0];
@@ -334,7 +340,9 @@ export class Swapping {
     let diracUtxo = this.diracUtxo.applySwapping(this);
 
     while (sellableAmount != 0n) {
-      if (maxSubsequents && swappings.length >= maxSubsequents) break;
+      if (maxSubsequents !== undefined && swappings.length >= maxSubsequents) {
+        break;
+      }
 
       const subsequents = diracUtxo.swappingsFor(
         this.user,
@@ -429,7 +437,7 @@ export class Swapping {
   private subSwapB = (
     amount: bigint,
     amntIsSold: boolean,
-    applyMinAmounts = true // TODO test false, TODO add to subSwapA (not important)
+    applyMinAmounts = true, // TODO test false, TODO add to subSwapA (not important)
   ): Swapping | undefined => {
     console.log(`subSwapB: ${amount} ${amntIsSold ? "sold" : "bought"}`);
 
@@ -453,7 +461,9 @@ export class Swapping {
     if (boughtAmount < minBuying) return undefined;
 
     let soldAmount = ceilDiv(boughtAmount * this.soldSpot, this.boughtSpot);
-    const minSelling = applyMinAmounts ? getMinSelling(this.soldAsset, this.minSelling) : 1n;
+    const minSelling = applyMinAmounts
+      ? getMinSelling(this.soldAsset, this.minSelling)
+      : 1n;
     if (soldAmount < minSelling && minSelling <= maxSelling) {
       soldAmount = minSelling;
     }

@@ -213,9 +213,13 @@ export class DiracUtxo {
   };
 
   public applySwapping = (swapping: Swapping): DiracUtxo => {
+    assert(
+      swapping.diracUtxo.dirac.concise() === this.dirac.concise(),
+      `dirac mismatch:\n${swapping.diracUtxo.dirac.concise()}\n!==\n${this.dirac.concise()}`,
+    );
     return new DiracUtxo(
       this.peuclidDatum,
-      this.dirac,
+      swapping.posteriorDirac,
       this.balance
         .normedPlus(
           PositiveValue.singleton(swapping.soldAsset, swapping.soldAmount),
