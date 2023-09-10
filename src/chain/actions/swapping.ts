@@ -482,8 +482,8 @@ export class Swapping {
       this.soldExp,
       true,
       amntIsSold ? this.maxBuying : amount, // per definition of a subSwap
-      this.minBuying,
-      this.minSelling,
+      applyMinAmounts ? this.minBuying : null,
+      applyMinAmounts ? this.minSelling : null,
     );
 
     // console.log(`to (B): ${subSwap.show()}`);
