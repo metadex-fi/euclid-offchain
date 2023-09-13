@@ -10,6 +10,7 @@ import { Action, UserAction } from "./actions/action.ts";
 
 import { Contract } from "./contract.ts";
 import { utxosToCore } from "../utils/conversion.ts";
+import { Wallet, WalletApi } from "https://deno.land/x/lucid@0.10.7/mod.ts";
 
 const forFeesEtc = PositiveValue.singleton(
   Asset.ADA,
@@ -51,9 +52,11 @@ export class User {
     public readonly privateKey?: string, // for emulation
     public readonly address?: Lucid.Address,
     paymentKeyHash?: KeyHash,
+    private readonly api?: WalletApi,
     private readonly userChaining = false, // whether the wallet supports chaining user-utxos
   ) {
     this.contract = new Contract(lucid);
+
     if (address) {
       const addressDetails = this.lucid.utils.getAddressDetails(address);
       assert(addressDetails.paymentCredential, "No payment credential");
@@ -65,9 +68,21 @@ export class User {
       }
       this.paymentKeyHash = paymentKeyHash_;
 
+      const utxoGetter = api 
+      ? async () => {
+        const utxos = ((await api.getUtxos()) || []).map((utxo) => {
+          const parsedUtxo = Lucid.C.TransactionUnspentOutput.from_bytes(
+            Lucid.fromHex(utxo),
+          );
+          return Lucid.coreToUtxo(parsedUtxo);
+        });
+        return utxos;
+      }
+      : () => lucid.utxosAt(address); // this calls the provider, above calls the wallet directly
+
       lucid.wallet.getUtxos = async () => {
         // console.log("getUtxos()");
-        const utxos = await lucid.utxosAt(address);
+        const utxos = await utxoGetter();
         // console.log("utxos (getUtxos):", utxos);
         // console.log("spentUtxos (getUtxos):", this.spentUtxos);
         // NOTE: using mempool-outputs does not quite work yet with nami/blockfrost for
@@ -96,7 +111,7 @@ export class User {
       lucid.wallet.getUtxosCore = async () => {
         // console.log("getUtxosCore()");
         const utxos = await lucid.wallet.getUtxos();
-        return utxosToCore(utxos);
+        return utxosToCore(utxos); // TODO maybe too much converting back and forth
       };
     } else {
       assert(paymentKeyHash, `neither address nor paymentKeyHash provided`);
@@ -335,10 +350,9 @@ export class User {
     lucid: Lucid.Lucid,
     api: Lucid.WalletApi,
   ): Promise<User> {
-    const address = await lucid.selectWallet(api).wallet
-      .address();
+    const address = await lucid.selectWallet(api).wallet.address();
     // const protocolParameters = await lucid.provider.getProtocolParameters();
-    return new User(lucid, undefined, address);
+    return new User(lucid, undefined, address, undefined, api);
   }
 
   static async fromPrivateKey(
