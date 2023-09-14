@@ -21,7 +21,7 @@ export class Param {
   constructor(
     public readonly owner: KeyHash,
     public readonly virtual: EuclidValue, // NOTE need those to be nonzero for multiplicative ticks
-    public readonly weights: SmallValue, // NOTE those are actually inverted
+    public readonly weights: EuclidValue,//SmallValue // NOTE those are actually inverted
     public readonly jumpSizes: SmallValue,
     public readonly active: bigint,
   ) {
@@ -139,9 +139,8 @@ ${tt})`;
       // const jumpSize = new PPositive(1n, gMaxJumpSize).genData();
       const jumpSize = new PPositive(1n, maxSmallInteger).genData();
       const js1 = jumpSize + 1n;
-      const ceil = js1 % maxSmallInteger ? 1n : 0n;
       const virtual = new PPositive(
-        (js1 / maxSmallInteger) + ceil,
+        ceilDiv(js1, maxSmallInteger),
       ).genData();
 
       const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual);
@@ -155,7 +154,7 @@ ${tt})`;
     return new Param(
       owner,
       new EuclidValue(virtuals),
-      new SmallValue(new EuclidValue(weights)),
+      new EuclidValue(weights),//new SmallValue(new EuclidValue(weights)),
       new SmallValue(new EuclidValue(jumpSizes)),
       1n, // TODO include active-status in testing
     );
@@ -170,7 +169,7 @@ ${tt})`;
     const jsv = jumpSize * virtual;
     const minWeight = ceilDiv(js1, virtual);
     let maxWeight = (maxInteger * js1) / (jsv + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
-    maxWeight = min(maxWeight, maxSmallInteger); //gMaxJumpSize);
+    // maxWeight = min(maxWeight, maxSmallInteger); //gMaxJumpSize);
 
     assert(
       minWeight <= maxWeight,
@@ -228,7 +227,7 @@ export class PParam extends PObject<Param> {
       new PRecord({
         owner: PKeyHash.ptype,
         virtual: PEuclidValue.ptype,
-        weights: PSmallValue.ptype,
+        weights: PEuclidValue.ptype, //PSmallValue.ptype,
         jumpSizes: PSmallValue.ptype,
         active: PInteger.ptype,
       }),
