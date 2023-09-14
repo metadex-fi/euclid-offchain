@@ -20,8 +20,8 @@ import { Contract } from "./contract.ts";
 import { User } from "./user.ts";
 import { maxInteger } from "../mod.ts";
 
-export const getMinBalance = (asset: Asset): bigint =>
-  asset.equals(Asset.ADA) ? 10000000n : 0n; // TODO arbitary aka both excessive and edge-casing
+// export const getMinBalance = (asset: Asset): bigint =>
+//   asset.equals(Asset.ADA) ? 10000000n : 0n; // TODO arbitary aka both excessive and edge-casing
 
 // this is supposed to account for potential differences in minAda, which sometimes
 // yields more than a few lovelaces, which in turn fucks with the new-Amm-comparison onchain
@@ -137,13 +137,27 @@ export class PreDiracUtxo {
   };
 }
 
+const minAdaBalance = 10000000n; // TODO arbitary aka both excessive and edge-casing
+
 export class DiracUtxo {
+  public readonly available: PositiveValue;
+
   private constructor( // keep private, because how we handle optional utxo arg
     public readonly peuclidDatum: PEuclidDatum,
     public readonly dirac: Dirac,
-    public readonly balance: PositiveValue,
+    public readonly funds: PositiveValue,
     public utxo?: Lucid.UTxO, //exists when reading, not when creating. Not readonly because subesequent-swappings needs to set it. TODO more safety here
-  ) {}
+  ) {
+    const adaBalance = funds.amountOf(Asset.ADA, 0n);
+    this.available = funds.clone;
+    if (0n < adaBalance) {
+      if(adaBalance <= minAdaBalance) {
+        this.available.drop(Asset.ADA);
+      } else {
+        this.available.increaseAmountOf(Asset.ADA, -minAdaBalance);
+      }
+    }
+  }
 
   static parse(
     from: PreDiracUtxo,
@@ -177,7 +191,7 @@ export class DiracUtxo {
     );
     return new DiracUtxo(peuclidDatum, dirac, balance);
   }
-
+  
   // public assets = (): Assets => this.dirac.assets;
   // public sharedAssets = (assets: Assets): Assets =>
   //   this.dirac.sharedAssets(assets);
@@ -190,14 +204,15 @@ export class DiracUtxo {
     // : undefined
     return `DiracUtxo (
   ${ttf}dirac: ${this.dirac.concise(ttf)},
-  ${ttf}balance: ${this.balance?.concise(ttf) ?? "undefined"}
+  ${ttf}balance: ${this.funds?.concise(ttf) ?? "undefined"},
+  ${ttf}available: ${this.available?.concise(ttf) ?? "undefined"}
   ${tt})`;
     // ${ttf}utxo size: ${size ?? "undefined"}
   };
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     const diracDatum = this.peuclidDatum.pconstant(new DiracDatum(this.dirac));
-    const funds = this.balance.toLucid;
+    const funds = this.funds.toLucid;
     const threadNFT = this.dirac.threadNFT.toLucidNFT;
     funds[Object.keys(threadNFT)[0]] = 1n;
 
@@ -220,7 +235,7 @@ export class DiracUtxo {
     return new DiracUtxo(
       this.peuclidDatum,
       swapping.posteriorDirac,
-      this.balance
+      this.funds
         .normedPlus(
           PositiveValue.singleton(swapping.soldAsset, swapping.soldAmount),
         )
@@ -247,7 +262,7 @@ export class DiracUtxo {
     let buyable_: PositiveValue;
     if (buyingAssets) {
       if (buyableAmnt === undefined) {
-        buyable_ = this.balance.ofAssets(buyingAssets);
+        buyable_ = this.available.ofAssets(buyingAssets);
       } else {
         const buyingAssets_ = buyingAssets.toList;
         assert(
@@ -257,7 +272,7 @@ export class DiracUtxo {
         const buyingAsset = buyingAssets_[0];
         buyable_ = PositiveValue.singleton(buyingAsset, buyableAmnt);
       }
-    } else buyable_ = this.balance;
+    } else buyable_ = this.available;
     console.log("buyable_:", buyable_.concise());
     console.log("sellable_:", sellable_?.concise());
     const param = paramUtxo.param;
@@ -279,7 +294,7 @@ export class DiracUtxo {
 
     param.assets.forEach((asset) => {
       // if (asset.equals(Asset.ADA)) return; // TODO for debugging, revert
-      const buyable = buyable_.amountOf(asset, 0n) - getMinBalance(asset);
+      const buyable = buyable_.amountOf(asset, 0n)// - getMinBalance(asset);
       const sellable = sellable_?.amountOf(asset, 0n);
       const minSelling = getMinSelling(asset, minSelling_);
       if (buyable < minBuying && sellable && sellable < minSelling) return;
@@ -289,7 +304,7 @@ export class DiracUtxo {
       const jumpSize = param.jumpSizes.amountOf(asset);
       const anchor = this.dirac.anchorPrices.amountOf(asset); // NOTE: inverted aka "price when selling for A0"
 
-      const liquidity = virtual + this.balance.amountOf(asset, 0n);
+      const liquidity = virtual + this.funds.amountOf(asset, 0n);
       if (liquidity <= 0n) return; // TODO reconsider if this can happen, throw error instead if not
       liquidity_.initAmountOf(asset, liquidity);
 
@@ -491,8 +506,7 @@ export class DiracUtxo {
           const sellingJumpSize = param.jumpSizes.amountOf(sellingAsset);
           const buyingJumpSize = param.jumpSizes.amountOf(buyingAsset);
 
-          const buyable = buyable_.amountOf(buyingAsset, 0n) -
-            getMinBalance(buyingAsset);
+          const buyable = buyable_.amountOf(buyingAsset, 0n)// - getMinBalance(buyingAsset);
           const sellable = sellable_?.amountOf(sellingAsset, 0n);
           if (buyable <= 0n || (sellable && sellable === 0n)) return;
 

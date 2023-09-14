@@ -16,7 +16,7 @@ import {
   randomChoice,
 } from "../../utils/generators.ts";
 import { User } from "../user.ts";
-import { DiracUtxo, getMinBalance, ParamUtxo } from "../utxo.ts";
+import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
 import { Assets } from "../../types/general/derived/asset/assets.ts";
 import { Dirac } from "../../types/euclid/dirac.ts";
@@ -69,8 +69,8 @@ export class Swapping {
       `soldSpot must be positive: ${this.show()}`,
     );
     assert(
-      boughtAmount <= diracUtxo.balance.amountOf(boughtAsset),
-      `boughtAmount must be less than or equal to the balance: ${this.show()}`,
+      boughtAmount <= diracUtxo.available.amountOf(boughtAsset),
+      `boughtAmount must be less than or equal to the available balance: ${this.show()}`,
     );
     assert(
       minBuying === null || minBuying > 0n,
@@ -83,7 +83,7 @@ export class Swapping {
     if (user) {
       assert(
         soldAmount <= user.balance!.amountOf(soldAsset),
-        `soldAmount must be less than or equal to the balance: ${this.show()}`,
+        `soldAmount must be less than or equal to the available balance: ${this.show()}`,
       );
     }
 
@@ -171,7 +171,7 @@ export class Swapping {
       `diracUtxo.utxo must be defined - subsequents-issue?`,
     );
     const oldDirac = this.diracUtxo.dirac;
-    const funds = this.diracUtxo.balance.clone; // TODO cloning probably not required here
+    const funds = this.diracUtxo.funds.clone; // TODO cloning probably not required here
     // console.log(`funds before: ${funds.show()}`)
     funds.addAmountOf(this.boughtAsset, -this.boughtAmount);
     funds.addAmountOf(this.soldAsset, this.soldAmount);
@@ -201,88 +201,12 @@ export class Swapping {
     );
     const datum_ = Data.to(datum);
 
-    // console.log("old anchors:", oldDirac.anchorPrices.concise());
-    // console.log("new anchors:", newDirac.anchorPrices.concise());
-
-    // begin logging
-    // const oldUtxo = this.diracUtxo.utxo!;
-    // const oldUtxo_ = Lucid.utxoToCore(oldUtxo);
-    // const oldbytes = BigInt(oldUtxo_.to_bytes().length);
-    // // NOTE this is hardcoded because we don't want async just because of this
-    // const coinsPerByte = parameters.coinsPerUtxoByte;
-    // const oldLockedAda = oldbytes * coinsPerByte;
-    // console.log("coinsPerByte (hardcoded):", coinsPerByte);
-    // console.log("old  - bytes:", oldbytes, "\tlockedAda:", oldLockedAda);
-
-    // // NOTE some of those are wrong, but should be equal number of bytes
-    // const newUtxo: Lucid.UTxO = {
-    //   txHash: oldUtxo.txHash,
-    //   outputIndex: oldUtxo.outputIndex,
-    //   assets: retour,
-    //   address: oldUtxo.address,
-    //   datumHash: null,
-    //   datum: datum_,
-    //   scriptRef: null,
-    // };
-    // const newUtxo_ = Lucid.utxoToCore(newUtxo);
-    // const newbytes = BigInt(newUtxo_.to_bytes().length);
-    // const newLockedAda = newbytes * coinsPerByte;
-    // console.log("new  - bytes:", newbytes, "\tlockedAda:", newLockedAda);
-    // const diffBytes = newbytes - oldbytes;
-    // const diffLockedAda = newLockedAda - oldLockedAda;
-    // console.log("diff - bytes:", diffBytes, "\tlockedAda:", diffLockedAda);
-
-    // const param = this.paramUtxo.param;
-    // const oldAmmSoldA = (this.diracUtxo.balance.amountOf(this.soldAsset, 0n) +
-    //   param.virtual.amountOf(this.soldAsset)) *
-    //   param.weights.amountOf(this.soldAsset);
-
-    // const oldAmmSoldB = (this.diracUtxo.balance.amountOf(this.soldAsset, 0n) +
-    //   diffLockedAda +
-    //   param.virtual.amountOf(this.soldAsset)) *
-    //   param.weights.amountOf(this.soldAsset);
-
-    // const oldAmmSoldC = (this.diracUtxo.balance.amountOf(this.soldAsset, 0n) -
-    //   diffLockedAda +
-    //   param.virtual.amountOf(this.soldAsset)) *
-    //   param.weights.amountOf(this.soldAsset);
-
-    // console.log("old balance:", this.diracUtxo.balance.concise());
-    // console.log("oldAmmSoldA:", oldAmmSoldA);
-    // console.log("oldAmmSoldB:", oldAmmSoldB); // <- same as in plutus error
-    // console.log("oldAmmSoldC:", oldAmmSoldC);
-
-    // const newAmmSoldA = (funds.amountOf(this.soldAsset, 0n) +
-    //   param.virtual.amountOf(this.soldAsset)) *
-    //   param.weights.amountOf(this.soldAsset);
-
-    // const newAmmSoldB = (funds.amountOf(this.soldAsset, 0n) +
-    //   diffLockedAda +
-    //   param.virtual.amountOf(this.soldAsset)) *
-    //   param.weights.amountOf(this.soldAsset);
-
-    // const newAmmSoldC = (funds.amountOf(this.soldAsset, 0n) -
-    //   diffLockedAda +
-    //   param.virtual.amountOf(this.soldAsset)) *
-    //   param.weights.amountOf(this.soldAsset);
-
-    // console.log("new balance:", funds.concise());
-    // console.log("newAmmSoldA:", newAmmSoldA);
-    // console.log("newAmmSoldB:", newAmmSoldB);
-    // console.log("newAmmSoldC:", newAmmSoldC);
-
-    // end logging
-
     const tx_ = tx
       .readFrom([this.paramUtxo.utxo!])
       .collectFrom(
         [this.diracUtxo.utxo!],
         Data.to(swapRedeemer),
       )
-      // .payToAddress( // TODO is this really necessary?
-      //   this.user!.address!,
-      //   this.boughtAsset.toLucidWith(this.boughtAmount)
-      // )
       .payToContract(
         this.user!.contract.address,
         {
@@ -567,7 +491,7 @@ export class Swapping {
       boughtExp,
       soldExp,
       true,
-      diracUtxo.balance.amountOf(boughtAsset) - getMinBalance(boughtAsset),
+      diracUtxo.available.amountOf(boughtAsset),
       minBuying,
       minSelling,
     );
@@ -725,8 +649,8 @@ export class Swapping {
     const dirac = this.diracUtxo.dirac;
     const anchorBuying = dirac.anchorPrices.amountOf(this.boughtAsset);
     const anchorSelling = dirac.anchorPrices.amountOf(this.soldAsset);
-    const balanceBuying = this.diracUtxo.balance.amountOf(this.boughtAsset, 0n);
-    const balanceSelling = this.diracUtxo.balance.amountOf(this.soldAsset, 0n);
+    const balanceBuying = this.diracUtxo.funds.amountOf(this.boughtAsset, 0n);
+    const balanceSelling = this.diracUtxo.funds.amountOf(this.soldAsset, 0n);
 
     const buyingLiquidity = balanceBuying + virtualBuying;
     const sellingLiquidity = balanceSelling + virtualSelling;

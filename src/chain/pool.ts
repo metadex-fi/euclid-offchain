@@ -134,10 +134,10 @@ export class Pool {
     } else return this.paramUtxo.paramNFT;
   }
 
-  public get balance(): Value {
+  public get available(): Value {
     const assets = this.paramUtxo.param.assets;
     const total = this.diracUtxos.reduce(
-      (a, b) => a.normedPlus(b.balance),
+      (a, b) => a.normedPlus(b.available),
       new PositiveValue(),
     ).ofAssets(this.paramUtxo.param.assets);
 
@@ -160,7 +160,7 @@ export class Pool {
     const virtual = this.paramUtxo.param.virtual.unsigned;
     return this.diracUtxos.map((d) => {
       const pricesA0 = Value.hadamard(
-        Value.normedAdd(d.balance.ofAssets(assets).unsigned, virtual),
+        Value.normedAdd(d.funds.ofAssets(assets).unsigned, virtual),
         weights,
       );
       const pricesA1 = new AssocMap<Asset, number>((a) => a.concise());
@@ -169,7 +169,7 @@ export class Pool {
       assets.forEach((asset) => {
         const priceA1_i = priceA0_1 / Number(pricesA0.amountOf(asset));
         pricesA1.set(asset, priceA1_i);
-        valueA1 += Number(d.balance.amountOf(asset, 0n)) * priceA1_i;
+        valueA1 += Number(d.funds.amountOf(asset, 0n)) * priceA1_i;
       });
       return {
         pricesA1: pricesA1,
