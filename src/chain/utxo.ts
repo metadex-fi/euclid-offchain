@@ -137,7 +137,7 @@ export class PreDiracUtxo {
   };
 }
 
-const minAdaBalance = 10000000n; // TODO arbitary aka both excessive and edge-casing
+export const minAdaBalance = 10000000n; // TODO arbitary aka both excessive and edge-casing
 
 export class DiracUtxo {
   public readonly available: PositiveValue;
