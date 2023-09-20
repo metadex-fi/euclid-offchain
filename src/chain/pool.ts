@@ -134,20 +134,23 @@ export class Pool {
     } else return this.paramUtxo.paramNFT;
   }
 
-  public get available(): Value {
+  private balance = (total: boolean): Value => {
     const assets = this.paramUtxo.param.assets;
-    const total = this.diracUtxos.reduce(
-      (a, b) => a.normedPlus(b.available),
+    const sum = this.diracUtxos.reduce(
+      (a, b) => a.normedPlus(total ? b.funds : b.available),
       new PositiveValue(),
     ).ofAssets(this.paramUtxo.param.assets);
 
-    const total_ = total.unsigned;
+    const sum_ = sum.unsigned;
     assets.forEach((asset) => {
-      total_.fillAmountOf(asset, 0n);
+      sum_.fillAmountOf(asset, 0n);
     });
 
-    return total_;
+    return sum_;
   }
+
+  public get available() {return this.balance(false)}
+  public get funds() {return this.balance(true)}
 
   public get assets(): Assets {
     return this.paramUtxo.param.assets;
