@@ -297,7 +297,7 @@ export class DiracUtxo {
       const buyable = buyable_.amountOf(asset, 0n)// - getMinBalance(asset);
       const sellable = sellable_?.amountOf(asset, 0n);
       const minSelling = getMinSelling(asset, minSelling_);
-      if (buyable < minBuying && sellable && sellable < minSelling) return;
+      if (buyable < minBuying && sellable && sellable !== -1n && sellable < minSelling) return;
 
       const virtual = param.virtual.amountOf(asset);
       const weight = param.weights.amountOf(asset); // NOTE: inverted
@@ -355,11 +355,11 @@ export class DiracUtxo {
       }
 
       if (
-        (sellable === undefined || sellable >= minSelling) && spotSelling > 0n
+        (sellable === undefined || sellable === -1n || sellable >= minSelling) && spotSelling > 0n
       ) {
         while (true) {
           const d = delta_(spotSelling);
-          const maxSelling = sellable && sellable > 0n ? min(sellable, d) : d;
+          const maxSelling = sellable && sellable !== -1n ? min(sellable, d) : d;
 
           if (maxSelling >= minSelling) {
             spotSelling_.initAmountOf(asset, spotSelling);
@@ -508,7 +508,7 @@ export class DiracUtxo {
 
           const buyable = buyable_.amountOf(buyingAsset, 0n)// - getMinBalance(buyingAsset);
           const sellable = sellable_?.amountOf(sellingAsset, 0n);
-          if (buyable <= 0n || (sellable && sellable === 0n)) return;
+          if (buyable <= 0n || (sellable && sellable !== -1n && sellable < minSelling)) return;
 
           const deltaSelling = delta(
             param.weights.amountOf(sellingAsset),
@@ -582,7 +582,7 @@ export class DiracUtxo {
               const d = deltaSelling(spotSelling);
               console.log(`deltaSelling: ${d}`);
               let newMaxSelling;
-              if (sellable && sellable > 0n) {
+              if (sellable && sellable !== -1n) {
                 if (sellable <= d) {
                   newMaxSelling = sellable;
                   console.log(
