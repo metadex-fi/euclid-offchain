@@ -8,7 +8,7 @@ import { PRecord } from "../general/fundamental/container/record.ts";
 import { f, t } from "../general/fundamental/type.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
 import { PInteger } from "../general/fundamental/primitive/integer.ts";
-import { ceilDiv, maxInteger, min } from "../../utils/generators.ts";
+import { ceilDiv, maxIntRoot, maxInteger, min } from "../../utils/generators.ts";
 import { Value } from "../general/derived/value/value.ts";
 import { maxSmallInteger, PSmallValue, SmallValue } from "./smallValue.ts";
 
@@ -169,7 +169,9 @@ ${tt})`;
     const jsv = jumpSize * virtual;
     const minWeight = ceilDiv(js1, virtual);
     let maxWeight = (maxInteger * js1) / (jsv + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
-    // maxWeight = min(maxWeight, maxSmallInteger); //gMaxJumpSize);
+    maxWeight = min(maxWeight, maxIntRoot); // TODO maxIntRoot is chosen rather randomly, 
+    // as a tradeoff between accurate weights and not hitting limits in swappings all the time
+    // (limits regarding spotPrices, which become newAnchorPrices)
 
     assert(
       minWeight <= maxWeight,

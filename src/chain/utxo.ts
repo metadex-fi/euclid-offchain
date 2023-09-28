@@ -315,10 +315,19 @@ export class DiracUtxo {
       const exp = Swapping.exp(Number(anchor), Number(amm), jumpMultiplier);
 
       let expBuying = BigInt(Math.floor(exp));
-      let expSelling = BigInt(Math.ceil(exp));
-
       let spotBuying = Swapping.spot(anchor, jumpSize, expBuying);
+      while (spotBuying > maxInteger) {
+        expBuying--;
+        spotBuying = Swapping.spot(anchor, jumpSize, expBuying);
+      }
+      
+      let expSelling = BigInt(Math.ceil(exp));
       let spotSelling = Swapping.spot(anchor, jumpSize, expSelling);
+      while (spotSelling > maxInteger) {
+        expSelling--;
+        spotSelling = Swapping.spot(anchor, jumpSize, expSelling);
+      }
+
 
       // TODO what about this?
       // NOTE: inverted
@@ -376,6 +385,7 @@ export class DiracUtxo {
             // NOTE/TODO: This should never result in an infite loop,
             // as decreasing uninverted selling price should eventually
             // result in some delta.
+            if (spotSelling > maxInteger) break;
           }
         }
       }
@@ -446,46 +456,6 @@ export class DiracUtxo {
           if (newSellingAmount < minSelling && minSelling <= maxSelling) {
             newSellingAmount = minSelling;
           }
-
-          // if (newSellingAmount < sellingAmount) {
-          //   switch (limitReached) {
-          //     case "none":
-          //       throw new Error(`sellingAmount was decreased:
-          //       ${newSellingAmount} < ${sellingAmount}
-          //       diff: ${newSellingAmount - sellingAmount}`);
-          //     case "selling":
-          //       increaseExpSelling(-1n);
-          //       limitReached = "none";
-          //       return;
-          //     case "buying":
-          //       // TODO is this being visited?
-          //       increaseExpBuying(1n);
-          //       limitReached = "none";
-          //       return;
-          //     default:
-          //       throw new Error(`unknown limitReached: ${limitReached}`);
-          //   }
-          // }
-
-          // if (newBuyingAmount < buyingAmount) {
-          //   switch (limitReached) {
-          //     case "none":
-          //       throw new Error(`buyingAmount was decreased:
-          //       ${newBuyingAmount} < ${buyingAmount}
-          //       diff: ${newBuyingAmount - buyingAmount}`);
-          //     case "selling":
-          //       increaseExpSelling(-1n);
-          //       limitReached = "none";
-          //       return;
-          //     case "buying":
-          //       // TODO is this being visited?
-          //       increaseExpBuying(1n);
-          //       limitReached = "none";
-          //       return;
-          //     default:
-          //       throw new Error(`unknown limitReached: ${limitReached}`);
-          //   }
-          // }
 
           maxSwapA0 = newMaxSwapA0;
           maxBuyingA0 = newMaxBuyingA0;
@@ -579,30 +549,37 @@ export class DiracUtxo {
               if (sellingLimit) return;
               // assert(!sellingLimit, `sellingLimit reached already`);
               increaseExpSelling(1n);
-              const d = deltaSelling(spotSelling);
-              console.log(`deltaSelling: ${d}`);
-              let newMaxSelling;
-              if (sellable && sellable !== -1n) {
-                if (sellable <= d) {
-                  newMaxSelling = sellable;
-                  console.log(
-                    `sellingLimit reached - sellable <= d: ${sellable} <= ${d}`,
-                  );
-                  sellingLimit = true;
-                  limitReached = "selling";
+              if (spotSelling > maxInteger) {
+                console.log(`spotSelling > maxInteger: ${spotSelling} > ${maxInteger}`);
+                increaseExpSelling(-1n);
+                sellingLimit = true;
+                limitReached = "selling";
+              } else {
+                const d = deltaSelling(spotSelling);
+                console.log(`deltaSelling: ${d}`);
+                let newMaxSelling;
+                if (sellable && sellable !== -1n) {
+                  if (sellable <= d) {
+                    newMaxSelling = sellable;
+                    console.log(
+                      `sellingLimit reached - sellable <= d: ${sellable} <= ${d}`,
+                    );
+                    sellingLimit = true;
+                    limitReached = "selling";
+                  } else {
+                    newMaxSelling = d;
+                  }
                 } else {
                   newMaxSelling = d;
                 }
-              } else {
-                newMaxSelling = d;
+                assert(
+                  newMaxSelling >= maxSelling,
+                  `maxSelling was decreased: 
+                  ${newMaxSelling} < ${maxSelling}
+                  diff: ${newMaxSelling - maxSelling}`,
+                );
+                maxSelling = newMaxSelling;
               }
-              assert(
-                newMaxSelling >= maxSelling,
-                `maxSelling was decreased: 
-                ${newMaxSelling} < ${maxSelling}
-                diff: ${newMaxSelling - maxSelling}`,
-              );
-              maxSelling = newMaxSelling;
             } else {
               if (buyingLimit) return;
               // assert(!buyingLimit, `buyingLimit reached already`);
@@ -681,8 +658,8 @@ export class DiracUtxo {
         // /// end logging/debugging
 
         // TODO better solution than this
-        if (spotBuying > maxInteger) return;
-        if (spotSelling > maxInteger) return;
+        // if (spotBuying > maxInteger) return;
+        // if (spotSelling > maxInteger) return;
 
         const swapping = Swapping.boundary(
           user,

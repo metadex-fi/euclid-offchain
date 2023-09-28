@@ -69,6 +69,14 @@ export class Swapping {
       `soldSpot must be positive: ${this.show()}`,
     );
     assert(
+      boughtSpot <= maxInteger,
+      `boughtSpot must be <= maxInteger: ${this.show()}`,
+    )
+    assert(
+      soldSpot <= maxInteger,
+      `soldSpot must be <= maxInteger: ${this.show()}`,
+    )
+    assert(
       boughtAmount <= diracUtxo.available.amountOf(boughtAsset),
       `boughtAmount must be less than or equal to the available balance: ${this.show()}`,
     );
@@ -809,7 +817,7 @@ export class Swapping {
       `seems like boughtExp is being changed in the wrong direction`,
     );
 
-    if (boughtSpot_ > 0n) {
+    if (boughtSpot_ > 0n && boughtSpot_ <= maxInteger) {
       const boughtSpotTooHigh = new Swapping(
         this.user,
         this.paramUtxo,
@@ -874,7 +882,7 @@ export class Swapping {
       `seems like soldExp is being changed in the wrong direction`,
     );
 
-    if (soldSpot_ > 0n) {
+    if (soldSpot_ > 0n && soldSpot_ <= maxInteger) {
       const buyingA0 = this.boughtAmount * soldSpot_;
       const sellingA0 = this.soldAmount * this.boughtSpot;
       const swapA0 = min(sellingA0, buyingA0);
