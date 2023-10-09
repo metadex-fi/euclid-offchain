@@ -97,7 +97,7 @@ export class Opening {
         jumpSize,
         exp,
       );
-      console.log("exp decreased:", exp, "finalAnchor:", finalAnchor);
+      // console.log("exp decreased:", exp, "finalAnchor:", finalAnchor);
     }
 
     console.log(`finalAnchor: ${finalAnchor} vs. baseAnchor: ${baseAnchor}`);
@@ -254,10 +254,10 @@ export class Opening {
   };
 
   // splitting it up this way to later use the same class to process actual user input
-  static genOfUser = (user: User): Opening | undefined => {
+  static genOfUser = (user: User): Opening | null => {
     // console.log(`attempting to open`);
     const balance = user.availableBalance;
-    if (!balance || balance.size < 1) return undefined;
+    if (!balance || balance.size < 1) return null;
     const maxAssets = gMaxLength;
     const deposit = balance.boundedSubValue(1n, maxAssets);
     const allAssets = deposit.assets;

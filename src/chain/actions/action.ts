@@ -13,7 +13,7 @@ export class UserAction {
     private readonly user: User,
   ) {}
 
-  public generate = (): Action | undefined => {
+  public generate = (): Action | null => {
     const actions = new Permutation(allActions);
     return actions.try((a) => {
       return a.genOfUser(this.user);
@@ -33,15 +33,15 @@ class Permutation<T> {
     return this.base.length === 0;
   }
 
-  public get next(): T | undefined {
-    if (this.done) return undefined;
+  public get next(): T | null {
+    if (this.done) return null;
     const [choice, i] = randomIndexedChoice(this.base);
     this.base = this.base.slice(0, i).concat(this.base.slice(i + 1));
     return choice;
   }
 
-  public try = <T0>(f: (arg: T) => T0 | undefined): T0 | undefined => {
-    if (this.done) return undefined;
+  public try = <T0>(f: (arg: T) => T0 | null): T0 | null => {
+    if (this.done) return null;
     return f(this.next!) ?? this.try(f);
   };
 }

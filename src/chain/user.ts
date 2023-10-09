@@ -68,17 +68,17 @@ export class User {
       }
       this.paymentKeyHash = paymentKeyHash_;
 
-      const utxoGetter = api 
-      ? async () => {
-        const utxos = ((await api.getUtxos()) || []).map((utxo) => {
-          const parsedUtxo = Lucid.C.TransactionUnspentOutput.from_bytes(
-            Lucid.fromHex(utxo),
-          );
-          return Lucid.coreToUtxo(parsedUtxo);
-        });
-        return utxos;
-      }
-      : () => lucid.utxosAt(address); // this calls the provider, above calls the wallet directly
+      const utxoGetter = api
+        ? async () => {
+          const utxos = ((await api.getUtxos()) || []).map((utxo) => {
+            const parsedUtxo = Lucid.C.TransactionUnspentOutput.from_bytes(
+              Lucid.fromHex(utxo),
+            );
+            return Lucid.coreToUtxo(parsedUtxo);
+          });
+          return utxos;
+        }
+        : () => lucid.utxosAt(address); // this calls the provider, above calls the wallet directly
 
       lucid.wallet.getUtxos = async () => {
         // console.log("getUtxos()");

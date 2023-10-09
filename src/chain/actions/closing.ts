@@ -25,13 +25,13 @@ export class Closing {
 
   public succeeded = (_txCore: Lucid.C.Transaction) => {};
 
-  static genOfUser = (user: User): Closing | undefined => {
+  static genOfUser = (user: User): Closing | null => {
     // console.log(`attempting to close`);
     const enoughForFees = user.availableBalance;
-    if (!enoughForFees) return undefined;
+    if (!enoughForFees) return null;
     const pools = user.contract.state?.pools.get(user.paymentKeyHash);
-    if (!pools) return undefined;
-    if (!pools.size) return undefined;
+    if (!pools) return null;
+    if (!pools.size) return null;
     const pool = randomChoice([...pools.values()]);
     // console.log(`Closing`);
     return new Closing(user, pool);

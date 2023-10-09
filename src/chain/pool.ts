@@ -147,10 +147,14 @@ export class Pool {
     });
 
     return sum_;
-  }
+  };
 
-  public get available() {return this.balance(false)}
-  public get funds() {return this.balance(true)}
+  public get available() {
+    return this.balance(false);
+  }
+  public get funds() {
+    return this.balance(true);
+  }
 
   public get assets(): Assets {
     return this.paramUtxo.param.assets;
@@ -272,6 +276,7 @@ export class Pool {
       d.swappingsFor(
         user,
         this.paramUtxo,
+        true,
         minBuying,
         minSelling,
         sellableBalance.unsigned,
