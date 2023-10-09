@@ -110,7 +110,7 @@ export class Swapping {
       // if (!this.validates()) {
       //   console.error(`Swapping does not validate: ${this.show()}`);
       // }
-      assert(this.validates(), `Swapping does not validate:: ${this.show()}`);
+      assert(this.validates(), `Swapping does not validate: ${this.show()}`);
 
       // if (runCorruptionTests) this.corruptAll();
     }
@@ -488,7 +488,7 @@ export class Swapping {
       `randomSubSwap(): failed to find a subSwap for ${this.show()}`,
     );
     assert(
-      this.equalNumbers(subSwap, true, true), // TODO why not compare minBuying?
+      this.equalNumbers(subSwap, false, true), // maxBuying changes per definition of a subSwap
       `subSwap with unchanged amounts should result in same Swapping, but got:\n${subSwap.show()}\nfrom\n${this.show()}`,
     );
     return subSwap;

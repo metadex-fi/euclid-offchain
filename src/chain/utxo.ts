@@ -411,33 +411,86 @@ export class DiracUtxo {
         const buyingSpot = buyingSpot_.amountOf(buyingAsset);
         const sellingSpot = sellingSpot_.amountOf(sellingAsset);
 
-        const sellingExp = sellingExp_.amountOf(sellingAsset);
         const buyingExp = buyingExp_.amountOf(buyingAsset);
+        const sellingExp = sellingExp_.amountOf(sellingAsset);
 
+        const buyable = buyable_.amountOf(buyingAsset, 0n);
         const maxBuying = maxBuying_.amountOf(buyingAsset);
         const maxSelling = maxSelling_.amountOf(sellingAsset);
 
         const minSelling = getMinSelling(sellingAsset, minSelling_);
 
         const getSwappingForPair = (tmpMinBuying?: bigint): Swapping | null => {
-          if (tmpMinBuying !== undefined && tmpMinBuying > maxBuying) {
-            console.log(
-              `tmpMinBuying > maxBuying: ${tmpMinBuying} > ${maxBuying}`,
-            );
-            return null;
+          let buyingSpot__: bigint;
+          let buyingExp__: bigint;
+          let maxBuying__: bigint | undefined;
+          if (tmpMinBuying !== undefined) {
+            // TODO extremely unoptimized
+            if (buyable >= tmpMinBuying) {
+              const weight = param.weights.amountOf(buyingAsset); // NOTE: inverted
+              const jumpSize = param.jumpSizes.amountOf(buyingAsset);
+              const anchor = this.dirac.anchorPrices.amountOf(buyingAsset); // NOTE: inverted aka "price when selling for A0"
+              const liquidity = liquidity_.amountOf(buyingAsset);
+
+              const amm = liquidity * weight; // NOTE: inverted aka "price when selling for A0"
+              assert(amm > 0n, `amm <= 0n`);
+
+              const jumpMultiplier = (Number(jumpSize) + 1) / Number(jumpSize);
+              const exp = Swapping.exp(
+                Number(anchor),
+                Number(amm),
+                jumpMultiplier,
+              );
+
+              buyingExp__ = BigInt(Math.floor(exp));
+
+              buyingSpot__ = Swapping.spot(anchor, jumpSize, buyingExp__);
+              while (buyingSpot__ > maxInteger) {
+                buyingExp__--;
+                buyingSpot__ = Swapping.spot(anchor, jumpSize, buyingExp__);
+              }
+
+              const delta_ = delta(weight, liquidity);
+              while (buyingSpot__ > 0n) {
+                const d = delta_(buyingSpot__);
+                maxBuying__ = min(buyable, -d);
+                // console.log(`
+                //   buyable: ${buyable}
+                //   d: ${d}
+                //   maxBuying: ${maxBuying}
+                // `);
+
+                if (maxBuying__ >= tmpMinBuying) {
+                  break;
+                } else {
+                  buyingExp__--;
+                  buyingSpot__ = Swapping.spot(anchor, jumpSize, buyingExp__);
+                  // if maxBuying is 0, then d is too low, which means that
+                  // we are too close at the amm-price. So we ~increase~ the
+                  // (uninverted) price we are willing to ~buy~ at stepwise
+                  // until either we hit the bounds or find a d >= 1.
+                }
+              }
+              if (maxBuying__ === undefined) return null;
+            } else return null;
+          } else {
+            buyingSpot__ = buyingSpot;
+            buyingExp__ = buyingExp;
+            maxBuying__ = maxBuying;
           }
+
           return this.swappingForPair(
             user,
             paramUtxo,
             buyingAsset,
             sellingAsset,
-            buyingSpot,
+            buyingSpot__,
             sellingSpot,
-            buyingExp,
+            buyingExp__,
             sellingExp,
             minBuying,
             minSelling,
-            maxBuying,
+            maxBuying__,
             maxSelling,
             liquidity_,
             buyable_,
@@ -499,12 +552,12 @@ export class DiracUtxo {
                 : null;
               console.log(`maybeBetterSlow: ${maybeBetterSlow?.show()}`);
               const maybeBetterFast = getSwappingForPair(tmpMinBuying);
-              if (maybeBetterFast) { // TODO revert
-                assert(
-                  maybeBetterSlow?.show() === maybeBetterFast?.show(),
-                  `maybeBetterSlow !== maybeBetterFast:\n${maybeBetterSlow?.show()}\n!==\n${maybeBetterFast?.show()}`,
-                );
-              }
+              // if (maybeBetterFast) { // TODO revert
+              assert(
+                maybeBetterSlow?.show() === maybeBetterFast?.show(),
+                `maybeBetterSlow !== maybeBetterFast:\n${maybeBetterSlow?.show()}\n!==\n${maybeBetterFast?.show()}`,
+              );
+              // }
               if (
                 maybeBetterSlow &&
                 maybeBetterSlow.effectivePrice <= swapping.effectivePrice
