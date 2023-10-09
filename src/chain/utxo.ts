@@ -425,25 +425,20 @@ export class DiracUtxo {
           let buyingExp__: bigint;
           let maxBuying__: bigint | undefined;
           if (tmpMinBuying !== undefined) {
-            // TODO extremely unoptimized
+            // TODO this is just copypaste from above, with slight adjustments
             if (buyable >= tmpMinBuying) {
               const weight = param.weights.amountOf(buyingAsset); // NOTE: inverted
               const jumpSize = param.jumpSizes.amountOf(buyingAsset);
               const anchor = this.dirac.anchorPrices.amountOf(buyingAsset); // NOTE: inverted aka "price when selling for A0"
               const liquidity = liquidity_.amountOf(buyingAsset);
-
               const amm = liquidity * weight; // NOTE: inverted aka "price when selling for A0"
-              assert(amm > 0n, `amm <= 0n`);
-
               const jumpMultiplier = (Number(jumpSize) + 1) / Number(jumpSize);
               const exp = Swapping.exp(
                 Number(anchor),
                 Number(amm),
                 jumpMultiplier,
               );
-
               buyingExp__ = BigInt(Math.floor(exp));
-
               buyingSpot__ = Swapping.spot(anchor, jumpSize, buyingExp__);
               while (buyingSpot__ > maxInteger) {
                 buyingExp__--;
@@ -454,21 +449,11 @@ export class DiracUtxo {
               while (buyingSpot__ > 0n) {
                 const d = delta_(buyingSpot__);
                 maxBuying__ = min(buyable, -d);
-                // console.log(`
-                //   buyable: ${buyable}
-                //   d: ${d}
-                //   maxBuying: ${maxBuying}
-                // `);
-
                 if (maxBuying__ >= tmpMinBuying) {
                   break;
                 } else {
                   buyingExp__--;
                   buyingSpot__ = Swapping.spot(anchor, jumpSize, buyingExp__);
-                  // if maxBuying is 0, then d is too low, which means that
-                  // we are too close at the amm-price. So we ~increase~ the
-                  // (uninverted) price we are willing to ~buy~ at stepwise
-                  // until either we hit the bounds or find a d >= 1.
                 }
               }
               if (maxBuying__ === undefined) return null;
@@ -502,70 +487,69 @@ export class DiracUtxo {
         if (swapping) {
           if (optimizeAmnts) {
             let i = 0;
-            const sellable__ = Value.singleton(
-              sellingAsset,
-              sellable_?.amountOf(sellingAsset, 0n) ?? -1n,
-            );
-            const buyableAssets_ = Assets.singleton(buyingAsset);
+            // const sellable__ = Value.singleton(
+            //   sellingAsset,
+            //   sellable_?.amountOf(sellingAsset, 0n) ?? -1n,
+            // );
+            // const buyableAssets_ = Assets.singleton(buyingAsset);
             while (true) {
               console.log(`trying to find better effective price (${i})`);
-              // const maybeBetter = getSwappingForPair(swapping.buyingAmnt + 1n);
-              // TODO room for optimization - forgoing above for below for now, because not sure above gets everything
               const tmpMinBuying: bigint = swapping.buyingAmnt + 1n;
-              const maybeBetters: Swapping[] = this.swappingsFor(
-                user,
-                paramUtxo,
-                false,
-                tmpMinBuying,
-                minSelling,
-                sellable__,
-                buyableAssets_,
-                buyableAmnt,
-              );
-              console.log(`maybeBetters: ${maybeBetters.length}`);
-              assert(
-                maybeBetters.length <= 1,
-                `maybeBetters.length must be <= 1, but got:\n${
-                  maybeBetters.map((s) => s.show()).join("\n")
-                }`,
-              );
-              let maybeBetterSlow: Swapping | null = maybeBetters?.length
-                ? maybeBetters[0]
-                : null;
-              maybeBetterSlow = maybeBetterSlow
-                ? Swapping.boundary(
-                  user,
-                  paramUtxo,
-                  this,
-                  buyingAsset,
-                  sellingAsset,
-                  maybeBetterSlow.buyingAmnt,
-                  maybeBetterSlow.sellingAmnt,
-                  maybeBetterSlow.buyingSpot,
-                  maybeBetterSlow.sellingSpot,
-                  maybeBetterSlow.buyingExp,
-                  maybeBetterSlow.sellingExp,
-                  minBuying,
-                  minSelling,
-                  tmpMinBuying,
-                )
-                : null;
-              console.log(`maybeBetterSlow: ${maybeBetterSlow?.show()}`);
               const maybeBetterFast = getSwappingForPair(tmpMinBuying);
-              // if (maybeBetterFast) { // TODO revert
-              assert(
-                maybeBetterSlow?.show() === maybeBetterFast?.show(),
-                `maybeBetterSlow !== maybeBetterFast:\n${maybeBetterSlow?.show()}\n!==\n${maybeBetterFast?.show()}`,
-              );
-              // }
+              // NOTE don't delete below, it's for asserting that the fast and slow version are equivalent
+              // const maybeBetters: Swapping[] = this.swappingsFor(
+              //   user,
+              //   paramUtxo,
+              //   false,
+              //   tmpMinBuying,
+              //   minSelling,
+              //   sellable__,
+              //   buyableAssets_,
+              //   buyableAmnt,
+              // );
+              // console.log(`maybeBetters: ${maybeBetters.length}`);
+              // assert(
+              //   maybeBetters.length <= 1,
+              //   `maybeBetters.length must be <= 1, but got:\n${
+              //     maybeBetters.map((s) => s.show()).join("\n")
+              //   }`,
+              // );
+              // let maybeBetterSlow: Swapping | null = maybeBetters?.length
+              //   ? maybeBetters[0]
+              //   : null;
+              // maybeBetterSlow = maybeBetterSlow
+              //   ? Swapping.boundary(
+              //     user,
+              //     paramUtxo,
+              //     this,
+              //     buyingAsset,
+              //     sellingAsset,
+              //     maybeBetterSlow.buyingAmnt,
+              //     maybeBetterSlow.sellingAmnt,
+              //     maybeBetterSlow.buyingSpot,
+              //     maybeBetterSlow.sellingSpot,
+              //     maybeBetterSlow.buyingExp,
+              //     maybeBetterSlow.sellingExp,
+              //     minBuying,
+              //     minSelling,
+              //     tmpMinBuying,
+              //   )
+              //   : null;
+              // console.log(`maybeBetterSlow: ${maybeBetterSlow?.show()}`);
+              // assert(
+              //   maybeBetterSlow?.show() === maybeBetterFast?.show(),
+              //   `maybeBetterSlow !== maybeBetterFast:\n${maybeBetterSlow?.show()}\n!==\n${maybeBetterFast?.show()}`,
+              // );
+              // const maybeBetter = maybeBetterSlow;
+              const maybeBetter = maybeBetterFast;
               if (
-                maybeBetterSlow &&
-                maybeBetterSlow.effectivePrice <= swapping.effectivePrice
+                maybeBetter &&
+                maybeBetter.effectivePrice <= swapping.effectivePrice
               ) {
                 console.log(
-                  `found swapping with better effective price (${i++}): ${maybeBetterSlow.effectivePrice} <= ${swapping.effectivePrice}`,
+                  `found swapping with better effective price (${i++}): ${maybeBetter.effectivePrice} <= ${swapping.effectivePrice}`,
                 );
-                swapping = maybeBetterSlow;
+                swapping = maybeBetter;
               } else break;
             }
           }

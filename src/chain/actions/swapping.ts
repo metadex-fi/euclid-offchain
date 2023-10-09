@@ -457,7 +457,7 @@ export class Swapping {
   };
 
   // NOTE subSwapA is only wrong regarding maxBuying
-  public subSwap = this.subSwapA; // TODO profile both and pick the better one (later)
+  public subSwap = this.subSwapB; // TODO profile both and pick the better one (later)
 
   private randomSubSwap = (): Swapping => {
     const minSelling = getMinSelling(this.sellingAsset, this.minSelling);
