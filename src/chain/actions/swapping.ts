@@ -276,6 +276,7 @@ export class Swapping {
   public succeeded = this.setSubsequentUtxo;
 
   public subsequents = (
+    amntOptimizationEndurance: number,
     maxSubsequents?: number,
     applyMinAmounts = true, // TODO test false
   ): Swapping[] => {
@@ -296,7 +297,7 @@ export class Swapping {
       const subsequents = diracUtxo.swappingsFor(
         this.user,
         this.paramUtxo,
-        true,
+        amntOptimizationEndurance,
         applyMinAmounts ? this.minBuying ?? undefined : undefined,
         applyMinAmounts ? this.minSelling ?? undefined : undefined,
         Value.singleton(this.sellingAsset, sellableAmount),
@@ -345,7 +346,7 @@ export class Swapping {
     const swappings = this.diracUtxo.swappingsFor(
       this.user,
       this.paramUtxo,
-      false,
+      0,
       applyMinAmounts ? this.minBuying ?? undefined : undefined,
       applyMinAmounts ? this.minSelling ?? undefined : undefined,
       Value.singleton(
@@ -539,6 +540,7 @@ export class Swapping {
     for (let i = maxInteger; i > 1n; i /= 10n) {
       swappings = user.contract!.state!.swappingsFor(
         user,
+        Number(genNonNegative(10n)),
         maybeNdef(genPositive(i)),
         maybeNdef(genPositive(i)),
       );
@@ -749,17 +751,17 @@ export class Swapping {
 
       this.corruptSoldAmnt(false),
       this.corruptBoughtAmnt(false),
-      // TODO revert
-      // this.corruptSoldAmnt(true),
-      // this.corruptBoughtAmnt(true),
-      // this.corruptSoldAmnt(true),
-      // this.corruptBoughtAmnt(true),
-      // this.corruptSoldAmnt(true),
-      // this.corruptBoughtAmnt(true),
-      // this.corruptSoldAmnt(true),
-      // this.corruptBoughtAmnt(true),
-      // this.corruptSoldAmnt(true),
-      // this.corruptBoughtAmnt(true),
+
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
     ].filter((s) => s) as Swapping[];
   };
 

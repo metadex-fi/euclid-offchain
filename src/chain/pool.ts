@@ -262,6 +262,7 @@ export class Pool {
 
   public swappingsFor(
     user: User,
+    amntOptimizationEndurance: number,
     minBuying?: bigint,
     minSelling?: bigint,
   ): Swapping[] {
@@ -276,7 +277,7 @@ export class Pool {
       d.swappingsFor(
         user,
         this.paramUtxo,
-        true,
+        amntOptimizationEndurance,
         minBuying,
         minSelling,
         sellableBalance.unsigned,
