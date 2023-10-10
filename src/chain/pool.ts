@@ -261,6 +261,7 @@ export class Pool {
   };
 
   public swappingsFor(
+    adhereMaxInteger: boolean,
     user: User,
     minBuying?: bigint,
     minSelling?: bigint,
@@ -274,6 +275,7 @@ export class Pool {
     if (!sellableBalance.size) return [];
     return this.diracUtxos.flatMap((d) =>
       d.swappingsFor(
+        adhereMaxInteger,
         user,
         this.paramUtxo,
         true,

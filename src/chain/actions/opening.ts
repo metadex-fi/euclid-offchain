@@ -70,7 +70,7 @@ export class Opening {
     virtual: bigint,
     weight: bigint,
     jumpSize: bigint,
-  ): bigint | undefined => {
+  ): bigint | null => {
     const amm = weight * (balance + virtual);
     const jumpMultiplier = 1 + (1 / Number(jumpSize));
     let exp = BigInt(Math.round(Swapping.exp(
@@ -102,8 +102,8 @@ export class Opening {
 
     console.log(`finalAnchor: ${finalAnchor} vs. baseAnchor: ${baseAnchor}`);
     if (finalAnchor < baseAnchor) {
-      console.log(`returning undefined`);
-      return undefined;
+      console.log(`returning null`);
+      return null;
     }
     console.log(`returning finalAnchor: ${finalAnchor}`);
     return finalAnchor;

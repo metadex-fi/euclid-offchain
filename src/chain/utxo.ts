@@ -249,6 +249,7 @@ export class DiracUtxo {
   };
 
   public swappingsFor = (
+    adhereMaxInteger: boolean,
     user: User | undefined,
     paramUtxo: ParamUtxo,
     optimizeAmnts: boolean,
@@ -257,7 +258,6 @@ export class DiracUtxo {
     sellable_?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
     buyingAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
     buyableAmnt?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
-    adhereMaxInteger = true,
   ): Swapping[] => {
     console.log("swappingsFor()");
     assert(minBuying > 0n, `minBuying <= 0n: ${minBuying}`);
@@ -383,7 +383,7 @@ export class DiracUtxo {
             // if maxSelling is 0, then d is too low, which means that
             // we are too close at the amm-price. So we ~decrease~ the
             // (uninverted) price we are willing to ~sell~ at stepwise
-            // until we find a d >= 1.
+            // until we hit the bounds or find a d >= 1.
             // NOTE/TODO: This should never result in an infite loop,
             // as decreasing uninverted selling price should eventually
             // result in some delta.
@@ -724,11 +724,6 @@ export class DiracUtxo {
         //   `);
         // sellingADA:    ${sellingADA}
 
-        // if (sellingLimit && (buyingLimit || !sellingADA)) return;
-        // TODO comment below out if current trial succeeds
-        // if (sellingLimit || buyingLimit) return; // TODO not sure this does not quit prematurely
-        // NOTE second branch only comes in effect when selling ADA, and enables corruption then. This way doens't work either though
-        // if ((maxSellingA0 <= maxBuyingA0 || buyingLimit) && !sellingLimit) {
         if (maxSellingA0 <= maxBuyingA0) {
           if (sellingLimit) return null;
           // assert(!sellingLimit, `sellingLimit reached already`);
@@ -851,6 +846,7 @@ export class DiracUtxo {
     // if (sellingSpot > maxInteger) return;
 
     const swapping = Swapping.boundary(
+      adhereMaxInteger,
       user,
       paramUtxo,
       this,

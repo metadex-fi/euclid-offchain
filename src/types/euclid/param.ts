@@ -171,13 +171,17 @@ ${tt})`;
   // TODO maxIntRoot is chosen rather randomly,
   // as a tradeoff between accurate weights and not hitting limits in swappings all the time
   // (limits regarding spotPrices, which become newAnchorPrices)
-  static weightBounds(jumpSize: bigint, virtual: bigint, maxWeight = maxIntRoot): [bigint, bigint] {
+  static weightBounds(
+    jumpSize: bigint,
+    virtual: bigint,
+    maxWeight = maxIntRoot,
+  ): [bigint, bigint] {
     // const vjs = virtual * jumpSize;
     const js1 = jumpSize + 1n;
     const jsv = jumpSize * virtual;
     const minWeight = ceilDiv(js1, virtual);
     let maxWeight_ = (maxInteger * js1) / (jsv + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
-    maxWeight_ = min(maxWeight_, maxWeight); 
+    maxWeight_ = min(maxWeight_, maxWeight);
     assert(
       minWeight <= maxWeight_,
       `minWeight (${minWeight}) must be <= maxWeight_ (${maxWeight_}); jumpSize: ${jumpSize}; virtual: ${virtual}`,

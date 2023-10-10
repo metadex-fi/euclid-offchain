@@ -32,6 +32,7 @@ export class Swapping {
   public subsequent?: Swapping;
 
   private constructor(
+    public readonly adhereMaxInteger: boolean,
     public readonly user: User | undefined, // webapp needs undefined iirc
     public readonly paramUtxo: ParamUtxo,
     public readonly diracUtxo: DiracUtxo,
@@ -70,11 +71,11 @@ export class Swapping {
       `sellingSpot must be positive: ${this.show()}`,
     );
     assert(
-      buyingSpot <= maxInteger,
+      !adhereMaxInteger || buyingSpot <= maxInteger,
       `buyingSpot must be <= maxInteger: ${this.show()}`,
     );
     assert(
-      sellingSpot <= maxInteger,
+      !adhereMaxInteger || sellingSpot <= maxInteger,
       `sellingSpot must be <= maxInteger: ${this.show()}`,
     );
     assert(
@@ -126,16 +127,17 @@ export class Swapping {
 
   public show = (): string => {
     return `Swapping (
-  paramUtxo:    ${this.paramUtxo.show()}
-  diracUtxo:    ${this.diracUtxo.show()}
+  adhereMaxInteger: ${this.adhereMaxInteger}
+  paramUtxo: ${this.paramUtxo.show()}
+  diracUtxo: ${this.diracUtxo.show()}
   buyingAsset:  ${this.buyingAsset.show()}
   sellingAsset: ${this.sellingAsset.show()}
   buyingAmnt:   ${this.buyingAmnt}
   sellingAmnt:  ${this.sellingAmnt}
   buyingSpot:   ${this.buyingSpot}
   sellingSpot:  ${this.sellingSpot}
-  (boughtA0:    ${this.buyingAmnt * this.sellingSpot})
-  (soldA0:      ${this.sellingAmnt * this.buyingSpot})
+  (buyingA0:    ${this.buyingAmnt * this.sellingSpot})
+  (sellingA0:   ${this.sellingAmnt * this.buyingSpot})
   buyingExp:    ${this.buyingExp}
   sellingExp:   ${this.sellingExp}
   spotPrice:    ${this.spotPrice}
@@ -294,6 +296,7 @@ export class Swapping {
       }
 
       const subsequents = diracUtxo.swappingsFor(
+        this.adhereMaxInteger,
         this.user,
         this.paramUtxo,
         true,
@@ -343,6 +346,7 @@ export class Swapping {
     console.log(`subSwapA: ${amount} ${amntIsSold ? "sold" : "bought"}`);
     // console.log(`from: ${this.show()}`);
     const swappings = this.diracUtxo.swappingsFor(
+      this.adhereMaxInteger,
       this.user,
       this.paramUtxo,
       false,
@@ -434,6 +438,7 @@ export class Swapping {
     );
 
     const subSwap = new Swapping(
+      this.adhereMaxInteger,
       this.user,
       this.paramUtxo,
       this.diracUtxo,
@@ -495,6 +500,7 @@ export class Swapping {
   };
 
   static boundary(
+    adhereMaxInteger: boolean,
     user: User | undefined,
     paramUtxo: ParamUtxo,
     diracUtxo: DiracUtxo,
@@ -512,6 +518,7 @@ export class Swapping {
   ): Swapping {
     console.log(`Swapping.boundary()`);
     return new Swapping(
+      adhereMaxInteger,
       user,
       paramUtxo,
       diracUtxo,
@@ -538,6 +545,7 @@ export class Swapping {
     // TODO probably too much
     for (let i = maxInteger; i > 1n; i /= 10n) {
       swappings = user.contract!.state!.swappingsFor(
+        true, //randomChoice([true, false]),
         user,
         maybeNdef(genPositive(i)),
         maybeNdef(genPositive(i)),
@@ -749,17 +757,17 @@ export class Swapping {
 
       this.corruptSoldAmnt(false),
       this.corruptBoughtAmnt(false),
-      // TODO revert
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
+      // TODO revert from time to time
+      // this.corruptSoldAmnt(true),
+      // this.corruptBoughtAmnt(true),
+      // this.corruptSoldAmnt(true),
+      // this.corruptBoughtAmnt(true),
+      // this.corruptSoldAmnt(true),
+      // this.corruptBoughtAmnt(true),
+      // this.corruptSoldAmnt(true),
+      // this.corruptBoughtAmnt(true),
+      // this.corruptSoldAmnt(true),
+      // this.corruptBoughtAmnt(true),
     ].filter((s) => s) as Swapping[];
   };
 
@@ -769,6 +777,7 @@ export class Swapping {
     const amnt = random ? genPositive(this.maxBuying - this.buyingAmnt) : 1n;
     console.log(`... by ${amnt}`);
     const boughtTooMuch = new Swapping(
+      this.adhereMaxInteger,
       this.user,
       this.paramUtxo,
       this.diracUtxo,
@@ -801,6 +810,7 @@ export class Swapping {
     const amnt = random ? genPositive(this.sellingAmnt - minSelling) : 1n;
     console.log(`... by ${amnt}`);
     const soldTooLittle = new Swapping(
+      this.adhereMaxInteger,
       this.user,
       this.paramUtxo,
       this.diracUtxo,
@@ -845,8 +855,11 @@ export class Swapping {
       `seems like buyingExp is being changed in the wrong direction`,
     );
 
-    if (buyingSpot_ > 0n && buyingSpot_ <= maxInteger) {
+    if (
+      buyingSpot_ > 0n && (!this.adhereMaxInteger || buyingSpot_ <= maxInteger)
+    ) {
       const buyingSpotTooHigh = new Swapping(
+        this.adhereMaxInteger,
         this.user,
         this.paramUtxo,
         this.diracUtxo,
@@ -911,13 +924,17 @@ export class Swapping {
       `seems like sellingExp is being changed in the wrong direction`,
     );
 
-    if (sellingSpot_ > 0n && sellingSpot_ <= maxInteger) {
+    if (
+      sellingSpot_ > 0n &&
+      (!this.adhereMaxInteger || sellingSpot_ <= maxInteger)
+    ) {
       const buyingA0 = this.buyingAmnt * sellingSpot_;
       const sellingA0 = this.sellingAmnt * this.buyingSpot;
       const swapA0 = min(sellingA0, buyingA0);
       if (swapA0 < sellingSpot_) return null;
 
       const sellingSpotTooLow = new Swapping(
+        this.adhereMaxInteger,
         this.user,
         this.paramUtxo,
         this.diracUtxo,
