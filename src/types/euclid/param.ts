@@ -168,25 +168,25 @@ ${tt})`;
   // => weight >= (jumpSize + 1n) / (virtual * jumpSize)
   // => weight <= (maxInteger * (jumpSize + 1n)) / (virtual * jumpSize)
   // weight >= (jumpSize + 1n) / virtual (NOTE: this comes from tickSize >= 1n)
-  static weightBounds(jumpSize: bigint, virtual: bigint): [bigint, bigint] {
+  // TODO maxIntRoot is chosen rather randomly,
+  // as a tradeoff between accurate weights and not hitting limits in swappings all the time
+  // (limits regarding spotPrices, which become newAnchorPrices)
+  static weightBounds(jumpSize: bigint, virtual: bigint, maxWeight = maxIntRoot): [bigint, bigint] {
     // const vjs = virtual * jumpSize;
     const js1 = jumpSize + 1n;
     const jsv = jumpSize * virtual;
     const minWeight = ceilDiv(js1, virtual);
-    let maxWeight = (maxInteger * js1) / (jsv + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
-    maxWeight = min(maxWeight, maxIntRoot); // TODO maxIntRoot is chosen rather randomly,
-    // as a tradeoff between accurate weights and not hitting limits in swappings all the time
-    // (limits regarding spotPrices, which become newAnchorPrices)
-
+    let maxWeight_ = (maxInteger * js1) / (jsv + 1n); // TODO +1n is a hack to keep minAnchorPrices <= maxInteger
+    maxWeight_ = min(maxWeight_, maxWeight); 
     assert(
-      minWeight <= maxWeight,
-      `minWeight (${minWeight}) must be <= maxWeight (${maxWeight}); jumpSize: ${jumpSize}; virtual: ${virtual}`,
+      minWeight <= maxWeight_,
+      `minWeight (${minWeight}) must be <= maxWeight_ (${maxWeight_}); jumpSize: ${jumpSize}; virtual: ${virtual}`,
     );
     // assert(
     //   maxWeight <= maxSmallInteger,
     //   `maxWeight (${maxWeight}) must be <= maxSmallInteger (${maxSmallInteger}); jumpSize: ${jumpSize}; virtual: ${virtual}`,
     // )
-    return [minWeight, maxWeight]; // TODO check that maxWeight >= minWeight (after adding maxSmallInteger)
+    return [minWeight, maxWeight_]; // TODO check that maxWeight >= minWeight (after adding maxSmallInteger)
   }
 
   // => virtual >= (jumpSize + 1n) / (weight * jumpSize)

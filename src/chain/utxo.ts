@@ -257,6 +257,7 @@ export class DiracUtxo {
     sellable_?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
     buyingAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
     buyableAmnt?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
+    adhereMaxInteger = true,
   ): Swapping[] => {
     console.log("swappingsFor()");
     assert(minBuying > 0n, `minBuying <= 0n: ${minBuying}`);
@@ -298,11 +299,11 @@ export class DiracUtxo {
       // if (asset.equals(Asset.ADA)) return; // TODO for debugging, revert
       const buyable = buyable_.amountOf(asset, 0n); // - getMinBalance(asset);
       const sellable = sellable_?.amountOf(asset, 0n);
+      const infiniteSellable = sellable === undefined || sellable === -1n;
       const minSelling = getMinSelling(asset, minSelling_);
-      if (
-        buyable < minBuying && sellable && sellable !== -1n &&
-        sellable < minSelling
-      ) return;
+      if (buyable < minBuying && !infiniteSellable && sellable < minSelling) {
+        return;
+      }
 
       const virtual = param.virtual.amountOf(asset);
       const weight = param.weights.amountOf(asset); // NOTE: inverted
@@ -321,14 +322,14 @@ export class DiracUtxo {
 
       let buyingExp = BigInt(Math.floor(exp));
       let buyingSpot = Swapping.spot(anchor, jumpSize, buyingExp);
-      while (buyingSpot > maxInteger) {
+      while (adhereMaxInteger && buyingSpot > maxInteger) {
         buyingExp--;
         buyingSpot = Swapping.spot(anchor, jumpSize, buyingExp);
       }
 
       let sellingExp = BigInt(Math.ceil(exp));
       let sellingSpot = Swapping.spot(anchor, jumpSize, sellingExp);
-      while (sellingSpot > maxInteger) {
+      while (adhereMaxInteger && sellingSpot > maxInteger) {
         sellingExp--;
         sellingSpot = Swapping.spot(anchor, jumpSize, sellingExp);
       }
@@ -367,16 +368,10 @@ export class DiracUtxo {
         }
       }
 
-      if (
-        (sellable === undefined || sellable === -1n ||
-          sellable >= minSelling) && sellingSpot > 0n
-      ) {
+      if ((infiniteSellable || sellable >= minSelling) && sellingSpot > 0n) {
         while (true) {
           const d = delta_(sellingSpot);
-          const maxSelling = sellable && sellable !== -1n
-            ? min(sellable, d)
-            : d;
-
+          const maxSelling = infiniteSellable ? d : min(sellable, d);
           if (maxSelling >= minSelling) {
             sellingSpot_.initAmountOf(asset, sellingSpot);
             sellingExp_.initAmountOf(asset, sellingExp);
@@ -392,7 +387,7 @@ export class DiracUtxo {
             // NOTE/TODO: This should never result in an infite loop,
             // as decreasing uninverted selling price should eventually
             // result in some delta.
-            if (sellingSpot > maxInteger) break;
+            if (adhereMaxInteger && sellingSpot > maxInteger) break;
           }
         }
       }
@@ -440,7 +435,7 @@ export class DiracUtxo {
               );
               buyingExp__ = BigInt(Math.floor(exp));
               buyingSpot__ = Swapping.spot(anchor, jumpSize, buyingExp__);
-              while (buyingSpot__ > maxInteger) {
+              while (adhereMaxInteger && buyingSpot__ > maxInteger) {
                 buyingExp__--;
                 buyingSpot__ = Swapping.spot(anchor, jumpSize, buyingExp__);
               }
@@ -465,6 +460,7 @@ export class DiracUtxo {
           }
 
           return this.swappingForPair(
+            adhereMaxInteger,
             user,
             paramUtxo,
             buyingAsset,
@@ -563,6 +559,7 @@ export class DiracUtxo {
   };
 
   private swappingForPair = (
+    adhereMaxInteger: boolean,
     user: User | undefined,
     paramUtxo: ParamUtxo,
     buyingAsset: Asset,
@@ -662,8 +659,9 @@ export class DiracUtxo {
 
       const buyable = buyable_.amountOf(buyingAsset, 0n); // - getMinBalance(buyingAsset);
       const sellable = sellable_?.amountOf(sellingAsset, 0n);
+      const infiniteSellable = sellable === undefined || sellable === -1n;
       if (
-        buyable <= 0n || (sellable && sellable !== -1n && sellable < minSelling)
+        buyable <= 0n || (!infiniteSellable && sellable < minSelling)
       ) return null;
 
       const deltaSelling = delta(
@@ -735,7 +733,7 @@ export class DiracUtxo {
           if (sellingLimit) return null;
           // assert(!sellingLimit, `sellingLimit reached already`);
           increaseExpSelling(1n);
-          if (sellingSpot > maxInteger) {
+          if (adhereMaxInteger && sellingSpot > maxInteger) {
             console.log(
               `sellingSpot > maxInteger: ${sellingSpot} > ${maxInteger}`,
             );
@@ -746,7 +744,7 @@ export class DiracUtxo {
             const d = deltaSelling(sellingSpot);
             console.log(`deltaSelling: ${d}`);
             let newMaxSelling;
-            if (sellable && sellable !== -1n) {
+            if (!infiniteSellable) {
               if (sellable <= d) {
                 newMaxSelling = sellable;
                 console.log(
