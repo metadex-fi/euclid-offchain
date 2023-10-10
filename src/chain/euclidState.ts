@@ -150,7 +150,6 @@ export class EuclidState {
 
   public swappingsFor(
     user: User,
-    amntOptimizationEndurance: number,
     minBuying?: bigint,
     minSelling?: bigint,
   ): Swapping[] {
@@ -161,7 +160,7 @@ export class EuclidState {
     //   console.log(`\t\tpools: ${pools.length}`);
     // }
     return pools.flatMap((pool) =>
-      pool.swappingsFor(user, amntOptimizationEndurance, minBuying, minSelling)
+      pool.swappingsFor(user, minBuying, minSelling)
     );
   }
 }
