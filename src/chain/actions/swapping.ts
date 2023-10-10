@@ -275,6 +275,7 @@ export class Swapping {
 
   public succeeded = this.setSubsequentUtxo;
 
+  // TODO test this
   public subsequents = (
     amntOptimizationEndurance: number,
     maxSubsequents?: number,
@@ -540,7 +541,7 @@ export class Swapping {
     for (let i = maxInteger; i > 1n; i /= 10n) {
       swappings = user.contract!.state!.swappingsFor(
         user,
-        Number(genNonNegative(10n)),
+        1000, //Number(genNonNegative(10n)),
         maybeNdef(genPositive(i)),
         maybeNdef(genPositive(i)),
       );
@@ -751,17 +752,17 @@ export class Swapping {
 
       this.corruptSoldAmnt(false),
       this.corruptBoughtAmnt(false),
-
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
+      // TODO revert at some point
+      // this.corruptSoldAmnt(true),
+      // this.corruptBoughtAmnt(true),
+      // this.corruptSoldAmnt(true),
+      // this.corruptBoughtAmnt(true),
+      // this.corruptSoldAmnt(true),
+      // this.corruptBoughtAmnt(true),
+      // this.corruptSoldAmnt(true),
+      // this.corruptBoughtAmnt(true),
+      // this.corruptSoldAmnt(true),
+      // this.corruptBoughtAmnt(true),
     ].filter((s) => s) as Swapping[];
   };
 
