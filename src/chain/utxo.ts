@@ -289,6 +289,7 @@ export class DiracUtxo {
     const sellingExp_ = new Value();
     const maxBuying_ = new PositiveValue();
     const maxSelling_ = new PositiveValue();
+    const adherenceImpacted = new Assets();
 
     // deposit of asset into pool to move inverted amm-price a to inverted spot price s
     // s := a = (l + d) * w => d = (s / w) - l
@@ -322,16 +323,27 @@ export class DiracUtxo {
 
       let buyingExp = BigInt(Math.floor(exp));
       let buyingSpot = Swapping.spot(anchor, jumpSize, buyingExp);
-      while (adhereMaxInteger && buyingSpot > maxInteger) {
-        buyingExp--;
-        buyingSpot = Swapping.spot(anchor, jumpSize, buyingExp);
+      let adherenceImpacted_ = false;
+      if (adhereMaxInteger && buyingSpot > maxInteger) {
+        adherenceImpacted.insert(asset);
+        adherenceImpacted_ = true;
+        while (adhereMaxInteger && buyingSpot > maxInteger) {
+          buyingExp--;
+          buyingSpot = Swapping.spot(anchor, jumpSize, buyingExp);
+        }
       }
 
       let sellingExp = BigInt(Math.ceil(exp));
       let sellingSpot = Swapping.spot(anchor, jumpSize, sellingExp);
-      while (adhereMaxInteger && sellingSpot > maxInteger) {
-        sellingExp--;
-        sellingSpot = Swapping.spot(anchor, jumpSize, sellingExp);
+      if (adhereMaxInteger && sellingSpot > maxInteger) {
+        if (!adherenceImpacted_) {
+          adherenceImpacted.insert(asset);
+          adherenceImpacted_ = true;
+        }
+        while (adhereMaxInteger && sellingSpot > maxInteger) {
+          sellingExp--;
+          sellingSpot = Swapping.spot(anchor, jumpSize, sellingExp);
+        }
       }
 
       // TODO what about this?
@@ -387,7 +399,13 @@ export class DiracUtxo {
             // NOTE/TODO: This should never result in an infite loop,
             // as decreasing uninverted selling price should eventually
             // result in some delta.
-            if (adhereMaxInteger && sellingSpot > maxInteger) break;
+            if (adhereMaxInteger && sellingSpot > maxInteger) {
+              if (!adherenceImpacted_) {
+                adherenceImpacted.insert(asset);
+                adherenceImpacted_ = true;
+              }
+              break;
+            }
           }
         }
       }
@@ -401,6 +419,7 @@ export class DiracUtxo {
       // const buyingSpot = buyingSpot_.amountOf(buyingAsset); // NOTE: inverted
       // const buyingExp = buyingExp_.amountOf(buyingAsset);
       // const maxBuying = maxBuying_.amountOf(buyingAsset);
+      const adherenceImpactedBuying = adherenceImpacted.has(buyingAsset);
 
       sellableAssets.forEach((sellingAsset) => {
         const buyingSpot = buyingSpot_.amountOf(buyingAsset);
@@ -414,6 +433,8 @@ export class DiracUtxo {
         const maxSelling = maxSelling_.amountOf(sellingAsset);
 
         const minSelling = getMinSelling(sellingAsset, minSelling_);
+        let adherenceImpacted_ = adherenceImpactedBuying ||
+          adherenceImpacted.has(sellingAsset);
 
         const getSwappingForPair = (tmpMinBuying?: bigint): Swapping | null => {
           let buyingSpot__: bigint;
@@ -435,9 +456,12 @@ export class DiracUtxo {
               );
               buyingExp__ = BigInt(Math.floor(exp));
               buyingSpot__ = Swapping.spot(anchor, jumpSize, buyingExp__);
-              while (adhereMaxInteger && buyingSpot__ > maxInteger) {
-                buyingExp__--;
-                buyingSpot__ = Swapping.spot(anchor, jumpSize, buyingExp__);
+              if (adhereMaxInteger && buyingSpot__ > maxInteger) {
+                adherenceImpacted_ = true;
+                while (adhereMaxInteger && buyingSpot__ > maxInteger) {
+                  buyingExp__--;
+                  buyingSpot__ = Swapping.spot(anchor, jumpSize, buyingExp__);
+                }
               }
 
               const delta_ = delta(weight, liquidity);
@@ -461,6 +485,7 @@ export class DiracUtxo {
 
           return this.swappingForPair(
             adhereMaxInteger,
+            adherenceImpacted_,
             user,
             paramUtxo,
             buyingAsset,
@@ -560,6 +585,7 @@ export class DiracUtxo {
 
   private swappingForPair = (
     adhereMaxInteger: boolean,
+    adherenceImpacted: boolean,
     user: User | undefined,
     paramUtxo: ParamUtxo,
     buyingAsset: Asset,
@@ -735,6 +761,7 @@ export class DiracUtxo {
             increaseExpSelling(-1n);
             sellingLimit = true;
             _limitReached = "selling";
+            adherenceImpacted = true;
           } else {
             const d = deltaSelling(sellingSpot);
             console.log(`deltaSelling: ${d}`);
@@ -847,6 +874,7 @@ export class DiracUtxo {
 
     const swapping = Swapping.boundary(
       adhereMaxInteger,
+      adherenceImpacted,
       user,
       paramUtxo,
       this,

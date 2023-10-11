@@ -33,6 +33,7 @@ export class Swapping {
 
   private constructor(
     public readonly adhereMaxInteger: boolean,
+    public readonly adherenceImpacted: boolean,
     public readonly user: User | undefined, // webapp needs undefined iirc
     public readonly paramUtxo: ParamUtxo,
     public readonly diracUtxo: DiracUtxo,
@@ -439,6 +440,7 @@ export class Swapping {
 
     const subSwap = new Swapping(
       this.adhereMaxInteger,
+      this.adherenceImpacted,
       this.user,
       this.paramUtxo,
       this.diracUtxo,
@@ -501,6 +503,7 @@ export class Swapping {
 
   static boundary(
     adhereMaxInteger: boolean,
+    adherenceImpacted: boolean,
     user: User | undefined,
     paramUtxo: ParamUtxo,
     diracUtxo: DiracUtxo,
@@ -519,6 +522,7 @@ export class Swapping {
     console.log(`Swapping.boundary()`);
     return new Swapping(
       adhereMaxInteger,
+      adherenceImpacted,
       user,
       paramUtxo,
       diracUtxo,
@@ -778,6 +782,7 @@ export class Swapping {
     console.log(`... by ${amnt}`);
     const boughtTooMuch = new Swapping(
       this.adhereMaxInteger,
+      this.adherenceImpacted,
       this.user,
       this.paramUtxo,
       this.diracUtxo,
@@ -811,6 +816,7 @@ export class Swapping {
     console.log(`... by ${amnt}`);
     const soldTooLittle = new Swapping(
       this.adhereMaxInteger,
+      this.adherenceImpacted,
       this.user,
       this.paramUtxo,
       this.diracUtxo,
@@ -860,6 +866,7 @@ export class Swapping {
     ) {
       const buyingSpotTooHigh = new Swapping(
         this.adhereMaxInteger,
+        this.adherenceImpacted,
         this.user,
         this.paramUtxo,
         this.diracUtxo,
@@ -935,6 +942,7 @@ export class Swapping {
 
       const sellingSpotTooLow = new Swapping(
         this.adhereMaxInteger,
+        this.adherenceImpacted,
         this.user,
         this.paramUtxo,
         this.diracUtxo,
