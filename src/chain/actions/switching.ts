@@ -25,16 +25,15 @@ export class Switching {
 
   public succeeded = (_txCore: Lucid.C.Transaction) => {};
 
-  // TODO implement and test
-  //   static genOfUser = (user: User): Switching | undefined => {
-  //     // console.log(`attempting to switch`);
-  //     const enoughForFees = user.availableBalance;
-  //     if (!enoughForFees) return undefined;
-  //     const pools = user.contract.state?.pools.get(user.paymentKeyHash);
-  //     if (!pools) return undefined;
-  //     if (!pools.size) return undefined;
-  //     const pool = randomChoice([...pools.values()]);
-  //     // console.log(`Switching`);
-  //     return new Switching(user, pool);
-  //   };
+  static genOfUser = (user: User): Switching | null => {
+    // console.log(`attempting to switch`);
+    const enoughForFees = user.availableBalance;
+    if (!enoughForFees) return null;
+    const pools = user.contract.state?.pools.get(user.paymentKeyHash);
+    if (!pools) return null;
+    if (!pools.size) return null;
+    const pool = randomChoice([...pools.values()]);
+    // console.log(`Switching`);
+    return new Switching(user, pool);
+  };
 }

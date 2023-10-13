@@ -405,7 +405,7 @@ export class DiracUtxo {
                 adherenceImpacted_ = true;
               }
               break;
-            }
+            };
           }
         }
       }
@@ -433,8 +433,7 @@ export class DiracUtxo {
         const maxSelling = maxSelling_.amountOf(sellingAsset);
 
         const minSelling = getMinSelling(sellingAsset, minSelling_);
-        let adherenceImpacted_ = adherenceImpactedBuying ||
-          adherenceImpacted.has(sellingAsset);
+        let adherenceImpacted_ = adherenceImpactedBuying || adherenceImpacted.has(sellingAsset);
 
         const getSwappingForPair = (tmpMinBuying?: bigint): Swapping | null => {
           let buyingSpot__: bigint;
