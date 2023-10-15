@@ -45,11 +45,12 @@ export class Swapping {
     public readonly sellingSpot: bigint, // inverted
     public readonly buyingExp: bigint,
     public readonly sellingExp: bigint,
-    runTests: boolean, // corruption-test-swappings don't run tests themselves.
+    private expLimit: number | null,
     private maxBuying: bigint, // for corruption-tests
     private minBuying_: bigint | null,
     private minSelling: bigint | null,
     private tmpMinBuying: bigint | null, // for optimiziation. Need to store this to make corruption-tests pass
+    runTests: boolean, // corruption-test-swappings don't run tests themselves.
   ) {
     assert(
       buyingAmnt <= maxBuying,
@@ -129,6 +130,7 @@ export class Swapping {
   public show = (): string => {
     return `Swapping (
   adhereMaxInteger: ${this.adhereMaxInteger}
+  adherenceImpacted: ${this.adherenceImpacted}
   paramUtxo: ${this.paramUtxo.show()}
   diracUtxo: ${this.diracUtxo.show()}
   buyingAsset:  ${this.buyingAsset.show()}
@@ -143,6 +145,7 @@ export class Swapping {
   sellingExp:   ${this.sellingExp}
   spotPrice:    ${this.spotPrice}
   eff.Price:    ${this.effectivePrice}
+  expLimit:     ${this.expLimit}
   maxBuying:    ${this.maxBuying}
   (maxBuyingA0: ${this.maxBuying * this.sellingSpot})
   minBuying:    ${this.minBuying_}
@@ -305,6 +308,8 @@ export class Swapping {
         applyMinAmounts ? this.minSelling ?? undefined : undefined,
         Value.singleton(this.sellingAsset, sellableAmount),
         Assets.singleton(this.buyingAsset),
+        undefined,
+        this.expLimit ?? undefined,
       );
       if (subsequents.length === 0) break;
       assert(
@@ -363,6 +368,7 @@ export class Swapping {
       // adding minBalance here because we are removing it again in swappingsFor
       // (amntIsSold ? this.buyingAmnt : amount) +
       //   getMinBalance(this.buyingAsset),
+      this.expLimit ?? undefined,
     );
     assert(
       swappings.length <= 1,
@@ -452,11 +458,12 @@ export class Swapping {
       this.sellingSpot,
       this.buyingExp,
       this.sellingExp,
-      true,
+      this.expLimit,
       amntIsSold ? this.maxBuying : amount, // per definition of a subSwap
       applyMinAmounts ? this.minBuying_ : null,
       applyMinAmounts ? this.minSelling : null,
       this.tmpMinBuying,
+      true,
     );
 
     // console.log(`to (B): ${subSwap.show()}`);
@@ -515,6 +522,7 @@ export class Swapping {
     sellingSpot: bigint,
     buyingExp: bigint,
     sellingExp: bigint,
+    expLimit: number | null,
     minBuying: bigint | null,
     minSelling: bigint | null,
     tmpMinBuying: bigint | null,
@@ -534,11 +542,12 @@ export class Swapping {
       sellingSpot,
       buyingExp,
       sellingExp,
-      true,
+      expLimit,
       diracUtxo.available.amountOf(buyingAsset),
       minBuying,
       minSelling,
       tmpMinBuying,
+      true,
     );
   }
 
@@ -549,10 +558,11 @@ export class Swapping {
     // TODO probably too much
     for (let i = maxInteger; i > 1n; i /= 10n) {
       swappings = user.contract!.state!.swappingsFor(
-        true, //randomChoice([true, false]),
+        true,
         user,
         maybeNdef(genPositive(i)),
         maybeNdef(genPositive(i)),
+        maybeNdef(Number(genPositive(50n))),
       );
       if (swappings.length > 0) break;
     }
@@ -794,11 +804,12 @@ export class Swapping {
       this.sellingSpot,
       this.buyingExp,
       this.sellingExp,
-      false,
+      this.expLimit,
       this.maxBuying,
       this.minBuying_,
       this.minSelling,
       this.tmpMinBuying,
+      false,
     );
     assert(
       !boughtTooMuch.validates(),
@@ -828,11 +839,12 @@ export class Swapping {
       this.sellingSpot,
       this.buyingExp,
       this.sellingExp,
-      false,
+      this.expLimit,
       this.maxBuying,
       this.minBuying_,
       this.minSelling,
       this.tmpMinBuying,
+      false,
     );
     assert(
       !soldTooLittle.validates(),
@@ -878,11 +890,12 @@ export class Swapping {
         this.sellingSpot,
         buyingExp_,
         this.sellingExp,
-        false,
+        this.expLimit,
         this.maxBuying,
         this.minBuying_,
         this.minSelling,
         this.tmpMinBuying,
+        false,
       );
 
       if (buyingSpotTooHigh.validates()) {
@@ -954,11 +967,12 @@ export class Swapping {
         sellingSpot_,
         this.buyingExp,
         sellingExp_,
-        false,
+        this.expLimit,
         this.maxBuying,
         this.minBuying_,
         this.minSelling,
         this.tmpMinBuying,
+        false,
       );
 
       if (sellingSpotTooLow.validates()) {

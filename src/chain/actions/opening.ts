@@ -41,6 +41,14 @@ export class Opening {
     return "Opening";
   }
 
+  public show = (): string => {
+    return `Opening (
+  param: ${this.param.concise()}
+  deposit: ${this.deposit.concise()}
+  numTicks: ${this.numTicks.concise()}
+)`;
+  };
+
   public split = (): Opening[] => {
     console.log(`splitting opening`);
     const pools = this.pool().split();

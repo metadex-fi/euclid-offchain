@@ -10,7 +10,7 @@ import { Action, UserAction } from "./actions/action.ts";
 
 import { Contract } from "./contract.ts";
 import { utxosToCore } from "../utils/conversion.ts";
-import { Wallet, WalletApi } from "https://deno.land/x/lucid@0.10.7/mod.ts";
+import { WalletApi } from "https://deno.land/x/lucid@0.10.7/mod.ts";
 
 const forFeesEtc = PositiveValue.singleton(
   Asset.ADA,

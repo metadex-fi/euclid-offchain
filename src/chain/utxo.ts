@@ -258,6 +258,7 @@ export class DiracUtxo {
     sellable_?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
     buyingAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
     buyableAmnt?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
+    expLimit?: number,
   ): Swapping[] => {
     console.log("swappingsFor()");
     assert(minBuying > 0n, `minBuying <= 0n: ${minBuying}`);
@@ -355,7 +356,11 @@ export class DiracUtxo {
       const delta_ = delta(weight, liquidity);
 
       if (buyable >= minBuying) {
-        while (buyingSpot > 0n) {
+        while (
+          buyingSpot > 0n &&
+          (expLimit === undefined ||
+            bestMultiplicationsAhead(Number(buyingExp)) <= expLimit)
+        ) {
           const d = delta_(buyingSpot);
           const maxBuying = min(buyable, -d);
           // console.log(`
@@ -381,7 +386,10 @@ export class DiracUtxo {
       }
 
       if ((infiniteSellable || sellable >= minSelling) && sellingSpot > 0n) {
-        while (true) {
+        while (
+          expLimit === undefined ||
+          bestMultiplicationsAhead(Number(sellingExp)) <= expLimit
+        ) {
           const d = delta_(sellingSpot);
           const maxSelling = infiniteSellable ? d : min(sellable, d);
           if (maxSelling >= minSelling) {
@@ -405,7 +413,11 @@ export class DiracUtxo {
                 adherenceImpacted_ = true;
               }
               break;
-            };
+            }
+            if (
+              expLimit &&
+              bestMultiplicationsAhead(Number(sellingExp)) > expLimit
+            ) break;
           }
         }
       }
@@ -433,7 +445,8 @@ export class DiracUtxo {
         const maxSelling = maxSelling_.amountOf(sellingAsset);
 
         const minSelling = getMinSelling(sellingAsset, minSelling_);
-        let adherenceImpacted_ = adherenceImpactedBuying || adherenceImpacted.has(sellingAsset);
+        let adherenceImpacted_ = adherenceImpactedBuying ||
+          adherenceImpacted.has(sellingAsset);
 
         const getSwappingForPair = (tmpMinBuying?: bigint): Swapping | null => {
           let buyingSpot__: bigint;
@@ -456,15 +469,19 @@ export class DiracUtxo {
               buyingExp__ = BigInt(Math.floor(exp));
               buyingSpot__ = Swapping.spot(anchor, jumpSize, buyingExp__);
               if (adhereMaxInteger && buyingSpot__ > maxInteger) {
-                adherenceImpacted_ = true;
                 while (adhereMaxInteger && buyingSpot__ > maxInteger) {
+                  adherenceImpacted_ = true;
                   buyingExp__--;
                   buyingSpot__ = Swapping.spot(anchor, jumpSize, buyingExp__);
                 }
               }
 
               const delta_ = delta(weight, liquidity);
-              while (buyingSpot__ > 0n) {
+              while (
+                buyingSpot__ > 0n &&
+                (expLimit === undefined ||
+                  bestMultiplicationsAhead(Number(buyingExp__)) <= expLimit)
+              ) {
                 const d = delta_(buyingSpot__);
                 maxBuying__ = min(buyable, -d);
                 if (maxBuying__ >= tmpMinBuying) {
@@ -501,6 +518,7 @@ export class DiracUtxo {
             buyable_,
             sellable_,
             tmpMinBuying,
+            expLimit,
           );
         };
         let swapping = getSwappingForPair();
@@ -601,6 +619,7 @@ export class DiracUtxo {
     buyable_: PositiveValue,
     sellable_?: Value,
     tmpMinBuying?: bigint,
+    expLimit?: number,
   ): Swapping | null => {
     if (sellingAsset.equals(buyingAsset)) return null;
     console.log(`
@@ -609,6 +628,12 @@ export class DiracUtxo {
       sellingAsset: ${sellingAsset.show()}
       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     `);
+    if (
+      expLimit !== undefined &&
+      bestMultiplicationsAhead(Number(buyingExp)) +
+            bestMultiplicationsAhead(Number(sellingExp)) > expLimit
+    ) return null;
+
     const param = paramUtxo.param;
 
     // NOTE: below not strictly A0, but want to avoid divisions.
@@ -637,21 +662,23 @@ export class DiracUtxo {
     let increaseExpSelling = (_by: bigint) => {};
     let increaseExpBuying = (_by: bigint) => {};
 
-    const updateValues = () => {
+    const updateValues = (maxSwapA0test = true) => {
       const newMaxBuyingA0 = maxBuying * sellingSpot;
       const newMaxSellingA0 = maxSelling * buyingSpot;
       const newMaxSwapA0 = min(newMaxSellingA0, newMaxBuyingA0);
 
       // NOTE this fails iff trying to find better effective price
-      assert(
-        newMaxSwapA0 >= maxSwapA0,
-        `maxSwapA0 was decreased:
+      if (maxSwapA0test) {
+        assert(
+          newMaxSwapA0 >= maxSwapA0,
+          `maxSwapA0 was decreased:
             ${newMaxSwapA0} < ${maxSwapA0}
             diff: ${newMaxSwapA0 - maxSwapA0}
             maxBuyingA0: ${maxBuyingA0} -> ${newMaxBuyingA0}
             maxSellingA0: ${maxSellingA0} -> ${newMaxSellingA0}
         `,
-      );
+        );
+      }
 
       const newBuyingAmount = newMaxSwapA0 / sellingSpot;
       let newSellingAmount = ceilDiv(
@@ -698,31 +725,44 @@ export class DiracUtxo {
         liquidity_.amountOf(buyingAsset),
       );
 
+      let buyingBestMults = expLimit
+        ? bestMultiplicationsAhead(Number(buyingExp))
+        : undefined;
+      let sellingBestMults = expLimit
+        ? bestMultiplicationsAhead(Number(sellingExp))
+        : undefined;
+
       increaseExpSelling = (by: bigint) => {
         sellingExp += by;
+        if (sellingBestMults !== undefined) {
+          sellingBestMults = bestMultiplicationsAhead(Number(sellingExp));
+        }
         const newSpotSelling = Swapping.spot(
           sellingAnchor,
           sellingJumpSize,
           sellingExp,
         );
-        console.log(
-          `increaseExpSelling: ${sellingExp - by} + ${by} = ${sellingExp}`,
-        );
-        console.log(`newSpotSelling: ${sellingSpot} -> ${newSpotSelling}`);
+        // console.log(
+        //   `increaseExpSelling: ${sellingExp - by} + ${by} = ${sellingExp}`,
+        // );
+        // console.log(`newSpotSelling: ${sellingSpot} -> ${newSpotSelling}`);
         sellingSpot = newSpotSelling;
       };
 
       increaseExpBuying = (by: bigint) => {
         buyingExp += by;
+        if (buyingBestMults !== undefined) {
+          buyingBestMults = bestMultiplicationsAhead(Number(buyingExp));
+        }
         const newSpotBuying = Swapping.spot(
           buyingAnchor,
           buyingJumpSize,
           buyingExp,
         );
-        console.log(
-          `increaseExpBuying: ${buyingExp - by} + ${by} = ${buyingExp}`,
-        );
-        console.log(`newSpotBuying: ${buyingSpot} -> ${newSpotBuying}`);
+        // console.log(
+        //   `increaseExpBuying: ${buyingExp - by} + ${by} = ${buyingExp}`,
+        // );
+        // console.log(`newSpotBuying: ${buyingSpot} -> ${newSpotBuying}`);
         buyingSpot = newSpotBuying;
       };
 
@@ -818,9 +858,157 @@ export class DiracUtxo {
           maxBuying = newMaxBuying;
         }
 
+        if (
+          expLimit !== undefined &&
+          buyingBestMults! + sellingBestMults! > expLimit
+        ) return null;
+
         updateValues();
       }
     } //else console.log("not looping")
+
+    if (expLimit !== undefined) {
+      let buyingMults = countMultiplications(Number(buyingExp));
+      let sellingMults = countMultiplications(Number(sellingExp));
+      if (buyingMults + sellingMults > expLimit) {
+        console.log(
+          `multiplications limit reached, optimizing: ${buyingMults} + ${sellingMults} > ${expLimit}`,
+        );
+        const sellingAnchor = this.dirac.anchorPrices.amountOf(sellingAsset);
+        const buyingAnchor = this.dirac.anchorPrices.amountOf(buyingAsset);
+
+        const sellingJumpSize = param.jumpSizes.amountOf(sellingAsset);
+        const buyingJumpSize = param.jumpSizes.amountOf(buyingAsset);
+
+        const buyingBest = bestMultiplicationsAhead(Number(buyingExp));
+        const sellingBest = bestMultiplicationsAhead(Number(sellingExp));
+        if (buyingBest + sellingBest > expLimit) {
+          console.log(
+            `can optimize neither: ${buyingBest} + ${sellingBest} > ${expLimit}`,
+          );
+          return null;
+        }
+        if (buyingMults <= buyingBest) {
+          console.log(`can only optimize sellingExp`);
+          const sellingLimit = expLimit - buyingMults;
+          while (sellingMults > sellingLimit) {
+            sellingExp++;
+            sellingMults = countMultiplications(Number(sellingExp));
+          }
+        } else if (sellingMults <= sellingBest) {
+          console.log(`can only optimize buyingExp`);
+          const buyingLimit = expLimit - sellingMults;
+          while (buyingMults > buyingLimit) {
+            buyingExp--;
+            buyingMults = countMultiplications(Number(buyingExp));
+          }
+        } else {
+          console.log(`can optimize both`);
+          //...so we are going to find all the better exps and then pick the best combination
+          const sellings: { exp: bigint; mults: number }[] = [];
+          const buyings: { exp: bigint; mults: number }[] = [];
+          let sellingNextExp = sellingExp;
+          let sellingNextMults = sellingMults;
+          while (sellingNextMults > sellingBest) {
+            sellingNextExp++;
+            const nextMults = countMultiplications(Number(sellingNextExp));
+            if (nextMults < sellingNextMults) {
+              sellings.push({ exp: sellingNextExp, mults: nextMults });
+              sellingNextMults = nextMults;
+            }
+          }
+          let buyingNextExp = buyingExp;
+          let buyingNextMults = buyingMults;
+          while (buyingNextMults > buyingBest) {
+            buyingNextExp--;
+            const nextMults = countMultiplications(Number(buyingNextExp));
+            if (nextMults < buyingNextMults) {
+              buyings.push({ exp: buyingNextExp, mults: nextMults });
+              buyingNextMults = nextMults;
+            }
+          }
+          console.log(`sellings: ${sellings.length}`);
+          console.log(`buyings: ${buyings.length}`);
+          let frontier: {
+            sellingExp: bigint;
+            buyingExp: bigint;
+            sellingMults: number;
+            buyingMults: number;
+            effectivePrice: number;
+          }[] = [];
+          for (const selling of sellings) {
+            for (const buying of buyings) {
+              if (selling.mults + buying.mults <= expLimit) {
+                frontier.push({
+                  sellingExp: selling.exp,
+                  buyingExp: buying.exp,
+                  sellingMults: selling.mults,
+                  buyingMults: buying.mults,
+                  effectivePrice: -1,
+                });
+                break;
+              }
+            }
+          }
+          console.log(`frontier: ${frontier.length}`);
+          assert(frontier.length, `frontier.length === 0`);
+          let bestPrice: number;
+          frontier = frontier.map((f) => {
+            const sellingSpot = Swapping.spot(
+              sellingAnchor,
+              sellingJumpSize,
+              f.sellingExp,
+            );
+            const buyingSpot = Swapping.spot(
+              buyingAnchor,
+              buyingJumpSize,
+              f.buyingExp,
+            );
+
+            const newMaxBuyingA0 = maxBuying * sellingSpot;
+            const newMaxSellingA0 = maxSelling * buyingSpot;
+            const newMaxSwapA0 = min(newMaxSellingA0, newMaxBuyingA0);
+
+            const newBuyingAmount = newMaxSwapA0 / sellingSpot;
+            let newSellingAmount = ceilDiv(
+              newBuyingAmount * sellingSpot,
+              buyingSpot,
+            );
+
+            if (newSellingAmount < minSelling && minSelling <= maxSelling) {
+              newSellingAmount = minSelling;
+            }
+
+            const effectivePrice = Number(newSellingAmount) /
+              Number(newBuyingAmount);
+            if (bestPrice === undefined || effectivePrice < bestPrice) {
+              bestPrice = effectivePrice;
+            }
+
+            return {
+              ...f,
+              effectivePrice,
+            };
+          });
+          console.log(`bestPrice: ${bestPrice!}`);
+          const optimum = frontier.find((f) => f.effectivePrice === bestPrice);
+          assert(optimum, `optimum === undefined`);
+          sellingExp = optimum.sellingExp;
+          buyingExp = optimum.buyingExp;
+        }
+        sellingSpot = Swapping.spot(
+          sellingAnchor,
+          sellingJumpSize,
+          sellingExp,
+        );
+        buyingSpot = Swapping.spot(
+          buyingAnchor,
+          buyingJumpSize,
+          buyingExp,
+        );
+        updateValues(false);
+      }
+    }
 
     console.log(`
       ---------------------------
@@ -885,6 +1073,7 @@ export class DiracUtxo {
       sellingSpot,
       buyingExp,
       sellingExp,
+      expLimit ?? null,
       minBuying_,
       minSelling,
       tmpMinBuying ?? null,
@@ -894,3 +1083,18 @@ export class DiracUtxo {
     // swappings.push(swapping);
   };
 }
+
+// each power of 2 is a multiplication.
+const countMultiplications = (exp: number): number => {
+  exp = Math.abs(exp);
+
+  const binaryRepresentation = exp.toString(2).slice(1);
+  const b = binaryRepresentation.length; // Total bits
+  const k = (binaryRepresentation.match(/1/g) || []).length; // Count of '1' bits
+
+  return b + k;
+};
+
+// best we can do to decrease the number of multiplications is reaching the next power of 2
+const bestMultiplicationsAhead = (exp: number): number =>
+  Math.abs(exp - 1).toString(2).length;
