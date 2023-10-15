@@ -11,7 +11,10 @@ import { Asset } from "../../types/general/derived/asset/asset.ts";
 import { Data } from "../../types/general/fundamental/type.ts";
 import {
   ceilDiv,
+  genNonNegative,
   genPositive,
+  maxInteger,
+  maybeNdef,
   min,
   randomChoice,
 } from "../../utils/generators.ts";
@@ -20,8 +23,7 @@ import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
 import { Assets } from "../../types/general/derived/asset/assets.ts";
 import { Dirac } from "../../types/euclid/dirac.ts";
-import { genNonNegative, maxInteger, maybeNdef } from "../../mod.ts";
-import { getMinSelling } from "../mod.ts";
+import { fitSellingLimit } from "../../utils/swapfinding.ts";
 
 // const sellingADAtolerance = 0;
 
@@ -46,9 +48,10 @@ export class Swapping {
     public readonly buyingExp: bigint,
     public readonly sellingExp: bigint,
     private expLimit: number | null,
-    private maxBuying: bigint, // for corruption-tests
-    private minBuying_: bigint | null,
-    private minSelling: bigint | null,
+    private maxBuying: bigint, // for corruption-tests (cannot be taken from dirac because of subSwaps)
+    private maxSelling: bigint | null, // for corruption-tests (cannot be left null because of subSwaps). Null means no limit
+    private minBuying_: bigint,
+    private minSelling: bigint,
     private tmpMinBuying: bigint | null, // for optimiziation. Need to store this to make corruption-tests pass
     runTests: boolean, // corruption-test-swappings don't run tests themselves.
   ) {
@@ -57,11 +60,11 @@ export class Swapping {
       `buyingAmnt must be less than or equal to maxBuying: ${this.show()}`,
     );
     assert(
-      buyingAmnt >= (minBuying_ ?? 1n),
+      buyingAmnt >= this.minBuying,
       `buyingAmnt too low: ${this.show()}`,
     );
     assert(
-      sellingAmnt >= getMinSelling(sellingAsset, minSelling),
+      sellingAmnt >= minSelling,
       `sellingAmnt too low: ${this.show()}`,
     );
     assert(
@@ -81,21 +84,16 @@ export class Swapping {
       `sellingSpot must be <= maxInteger: ${this.show()}`,
     );
     assert(
-      buyingAmnt <= diracUtxo.available.amountOf(buyingAsset),
-      `buyingAmnt must be less than or equal to the available balance: ${this.show()}`,
-    );
-    assert(
-      minBuying_ === null || minBuying_ > 0n,
+      minBuying_ > 0n,
       `minBuying must be positive: ${this.show()}`,
     );
     assert(
-      minSelling === null || minSelling > 0n,
-      `minSelling must be positive: ${this.show()}`,
+      tmpMinBuying === null || minBuying_ <= tmpMinBuying,
+      `tmpMinBuying must be <= minBuying: ${this.show()}`,
     );
     assert(
-      minBuying_ === null || tmpMinBuying === null ||
-        minBuying_ <= tmpMinBuying,
-      `tmpMinBuying must be <= minBuying: ${this.show()}`,
+      minSelling > 0n,
+      `minSelling must be positive: ${this.show()}`,
     );
     if (user) {
       assert(
@@ -119,7 +117,7 @@ export class Swapping {
     }
   }
 
-  private get minBuying(): bigint | null {
+  private get minBuying(): bigint {
     return this.tmpMinBuying ?? this.minBuying_;
   }
 
@@ -304,8 +302,8 @@ export class Swapping {
         this.user,
         this.paramUtxo,
         true,
-        applyMinAmounts ? this.minBuying ?? undefined : undefined,
-        applyMinAmounts ? this.minSelling ?? undefined : undefined,
+        applyMinAmounts ? this.minBuying : undefined,
+        applyMinAmounts ? this.minSelling : undefined,
         Value.singleton(this.sellingAsset, sellableAmount),
         Assets.singleton(this.buyingAsset),
         undefined,
@@ -335,70 +333,70 @@ export class Swapping {
     return swappings;
   };
 
-  private setMaxBuying = (maxBuying: bigint): void => {
-    this.maxBuying = maxBuying;
-  };
+  // private setMaxBuying = (maxBuying: bigint): void => {
+  //   this.maxBuying = maxBuying;
+  // };
 
   // The idea behind this variant is the guess that with lower amounts we might
   // have a different optimum for exponents and prices
   // ~~> update: as we're not touching buyingExps in the swappingsFor loop anymore, only diff in maxBuying
   // TODO maybe investigate further, and compare performances. Note that the other variant is correct, this one wrong, regarding maxBuying
   // TODO granularity
-  private subSwapA = (
-    amount: bigint,
-    amntIsSold: boolean,
-    applyMinAmounts = true, // TODO test false
-  ): Swapping | null => {
-    console.log(`subSwapA: ${amount} ${amntIsSold ? "sold" : "bought"}`);
-    // console.log(`from: ${this.show()}`);
-    const swappings = this.diracUtxo.swappingsFor(
-      this.adhereMaxInteger,
-      this.user,
-      this.paramUtxo,
-      false,
-      applyMinAmounts ? this.minBuying ?? undefined : undefined,
-      applyMinAmounts ? this.minSelling ?? undefined : undefined,
-      Value.singleton(
-        this.sellingAsset,
-        amntIsSold ? amount : this.sellingAmnt,
-      ),
-      Assets.singleton(this.buyingAsset),
-      // TODO what
-      amntIsSold ? this.buyingAmnt : amount,
-      // adding minBalance here because we are removing it again in swappingsFor
-      // (amntIsSold ? this.buyingAmnt : amount) +
-      //   getMinBalance(this.buyingAsset),
-      this.expLimit ?? undefined,
-    );
-    assert(
-      swappings.length <= 1,
-      `swappings.length must be <= 1, but got:\n${
-        swappings.map((s) => s.show()).join("\n")
-      }`,
-    );
-    const subSwapA = swappings.length > 0 ? swappings[0] : null;
-    if (subSwapA) subSwapA.setMaxBuying(amntIsSold ? this.maxBuying : amount); // per definition of a subSwap
-    // console.log(`to (A): ${subSwapA?.show()}`);
-    const compareSubSwaps = true;
-    if (compareSubSwaps) {
-      const subSwapB = this.subSwapB(amount, amntIsSold);
-      if (subSwapA) {
-        assert(subSwapB, `subSwapB must be defined, but got null`);
-        assert(
-          subSwapA.equalNumbers(subSwapB, false, false),
-          `found difference in subSwap-functions:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`,
-        );
-        // assert(subSwapA.show() === subSwapB.show(), `SUCCESS! ... but only show()-difference:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
-        // the above detects only a difference in maxBuying, so we're not using it. TODO/NOTE the other variant is correct, this one wrong
-      } else {assert(
-          subSwapB === null,
-          `subSwapB must be null, but got:\n${subSwapB?.show()}`,
-        );}
-      return subSwapB; // NOTE this is because minBuying and maxima are different, subSwapB has the correct one
-    }
+  // private subSwapA = (
+  //   amount: bigint,
+  //   amntIsSold: boolean,
+  //   applyMinAmounts = true, // TODO test false
+  // ): Swapping | null => {
+  //   console.log(`subSwapA: ${amount} ${amntIsSold ? "sold" : "bought"}`);
+  //   // console.log(`from: ${this.show()}`);
+  //   const swappings = this.diracUtxo.swappingsFor(
+  //     this.adhereMaxInteger,
+  //     this.user,
+  //     this.paramUtxo,
+  //     false,
+  //     applyMinAmounts ? this.minBuying ?? undefined : undefined,
+  //     applyMinAmounts ? this.minSelling ?? undefined : undefined,
+  //     Value.singleton(
+  //       this.sellingAsset,
+  //       amntIsSold ? amount : this.sellingAmnt,
+  //     ),
+  //     Assets.singleton(this.buyingAsset),
+  //     // TODO what
+  //     amntIsSold ? this.buyingAmnt : amount,
+  //     // adding minBalance here because we are removing it again in swappingsFor
+  //     // (amntIsSold ? this.buyingAmnt : amount) +
+  //     //   getMinBalance(this.buyingAsset),
+  //     this.expLimit ?? undefined,
+  //   );
+  //   assert(
+  //     swappings.length <= 1,
+  //     `swappings.length must be <= 1, but got:\n${
+  //       swappings.map((s) => s.show()).join("\n")
+  //     }`,
+  //   );
+  //   const subSwapA = swappings.length > 0 ? swappings[0] : null;
+  //   if (subSwapA) subSwapA.setMaxBuying(amntIsSold ? this.maxBuying : amount); // per definition of a subSwap
+  //   // console.log(`to (A): ${subSwapA?.show()}`);
+  //   const compareSubSwaps = true;
+  //   if (compareSubSwaps) {
+  //     const subSwapB = this.subSwapB(amount, amntIsSold);
+  //     if (subSwapA) {
+  //       assert(subSwapB, `subSwapB must be defined, but got null`);
+  //       assert(
+  //         subSwapA.equalNumbers(subSwapB, false, false),
+  //         `found difference in subSwap-functions:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`,
+  //       );
+  //       // assert(subSwapA.show() === subSwapB.show(), `SUCCESS! ... but only show()-difference:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
+  //       // the above detects only a difference in maxBuying, so we're not using it. TODO/NOTE the other variant is correct, this one wrong
+  //     } else {assert(
+  //         subSwapB === null,
+  //         `subSwapB must be null, but got:\n${subSwapB?.show()}`,
+  //       );}
+  //     return subSwapB; // NOTE this is because minBuying and maxima are different, subSwapB has the correct one
+  //   }
 
-    return subSwapA;
-  };
+  //   return subSwapA;
+  // };
 
   private subSwapB = (
     amount: bigint,
@@ -423,13 +421,11 @@ export class Swapping {
     // console.log(`swapA0: ${swapA0}`);
     // console.log(`buyingAmnt: ${buyingAmnt}`);
 
-    const minBuying = applyMinAmounts ? this.minBuying ?? 1n : 1n;
+    const minBuying = applyMinAmounts ? this.minBuying : 1n;
     if (buyingAmnt < minBuying) return null;
 
     let sellingAmnt = ceilDiv(buyingAmnt * this.sellingSpot, this.buyingSpot);
-    const minSelling = applyMinAmounts
-      ? getMinSelling(this.sellingAsset, this.minSelling)
-      : 1n;
+    const minSelling = applyMinAmounts ? this.minSelling : 1n;
     if (sellingAmnt < minSelling && minSelling <= maxSelling) {
       sellingAmnt = minSelling;
     }
@@ -460,8 +456,9 @@ export class Swapping {
       this.sellingExp,
       this.expLimit,
       amntIsSold ? this.maxBuying : amount, // per definition of a subSwap
-      applyMinAmounts ? this.minBuying_ : null,
-      applyMinAmounts ? this.minSelling : null,
+      amntIsSold ? amount : this.maxSelling, // per definition of a subSwap
+      applyMinAmounts ? this.minBuying_ : 1n,
+      applyMinAmounts ? this.minSelling : 1n,
       this.tmpMinBuying,
       true,
     );
@@ -474,17 +471,15 @@ export class Swapping {
   public subSwap = this.subSwapB; // TODO profile both and pick the better one (later)
 
   private randomSubSwap = (): Swapping => {
-    const minSelling = getMinSelling(this.sellingAsset, this.minSelling);
-    const minBuying = this.minBuying ?? 1n;
     const maxSelling = this.sellingAmnt - 1n;
     const maxBuying = this.buyingAmnt - 1n;
-    const sellingOption = maxSelling >= minSelling;
-    const buyingOption = maxBuying >= minBuying;
+    const sellingOption = maxSelling >= this.minSelling;
+    const buyingOption = maxBuying >= this.minBuying;
     if (sellingOption || buyingOption) {
       for (let i = 0; i < 100; i++) {
         const amntIsSold = randomChoice([sellingOption, !buyingOption]);
         const maxAmnt = amntIsSold ? maxSelling : maxBuying;
-        const minAmnt = amntIsSold ? minSelling : minBuying;
+        const minAmnt = amntIsSold ? this.minSelling : this.minBuying;
         const amount = minAmnt + genNonNegative(maxAmnt - minAmnt);
         const subSwap = this.subSwap(amount, amntIsSold);
         if (subSwap) return subSwap;
@@ -523,8 +518,8 @@ export class Swapping {
     buyingExp: bigint,
     sellingExp: bigint,
     expLimit: number | null,
-    minBuying: bigint | null,
-    minSelling: bigint | null,
+    minBuying: bigint,
+    minSelling: bigint,
     tmpMinBuying: bigint | null,
   ): Swapping {
     console.log(`Swapping.boundary()`);
@@ -544,6 +539,7 @@ export class Swapping {
       sellingExp,
       expLimit,
       diracUtxo.available.amountOf(buyingAsset),
+      null,
       minBuying,
       minSelling,
       tmpMinBuying,
@@ -772,8 +768,8 @@ export class Swapping {
       this.corruptSoldAmnt(false),
       this.corruptBoughtAmnt(false),
       // TODO revert from time to time
-      // this.corruptSoldAmnt(true),
-      // this.corruptBoughtAmnt(true),
+      this.corruptSoldAmnt(true),
+      this.corruptBoughtAmnt(true),
       // this.corruptSoldAmnt(true),
       // this.corruptBoughtAmnt(true),
       // this.corruptSoldAmnt(true),
@@ -785,12 +781,15 @@ export class Swapping {
     ].filter((s) => s) as Swapping[];
   };
 
-  public corruptBoughtAmnt = (random: boolean): Swapping | null => {
-    console.log(`trying to corrupt bought amount...`);
-    if (this.buyingAmnt === this.maxBuying) return null;
-    const amnt = random ? genPositive(this.maxBuying - this.buyingAmnt) : 1n;
-    console.log(`... by ${amnt}`);
-    const boughtTooMuch = new Swapping(
+  private corrupted = (
+    buyingAmnt: bigint,
+    sellingAmnt: bigint,
+    buyingSpot: bigint,
+    sellingSpot: bigint,
+    buyingExp: bigint,
+    sellingExp: bigint,
+  ): Swapping =>
+    new Swapping(
       this.adhereMaxInteger,
       this.adherenceImpacted,
       this.user,
@@ -798,18 +797,32 @@ export class Swapping {
       this.diracUtxo,
       this.buyingAsset,
       this.sellingAsset,
+      buyingAmnt,
+      sellingAmnt,
+      buyingSpot,
+      sellingSpot,
+      buyingExp,
+      sellingExp,
+      this.expLimit,
+      this.maxBuying,
+      this.maxSelling,
+      this.minBuying_,
+      this.minSelling,
+      this.tmpMinBuying,
+      false,
+    );
+  public corruptBoughtAmnt = (random: boolean): Swapping | null => {
+    console.log(`trying to corrupt bought amount...`);
+    if (this.buyingAmnt === this.maxBuying) return null;
+    const amnt = random ? genPositive(this.maxBuying - this.buyingAmnt) : 1n;
+    console.log(`... by ${amnt}`);
+    const boughtTooMuch = this.corrupted(
       this.buyingAmnt + amnt,
       this.sellingAmnt,
       this.buyingSpot,
       this.sellingSpot,
       this.buyingExp,
       this.sellingExp,
-      this.expLimit,
-      this.maxBuying,
-      this.minBuying_,
-      this.minSelling,
-      this.tmpMinBuying,
-      false,
     );
     assert(
       !boughtTooMuch.validates(),
@@ -821,30 +834,16 @@ export class Swapping {
 
   public corruptSoldAmnt = (random: boolean): Swapping | null => {
     console.log(`trying to corrupt sold amount...`);
-    const minSelling = getMinSelling(this.sellingAsset, this.minSelling);
-    if (this.sellingAmnt === minSelling) return null;
-    const amnt = random ? genPositive(this.sellingAmnt - minSelling) : 1n;
+    if (this.sellingAmnt === this.minSelling) return null;
+    const amnt = random ? genPositive(this.sellingAmnt - this.minSelling) : 1n;
     console.log(`... by ${amnt}`);
-    const soldTooLittle = new Swapping(
-      this.adhereMaxInteger,
-      this.adherenceImpacted,
-      this.user,
-      this.paramUtxo,
-      this.diracUtxo,
-      this.buyingAsset,
-      this.sellingAsset,
+    const soldTooLittle = this.corrupted(
       this.buyingAmnt,
       this.sellingAmnt - amnt,
       this.buyingSpot,
       this.sellingSpot,
       this.buyingExp,
       this.sellingExp,
-      this.expLimit,
-      this.maxBuying,
-      this.minBuying_,
-      this.minSelling,
-      this.tmpMinBuying,
-      false,
     );
     assert(
       !soldTooLittle.validates(),
@@ -861,41 +860,52 @@ export class Swapping {
 
     const jsBuying = param.jumpSizes.amountOf(this.buyingAsset);
     const anchorBuying = dirac.anchorPrices.amountOf(this.buyingAsset);
-    let buyingExp_ = this.buyingExp;
-    let buyingSpot_ = this.buyingSpot;
-    while (buyingSpot_ === this.buyingSpot) {
-      buyingExp_++;
-      buyingSpot_ = Swapping.spot(anchorBuying, jsBuying, buyingExp_);
+    let buyingExp = this.buyingExp;
+    let sellingExp = this.sellingExp;
+    let buyingSpot = this.buyingSpot;
+    let sellingSpot = this.sellingSpot;
+    while (buyingSpot === this.buyingSpot) {
+      buyingExp++;
+      buyingSpot = Swapping.spot(anchorBuying, jsBuying, buyingExp);
     }
+    if (this.expLimit !== null) {
+      const optimized = fitSellingLimit(
+        param,
+        dirac,
+        this.buyingAsset,
+        this.sellingAsset,
+        buyingExp,
+        this.sellingExp,
+        this.expLimit,
+        this.maxBuying,
+        this.maxSelling,
+        this.minSelling,
+      );
+      if (optimized === null) return null;
+      else if (optimized !== "unchanged") {
+        buyingExp = optimized.buyingExp;
+        sellingExp = optimized.sellingExp;
+        buyingSpot = optimized.buyingSpot;
+        sellingSpot = optimized.sellingSpot;
+      }
+    }
+
     // NOTE prices are inverted
     assert(
-      buyingSpot_ > this.buyingSpot,
+      buyingSpot > this.buyingSpot,
       `seems like buyingExp is being changed in the wrong direction`,
     );
 
     if (
-      buyingSpot_ > 0n && (!this.adhereMaxInteger || buyingSpot_ <= maxInteger)
+      buyingSpot > 0n && (!this.adhereMaxInteger || buyingSpot <= maxInteger)
     ) {
-      const buyingSpotTooHigh = new Swapping(
-        this.adhereMaxInteger,
-        this.adherenceImpacted,
-        this.user,
-        this.paramUtxo,
-        this.diracUtxo,
-        this.buyingAsset,
-        this.sellingAsset,
+      const buyingSpotTooHigh = this.corrupted(
         this.buyingAmnt,
         this.sellingAmnt,
-        buyingSpot_,
-        this.sellingSpot,
-        buyingExp_,
-        this.sellingExp,
-        this.expLimit,
-        this.maxBuying,
-        this.minBuying_,
-        this.minSelling,
-        this.tmpMinBuying,
-        false,
+        buyingSpot,
+        sellingSpot,
+        buyingExp,
+        sellingExp,
       );
 
       if (buyingSpotTooHigh.validates()) {
@@ -914,8 +924,8 @@ export class Swapping {
         Swapping.exponentsYieldPrice(
           anchorBuying,
           jsBuying,
-          buyingExp_,
-          buyingSpot_,
+          buyingExp,
+          buyingSpot,
           "buying",
         ),
         `buyingSpotTooHigh should still yield the correct price: ${buyingSpotTooHigh.show()}`,
@@ -932,47 +942,58 @@ export class Swapping {
 
     const jsSelling = param.jumpSizes.amountOf(this.sellingAsset);
     const anchorSelling = dirac.anchorPrices.amountOf(this.sellingAsset);
-    let sellingExp_ = this.sellingExp;
-    let sellingSpot_ = this.sellingSpot;
-    while (sellingSpot_ === this.sellingSpot) {
-      sellingExp_--;
-      sellingSpot_ = Swapping.spot(anchorSelling, jsSelling, sellingExp_);
+    let buyingExp = this.buyingExp;
+    let sellingExp = this.sellingExp;
+    let buyingSpot = this.buyingSpot;
+    let sellingSpot = this.sellingSpot;
+    while (sellingSpot === this.sellingSpot) {
+      sellingExp--;
+      sellingSpot = Swapping.spot(anchorSelling, jsSelling, sellingExp);
     }
+    if (this.expLimit !== null) {
+      const optimized = fitSellingLimit(
+        param,
+        dirac,
+        this.buyingAsset,
+        this.sellingAsset,
+        buyingExp,
+        this.sellingExp,
+        this.expLimit,
+        this.maxBuying,
+        this.maxSelling,
+        this.minSelling,
+      );
+      if (optimized === null) return null;
+      else if (optimized !== "unchanged") {
+        buyingExp = optimized.buyingExp;
+        sellingExp = optimized.sellingExp;
+        buyingSpot = optimized.buyingSpot;
+        sellingSpot = optimized.sellingSpot;
+      }
+    }
+
     // NOTE prices are inverted
     assert(
-      sellingSpot_ < this.sellingSpot,
+      sellingSpot < this.sellingSpot,
       `seems like sellingExp is being changed in the wrong direction`,
     );
 
     if (
-      sellingSpot_ > 0n &&
-      (!this.adhereMaxInteger || sellingSpot_ <= maxInteger)
+      sellingSpot > 0n &&
+      (!this.adhereMaxInteger || sellingSpot <= maxInteger)
     ) {
-      const buyingA0 = this.buyingAmnt * sellingSpot_;
+      const buyingA0 = this.buyingAmnt * sellingSpot;
       const sellingA0 = this.sellingAmnt * this.buyingSpot;
       const swapA0 = min(sellingA0, buyingA0);
-      if (swapA0 < sellingSpot_) return null;
+      if (swapA0 < sellingSpot) return null;
 
-      const sellingSpotTooLow = new Swapping(
-        this.adhereMaxInteger,
-        this.adherenceImpacted,
-        this.user,
-        this.paramUtxo,
-        this.diracUtxo,
-        this.buyingAsset,
-        this.sellingAsset,
+      const sellingSpotTooLow = this.corrupted(
         this.buyingAmnt,
         this.sellingAmnt,
-        this.buyingSpot,
-        sellingSpot_,
-        this.buyingExp,
-        sellingExp_,
-        this.expLimit,
-        this.maxBuying,
-        this.minBuying_,
-        this.minSelling,
-        this.tmpMinBuying,
-        false,
+        buyingSpot,
+        sellingSpot,
+        buyingExp,
+        sellingExp,
       );
 
       if (sellingSpotTooLow.validates()) {
@@ -991,8 +1012,8 @@ export class Swapping {
         Swapping.exponentsYieldPrice(
           anchorSelling,
           jsSelling,
-          sellingExp_,
-          sellingSpot_,
+          sellingExp,
+          sellingSpot,
           "selling",
         ),
         `sellingSpotTooLow should still yield the correct price: ${sellingSpotTooLow.show()}`,
@@ -1001,27 +1022,4 @@ export class Swapping {
       return sellingSpotTooLow;
     } else return null;
   };
-
-  // public corruptRandomAmnts = (): Swapping | null => {
-  //   for (let i = 0; i < 100; i++) {
-  //     const randomAmnts = new Swapping(
-  //       this.user,
-  //       this.paramUtxo,
-  //       this.diracUtxo,
-  //       this.buyingAsset,
-  //       this.sellingAsset,
-  //       genPositive(this.maxBuying),
-  //       genPositive(this.sellingAmnt),
-  //       this.buyingSpot,
-  //       this.sellingSpot,
-  //       this.buyingExp,
-  //       this.buyingSpot,
-  //       false,
-  //       this.maxBuying,
-  //       this.granularity,
-  //     );
-  //     if (!randomAmnts.validates()) return randomAmnts;
-  //   }
-  //   return null;
-  // }
 }
