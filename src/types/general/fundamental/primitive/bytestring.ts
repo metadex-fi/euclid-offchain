@@ -2,10 +2,10 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   genByteString,
   genNonNegative,
-  gMaxStringBytes,
   maybeNdef,
 } from "../../../../utils/generators.ts";
 import { PType } from "../type.ts";
+import { gMaxStringBytes } from "../../../../utils/constants.ts";
 
 export class PByteString implements PType<Uint8Array, Uint8Array> {
   public readonly population;

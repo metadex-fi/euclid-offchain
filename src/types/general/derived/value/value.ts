@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { abs, max, maxInteger, min } from "../../../../utils/generators.ts";
+import { abs, max, min } from "../../../../utils/generators.ts";
 import { IdNFT } from "../../../euclid/idnft.ts";
 import { AssocMap, PMap } from "../../fundamental/container/map.ts";
 import { PWrapped } from "../../fundamental/container/wrapped.ts";
@@ -9,6 +9,7 @@ import { Assets, ccysTkns } from "../asset/assets.ts";
 import { Currency, PCurrency } from "../asset/currency.ts";
 import { PToken, Token } from "../asset/token.ts";
 import { PBounded } from "../bounded/bounded.ts";
+import { maxInteger } from "../../../../utils/constants.ts";
 
 export const ccysTknsAmnts = new AssocMap<Currency, AssocMap<Token, bigint>>(
   (currency) => currency.show(),

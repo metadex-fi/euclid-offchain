@@ -2,7 +2,6 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   Generators,
   genNonNegative,
-  gMaxLength,
   maybeNdef,
   min,
   randomChoice,
@@ -10,6 +9,7 @@ import {
 import { maxShowDepth } from "../../../../utils/proptests.ts";
 import { Data, f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
 import { PList } from "./list.ts";
+import { gMaxLength } from "../../../../utils/constants.ts";
 
 function census(numKeys: bigint, numValues: bigint, size: bigint): bigint {
   let population = 1n;

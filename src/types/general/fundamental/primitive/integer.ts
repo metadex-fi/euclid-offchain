@@ -1,6 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { genNumber, maxInteger } from "../../../../utils/generators.ts";
+import { genNumber } from "../../../../utils/generators.ts";
 import { PType } from "../type.ts";
+import { maxInteger } from "../../../../utils/constants.ts";
 
 export class PInteger implements PType<bigint, bigint> {
   public readonly population = maxInteger * 2n + 1n;

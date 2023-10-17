@@ -2,7 +2,6 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
 import {
   boundedSubset,
-  gMaxLength,
   max,
   nonEmptySubSet,
   randomChoice,
@@ -16,6 +15,7 @@ import { PNonEmptyList } from "../nonEmptyList.ts";
 import { Asset, PAsset } from "./asset.ts";
 import { Currency, PCurrency } from "./currency.ts";
 import { PToken, Token } from "./token.ts";
+import { gMaxLength } from "../../../../utils/constants.ts";
 
 export const ccysTkns = new AssocMap<Currency, Token[]>((ccy) => ccy.show());
 const PNonEmptyTokenList = new PNonEmptyList(PToken.ptype);

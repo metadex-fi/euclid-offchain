@@ -7,18 +7,12 @@ import { Asset } from "../../types/general/derived/asset/asset.ts";
 import { Value } from "../../types/general/derived/value/value.ts";
 import { PPositive } from "../../types/general/derived/bounded/positive.ts";
 import { PositiveValue } from "../../types/general/derived/value/positiveValue.ts";
-import {
-  genNonNegative,
-  gMaxLength,
-  max,
-  min,
-} from "../../utils/generators.ts";
+import { genNonNegative, max, min } from "../../utils/generators.ts";
 import { Pool } from "../pool.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
-import { IdNFT, maxInteger } from "../../mod.ts";
-import { Swapping } from "./mod.ts";
-
+import { calcExp, calcSpot } from "./swapfinding/helpers.ts";
+import { gMaxLength, maxInteger } from "../../utils/constants.ts";
 // complete settings for opening a pool
 export class Opening {
   constructor(
@@ -81,7 +75,7 @@ export class Opening {
   ): bigint | null => {
     const amm = weight * (balance + virtual);
     const jumpMultiplier = 1 + (1 / Number(jumpSize));
-    let exp = BigInt(Math.round(Swapping.exp(
+    let exp = BigInt(Math.round(calcExp(
       Number(baseAnchor),
       Number(amm),
       jumpMultiplier,
@@ -91,20 +85,12 @@ export class Opening {
     console.log("initial exp:", exp, "finalAnchor:", finalAnchor);
     while (finalAnchor <= upperLimit) {
       exp++;
-      finalAnchor = Swapping.spot(
-        baseAnchor,
-        jumpSize,
-        exp,
-      );
+      finalAnchor = calcSpot(baseAnchor, jumpSize)(exp);
       console.log("exp increased:", exp, "finalAnchor:", finalAnchor);
     }
     while (finalAnchor > upperLimit && finalAnchor >= baseAnchor) {
       exp--;
-      finalAnchor = Swapping.spot(
-        baseAnchor,
-        jumpSize,
-        exp,
-      );
+      finalAnchor = calcSpot(baseAnchor, jumpSize)(exp);
       // console.log("exp decreased:", exp, "finalAnchor:", finalAnchor);
     }
 

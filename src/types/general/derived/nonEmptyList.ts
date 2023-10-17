@@ -2,12 +2,12 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   Generators,
   genPositive,
-  gMaxLength,
   maybeNdef,
 } from "../../../utils/generators.ts";
 import { PList } from "../fundamental/container/list.ts";
 import { PData, PLifted } from "../fundamental/type.ts";
 import { PConstraint } from "./../fundamental/container/constraint.ts";
+import { gMaxLength } from "../../../utils/constants.ts";
 
 export class PNonEmptyList<PElem extends PData> extends PConstraint<
   PList<PElem>

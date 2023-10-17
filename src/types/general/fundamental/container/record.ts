@@ -4,7 +4,6 @@ import {
   Generators,
   genName,
   genNonNegative,
-  gMaxLength,
   maybeNdef,
 } from "../../../../utils/generators.ts";
 import {
@@ -16,6 +15,7 @@ import {
   RecordOfMaybe,
   t,
 } from "../type.ts";
+import { gMaxLength } from "../../../../utils/constants.ts";
 
 export class PRecord<PFields extends PData>
   implements

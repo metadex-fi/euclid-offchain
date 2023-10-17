@@ -8,14 +8,10 @@ import { PRecord } from "../general/fundamental/container/record.ts";
 import { f, t } from "../general/fundamental/type.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
 import { PInteger } from "../general/fundamental/primitive/integer.ts";
-import {
-  ceilDiv,
-  maxInteger,
-  maxIntRoot,
-  min,
-} from "../../utils/generators.ts";
+import { ceilDiv, min } from "../../utils/generators.ts";
 import { Value } from "../general/derived/value/value.ts";
 import { maxSmallInteger, PSmallValue, SmallValue } from "./smallValue.ts";
+import { maxInteger, maxIntRoot } from "../../utils/constants.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
 

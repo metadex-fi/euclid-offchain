@@ -3,10 +3,10 @@ import { Lucid } from "../../../../../lucid.mod.ts";
 import {
   genName,
   genNonNegative,
-  gMaxStringLength,
   maybeNdef,
 } from "../../../../utils/generators.ts";
 import { PType } from "../type.ts";
+import { gMaxStringLength } from "../../../../utils/constants.ts";
 
 export class PString implements PType<Uint8Array, string> {
   public readonly population;

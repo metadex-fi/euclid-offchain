@@ -1,4 +1,4 @@
-import { maxInteger } from "../../utils/generators.ts";
+import { maxInteger } from "../../utils/constants.ts";
 import { PBounded } from "../general/derived/bounded/bounded.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
 import { PRecord } from "../general/fundamental/container/record.ts";

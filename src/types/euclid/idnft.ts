@@ -1,6 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../lucid.mod.ts";
-import { maxInteger } from "../../utils/generators.ts";
 import { Asset } from "../general/derived/asset/asset.ts";
 import { Currency, PCurrency } from "../general/derived/asset/currency.ts";
 import { Hash, PHash } from "../general/derived/hash/hash.ts";
