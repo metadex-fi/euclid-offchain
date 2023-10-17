@@ -158,7 +158,7 @@ export const findForDirac = (
         } else {
           const fittedBuying = fitExp({
             adhereMaxInteger,
-            available,
+            available: buyingArgs.consts.available,
             min_: tmpMinBuying, // sole difference
             calcSpot_: buyingArgs.funcs.calcSpot_,
             calcDelta_: buyingArgs.funcs.calcDelta_,
@@ -199,28 +199,28 @@ export const findForDirac = (
 
       if (swapping) {
         // TODO revert
-        // if (optimizeAmnts) {
-        //   let i = 0;
-        //   while (true) {
-        //     console.log(`trying to find better effective price (${i})`);
-        //     const tmpMinBuying: bigint = swapping.buyingAmnt + 1n;
-        //     const maybeBetterFast = getSwappingForPair(
-        //       buyingArgs,
-        //       tmpMinBuying,
-        //     );
-        //     const maybeBetter = maybeBetterFast;
-        //     if (
-        //       maybeBetter &&
-        //       maybeBetter.effectivePrice <= swapping.effectivePrice
-        //     ) {
-        //       console.log(
-        //         `found swapping with better or equal effective price (${i++}): ${maybeBetter.effectivePrice} <= ${swapping.effectivePrice}`,
-        //       );
-        //       // TODO copy over the whole comparison with maybeBetterSlow and confirm equivalence
-        //       swapping = maybeBetter;
-        //     } else break;
-        //   }
-        // }
+        if (optimizeAmnts) {
+          let i = 0;
+          while (true) {
+            console.log(`trying to find better effective price (${i})`);
+            const tmpMinBuying: bigint = swapping.buyingAmnt + 1n;
+            const maybeBetterFast = getSwappingForPair(
+              buyingArgs,
+              tmpMinBuying,
+            );
+            const maybeBetter = maybeBetterFast;
+            if (
+              maybeBetter &&
+              maybeBetter.effectivePrice <= swapping.effectivePrice
+            ) {
+              console.log(
+                `found swapping with better or equal effective price (${i++}): ${maybeBetter.effectivePrice} <= ${swapping.effectivePrice}`,
+              );
+              // TODO copy over the whole comparison with maybeBetterSlow and confirm equivalence
+              swapping = maybeBetter;
+            } else break;
+          }
+        }
         swappings.push(swapping);
       }
     });

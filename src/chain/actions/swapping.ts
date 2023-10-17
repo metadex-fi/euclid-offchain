@@ -142,24 +142,24 @@ export class Swapping {
   adherenceImpacted: ${this.adherenceImpacted}
   paramUtxo: ${this.paramUtxo.show()}
   diracUtxo: ${this.diracUtxo.show()}
-  buyingAsset:    ${this.buyingAsset.show()}
-  sellingAsset:   ${this.sellingAsset.show()}
-  buyingAmnt:     ${this.buyingAmnt}
-  sellingAmnt:    ${this.sellingAmnt}
-  buyingSpot:     ${this.buyingSpot}
-  sellingSpot:    ${this.sellingSpot}
-  (buyingA0:      ${this.buyingAmnt * this.sellingSpot})
-  (sellingA0:     ${this.sellingAmnt * this.buyingSpot})
-  buyingExp:      ${this.buyingExp}
-  sellingExp:     ${this.sellingExp}
-  spotPrice:      ${this.spotPrice}
-  eff.Price:      ${this.effectivePrice}
-  expLimit:       ${this.expLimit}
-  availableBuying: ${this.availableBuying}
+  buyingAsset:      ${this.buyingAsset.show()}
+  sellingAsset:     ${this.sellingAsset.show()}
+  buyingAmnt:       ${this.buyingAmnt}
+  sellingAmnt:      ${this.sellingAmnt}
+  buyingSpot:       ${this.buyingSpot}
+  sellingSpot:      ${this.sellingSpot}
+  (buyingA0:        ${this.buyingAmnt * this.sellingSpot})
+  (sellingA0:       ${this.sellingAmnt * this.buyingSpot})
+  buyingExp:        ${this.buyingExp}
+  sellingExp:       ${this.sellingExp}
+  spotPrice:        ${this.spotPrice}
+  eff.Price:        ${this.effectivePrice}
+  expLimit:         ${this.expLimit}
+  availableBuying:  ${this.availableBuying}
   availableSelling: ${this.availableSelling}
-  minBuying:      ${this.minBuying_}
-  minSelling:     ${this.minSelling}
-  tmpMinBuying:   ${this.tmpMinBuying}
+  minBuying:        ${this.minBuying_}
+  minSelling:       ${this.minSelling}
+  tmpMinBuying:     ${this.tmpMinBuying}
   )`;
     // (maxBuyingA0: ${this.maxBuying * this.sellingSpot})
   };
