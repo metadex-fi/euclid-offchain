@@ -879,7 +879,7 @@ export class Swapping {
     let buyingSpot = this.buyingSpot;
     let sellingSpot = this.sellingSpot;
     const calcBuyingSpot = this.calcSpot("buying");
-    while (buyingSpot === this.buyingSpot) {
+    while (buyingSpot <= this.buyingSpot) {
       buyingExp++;
       buyingSpot = calcBuyingSpot(buyingExp);
     }
@@ -899,13 +899,13 @@ export class Swapping {
         if (fittedExps === null) return null;
         else if (fittedExps === "unchanged") break;
         else {
-          const oldBuyingSpot = buyingSpot;
-          buyingSpot = calcBuyingSpot(fittedExps.buyingExp);
-          if (buyingSpot <= oldBuyingSpot) {
+          const newBuyingSpot = calcBuyingSpot(fittedExps.buyingExp);
+          if (newBuyingSpot <= this.buyingSpot) {
             buyingExp++;
           } else {
             buyingExp = fittedExps.buyingExp;
             sellingExp = fittedExps.sellingExp;
+            buyingSpot = newBuyingSpot;
             sellingSpot = calcSellingSpot(fittedExps.sellingExp);
             break;
           }
@@ -943,7 +943,7 @@ export class Swapping {
         // }
       } else console.log(`bought spot corruption failed: ${nested}`);
 
-      // TODO FIXME
+      // TODO FIXME (not urgent, it never failed)
       // assert(
       //   Swapping.exponentsYieldPrice(
       //     anchorBuying,
@@ -967,7 +967,7 @@ export class Swapping {
     let buyingSpot = this.buyingSpot;
     let sellingSpot = this.sellingSpot;
     const calcSellingSpot = this.calcSpot("selling");
-    while (sellingSpot === this.sellingSpot) {
+    while (sellingSpot >= this.sellingSpot) {
       sellingExp--;
       sellingSpot = calcSellingSpot(sellingExp);
     }
@@ -987,14 +987,14 @@ export class Swapping {
         if (fittedExps === null) return null;
         else if (fittedExps === "unchanged") break;
         else {
-          const oldSellingSpot = sellingSpot;
-          sellingSpot = calcSellingSpot(fittedExps.sellingExp);
-          if (sellingSpot >= oldSellingSpot) {
-            buyingExp--;
+          const newSellingSpot = calcSellingSpot(fittedExps.sellingExp);
+          if (newSellingSpot >= this.sellingSpot) {
+            sellingExp--;
           } else {
             buyingExp = fittedExps.buyingExp;
             sellingExp = fittedExps.sellingExp;
             buyingSpot = calcBuyingSpot(fittedExps.buyingExp);
+            sellingSpot = newSellingSpot;
             break;
           }
         }
@@ -1037,7 +1037,7 @@ export class Swapping {
         // }
       } else console.log(`sold spot corruption failed: ${nested}`);
 
-      // TODO FIXME
+      // TODO FIXME (not urgent, it never failed)
       // assert(
       //   Swapping.exponentsYieldPrice(
       //     anchorSelling,

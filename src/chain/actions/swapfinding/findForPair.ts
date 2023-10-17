@@ -72,8 +72,18 @@ export const swappingForPair = (args: SwappingForPairArgs): Swapping | null => {
       if (postFitExps === null) return null;
       else if (postFitExps === "unchanged") break;
       else {
-        postFit.buyingVars.exp = postFitExps.buyingExp;
-        postFit.sellingVars.exp = postFitExps.sellingExp;
+        if (postFit.buyingVars.exp !== postFitExps.buyingExp) {
+          postFit.buyingVars.exp = postFitExps.buyingExp;
+          postFit.buyingVars.spot = args.buyingArgs.funcs.calcSpot_(
+            postFitExps.buyingExp,
+          );
+        }
+        if (postFit.sellingVars.exp !== postFitExps.sellingExp) {
+          postFit.sellingVars.exp = postFitExps.sellingExp;
+          postFit.sellingVars.spot = args.sellingArgs.funcs.calcSpot_(
+            postFitExps.sellingExp,
+          );
+        }
       }
     }
   }
