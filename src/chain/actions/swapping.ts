@@ -24,7 +24,7 @@ import { Assets } from "../../types/general/derived/asset/assets.ts";
 import { Dirac } from "../../types/euclid/dirac.ts";
 import { calcSpot, countMultiplications } from "./swapfinding/helpers.ts";
 import { fitExpLimit } from "./swapfinding/fitExpLimit.ts";
-import { maxInteger } from "../../utils/constants.ts";
+import { compareVariants, maxInteger } from "../../utils/constants.ts";
 
 // const sellingADAtolerance = 0;
 
@@ -164,25 +164,42 @@ export class Swapping {
     // (maxBuyingA0: ${this.maxBuying * this.sellingSpot})
   };
 
-  public equalNumbers = (
+  public equals = (
     other: Swapping,
-    compareMaxBuying: boolean,
-    compareMinima: boolean,
+    compareAvailable: boolean,
+    compareMinHard: boolean,
+    compareMinSoft: boolean,
   ): boolean => {
-    return (
-      this.buyingAmnt === other.buyingAmnt &&
-      this.sellingAmnt === other.sellingAmnt &&
-      this.buyingSpot === other.buyingSpot &&
-      this.sellingSpot === other.sellingSpot &&
-      this.buyingExp === other.buyingExp &&
-      this.sellingExp === other.sellingExp &&
-      (!compareMaxBuying || this.availableBuying === other.availableBuying) &&
-      (!compareMinima || (
-        this.minBuying_ === other.minBuying_ &&
-        this.minSelling === other.minSelling &&
-        this.tmpMinBuying === other.tmpMinBuying
-      ))
-    );
+    const as = this.show().split("\n");
+    const bs = other.show().split("\n");
+
+    if (as.length !== bs.length) {
+      console.log(`mismatch in length: ${as.length} !== ${bs.length}`);
+      return false;
+    }
+    for (let i = 0; i < as.length; i++) {
+      const a = as[i];
+      const b = bs[i];
+      if (!compareAvailable && a.includes("available")) continue;
+      if (
+        !compareMinHard &&
+        (a.includes("minBuying") || a.includes("tmpMinBuying"))
+      ) continue;
+      if (!(compareMinHard || compareMinSoft) && a.includes("minSelling")) {
+        continue;
+      }
+      if (a !== b) {
+        console.log(`mismatch: ${a} !== ${b}`);
+        return false;
+      }
+    }
+    if (compareMinSoft && this.minBuying !== other.minBuying) {
+      console.log(
+        `mismatch in minBuying: ${this.minBuying} !== ${other.minBuying}`,
+      );
+      return false;
+    }
+    return true;
   };
 
   public split = (): Swapping[] => {
@@ -344,75 +361,77 @@ export class Swapping {
     return swappings;
   };
 
-  // private setMaxBuying = (maxBuying: bigint): void => {
-  //   this.maxBuying = maxBuying;
-  // };
+  private setAvailableBuying = (availableBuying: bigint): void => {
+    this.availableBuying = availableBuying;
+  };
 
   // The idea behind this variant is the guess that with lower amounts we might
   // have a different optimum for exponents and prices
   // ~~> update: as we're not touching buyingExps in the swappingsFor loop anymore, only diff in maxBuying
   // TODO maybe investigate further, and compare performances. Note that the other variant is correct, this one wrong, regarding maxBuying
   // TODO granularity
-  // private subSwapA = (
-  //   amount: bigint,
-  //   amntIsSold: boolean,
-  //   applyMinAmounts = true, // TODO test false
-  // ): Swapping | null => {
-  //   console.log(`subSwapA: ${amount} ${amntIsSold ? "sold" : "bought"}`);
-  //   // console.log(`from: ${this.show()}`);
-  //   const swappings = this.diracUtxo.swappingsFor(
-  //     this.adhereMaxInteger,
-  //     this.user,
-  //     this.paramUtxo,
-  //     false,
-  //     applyMinAmounts ? this.minBuying ?? undefined : undefined,
-  //     applyMinAmounts ? this.minSelling ?? undefined : undefined,
-  //     Value.singleton(
-  //       this.sellingAsset,
-  //       amntIsSold ? amount : this.sellingAmnt,
-  //     ),
-  //     Assets.singleton(this.buyingAsset),
-  //     // TODO what
-  //     amntIsSold ? this.buyingAmnt : amount,
-  //     // adding minBalance here because we are removing it again in swappingsFor
-  //     // (amntIsSold ? this.buyingAmnt : amount) +
-  //     //   getMinBalance(this.buyingAsset),
-  //     this.expLimit ?? undefined,
-  //   );
-  //   assert(
-  //     swappings.length <= 1,
-  //     `swappings.length must be <= 1, but got:\n${
-  //       swappings.map((s) => s.show()).join("\n")
-  //     }`,
-  //   );
-  //   const subSwapA = swappings.length > 0 ? swappings[0] : null;
-  //   if (subSwapA) subSwapA.setMaxBuying(amntIsSold ? this.maxBuying : amount); // per definition of a subSwap
-  //   // console.log(`to (A): ${subSwapA?.show()}`);
-  //   const compareSubSwaps = true;
-  //   if (compareSubSwaps) {
-  //     const subSwapB = this.subSwapB(amount, amntIsSold);
-  //     if (subSwapA) {
-  //       assert(subSwapB, `subSwapB must be defined, but got null`);
-  //       assert(
-  //         subSwapA.equalNumbers(subSwapB, false, false),
-  //         `found difference in subSwap-functions:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`,
-  //       );
-  //       // assert(subSwapA.show() === subSwapB.show(), `SUCCESS! ... but only show()-difference:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
-  //       // the above detects only a difference in maxBuying, so we're not using it. TODO/NOTE the other variant is correct, this one wrong
-  //     } else {assert(
-  //         subSwapB === null,
-  //         `subSwapB must be null, but got:\n${subSwapB?.show()}`,
-  //       );}
-  //     return subSwapB; // NOTE this is because minBuying and maxima are different, subSwapB has the correct one
-  //   }
+  private subSwapA = (
+    amount: bigint,
+    amntIsSold: boolean,
+    applyMinAmounts = true, // TODO test false
+  ): Swapping | null => {
+    console.log(`subSwapA: ${amount} ${amntIsSold ? "sold" : "bought"}`);
+    // console.log(`from: ${this.show()}`);
+    const swappings = this.diracUtxo.swappingsFor(
+      this.adhereMaxInteger,
+      this.user,
+      this.paramUtxo,
+      false,
+      applyMinAmounts ? this.minBuying ?? undefined : undefined,
+      applyMinAmounts ? this.minSelling ?? undefined : undefined,
+      Value.singleton(
+        this.sellingAsset,
+        amntIsSold ? amount : this.sellingAmnt,
+      ),
+      Assets.singleton(this.buyingAsset),
+      // TODO what
+      amntIsSold ? this.buyingAmnt : amount,
+      // adding minBalance here because we are removing it again in swappingsFor
+      // (amntIsSold ? this.buyingAmnt : amount) +
+      //   getMinBalance(this.buyingAsset),
+      this.expLimit ?? undefined,
+    );
+    assert(
+      swappings.length <= 1,
+      `swappings.length must be <= 1, but got:\n${
+        swappings.map((s) => s.show()).join("\n")
+      }`,
+    );
+    const subSwapA = swappings.length > 0 ? swappings[0] : null;
+    if (subSwapA) {
+      subSwapA.setAvailableBuying(amntIsSold ? this.availableBuying : amount); // per definition of a subSwap
+    }
+    // console.log(`to (A): ${subSwapA?.show()}`);
+    const compareSubSwaps = compareVariants;
+    if (compareSubSwaps) {
+      const subSwapB = this.subSwapB(amount, amntIsSold);
+      if (subSwapA) {
+        assert(subSwapB, `subSwapB must be defined, but got null`);
+        assert(
+          subSwapA.equals(subSwapB, false, false, true), // NOTE compareMinSoft is new
+          `found difference in subSwap-functions:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`,
+        );
+        // assert(subSwapA.show() === subSwapB.show(), `SUCCESS! ... but only show()-difference:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
+        // the above detects only a difference in maxBuying, so we're not using it. TODO/NOTE the other variant is correct, this one wrong
+      } else {assert(
+          subSwapB === null,
+          `subSwapB must be null, but got:\n${subSwapB?.show()}`,
+        );}
+      return subSwapB; // NOTE this is because minBuying and maxima are different, subSwapB has the correct one
+    }
 
-  //   return subSwapA;
-  // };
+    return subSwapA;
+  };
 
   private subSwapB = (
     amount: bigint,
     amntIsSold: boolean,
-    applyMinAmounts = true, // TODO test false, TODO add to subSwapA (not important)
+    applyMinAmounts = true, // TODO test false
   ): Swapping | null => {
     console.log(`subSwapB: ${amount} ${amntIsSold ? "sold" : "bought"}`);
 
@@ -479,7 +498,7 @@ export class Swapping {
   };
 
   // NOTE subSwapA is only wrong regarding maxBuying
-  public subSwap = this.subSwapB; // TODO profile both and pick the better one (later)
+  public subSwap = compareVariants ? this.subSwapA : this.subSwapB; // TODO profile both and pick the better one (later)
 
   private randomSubSwap = (): Swapping => {
     const maxSelling = this.sellingAmnt - 1n;
@@ -508,7 +527,7 @@ export class Swapping {
       `randomSubSwap(): failed to find a subSwap for ${this.show()}`,
     );
     assert(
-      this.equalNumbers(subSwap, false, true), // maxBuying changes per definition of a subSwap
+      this.equals(subSwap, false, true, true), // maxBuying changes per definition of a subSwap
       `subSwap with unchanged amounts should result in same Swapping, but got:\n${subSwap.show()}\nfrom\n${this.show()}`,
     );
     return subSwap;
@@ -552,7 +571,7 @@ export class Swapping {
       sellingExp,
       expLimit,
       availableBuying, //diracUtxo.available.amountOf(buyingAsset),
-      availableSelling === -1n ? null : availableSelling, //user ? user.balance!.amountOf(sellingAsset) : null,
+      availableSelling === -1n ? null : availableSelling, //user ? user.availableBalance!.amountOf(sellingAsset) : null,
       minBuying,
       minSelling,
       tmpMinBuying,
@@ -887,6 +906,7 @@ export class Swapping {
       const calcSellingSpot = this.calcSpot("selling");
       while (true) {
         const fittedExps = fitExpLimit({
+          adhereMaxInteger: this.adhereMaxInteger,
           expLimit: this.expLimit,
           buyingExp,
           sellingExp,
@@ -975,6 +995,7 @@ export class Swapping {
       const calcBuyingSpot = this.calcSpot("buying");
       while (true) {
         const fittedExps = fitExpLimit({
+          adhereMaxInteger: this.adhereMaxInteger,
           expLimit: this.expLimit,
           buyingExp,
           sellingExp,

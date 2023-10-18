@@ -4,8 +4,10 @@ import {
   countMultiplications,
   updatedAmnts,
 } from "./helpers.ts";
+import { maxInteger } from "../../../utils/constants.ts";
 
 interface FitExpLimitArgs {
+  readonly adhereMaxInteger: boolean;
   readonly expLimit: number;
   buyingExp: bigint;
   sellingExp: bigint;
@@ -20,6 +22,7 @@ export const fitExpLimit = (args: FitExpLimitArgs):
   | {
     buyingExp: bigint;
     sellingExp: bigint;
+    adherenceImpacted: boolean;
   }
   | "unchanged"
   | null => {
@@ -35,6 +38,7 @@ export const fitExpLimit = (args: FitExpLimitArgs):
 
     const buyingBest = bestMultiplicationsAhead(Number(args.buyingExp));
     const sellingBest = bestMultiplicationsAhead(Number(args.sellingExp));
+    let adherenceImpacted = false;
 
     if (buyingBest + sellingBest > args.expLimit) {
       console.log(
@@ -107,9 +111,13 @@ export const fitExpLimit = (args: FitExpLimitArgs):
       assert(frontier.length, `frontier.length === 0`);
 
       let bestPrice: number;
-      frontier = frontier.map((f) => {
+      frontier = frontier.flatMap((f) => {
         const buyingSpot = args.calcBuyingSpot(f.buyingExp);
         const sellingSpot = args.calcSellingSpot(f.sellingExp);
+        if (args.adhereMaxInteger && sellingSpot > maxInteger) {
+          adherenceImpacted = true;
+          return [];
+        }
 
         const newAmounts = updatedAmnts(
           buyingSpot,
@@ -130,6 +138,13 @@ export const fitExpLimit = (args: FitExpLimitArgs):
           effectivePrice,
         };
       });
+      if (frontier.length === 0) {
+        assert(
+          adherenceImpacted,
+          `no frontier, but adherence not impacted either`,
+        );
+        return null;
+      }
       console.log(`bestPrice: ${bestPrice!}`);
       const optimum = frontier.find((f) => f.effectivePrice === bestPrice);
       assert(optimum, `optimum === undefined`);
@@ -147,6 +162,7 @@ export const fitExpLimit = (args: FitExpLimitArgs):
     return {
       buyingExp: args.buyingExp,
       sellingExp: args.sellingExp,
+      adherenceImpacted,
     };
   }
 };

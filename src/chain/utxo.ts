@@ -18,6 +18,9 @@ import { Swapping } from "./actions/swapping.ts";
 import { Contract } from "./contract.ts";
 import { User } from "./user.ts";
 import { findForDirac } from "./actions/swapfinding/findForDirac.ts";
+import { ceilDiv, max, min } from "../utils/generators.ts";
+import { calcDelta, calcExp, calcSpot } from "./actions/swapfinding/helpers.ts";
+import { compareVariants, maxInteger } from "../utils/constants.ts";
 
 // export const getMinBalance = (asset: Asset): bigint =>
 //   asset.equals(Asset.ADA) ? 10000000n : 0n; // TODO arbitary aka both excessive and edge-casing
@@ -246,336 +249,717 @@ export class DiracUtxo {
     minBuying = 1n,
     minSelling_ = 1n,
     availableSelling_?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
-    buyingAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
-    buyableAmnt?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
+    buyableAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
+    availableBuying?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
     expLimit?: number,
   ): Swapping[] => {
     console.log("swappingsFor()");
     assert(minBuying > 0n, `minBuying <= 0n: ${minBuying}`);
     assert(minSelling_ > 0n, `minSelling_ <= 0n: ${minSelling_}`);
-    return findForDirac(
+    const swappings = findForDirac({
       adhereMaxInteger,
       user,
       paramUtxo,
-      this,
+      diracUtxo: this,
       optimizeAmnts,
       minBuying,
       minSelling_,
-      availableSelling_ ?? null,
-      buyingAssets ?? null,
-      buyableAmnt ?? null,
-      expLimit ?? null,
-    );
+      availableSelling_: availableSelling_ ?? null,
+      buyableAssets: buyableAssets ?? null,
+      availableBuying: availableBuying ?? null,
+      expLimit: expLimit ?? null,
+    });
+
+    if (compareVariants && expLimit === undefined) {
+      const oldSwappings = this.oldSwappingsFor(
+        adhereMaxInteger,
+        user ?? undefined,
+        paramUtxo,
+        optimizeAmnts,
+        minBuying,
+        minSelling_,
+        availableSelling_,
+        buyableAssets,
+        availableBuying,
+      );
+      assert(
+        oldSwappings.length === swappings.length,
+        `length mismatch: ${oldSwappings.length} !== ${swappings.length}`,
+      );
+      const notFound: Swapping[] = [];
+      swappings.forEach((swapping) => {
+        const i = oldSwappings.findIndex((s) =>
+          s.equals(swapping, true, true, true)
+        );
+        if (i === -1) notFound.push(swapping);
+        else oldSwappings.splice(i, 1);
+      });
+      assert(
+        notFound.length === 0 && oldSwappings.length === 0,
+        `old and new swappings mismatch:\nold:\n${
+          oldSwappings.map((s) => s.show()).join("\n")
+        }\nnew:\n${notFound.map((s) => s.show()).join("\n")}`,
+      );
+    }
+
+    return swappings;
   };
 
-  // public swappingsFor = (
-  //   adhereMaxInteger: boolean,
-  //   user: User | null,
-  //   paramUtxo: ParamUtxo,
-  //   optimizeAmnts: boolean,
-  //   minBuying = 1n,
-  //   minSelling_ = 1n,
-  //   availableSelling_?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
-  //   buyingAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
-  //   buyableAmnt?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
-  //   expLimit?: number,
-  // ): Swapping[] => {
-  //   console.log("swappingsFor()");
-  //   assert(minBuying > 0n, `minBuying <= 0n: ${minBuying}`);
-  //   assert(minSelling_ > 0n, `minSelling_ <= 0n: ${minSelling_}`);
-  //   const swappings = new Array<Swapping>();
-  //   let availableBuying_: PositiveValue;
-  //   if (buyingAssets) {
-  //     if (buyableAmnt === undefined) {
-  //       availableBuying_ = this.available.ofAssets(buyingAssets);
-  //     } else {
-  //       const buyingAssets_ = buyingAssets.toList;
-  //       assert(
-  //         buyingAssets_.length === 1,
-  //         `buyingAssets_.length !== 1: ${buyingAssets.show()}`,
-  //       );
-  //       const buyingAsset = buyingAssets_[0];
-  //       availableBuying_ = PositiveValue.singleton(buyingAsset, buyableAmnt);
-  //     }
-  //   } else availableBuying_ = this.available;
-  //   console.log("availableBuying_:", availableBuying_.concise());
-  //   console.log("availableSelling_:", availableSelling_?.concise());
-  //   const param = paramUtxo.param;
+  private oldSwappingsFor = (
+    adhereMaxInteger: boolean,
+    user: User | undefined,
+    paramUtxo: ParamUtxo,
+    optimizeAmnts: boolean,
+    minBuying = 1n,
+    minSelling_ = 1n,
+    sellable_?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
+    buyingAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
+    buyableAmnt?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
+  ): Swapping[] => {
+    console.log("oldSwappingsFor()");
+    assert(minBuying > 0n, `minBuying <= 0n: ${minBuying}`);
+    assert(minSelling_ > 0n, `minSelling_ <= 0n: ${minSelling_}`);
+    const swappings = new Array<Swapping>();
+    let buyable_: PositiveValue;
+    if (buyingAssets) {
+      if (buyableAmnt === undefined) {
+        buyable_ = this.available.ofAssets(buyingAssets);
+      } else {
+        const buyingAssets_ = buyingAssets.toList;
+        assert(
+          buyingAssets_.length === 1,
+          `buyingAssets_.length !== 1: ${buyingAssets.show()}`,
+        );
+        const buyingAsset = buyingAssets_[0];
+        buyable_ = PositiveValue.singleton(buyingAsset, buyableAmnt);
+      }
+    } else buyable_ = this.available;
+    console.log("buyable_:", buyable_.concise());
+    console.log("sellable_:", sellable_?.concise());
+    const param = paramUtxo.param;
 
-  //   const liquidity_ = new PositiveValue();
+    const liquidity_ = new PositiveValue();
 
-  //   const buyingSpot_ = new PositiveValue();
-  //   const sellingSpot_ = new PositiveValue();
-  //   const buyingExp_ = new Value();
-  //   const sellingExp_ = new Value();
-  //   const maxBuying_ = new PositiveValue();
-  //   const maxSelling_ = new PositiveValue();
-  //   const adherenceImpacted = new Assets();
+    const buyingSpot_ = new PositiveValue();
+    const sellingSpot_ = new PositiveValue();
+    const buyingExp_ = new Value();
+    const sellingExp_ = new Value();
+    const maxBuying_ = new PositiveValue();
+    const maxSelling_ = new PositiveValue();
+    const adherenceImpacted = new Assets();
 
-  //   // deposit of asset into pool to move inverted amm-price a to inverted spot price s
-  //   // s := a = (l + d) * w => d = (s / w) - l
-  //   // const delta = (w: number, l: number) => (s: number) => (s / w) - l;
-  //   // const delta = (s: number) => l * (((s / a) ** (w / (w + 1))) - 1);
+    // deposit of asset into pool to move inverted amm-price a to inverted spot price s
+    // s := a = (l + d) * w => d = (s / w) - l
+    // const delta = (w: number, l: number) => (s: number) => (s / w) - l;
+    // const delta = (s: number) => l * (((s / a) ** (w / (w + 1))) - 1);
 
-  //   param.assets.forEach((asset) => {
-  //     // if (asset.equals(Asset.ADA)) return; // TODO for debugging, revert
-  //     const availableBuying = availableBuying_.amountOf(asset, 0n); // - getMinBalance(asset);
-  //     const availableSelling = availableSelling_?.amountOf(asset, 0n);
-  //     const infiniteSellable = availableSelling === undefined ||
-  //       availableSelling === -1n;
-  //     const minSelling = getMinSelling(asset, minSelling_);
-  //     if (
-  //       availableBuying < minBuying && !infiniteSellable &&
-  //       availableSelling < minSelling
-  //     ) {
-  //       return;
-  //     }
+    const getMinSelling = (
+      asset: Asset,
+      minSelling: bigint | null,
+    ): bigint => max(minSelling ?? 1n, asset.equals(Asset.ADA) ? 1000000n : 1n); // TODO arbitary aka both excessive and edge-casing
 
-  //     const virtual = param.virtual.amountOf(asset);
-  //     const weight = param.weights.amountOf(asset); // NOTE: inverted
-  //     const jumpSize = param.jumpSizes.amountOf(asset);
-  //     const anchor = this.dirac.anchorPrices.amountOf(asset); // NOTE: inverted aka "price when selling for A0"
+    param.assets.forEach((asset) => {
+      // if (asset.equals(Asset.ADA)) return; // TODO for debugging, revert
+      const buyable = buyable_.amountOf(asset, 0n); // - getMinBalance(asset);
+      const sellable = sellable_?.amountOf(asset, 0n);
+      const infiniteSellable = sellable === undefined || sellable === -1n;
+      const minSelling = getMinSelling(asset, minSelling_);
+      if (buyable < minBuying && !infiniteSellable && sellable < minSelling) {
+        return;
+      }
 
-  //     const liquidity = virtual + this.funds.amountOf(asset, 0n);
-  //     if (liquidity <= 0n) return; // TODO reconsider if this can happen, throw error instead if not
-  //     liquidity_.initAmountOf(asset, liquidity);
+      const virtual = param.virtual.amountOf(asset);
+      const weight = param.weights.amountOf(asset); // NOTE: inverted
+      const jumpSize = param.jumpSizes.amountOf(asset);
+      const anchor = this.dirac.anchorPrices.amountOf(asset); // NOTE: inverted aka "price when selling for A0"
 
-  //     const amm = liquidity * weight; // NOTE: inverted aka "price when selling for A0"
-  //     assert(amm > 0n, `amm <= 0n`);
+      const liquidity = virtual + this.funds.amountOf(asset, 0n);
+      if (liquidity <= 0n) return; // TODO reconsider if this can happen, throw error instead if not
+      liquidity_.initAmountOf(asset, liquidity);
 
-  //     const jumpMultiplier = (Number(jumpSize) + 1) / Number(jumpSize);
-  //     const exp = calcExp(Number(anchor), Number(amm), jumpMultiplier);
+      const amm = liquidity * weight; // NOTE: inverted aka "price when selling for A0"
+      assert(amm > 0n, `amm <= 0n`);
 
-  //     let buyingExp = BigInt(Math.floor(exp));
-  //     let buyingSpot = calcSpot(anchor, jumpSize, buyingExp);
-  //     let adherenceImpacted_ = false;
-  //     if (adhereMaxInteger && buyingSpot > maxInteger) {
-  //       adherenceImpacted.insert(asset);
-  //       adherenceImpacted_ = true;
-  //       while (adhereMaxInteger && buyingSpot > maxInteger) {
-  //         buyingExp--;
-  //         buyingSpot = calcSpot(anchor, jumpSize, buyingExp);
-  //       }
-  //     }
+      const jumpMultiplier = (Number(jumpSize) + 1) / Number(jumpSize);
+      const exp = calcExp(Number(anchor), Number(amm), jumpMultiplier);
 
-  //     let sellingExp = BigInt(Math.ceil(exp));
-  //     let sellingSpot = calcSpot(anchor, jumpSize, sellingExp);
-  //     if (adhereMaxInteger && sellingSpot > maxInteger) {
-  //       if (!adherenceImpacted_) {
-  //         adherenceImpacted.insert(asset);
-  //         adherenceImpacted_ = true;
-  //       }
-  //       while (adhereMaxInteger && sellingSpot > maxInteger) {
-  //         sellingExp--;
-  //         sellingSpot = calcSpot(anchor, jumpSize, sellingExp);
-  //       }
-  //     }
+      let buyingExp = BigInt(Math.floor(exp));
+      let buyingSpot = calcSpot(anchor, jumpSize)(buyingExp);
+      let adherenceImpacted_ = false;
+      if (adhereMaxInteger && buyingSpot > maxInteger) {
+        adherenceImpacted.insert(asset);
+        adherenceImpacted_ = true;
+        while (adhereMaxInteger && buyingSpot > maxInteger) {
+          buyingExp--;
+          buyingSpot = calcSpot(anchor, jumpSize)(buyingExp);
+        }
+      }
 
-  //     // TODO what about this?
-  //     // NOTE: inverted
-  //     // assert(spot(anchor, jumpSize, buyingExp + 1n) >= amm, `buyingExp could be higher`);
-  //     // assert(spot(anchor, jumpSize, sellingExp - 1n) <= amm, `sellingSpot could be lower`);
-  //     // assert(buyingSpot >= anchor, `buyingSpot < anchor`); // TODO do we want that in the loop below? Do we want it at all?
+      let sellingExp = BigInt(Math.ceil(exp));
+      let sellingSpot = calcSpot(anchor, jumpSize)(sellingExp);
+      if (adhereMaxInteger && sellingSpot > maxInteger) {
+        if (!adherenceImpacted_) {
+          adherenceImpacted.insert(asset);
+          adherenceImpacted_ = true;
+        }
+        while (adhereMaxInteger && sellingSpot > maxInteger) {
+          sellingExp--;
+          sellingSpot = calcSpot(anchor, jumpSize)(sellingExp);
+        }
+      }
 
-  //     const delta_ = calcDelta(weight, liquidity);
+      // TODO what about this?
+      // NOTE: inverted
+      // assert(spot(anchor, jumpSize, buyingExp + 1n) >= amm, `buyingExp could be higher`);
+      // assert(spot(anchor, jumpSize, sellingExp - 1n) <= amm, `sellingSpot could be lower`);
+      // assert(buyingSpot >= anchor, `buyingSpot < anchor`); // TODO do we want that in the loop below? Do we want it at all?
 
-  //     const foundBuyingExp = findBuyingExp(
-  //       anchor,
-  //       jumpSize,
-  //       availableBuying,
-  //       minBuying,
-  //       delta_,
-  //       buyingExp,
-  //       expLimit,
-  //     );
-  //     if (foundBuyingExp) {
-  //       buyingExp_.initAmountOf(asset, foundBuyingExp.buyingExp);
-  //       buyingSpot_.initAmountOf(asset, foundBuyingExp.buyingSpot);
-  //       maxBuying_.initAmountOf(asset, foundBuyingExp.maxBuying);
-  //     }
+      const delta_ = calcDelta(weight, liquidity);
 
-  //     const foundSellingExp = findSellingExp(
-  //       adhereMaxInteger,
-  //       anchor,
-  //       jumpSize,
-  //       availableSelling,
-  //       minSelling,
-  //       delta_,
-  //       sellingExp,
-  //       expLimit,
-  //     );
-  //     if (foundSellingExp) {
-  //       if (foundSellingExp === "cannotAdhere") {
-  //         if (!adherenceImpacted_) {
-  //           adherenceImpacted.insert(asset);
-  //           adherenceImpacted_ = true;
-  //         }
-  //       } else {
-  //         sellingExp_.initAmountOf(asset, foundSellingExp.sellingExp);
-  //         sellingSpot_.initAmountOf(asset, foundSellingExp.sellingSpot);
-  //         maxSelling_.initAmountOf(asset, foundSellingExp.maxSelling);
-  //       }
-  //     }
-  //   });
+      if (buyable >= minBuying) {
+        while (buyingSpot > 0n) {
+          const d = delta_(buyingSpot);
+          const maxBuying = min(buyable, -d);
+          // console.log(`
+          //   buyable: ${buyable}
+          //   d: ${d}
+          //   maxBuying: ${maxBuying}
+          // `);
 
-  //   const sellableAssets = maxSelling_.assets.toList;
-  //   const buyableAssets = maxBuying_.assets.toList;
+          if (maxBuying >= minBuying) {
+            buyingSpot_.initAmountOf(asset, buyingSpot);
+            buyingExp_.initAmountOf(asset, buyingExp);
+            maxBuying_.initAmountOf(asset, maxBuying);
+            break;
+          } else {
+            buyingExp--;
+            buyingSpot = calcSpot(anchor, jumpSize)(buyingExp);
+            // if maxBuying is 0, then d is too low, which means that
+            // we are too close at the amm-price. So we ~increase~ the
+            // (uninverted) price we are willing to ~buy~ at stepwise
+            // until either we hit the bounds or find a d >= 1.
+          }
+        }
+      }
 
-  //   buyableAssets.forEach((buyingAsset) => {
-  //     // NOTE if those become non-const again, move them into the inner loop again
-  //     const buyingSpot = buyingSpot_.amountOf(buyingAsset); // NOTE: inverted
-  //     const buyingExp = buyingExp_.amountOf(buyingAsset);
-  //     const maxBuying = maxBuying_.amountOf(buyingAsset);
-  //     const availableBuying = optimizeAmnts
-  //       ? availableBuying_.amountOf(buyingAsset, 0n)
-  //       : null;
-  //     const adherenceImpactedBuying = adherenceImpacted.has(buyingAsset);
+      if ((infiniteSellable || sellable >= minSelling) && sellingSpot > 0n) {
+        while (true) {
+          const d = delta_(sellingSpot);
+          const maxSelling = infiniteSellable ? d : min(sellable, d);
+          if (maxSelling >= minSelling) {
+            sellingSpot_.initAmountOf(asset, sellingSpot);
+            sellingExp_.initAmountOf(asset, sellingExp);
+            maxSelling_.initAmountOf(asset, maxSelling);
+            break;
+          } else {
+            sellingExp++;
+            sellingSpot = calcSpot(anchor, jumpSize)(sellingExp);
+            // if maxSelling is 0, then d is too low, which means that
+            // we are too close at the amm-price. So we ~decrease~ the
+            // (uninverted) price we are willing to ~sell~ at stepwise
+            // until we hit the bounds or find a d >= 1.
+            // NOTE/TODO: This should never result in an infite loop,
+            // as decreasing uninverted selling price should eventually
+            // result in some delta.
+            if (adhereMaxInteger && sellingSpot > maxInteger) {
+              // below is probably wrong, because we are in this case not even adding this one to sellable assets
+              // if (!adherenceImpacted_) {
+              //   adherenceImpacted.insert(asset);
+              //   adherenceImpacted_ = true;
+              // }
+              break;
+            }
+          }
+        }
+      }
+    });
 
-  //     const delta_ = optimizeAmnts
-  //       ? calcDelta(
-  //         param.weights.amountOf(buyingAsset),
-  //         liquidity_.amountOf(buyingAsset),
-  //       )
-  //       : null;
+    const sellableAssets = maxSelling_.assets.toList;
+    const buyableAssets = maxBuying_.assets.toList;
 
-  //     sellableAssets.forEach((sellingAsset) => {
-  //       const sellingSpot = sellingSpot_.amountOf(sellingAsset);
-  //       const sellingExp = sellingExp_.amountOf(sellingAsset);
-  //       const maxSelling = maxSelling_.amountOf(sellingAsset);
-  //       const minSelling = getMinSelling(sellingAsset, minSelling_);
-  //       const adherenceImpacted_ = adherenceImpactedBuying ||
-  //         adherenceImpacted.has(sellingAsset);
+    buyableAssets.forEach((buyingAsset) => {
+      // NOTE if those become non-const again, move them into the inner loop again
+      // const buyingSpot = buyingSpot_.amountOf(buyingAsset); // NOTE: inverted
+      // const buyingExp = buyingExp_.amountOf(buyingAsset);
+      // const maxBuying = maxBuying_.amountOf(buyingAsset);
+      const adherenceImpactedBuying = adherenceImpacted.has(buyingAsset);
 
-  //       const getSwappingForPair = (
-  //         tmpMinBuying?: bigint,
-  //       ): Swapping | null => {
-  //         let buyingSpot__: bigint;
-  //         let buyingExp__: bigint;
-  //         let maxBuying__: bigint;
-  //         if (tmpMinBuying !== undefined) {
-  //           assert(availableBuying !== null, `availableBuying is null`);
-  //           assert(delta_ !== null, `delta_ is null`);
-  //           const foundBuyingExp__ = findBuyingExp(
-  //             this.dirac.anchorPrices.amountOf(buyingAsset),
-  //             param.jumpSizes.amountOf(buyingAsset),
-  //             availableBuying,
-  //             tmpMinBuying,
-  //             delta_,
-  //             buyingExp,
-  //             expLimit,
-  //           );
-  //           if (foundBuyingExp__) {
-  //             buyingExp__ = foundBuyingExp__.buyingExp;
-  //             buyingSpot__ = foundBuyingExp__.buyingSpot;
-  //             maxBuying__ = foundBuyingExp__.maxBuying;
-  //           } else return null;
-  //         } else {
-  //           buyingSpot__ = buyingSpot;
-  //           buyingExp__ = buyingExp;
-  //           maxBuying__ = maxBuying;
-  //         }
+      sellableAssets.forEach((sellingAsset) => {
+        const buyingSpot = buyingSpot_.amountOf(buyingAsset);
+        const sellingSpot = sellingSpot_.amountOf(sellingAsset);
 
-  //         return swappingForPair({
-  //           adhereMaxInteger,
-  //           adherenceImpacted: adherenceImpacted_,
-  //           user,
-  //           paramUtxo,
-  //           diracUtxo: this,
-  //           buyingAsset,
-  //           sellingAsset,
-  //           buyingSpot__,
-  //           sellingSpot,
-  //           buyingExp__,
-  //           sellingExp,
-  //           minBuying,
-  //           minSelling,
-  //           maxBuying__,
-  //           maxSelling,
-  //           liquidity_,
-  //           availableBuying_,
-  //           availableSelling_,
-  //           tmpMinBuying: tmpMinBuying ?? null,
-  //           expLimit: expLimit ?? null,
-  //       });
-  //       };
+        const buyingExp = buyingExp_.amountOf(buyingAsset);
+        const sellingExp = sellingExp_.amountOf(sellingAsset);
 
-  //       let swapping = getSwappingForPair();
-  //       if (swapping) {
-  //         // TODO revert
-  //         if (optimizeAmnts) {
-  //           let i = 0;
-  //           // const availableSelling_ = Value.singleton(
-  //           //   sellingAsset,
-  //           //   availableSelling_?.amountOf(sellingAsset, 0n) ?? -1n,
-  //           // );
-  //           // const buyableAssets_ = Assets.singleton(buyingAsset);
-  //           while (true) {
-  //             console.log(`trying to find better effective price (${i})`);
-  //             const tmpMinBuying: bigint = swapping.buyingAmnt + 1n;
-  //             const maybeBetterFast = getSwappingForPair(tmpMinBuying);
-  //             // NOTE don't delete below, it's for asserting that the fast and slow version are equivalent
-  //             // const maybeBetters: Swapping[] = this.swappingsFor(
-  //             //   user,
-  //             //   paramUtxo,
-  //             //   false,
-  //             //   tmpMinBuying,
-  //             //   minSelling,
-  //             //   availableSelling_,
-  //             //   buyableAssets_,
-  //             //   buyableAmnt,
-  //             // );
-  //             // console.log(`maybeBetters: ${maybeBetters.length}`);
-  //             // assert(
-  //             //   maybeBetters.length <= 1,
-  //             //   `maybeBetters.length must be <= 1, but got:\n${
-  //             //     maybeBetters.map((s) => s.show()).join("\n")
-  //             //   }`,
-  //             // );
-  //             // let maybeBetterSlow: Swapping | null = maybeBetters?.length
-  //             //   ? maybeBetters[0]
-  //             //   : null;
-  //             // maybeBetterSlow = maybeBetterSlow
-  //             //   ? Swapping.boundary(
-  //             //     user,
-  //             //     paramUtxo,
-  //             //     this,
-  //             //     buyingAsset,
-  //             //     sellingAsset,
-  //             //     maybeBetterSlow.buyingAmnt,
-  //             //     maybeBetterSlow.sellingAmnt,
-  //             //     maybeBetterSlow.buyingSpot,
-  //             //     maybeBetterSlow.sellingSpot,
-  //             //     maybeBetterSlow.buyingExp,
-  //             //     maybeBetterSlow.sellingExp,
-  //             //     minBuying,
-  //             //     minSelling,
-  //             //     tmpMinBuying,
-  //             //   )
-  //             //   : null;
-  //             // console.log(`maybeBetterSlow: ${maybeBetterSlow?.show()}`);
-  //             // assert(
-  //             //   maybeBetterSlow?.show() === maybeBetterFast?.show(),
-  //             //   `maybeBetterSlow !== maybeBetterFast:\n${maybeBetterSlow?.show()}\n!==\n${maybeBetterFast?.show()}`,
-  //             // );
-  //             // const maybeBetter = maybeBetterSlow;
-  //             const maybeBetter = maybeBetterFast;
-  //             if (
-  //               maybeBetter &&
-  //               maybeBetter.effectivePrice <= swapping.effectivePrice
-  //             ) {
-  //               console.log(
-  //                 `found swapping with better or equal effective price (${i++}): ${maybeBetter.effectivePrice} <= ${swapping.effectivePrice}`,
-  //               );
-  //               swapping = maybeBetter;
-  //             } else break;
-  //           }
-  //         }
-  //         swappings.push(swapping);
-  //       }
-  //     });
-  //   });
+        const buyable = buyable_.amountOf(buyingAsset, 0n);
+        const maxBuying = maxBuying_.amountOf(buyingAsset);
+        const maxSelling = maxSelling_.amountOf(sellingAsset);
 
-  //   // console.log("swappings", swappings)
-  //   return swappings;
-  // };
+        const minSelling = getMinSelling(sellingAsset, minSelling_);
+        let adherenceImpacted_ = adherenceImpactedBuying ||
+          adherenceImpacted.has(sellingAsset);
+
+        const getSwappingForPair = (tmpMinBuying?: bigint): Swapping | null => {
+          let buyingSpot__: bigint;
+          let buyingExp__: bigint;
+          let maxBuying__: bigint | undefined;
+          if (tmpMinBuying !== undefined) {
+            // TODO this is just copypaste from above, with slight adjustments. Clean it up some time
+            if (buyable >= tmpMinBuying) {
+              const weight = param.weights.amountOf(buyingAsset); // NOTE: inverted
+              const jumpSize = param.jumpSizes.amountOf(buyingAsset);
+              const anchor = this.dirac.anchorPrices.amountOf(buyingAsset); // NOTE: inverted aka "price when selling for A0"
+              const liquidity = liquidity_.amountOf(buyingAsset);
+              const amm = liquidity * weight; // NOTE: inverted aka "price when selling for A0"
+              const jumpMultiplier = (Number(jumpSize) + 1) / Number(jumpSize);
+              const exp = calcExp(
+                Number(anchor),
+                Number(amm),
+                jumpMultiplier,
+              );
+              buyingExp__ = BigInt(Math.floor(exp));
+              buyingSpot__ = calcSpot(anchor, jumpSize)(buyingExp__);
+              if (adhereMaxInteger && buyingSpot__ > maxInteger) {
+                adherenceImpacted_ = true;
+                while (adhereMaxInteger && buyingSpot__ > maxInteger) {
+                  buyingExp__--;
+                  buyingSpot__ = calcSpot(anchor, jumpSize)(buyingExp__);
+                }
+              }
+
+              const delta_ = calcDelta(weight, liquidity);
+              while (buyingSpot__ > 0n) {
+                const d = delta_(buyingSpot__);
+                maxBuying__ = min(buyable, -d);
+                if (maxBuying__ >= tmpMinBuying) {
+                  break;
+                } else {
+                  buyingExp__--;
+                  buyingSpot__ = calcSpot(anchor, jumpSize)(buyingExp__);
+                }
+              }
+              if (maxBuying__ === undefined) return null;
+            } else return null;
+          } else {
+            buyingSpot__ = buyingSpot;
+            buyingExp__ = buyingExp;
+            maxBuying__ = maxBuying;
+          }
+
+          return this.swappingForPair(
+            adhereMaxInteger,
+            adherenceImpacted_,
+            user,
+            paramUtxo,
+            buyingAsset,
+            sellingAsset,
+            buyingSpot__,
+            sellingSpot,
+            buyingExp__,
+            sellingExp,
+            minBuying,
+            minSelling,
+            maxBuying__,
+            maxSelling,
+            liquidity_,
+            buyable_,
+            sellable_,
+            tmpMinBuying,
+          );
+        };
+        let swapping = getSwappingForPair();
+        if (swapping) {
+          if (optimizeAmnts) {
+            let i = 0;
+            // const sellable__ = Value.singleton(
+            //   sellingAsset,
+            //   sellable_?.amountOf(sellingAsset, 0n) ?? -1n,
+            // );
+            // const buyableAssets_ = Assets.singleton(buyingAsset);
+            while (true) {
+              console.log(`trying to find better effective price (${i})`);
+              const tmpMinBuying: bigint = swapping.buyingAmnt + 1n;
+              const maybeBetterFast = getSwappingForPair(tmpMinBuying);
+              // NOTE don't delete below, it's for asserting that the fast and slow version are equivalent
+              // const maybeBetters: Swapping[] = this.swappingsFor(
+              //   user,
+              //   paramUtxo,
+              //   false,
+              //   tmpMinBuying,
+              //   minSelling,
+              //   sellable__,
+              //   buyableAssets_,
+              //   buyableAmnt,
+              // );
+              // console.log(`maybeBetters: ${maybeBetters.length}`);
+              // assert(
+              //   maybeBetters.length <= 1,
+              //   `maybeBetters.length must be <= 1, but got:\n${
+              //     maybeBetters.map((s) => s.show()).join("\n")
+              //   }`,
+              // );
+              // let maybeBetterSlow: Swapping | null = maybeBetters?.length
+              //   ? maybeBetters[0]
+              //   : null;
+              // maybeBetterSlow = maybeBetterSlow
+              //   ? Swapping.boundary(
+              //     user,
+              //     paramUtxo,
+              //     this,
+              //     buyingAsset,
+              //     sellingAsset,
+              //     maybeBetterSlow.buyingAmnt,
+              //     maybeBetterSlow.sellingAmnt,
+              //     maybeBetterSlow.buyingSpot,
+              //     maybeBetterSlow.sellingSpot,
+              //     maybeBetterSlow.buyingExp,
+              //     maybeBetterSlow.sellingExp,
+              //     minBuying,
+              //     minSelling,
+              //     tmpMinBuying,
+              //   )
+              //   : null;
+              // console.log(`maybeBetterSlow: ${maybeBetterSlow?.show()}`);
+              // assert(
+              //   maybeBetterSlow?.show() === maybeBetterFast?.show(),
+              //   `maybeBetterSlow !== maybeBetterFast:\n${maybeBetterSlow?.show()}\n!==\n${maybeBetterFast?.show()}`,
+              // );
+              // const maybeBetter = maybeBetterSlow;
+              const maybeBetter = maybeBetterFast;
+              if (
+                maybeBetter &&
+                maybeBetter.effectivePrice <= swapping.effectivePrice
+              ) {
+                console.log(
+                  `found swapping with better effective price (${i++}): ${maybeBetter.effectivePrice} <= ${swapping.effectivePrice}`,
+                );
+                swapping = maybeBetter;
+              } else break;
+            }
+          }
+          swappings.push(swapping);
+        }
+      });
+    });
+
+    // console.log("swappings", swappings)
+    return swappings;
+  };
+
+  private swappingForPair = (
+    adhereMaxInteger: boolean,
+    adherenceImpacted: boolean,
+    user: User | undefined,
+    paramUtxo: ParamUtxo,
+    buyingAsset: Asset,
+    sellingAsset: Asset,
+    buyingSpot: bigint,
+    sellingSpot: bigint,
+    buyingExp: bigint,
+    sellingExp: bigint,
+    minBuying_: bigint,
+    minSelling: bigint,
+    maxBuying: bigint,
+    maxSelling: bigint,
+    liquidity_: PositiveValue,
+    buyable_: PositiveValue,
+    sellable_?: Value,
+    tmpMinBuying?: bigint,
+  ): Swapping | null => {
+    if (sellingAsset.equals(buyingAsset)) return null;
+    console.log(`
+      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      buyingAsset: ${buyingAsset.show()}
+      sellingAsset: ${sellingAsset.show()}
+      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    `);
+    const param = paramUtxo.param;
+
+    // NOTE: below not strictly A0, but want to avoid divisions.
+    // Ok, since only relative value matters. Assume it's a different A0', derived from:
+    //  const maxBuyingA0 = (maxBuying / buyingSpot) * (sellingSpot * buyingSpot);
+    //  const maxSellingA0 = (maxSelling / sellingSpot) * (sellingSpot * buyingSpot);
+    //  (sellingSpot * buyingSpot) are the same for both and added so we can remove divisions.
+
+    // const minSelling = tmpMinSelling ?? minSelling_;
+    const minBuying = tmpMinBuying ?? minBuying_;
+    assert(
+      minBuying <= maxBuying,
+      `minBuying > maxBuying: ${minBuying} > ${maxBuying}`,
+    );
+    assert(
+      minSelling <= maxSelling,
+      `minSelling > maxSelling: ${minSelling} > ${maxSelling}`,
+    );
+    // if (minBuying > maxBuying) return null;
+    let maxBuyingA0 = -1n;
+    let maxSellingA0 = -1n;
+    let maxSwapA0 = -1n;
+    let buyingAmount = -1n;
+    let sellingAmount = -1n;
+    let _limitReached = "none";
+    let increaseExpSelling = (_by: bigint) => {};
+    let increaseExpBuying = (_by: bigint) => {};
+
+    const updateValues = () => {
+      const newMaxBuyingA0 = maxBuying * sellingSpot;
+      const newMaxSellingA0 = maxSelling * buyingSpot;
+      const newMaxSwapA0 = min(newMaxSellingA0, newMaxBuyingA0);
+
+      // NOTE this fails iff trying to find better effective price
+      assert(
+        newMaxSwapA0 >= maxSwapA0,
+        `maxSwapA0 was decreased:
+            ${newMaxSwapA0} < ${maxSwapA0}
+            diff: ${newMaxSwapA0 - maxSwapA0}
+            maxBuyingA0: ${maxBuyingA0} -> ${newMaxBuyingA0}
+            maxSellingA0: ${maxSellingA0} -> ${newMaxSellingA0}
+        `,
+      );
+
+      const newBuyingAmount = newMaxSwapA0 / sellingSpot;
+      let newSellingAmount = ceilDiv(
+        newBuyingAmount * sellingSpot,
+        buyingSpot,
+      );
+
+      if (newSellingAmount < minSelling && minSelling <= maxSelling) {
+        newSellingAmount = minSelling;
+      }
+
+      maxSwapA0 = newMaxSwapA0;
+      maxBuyingA0 = newMaxBuyingA0;
+      maxSellingA0 = newMaxSellingA0;
+      buyingAmount = newBuyingAmount;
+      sellingAmount = newSellingAmount;
+    };
+
+    updateValues();
+
+    if (buyingAmount < minBuying || sellingAmount < minSelling) {
+      console.log("looping");
+      // return;
+      // TODO marginal efficiency gains possible here by initialzing only JIT
+      const sellingAnchor = this.dirac.anchorPrices.amountOf(sellingAsset);
+      const buyingAnchor = this.dirac.anchorPrices.amountOf(buyingAsset);
+
+      const sellingJumpSize = param.jumpSizes.amountOf(sellingAsset);
+      const buyingJumpSize = param.jumpSizes.amountOf(buyingAsset);
+
+      const buyable = buyable_.amountOf(buyingAsset, 0n); // - getMinBalance(buyingAsset);
+      const sellable = sellable_?.amountOf(sellingAsset, 0n);
+      const infiniteSellable = sellable === undefined || sellable === -1n;
+      if (
+        buyable <= 0n || (!infiniteSellable && sellable < minSelling)
+      ) return null;
+
+      const deltaSelling = calcDelta(
+        param.weights.amountOf(sellingAsset),
+        liquidity_.amountOf(sellingAsset),
+      );
+      const deltaBuying = calcDelta(
+        param.weights.amountOf(buyingAsset),
+        liquidity_.amountOf(buyingAsset),
+      );
+
+      increaseExpSelling = (by: bigint) => {
+        sellingExp += by;
+        const newSpotSelling = calcSpot(
+          sellingAnchor,
+          sellingJumpSize,
+        )(
+          sellingExp,
+        );
+        console.log(
+          `increaseExpSelling: ${sellingExp - by} + ${by} = ${sellingExp}`,
+        );
+        console.log(`newSpotSelling: ${sellingSpot} -> ${newSpotSelling}`);
+        sellingSpot = newSpotSelling;
+      };
+
+      increaseExpBuying = (by: bigint) => {
+        buyingExp += by;
+        const newSpotBuying = calcSpot(
+          buyingAnchor,
+          buyingJumpSize,
+        )(
+          buyingExp,
+        );
+        console.log(
+          `increaseExpBuying: ${buyingExp - by} + ${by} = ${buyingExp}`,
+        );
+        console.log(`newSpotBuying: ${buyingSpot} -> ${newSpotBuying}`);
+        buyingSpot = newSpotBuying;
+      };
+
+      let sellingLimit = false;
+      let buyingLimit = false;
+      while (buyingAmount < minBuying || sellingAmount < minSelling) {
+        console.log(`
+          minBuying:     ${minBuying}
+          minSelling:    ${minSelling}
+          maxBuying:     ${maxBuying}
+          maxSelling:    ${maxSelling}
+          maxBuyingA0:   ${maxBuyingA0}
+          maxSellingA0:  ${maxSellingA0}
+          maxSwapA0:     ${maxSwapA0}
+          buyingSpot:    ${buyingSpot}
+          sellingSpot:   ${sellingSpot}
+          buyingExp:     ${buyingExp}
+          sellingExp:    ${sellingExp}
+          buyingAmount:  ${buyingAmount}
+          sellingAmount: ${sellingAmount}
+          sellingLimit:  ${sellingLimit}
+          buyingLimit:   ${buyingLimit}
+          limitReached:  ${_limitReached}
+          `);
+
+        if (maxSellingA0 <= maxBuyingA0) {
+          if (sellingLimit) return null;
+          // assert(!sellingLimit, `sellingLimit reached already`);
+          increaseExpSelling(1n);
+          if (adhereMaxInteger && sellingSpot > maxInteger) {
+            console.log(
+              `sellingSpot > maxInteger: ${sellingSpot} > ${maxInteger}`,
+            );
+            increaseExpSelling(-1n);
+            sellingLimit = true;
+            _limitReached = "selling";
+            adherenceImpacted = true;
+          } else {
+            const d = deltaSelling(sellingSpot);
+            console.log(`deltaSelling: ${d}`);
+            let newMaxSelling;
+            if (!infiniteSellable) {
+              if (sellable <= d) {
+                newMaxSelling = sellable;
+                console.log(
+                  `sellingLimit reached - sellable <= d: ${sellable} <= ${d}`,
+                );
+                sellingLimit = true;
+                _limitReached = "selling";
+              } else {
+                newMaxSelling = d;
+              }
+            } else {
+              newMaxSelling = d;
+            }
+            assert(
+              newMaxSelling >= maxSelling,
+              `maxSelling was decreased: 
+              ${newMaxSelling} < ${maxSelling}
+              diff: ${newMaxSelling - maxSelling}`,
+            );
+            maxSelling = newMaxSelling;
+          }
+        } else {
+          if (buyingLimit) return null;
+          // assert(!buyingLimit, `buyingLimit reached already`);
+          // NOTE this fails iff trying to find better effective price
+          assert(
+            minSelling > 1n,
+            `only expecting this branch when minSelling > 1n`,
+          );
+          increaseExpBuying(-1n);
+          const d = -deltaBuying(buyingSpot);
+          console.log(`-deltaBuying: ${d}`);
+          let newMaxBuying;
+          if (buyable <= d) {
+            newMaxBuying = buyable;
+            console.log(
+              `buyingLimit reached - buyable <= d: ${buyable} <= ${d}`,
+            );
+            buyingLimit = true;
+            _limitReached = "buying";
+          } else {
+            newMaxBuying = d;
+          }
+          assert(
+            newMaxBuying >= maxBuying,
+            `maxBuying was decreased:
+            ${newMaxBuying} <= ${maxBuying}
+            diff: ${newMaxBuying - maxBuying}`,
+          );
+          maxBuying = newMaxBuying;
+        }
+
+        updateValues();
+      }
+    } //else console.log("not looping")
+
+    console.log(`
+      ---------------------------
+      minBuying:     ${minBuying}
+      minSelling:    ${minSelling}
+      maxBuying:     ${maxBuying}
+      maxSelling:    ${maxSelling}
+      maxBuyingA0:   ${maxBuyingA0}
+      maxSellingA0:  ${maxSellingA0}
+      maxSwapA0:     ${maxSwapA0}
+      buyingSpot:    ${buyingSpot}
+      sellingSpot:   ${sellingSpot}
+      buyingExp:     ${buyingExp}
+      sellingExp:    ${sellingExp}
+      buyingAmount:  ${buyingAmount}
+      sellingAmount: ${sellingAmount}
+      ---------------------------
+    `);
+    // const sellingAmount = maxSellingA0 <= maxBuyingA0 ? maxSelling : BigInt(sellingAmount_);
+
+    // /// logging/debugging
+
+    // const buyingJs = param.jumpSizes.amountOf(buyingAsset);
+    // const sellingJs = param.jumpSizes.amountOf(sellingAsset);
+    // const buyingAnchor = this.dirac.anchorPrices.amountOf(buyingAsset);
+    // const sellingAnchor = this.dirac.anchorPrices.amountOf(sellingAsset);
+
+    // const buyingJumpMultiplier = (Number(buyingJs) + 1) / Number(buyingJs);
+    // const sellingJumpMultiplier = (Number(sellingJs) + 1) /
+    //   Number(sellingJs);
+    // const ammBuying = liquidity_.amountOf(buyingAsset) *
+    //   param.weights.amountOf(buyingAsset);
+    // const ammSelling = liquidity_.amountOf(sellingAsset) *
+    //   param.weights.amountOf(sellingAsset);
+    // const buyingExp = Math.log(Number(ammBuying) / Number(buyingAnchor)) /
+    //   Math.log(buyingJumpMultiplier);
+    // const sellingExp =
+    //   Math.log(Number(ammSelling) / Number(sellingAnchor)) /
+    //   Math.log(sellingJumpMultiplier);
+
+    // console.log(
+    //   `buyingExp: ${buyingExp} -> ${buyingExp}, sellingExp: ${sellingExp} -> ${sellingExp}`,
+    // );
+
+    // /// end logging/debugging
+
+    // TODO better solution than this
+    // if (buyingSpot > maxInteger) return;
+    // if (sellingSpot > maxInteger) return;
+
+    const swapping = Swapping.boundary(
+      adhereMaxInteger,
+      adherenceImpacted,
+      user ?? null,
+      paramUtxo,
+      this,
+      buyingAsset,
+      sellingAsset,
+      buyingAmount,
+      sellingAmount,
+      buyingSpot,
+      sellingSpot,
+      buyingExp,
+      sellingExp,
+      null,
+      buyable_.amountOf(buyingAsset),
+      sellable_?.amountOf(sellingAsset) ??
+        (user ? user.availableBalance!.amountOf(sellingAsset) : -1n),
+      minBuying_,
+      minSelling,
+      tmpMinBuying ?? null,
+    );
+
+    return swapping;
+    // swappings.push(swapping);
+  };
 }

@@ -9,7 +9,6 @@ import { AssetArgs, PostFitAmnts } from "./assetArgs.ts";
 
 interface SwappingForPairArgs {
   readonly adhereMaxInteger: boolean;
-  readonly adherenceImpacted: boolean;
   readonly user: User | null;
   readonly paramUtxo: ParamUtxo;
   readonly diracUtxo: DiracUtxo;
@@ -36,54 +35,60 @@ export const swappingForPair = (args: SwappingForPairArgs): Swapping | null => {
       args.expLimit
   ) return null;
 
-  let postFit: PostFitAmnts | null = {
+  let adherenceImpacted = args.buyingArgs.consts.adherenceImpacted || args.sellingArgs.consts.adherenceImpacted;
+  let fitted: PostFitAmnts | null = {
     buyingVars: args.buyingArgs.vars,
     sellingVars: args.sellingArgs.vars,
-    adherenceImpacted: args.adherenceImpacted,
+    adherenceImpacted,
   };
 
   while (true) {
-    postFit = fitMinAmnts({
+    fitted = fitMinAmnts({
       adhereMaxInteger: args.adhereMaxInteger,
       tmpMinBuying: args.tmpMinBuying,
       expLimit: args.expLimit,
       buying: {
         ...args.buyingArgs,
-        vars: postFit.buyingVars,
+        vars: fitted.buyingVars,
       },
       selling: {
         ...args.sellingArgs,
-        vars: postFit.sellingVars,
+        vars: fitted.sellingVars,
       },
     });
-    if (postFit === null) return null;
-    else if (args.expLimit === null) break;
-    else {
-      const postFitExps = fitExpLimit({
+    if (fitted === null) return null;
+    else if (args.expLimit === null) {
+      adherenceImpacted ||= fitted.adherenceImpacted;
+      break;
+    } else {
+      adherenceImpacted ||= fitted.adherenceImpacted;
+      const fittedExps = fitExpLimit({
+        adhereMaxInteger: args.adhereMaxInteger,
         expLimit: args.expLimit,
-        buyingExp: postFit.buyingVars.exp,
-        sellingExp: postFit.sellingVars.exp,
-        maxBuying: postFit.buyingVars.max,
-        maxSelling: postFit.sellingVars.max,
+        buyingExp: fitted.buyingVars.exp,
+        sellingExp: fitted.sellingVars.exp,
+        maxBuying: fitted.buyingVars.max,
+        maxSelling: fitted.sellingVars.max,
         calcBuyingSpot: args.buyingArgs.funcs.calcSpot_,
         calcSellingSpot: args.sellingArgs.funcs.calcSpot_,
         minSelling: args.sellingArgs.consts.min,
       });
-      if (postFitExps === null) return null;
-      else if (postFitExps === "unchanged") break;
+      if (fittedExps === null) return null;
+      else if (fittedExps === "unchanged") break;
       else {
-        if (postFit.buyingVars.exp !== postFitExps.buyingExp) {
-          postFit.buyingVars.exp = postFitExps.buyingExp;
-          postFit.buyingVars.spot = args.buyingArgs.funcs.calcSpot_(
-            postFitExps.buyingExp,
+        if (fitted.buyingVars.exp !== fittedExps.buyingExp) {
+          fitted.buyingVars.exp = fittedExps.buyingExp;
+          fitted.buyingVars.spot = args.buyingArgs.funcs.calcSpot_(
+            fittedExps.buyingExp,
           );
         }
-        if (postFit.sellingVars.exp !== postFitExps.sellingExp) {
-          postFit.sellingVars.exp = postFitExps.sellingExp;
-          postFit.sellingVars.spot = args.sellingArgs.funcs.calcSpot_(
-            postFitExps.sellingExp,
+        if (fitted.sellingVars.exp !== fittedExps.sellingExp) {
+          fitted.sellingVars.exp = fittedExps.sellingExp;
+          fitted.sellingVars.spot = args.sellingArgs.funcs.calcSpot_(
+            fittedExps.sellingExp,
           );
         }
+        adherenceImpacted ||= fittedExps.adherenceImpacted;
       }
     }
   }
@@ -115,28 +120,28 @@ export const swappingForPair = (args: SwappingForPairArgs): Swapping | null => {
   // /// end logging/debugging
 
   assert(
-    postFit.buyingVars.amnt !== null,
+    fitted.buyingVars.amnt !== null,
     `fittedAmnts.buyingVars.amnt is null`,
   );
   assert(
-    postFit.sellingVars.amnt !== null,
+    fitted.sellingVars.amnt !== null,
     `fittedAmnts.sellingVars.amnt is null`,
   );
 
   const swapping = Swapping.boundary(
     args.adhereMaxInteger,
-    args.adherenceImpacted,
+    adherenceImpacted,
     args.user,
     args.paramUtxo,
     args.diracUtxo,
     args.buyingArgs.consts.asset,
     args.sellingArgs.consts.asset,
-    postFit.buyingVars.amnt,
-    postFit.sellingVars.amnt,
-    postFit.buyingVars.spot,
-    postFit.sellingVars.spot,
-    postFit.buyingVars.exp,
-    postFit.sellingVars.exp,
+    fitted.buyingVars.amnt,
+    fitted.sellingVars.amnt,
+    fitted.buyingVars.spot,
+    fitted.sellingVars.spot,
+    fitted.buyingVars.exp,
+    fitted.sellingVars.exp,
     args.expLimit ?? null,
     args.buyingArgs.consts.available,
     args.sellingArgs.consts.available,
