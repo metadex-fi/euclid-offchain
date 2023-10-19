@@ -9,4 +9,4 @@ export const gMaxStringBytes = gMaxStringLength / 2n;
 export const gMaxLength = 3n;
 export const gMaxDepth = 4n;
 export const feesEtcLovelace = 100000000n; // costs in lovelace for fees etc. TODO excessive
-export const compareVariants = true;
+export const compareVariants = false;
