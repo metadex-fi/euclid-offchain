@@ -2,10 +2,10 @@ import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   Generators,
   genPositive,
-  gMaxLength,
   randomChoice,
 } from "../../../../utils/generators.ts";
 import { f, PConstanted, PData, PLifted, PType, t } from "../type.ts";
+import { gMaxLength } from "../../../../utils/constants.ts";
 
 export class PEnum<PT extends PData>
   implements PType<PConstanted<PT>, PLifted<PT>> {
