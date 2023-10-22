@@ -12,16 +12,17 @@ interface PreFitAmnts {
 }
 
 export const fitMinAmnts = (args: PreFitAmnts): PostFitAmnts | null => {
-  let adherenceImpacted = false;
+  let maxIntImpacted = false;
   const minBuying = args.tmpMinBuying ?? args.buying.consts.min;
   let maxBuyingA0 = -1n;
   let maxSellingA0 = -1n;
   let maxSwapA0 = -1n;
   args.buying.vars.amnt = -1n;
   args.selling.vars.amnt = -1n;
-  let limitReached: "buying" | "selling" | "none" = "none";
+  // let limitReached: "buying" | "selling" | "none" = "none";
   let increaseSellingExp = (_by: bigint) => {};
   let increaseBuyingExp = (_by: bigint) => {};
+  let loopAgain = false;
 
   assert(
     minBuying <= args.buying.vars.max,
@@ -39,19 +40,20 @@ export const fitMinAmnts = (args: PreFitAmnts): PostFitAmnts | null => {
     const newAmnts = updatedAmnts(
       args.buying.vars.spot,
       args.selling.vars.spot,
-      args.selling.consts.min, //expOptimization ? minSelling : null, // only for exponent-optimization
-      args.buying.vars.max, // NOTE above is from older version, because it worked
+      args.buying.vars.max,
       args.selling.vars.max,
     );
 
     // logically only this one is confirmed, but the other one worked before
     // if (direction === "sellingAmnt" && newAmnts.newMaxSwapA0 < maxSwapA0) {
+
+    //TODO FIXME (this works when using minSelling updatedAmnts)
     if (newAmnts.newMaxSwapA0 < maxSwapA0) {
       console.log(`maxSwapA0 was decreased:
         ${newAmnts.newMaxSwapA0} < ${maxSwapA0}
         diff: ${newAmnts.newMaxSwapA0 - maxSwapA0}
-        maxBuyingA0: ${maxBuyingA0} -> ${newAmnts.newMaxBuyingA0}
-        maxSellingA0: ${maxSellingA0} -> ${newAmnts.newMaxSellingA0}
+        // maxBuyingA0: ${maxBuyingA0} -> ${newAmnts.newMaxBuyingA0}
+        // maxSellingA0: ${maxSellingA0} -> ${newAmnts.newMaxSellingA0}
     `);
       return false;
     }
@@ -78,6 +80,14 @@ export const fitMinAmnts = (args: PreFitAmnts): PostFitAmnts | null => {
     // }
 
     assert(newAmnts.newMaxSellingA0 !== null, `newMaxSellingA0 is null`);
+    // if (newAmnts.newSellingAmnt < args.selling.consts.min) {
+    //   //TODO WIP, wild guess
+    //   console.log(
+    //     `newSellingAmnt < minSelling: ${newAmnts.newSellingAmnt} < ${args.selling.consts.min}`,
+    //   );
+    //   loopAgain = true;
+    //   return true;
+    // }
     maxSwapA0 = newAmnts.newMaxSwapA0;
     maxBuyingA0 = newAmnts.newMaxBuyingA0;
     maxSellingA0 = newAmnts.newMaxSellingA0;
@@ -90,6 +100,7 @@ export const fitMinAmnts = (args: PreFitAmnts): PostFitAmnts | null => {
   assert(updateAmounts(), `updateAmounts() failed`);
 
   if (
+    loopAgain ||
     args.buying.vars.amnt < minBuying ||
     args.selling.vars.amnt < args.selling.consts.min
   ) {
@@ -137,9 +148,11 @@ export const fitMinAmnts = (args: PreFitAmnts): PostFitAmnts | null => {
     let buyingLimit = false;
     let direction = "bothAmnts";
     while (
+      loopAgain ||
       args.buying.vars.amnt < minBuying ||
       args.selling.vars.amnt < args.selling.consts.min
     ) {
+      loopAgain = false;
       if (
         args.buying.vars.amnt < minBuying &&
         args.selling.vars.amnt < args.selling.consts.min
@@ -149,7 +162,7 @@ export const fitMinAmnts = (args: PreFitAmnts): PostFitAmnts | null => {
         direction = "bothAmnts";
       } else if (args.buying.vars.amnt < minBuying) {
         assert(maxSellingA0 <= maxBuyingA0, `maxSellingA0 > maxBuyingA0`);
-        assert(direction !== "sellingAmnt", `direction === "sellingAmnt"`);
+        assert(direction !== "sellingAmnt", `direction === "sellingAmnt"`); // this fails when not using minSelling in updatedAmnts
         direction = "buyingAmnt";
       } else if (args.selling.vars.amnt < args.selling.consts.min) {
         assert(maxSellingA0 > maxBuyingA0, `maxSellingA0 <= maxBuyingA0`);
@@ -175,10 +188,10 @@ export const fitMinAmnts = (args: PreFitAmnts): PostFitAmnts | null => {
         sellingAmnt:  ${args.selling.vars.amnt}
         sellingLimit: ${sellingLimit}
         buyingLimit:  ${buyingLimit}
-        limitReached: ${limitReached}
         direction:    ${direction}
         `);
-      limitReached = "none";
+      // limitReached: ${limitReached}
+      // limitReached = "none";
       // const oldMaxSelling = args.selling.vars.max;
       // const oldMaxBuying = args.buying.vars.max;
 
@@ -224,8 +237,8 @@ export const fitMinAmnts = (args: PreFitAmnts): PostFitAmnts | null => {
           );
           increaseSellingExp(-1n);
           sellingLimit = true;
-          limitReached = "selling";
-          adherenceImpacted = true;
+          // limitReached = "selling";
+          maxIntImpacted = true;
         } else {
           const delta = args.selling.funcs.calcDelta_(args.selling.vars.spot);
           console.log(`deltaSelling: ${delta}`);
@@ -237,7 +250,7 @@ export const fitMinAmnts = (args: PreFitAmnts): PostFitAmnts | null => {
                 `sellingLimit reached - availableSelling <= d: ${args.selling.consts.available} <= ${delta}`,
               );
               sellingLimit = true;
-              limitReached = "selling";
+              // limitReached = "selling";
             } else {
               newMaxSelling = delta;
             }
@@ -268,7 +281,7 @@ export const fitMinAmnts = (args: PreFitAmnts): PostFitAmnts | null => {
             `buyingLimit reached - availableBuying <= d: ${args.buying.consts.available} <= ${delta}`,
           );
           buyingLimit = true;
-          limitReached = "buying";
+          // limitReached = "buying";
         } else {
           newMaxBuying = delta;
         }
@@ -324,6 +337,6 @@ export const fitMinAmnts = (args: PreFitAmnts): PostFitAmnts | null => {
   return {
     buyingVars: args.buying.vars,
     sellingVars: args.selling.vars,
-    adherenceImpacted,
+    maxIntImpacted,
   };
 };

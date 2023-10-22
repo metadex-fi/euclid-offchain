@@ -15,14 +15,13 @@ interface FitExpLimitArgs {
   readonly maxSelling: bigint | null;
   readonly calcBuyingSpot: (exp: bigint) => bigint;
   readonly calcSellingSpot: (exp: bigint) => bigint;
-  readonly minSelling: bigint;
 }
 
 export const fitExpLimit = (args: FitExpLimitArgs):
   | {
     buyingExp: bigint;
     sellingExp: bigint;
-    adherenceImpacted: boolean;
+    maxIntImpacted: boolean;
   }
   | "unchanged"
   | null => {
@@ -38,7 +37,7 @@ export const fitExpLimit = (args: FitExpLimitArgs):
 
     const buyingBest = bestMultiplicationsAhead(Number(args.buyingExp));
     const sellingBest = bestMultiplicationsAhead(Number(args.sellingExp));
-    let adherenceImpacted = false;
+    let maxIntImpacted = false;
 
     if (buyingBest + sellingBest > args.expLimit) {
       console.log(
@@ -115,14 +114,13 @@ export const fitExpLimit = (args: FitExpLimitArgs):
         const buyingSpot = args.calcBuyingSpot(f.buyingExp);
         const sellingSpot = args.calcSellingSpot(f.sellingExp);
         if (args.adhereMaxInteger && sellingSpot > maxInteger) {
-          adherenceImpacted = true;
+          maxIntImpacted = true;
           return [];
         }
 
         const newAmounts = updatedAmnts(
           buyingSpot,
           sellingSpot,
-          args.minSelling,
           args.maxBuying,
           args.maxSelling,
         );
@@ -140,7 +138,7 @@ export const fitExpLimit = (args: FitExpLimitArgs):
       });
       if (frontier.length === 0) {
         assert(
-          adherenceImpacted,
+          maxIntImpacted,
           `no frontier, but adherence not impacted either`,
         );
         return null;
@@ -162,7 +160,7 @@ export const fitExpLimit = (args: FitExpLimitArgs):
     return {
       buyingExp: args.buyingExp,
       sellingExp: args.sellingExp,
-      adherenceImpacted,
+      maxIntImpacted,
     };
   }
 };

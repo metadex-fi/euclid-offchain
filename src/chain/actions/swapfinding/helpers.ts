@@ -1,5 +1,9 @@
 import { ceilDiv, min } from "../../../utils/generators.ts";
 import { maxInteger } from "../../../utils/constants.ts";
+import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { AssetArgs, PostFitAmnts } from "./assetArgs.ts";
+import { fitMinAmnts } from "./fitMinAmnts.ts";
+import { fitExpLimit } from "./fitExpLimit.ts";
 
 export const calcDelta = (w: bigint, l: bigint) => (s: bigint) =>
   (s - l * w) / w;
@@ -63,7 +67,14 @@ export const fitExp = (args: FitExpArgs):
         }
       }
     }
+    console.log(
+      `fitExp: expLimit reached: ${
+        bestMultiplicationsAhead(Number(args.exp))
+      } > ${args.expLimit}`,
+    );
+    return null;
   }
+  console.log(`fitExp: not enough available: ${args.available} < ${args.min_}`);
   return null;
 };
 
@@ -75,7 +86,6 @@ export const fitExp = (args: FitExpArgs):
 export const updatedAmnts = (
   buyingSpot: bigint,
   sellingSpot: bigint,
-  minSelling: bigint,
   maxBuying: bigint,
   maxSelling: bigint | null,
 ): {
@@ -85,19 +95,26 @@ export const updatedAmnts = (
   newBuyingAmnt: bigint;
   newSellingAmnt: bigint;
 } => {
-  const newMaxBuyingA0 = maxBuying * sellingSpot;
   const infiniteSellable = maxSelling === null || maxSelling === -1n;
+  const newMaxBuyingA0 = maxBuying * sellingSpot;
   const newMaxSellingA0 = infiniteSellable ? null : maxSelling * buyingSpot;
   const newMaxSwapA0 = newMaxSellingA0 === null
     ? newMaxBuyingA0
     : min(newMaxSellingA0, newMaxBuyingA0);
 
   const newBuyingAmnt = newMaxSwapA0 / sellingSpot;
-  let newSellingAmnt = ceilDiv(
+  assert(
+    newBuyingAmnt <= maxBuying,
+    `newBuyingAmnt > maxBuying: ${newBuyingAmnt} > ${maxBuying}`,
+  );
+  const newSellingAmnt = ceilDiv(
     newBuyingAmnt * sellingSpot,
     buyingSpot,
   );
-  if (newSellingAmnt < minSelling) newSellingAmnt = minSelling;
+  assert(
+    infiniteSellable || newSellingAmnt <= maxSelling,
+    `newSellingAmnt > maxSelling: ${newSellingAmnt} > ${maxSelling}`,
+  );
 
   return {
     newMaxSwapA0,
@@ -107,6 +124,79 @@ export const updatedAmnts = (
     newSellingAmnt,
   };
 };
+
+interface FitAmntsArgs {
+  readonly adhereMaxInteger: boolean;
+  readonly tmpMinBuying: bigint | null;
+  readonly expLimit: number | null;
+  readonly buyingArgs: AssetArgs;
+  readonly sellingArgs: AssetArgs;
+}
+
+export const fitAmnts = (args: FitAmntsArgs): PostFitAmnts | null => {
+
+
+  let fitted: PostFitAmnts | null = {
+    buyingVars: args.buyingArgs.vars,
+    sellingVars: args.sellingArgs.vars,
+    maxIntImpacted: args.buyingArgs.consts.maxIntImpacted || args.sellingArgs.consts.maxIntImpacted,
+  };
+
+  while (true) {
+    fitted = fitMinAmnts({
+      adhereMaxInteger: args.adhereMaxInteger,
+      tmpMinBuying: args.tmpMinBuying,
+      expLimit: args.expLimit,
+      buying: {
+        ...args.buyingArgs,
+        vars: fitted.buyingVars,
+      },
+      selling: {
+        ...args.sellingArgs,
+        vars: fitted.sellingVars,
+      },
+    });
+    if (fitted === null) {
+      console.log(`could not fit minAmnts`);
+      return null;
+    } else if (args.expLimit === null) {
+      fitted.maxIntImpacted ||= fitted.maxIntImpacted;
+      break;
+    } else {
+      fitted.maxIntImpacted ||= fitted.maxIntImpacted;
+      const fittedExps = fitExpLimit({
+        adhereMaxInteger: args.adhereMaxInteger,
+        expLimit: args.expLimit,
+        buyingExp: fitted.buyingVars.exp,
+        sellingExp: fitted.sellingVars.exp,
+        maxBuying: fitted.buyingVars.max,
+        maxSelling: fitted.sellingVars.max,
+        calcBuyingSpot: args.buyingArgs.funcs.calcSpot_,
+        calcSellingSpot: args.sellingArgs.funcs.calcSpot_,
+      });
+      if (fittedExps === null) {
+        console.log(`could not fit expLimit`);
+        return null;
+      } else if (fittedExps === "unchanged") break;
+      else {
+        if (fitted.buyingVars.exp !== fittedExps.buyingExp) {
+          fitted.buyingVars.exp = fittedExps.buyingExp;
+          fitted.buyingVars.spot = args.buyingArgs.funcs.calcSpot_(
+            fittedExps.buyingExp,
+          );
+        }
+        if (fitted.sellingVars.exp !== fittedExps.sellingExp) {
+          fitted.sellingVars.exp = fittedExps.sellingExp;
+          fitted.sellingVars.spot = args.sellingArgs.funcs.calcSpot_(
+            fittedExps.sellingExp,
+          );
+        }
+        fitted.maxIntImpacted ||= fittedExps.maxIntImpacted;
+      }
+    }
+  }
+  return fitted;
+}
 
 // each power of 2 is a multiplication.
 export const countMultiplications = (exp: number): number => {

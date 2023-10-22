@@ -9,7 +9,7 @@ interface AssetConsts {
   readonly asset: Asset;
   readonly available: bigint;
   readonly min: bigint;
-  readonly adherenceImpacted: boolean;
+  readonly maxIntImpacted: boolean;
 }
 
 interface AssetFuncs {
@@ -34,7 +34,7 @@ export interface AssetArgs {
 export interface PostFitAmnts {
   readonly buyingVars: AssetVars;
   readonly sellingVars: AssetVars;
-  readonly adherenceImpacted: boolean;
+  maxIntImpacted: boolean;
 }
 
 export const cloneArgs = (args: AssetArgs): AssetArgs => {
@@ -57,7 +57,7 @@ export interface BaseArgs {
   readonly spot: bigint;
   readonly calcSpot_: (exp: bigint) => bigint;
   readonly calcDelta_: (spot: bigint) => bigint;
-  readonly adherenceImpacted: boolean;
+  readonly maxIntImpacted: boolean;
 }
 
 export const calcBaseArgs = (
@@ -85,9 +85,9 @@ export const calcBaseArgs = (
 
   let exp = BigInt(Math.ceil(exp_));
   let spot = calcSpot_(exp);
-  let adherenceImpacted = false;
+  let maxIntImpacted = false;
   while (adhereMaxInteger && spot > maxInteger) {
-    adherenceImpacted = true;
+    maxIntImpacted = true;
     exp--;
     spot = calcSpot_(exp);
   }
@@ -96,6 +96,6 @@ export const calcBaseArgs = (
     spot,
     calcSpot_,
     calcDelta_,
-    adherenceImpacted,
+    maxIntImpacted,
   };
 };

@@ -20,7 +20,11 @@ import { User } from "./user.ts";
 import { findForDirac } from "./actions/swapfinding/findForDirac.ts";
 import { ceilDiv, max, min } from "../utils/generators.ts";
 import { calcDelta, calcExp, calcSpot } from "./actions/swapfinding/helpers.ts";
-import { compareVariants, maxInteger } from "../utils/constants.ts";
+import {
+  compareVariants,
+  maxInteger,
+  // webappExpLimit,
+} from "../utils/constants.ts";
 
 // export const getMinBalance = (asset: Asset): bigint =>
 //   asset.equals(Asset.ADA) ? 10000000n : 0n; // TODO arbitary aka both excessive and edge-casing
@@ -253,7 +257,7 @@ export class DiracUtxo {
     availableBuying?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
     expLimit?: number,
   ): Swapping[] => {
-    console.log("swappingsFor()");
+    console.log("diracUtxo.swappingsFor()");
     assert(minBuying > 0n, `minBuying <= 0n: ${minBuying}`);
     assert(minSelling_ > 0n, `minSelling_ <= 0n: ${minSelling_}`);
     const swappings = findForDirac({
@@ -270,35 +274,71 @@ export class DiracUtxo {
       expLimit: expLimit ?? null,
     });
 
-    if (compareVariants && expLimit === undefined) {
-      const oldSwappings = this.oldSwappingsFor(
-        adhereMaxInteger,
-        user ?? undefined,
-        paramUtxo,
-        optimizeAmnts,
-        minBuying,
-        minSelling_,
-        availableSelling_,
-        buyableAssets,
-        availableBuying,
-      );
+    if (compareVariants) {
+      let swappings_: Swapping[];
+      const ignore: string[] = [];
+      if (expLimit === undefined) {
+        // return swappings;
+        console.log("calculating variant with oldSwappingsFor()");
+        swappings_ = this.oldSwappingsFor(
+          adhereMaxInteger,
+          user ?? undefined,
+          paramUtxo,
+          optimizeAmnts,
+          minBuying,
+          minSelling_,
+          availableSelling_,
+          buyableAssets,
+          availableBuying,
+        );
+      } else {
+        return swappings;
+        // if (expLimit < webappExpLimit) return swappings;
+        // console.log("calculating variant with expLimit:", expLimit);
+        // ignore = [
+        //   "expLimit",
+        //   "Exp",
+        //   "Spot",
+        //   "Price",
+        //   "Amnt",
+        //   "A0",
+        //   "tmpMinBuying",
+        // ]; // NOTE most of those are not irrelevant
+        // swappings_ = this.swappingsFor(
+        //   adhereMaxInteger,
+        //   user,
+        //   paramUtxo,
+        //   optimizeAmnts,
+        //   minBuying,
+        //   minSelling_,
+        //   availableSelling_,
+        //   buyableAssets,
+        //   availableBuying,
+        //   // expLimit <- only difference
+        // );
+      }
+      console.log("expLimit:", expLimit);
       assert(
-        oldSwappings.length === swappings.length,
-        `length mismatch: ${oldSwappings.length} !== ${swappings.length}`,
+        swappings_.length === swappings.length,
+        `length mismatch:\nvariant:\n${
+          swappings_.map((s) => s.show()).join("\n")
+        }\nactual:\n${swappings.map((s) => s.show()).join("\n")}`,
       );
       const notFound: Swapping[] = [];
       swappings.forEach((swapping) => {
-        const i = oldSwappings.findIndex((s) =>
-          s.equals(swapping, true, true, true)
-        );
+        const i = swappings_.findIndex((s) => s.equals(swapping, true, ignore));
         if (i === -1) notFound.push(swapping);
-        else oldSwappings.splice(i, 1);
+        else swappings_.splice(i, 1);
       });
+      // if (expLimit !== undefined) {
+      //   // NOTE this is not correct
+      //   swappings_ = swappings_.filter((s) => !s.maxIntImpacted);
+      // }
       assert(
-        notFound.length === 0 && oldSwappings.length === 0,
-        `old and new swappings mismatch:\nold:\n${
-          oldSwappings.map((s) => s.show()).join("\n")
-        }\nnew:\n${notFound.map((s) => s.show()).join("\n")}`,
+        notFound.length === 0 && swappings_.length === 0,
+        `swappings mismatch:\nvariant:\n${
+          swappings_.map((s) => s.show()).join("\n")
+        }\nactual:\n${notFound.map((s) => s.show()).join("\n")}`,
       );
     }
 
@@ -346,7 +386,7 @@ export class DiracUtxo {
     const sellingExp_ = new Value();
     const maxBuying_ = new PositiveValue();
     const maxSelling_ = new PositiveValue();
-    const adherenceImpacted = new Assets();
+    const maxIntImpacted = new Assets();
 
     // deposit of asset into pool to move inverted amm-price a to inverted spot price s
     // s := a = (l + d) * w => d = (s / w) - l
@@ -385,10 +425,10 @@ export class DiracUtxo {
 
       let buyingExp = BigInt(Math.floor(exp));
       let buyingSpot = calcSpot(anchor, jumpSize)(buyingExp);
-      let adherenceImpacted_ = false;
+      let maxIntImpacted_ = false;
       if (adhereMaxInteger && buyingSpot > maxInteger) {
-        adherenceImpacted.insert(asset);
-        adherenceImpacted_ = true;
+        maxIntImpacted.insert(asset);
+        maxIntImpacted_ = true;
         while (adhereMaxInteger && buyingSpot > maxInteger) {
           buyingExp--;
           buyingSpot = calcSpot(anchor, jumpSize)(buyingExp);
@@ -398,9 +438,9 @@ export class DiracUtxo {
       let sellingExp = BigInt(Math.ceil(exp));
       let sellingSpot = calcSpot(anchor, jumpSize)(sellingExp);
       if (adhereMaxInteger && sellingSpot > maxInteger) {
-        if (!adherenceImpacted_) {
-          adherenceImpacted.insert(asset);
-          adherenceImpacted_ = true;
+        if (!maxIntImpacted_) {
+          maxIntImpacted.insert(asset);
+          maxIntImpacted_ = true;
         }
         while (adhereMaxInteger && sellingSpot > maxInteger) {
           sellingExp--;
@@ -463,9 +503,9 @@ export class DiracUtxo {
             // result in some delta.
             if (adhereMaxInteger && sellingSpot > maxInteger) {
               // below is probably wrong, because we are in this case not even adding this one to sellable assets
-              // if (!adherenceImpacted_) {
-              //   adherenceImpacted.insert(asset);
-              //   adherenceImpacted_ = true;
+              // if (!maxIntImpacted_) {
+              //   maxIntImpacted.insert(asset);
+              //   maxIntImpacted_ = true;
               // }
               break;
             }
@@ -482,7 +522,7 @@ export class DiracUtxo {
       // const buyingSpot = buyingSpot_.amountOf(buyingAsset); // NOTE: inverted
       // const buyingExp = buyingExp_.amountOf(buyingAsset);
       // const maxBuying = maxBuying_.amountOf(buyingAsset);
-      const adherenceImpactedBuying = adherenceImpacted.has(buyingAsset);
+      const maxIntImpactedBuying = maxIntImpacted.has(buyingAsset);
 
       sellableAssets.forEach((sellingAsset) => {
         const buyingSpot = buyingSpot_.amountOf(buyingAsset);
@@ -496,8 +536,8 @@ export class DiracUtxo {
         const maxSelling = maxSelling_.amountOf(sellingAsset);
 
         const minSelling = getMinSelling(sellingAsset, minSelling_);
-        let adherenceImpacted_ = adherenceImpactedBuying ||
-          adherenceImpacted.has(sellingAsset);
+        let maxIntImpacted_ = maxIntImpactedBuying ||
+          maxIntImpacted.has(sellingAsset);
 
         const getSwappingForPair = (tmpMinBuying?: bigint): Swapping | null => {
           let buyingSpot__: bigint;
@@ -520,7 +560,7 @@ export class DiracUtxo {
               buyingExp__ = BigInt(Math.floor(exp));
               buyingSpot__ = calcSpot(anchor, jumpSize)(buyingExp__);
               if (adhereMaxInteger && buyingSpot__ > maxInteger) {
-                adherenceImpacted_ = true;
+                maxIntImpacted_ = true;
                 while (adhereMaxInteger && buyingSpot__ > maxInteger) {
                   buyingExp__--;
                   buyingSpot__ = calcSpot(anchor, jumpSize)(buyingExp__);
@@ -548,7 +588,7 @@ export class DiracUtxo {
 
           return this.swappingForPair(
             adhereMaxInteger,
-            adherenceImpacted_,
+            maxIntImpacted_,
             user,
             paramUtxo,
             buyingAsset,
@@ -648,7 +688,7 @@ export class DiracUtxo {
 
   private swappingForPair = (
     adhereMaxInteger: boolean,
-    adherenceImpacted: boolean,
+    maxIntImpacted: boolean,
     user: User | undefined,
     paramUtxo: ParamUtxo,
     buyingAsset: Asset,
@@ -770,10 +810,10 @@ export class DiracUtxo {
         )(
           sellingExp,
         );
-        console.log(
-          `increaseExpSelling: ${sellingExp - by} + ${by} = ${sellingExp}`,
-        );
-        console.log(`newSpotSelling: ${sellingSpot} -> ${newSpotSelling}`);
+        // console.log(
+        //   `increaseExpSelling: ${sellingExp - by} + ${by} = ${sellingExp}`,
+        // );
+        // console.log(`newSpotSelling: ${sellingSpot} -> ${newSpotSelling}`);
         sellingSpot = newSpotSelling;
       };
 
@@ -785,57 +825,57 @@ export class DiracUtxo {
         )(
           buyingExp,
         );
-        console.log(
-          `increaseExpBuying: ${buyingExp - by} + ${by} = ${buyingExp}`,
-        );
-        console.log(`newSpotBuying: ${buyingSpot} -> ${newSpotBuying}`);
+        // console.log(
+        //   `increaseExpBuying: ${buyingExp - by} + ${by} = ${buyingExp}`,
+        // );
+        // console.log(`newSpotBuying: ${buyingSpot} -> ${newSpotBuying}`);
         buyingSpot = newSpotBuying;
       };
 
       let sellingLimit = false;
       let buyingLimit = false;
       while (buyingAmount < minBuying || sellingAmount < minSelling) {
-        console.log(`
-          minBuying:     ${minBuying}
-          minSelling:    ${minSelling}
-          maxBuying:     ${maxBuying}
-          maxSelling:    ${maxSelling}
-          maxBuyingA0:   ${maxBuyingA0}
-          maxSellingA0:  ${maxSellingA0}
-          maxSwapA0:     ${maxSwapA0}
-          buyingSpot:    ${buyingSpot}
-          sellingSpot:   ${sellingSpot}
-          buyingExp:     ${buyingExp}
-          sellingExp:    ${sellingExp}
-          buyingAmount:  ${buyingAmount}
-          sellingAmount: ${sellingAmount}
-          sellingLimit:  ${sellingLimit}
-          buyingLimit:   ${buyingLimit}
-          limitReached:  ${_limitReached}
-          `);
+        // console.log(`
+        //   minBuying:     ${minBuying}
+        //   minSelling:    ${minSelling}
+        //   maxBuying:     ${maxBuying}
+        //   maxSelling:    ${maxSelling}
+        //   maxBuyingA0:   ${maxBuyingA0}
+        //   maxSellingA0:  ${maxSellingA0}
+        //   maxSwapA0:     ${maxSwapA0}
+        //   buyingSpot:    ${buyingSpot}
+        //   sellingSpot:   ${sellingSpot}
+        //   buyingExp:     ${buyingExp}
+        //   sellingExp:    ${sellingExp}
+        //   buyingAmount:  ${buyingAmount}
+        //   sellingAmount: ${sellingAmount}
+        //   sellingLimit:  ${sellingLimit}
+        //   buyingLimit:   ${buyingLimit}
+        //   limitReached:  ${_limitReached}
+        //   `);
 
         if (maxSellingA0 <= maxBuyingA0) {
           if (sellingLimit) return null;
           // assert(!sellingLimit, `sellingLimit reached already`);
           increaseExpSelling(1n);
           if (adhereMaxInteger && sellingSpot > maxInteger) {
-            console.log(
-              `sellingSpot > maxInteger: ${sellingSpot} > ${maxInteger}`,
-            );
+            // console.log(
+            //   `sellingSpot > maxInteger: ${sellingSpot} > ${maxInteger}`,
+            // );
             increaseExpSelling(-1n);
             sellingLimit = true;
             _limitReached = "selling";
-            adherenceImpacted = true;
+            maxIntImpacted = true;
           } else {
             const d = deltaSelling(sellingSpot);
-            console.log(`deltaSelling: ${d}`);
+            // console.log(`deltaSelling: ${d}`);
             let newMaxSelling;
             if (!infiniteSellable) {
               if (sellable <= d) {
                 newMaxSelling = sellable;
-                console.log(
-                  `sellingLimit reached - sellable <= d: ${sellable} <= ${d}`,
-                );
+                // console.log(
+                //   `sellingLimit reached - sellable <= d: ${sellable} <= ${d}`,
+                // );
                 sellingLimit = true;
                 _limitReached = "selling";
               } else {
@@ -862,13 +902,13 @@ export class DiracUtxo {
           );
           increaseExpBuying(-1n);
           const d = -deltaBuying(buyingSpot);
-          console.log(`-deltaBuying: ${d}`);
+          // console.log(`-deltaBuying: ${d}`);
           let newMaxBuying;
           if (buyable <= d) {
             newMaxBuying = buyable;
-            console.log(
-              `buyingLimit reached - buyable <= d: ${buyable} <= ${d}`,
-            );
+            // console.log(
+            //   `buyingLimit reached - buyable <= d: ${buyable} <= ${d}`,
+            // );
             buyingLimit = true;
             _limitReached = "buying";
           } else {
@@ -938,7 +978,7 @@ export class DiracUtxo {
 
     const swapping = Swapping.boundary(
       adhereMaxInteger,
-      adherenceImpacted,
+      maxIntImpacted,
       user ?? null,
       paramUtxo,
       this,

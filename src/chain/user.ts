@@ -189,9 +189,11 @@ export class User {
 
   // TODO use this and/or make this automatic in update() for example (only when a new block happens though)
   private resetMempool = (): void => {
-    // console.log(
-    //   `resetting:\n\nspent utxos: ${this.spentUtxos}\n\npending utxos:${this.pendingUtxos}`,
-    // );
+    console.log(`resetting mempool`);
+    if (this.spentUtxos.length) console.log(`spentUtxos:`, this.spentUtxos);
+    if (this.pendingUtxos.length) {
+      console.log(`pendingUtxos:`, this.pendingUtxos);
+    }
     this.spentUtxos.splice(0, this.spentUtxos.length);
     this.pendingUtxos.splice(0, this.pendingUtxos.length);
     this.usedSplitting = false;
@@ -202,6 +204,7 @@ export class User {
     const retrying_ = this.retrying.slice();
     this.retrying = [];
     for (const action of retrying_) {
+      console.log(`retrying ${action.type}`);
       results.push(await this.execute(action));
     }
     return results;

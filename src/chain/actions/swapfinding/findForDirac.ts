@@ -38,9 +38,13 @@ export const findForDirac = (args: FindForDiracArgs): Swapping[] => {
 
   const assets = args.paramUtxo.param.assets;
   assets.forEach((sellingAsset, sellingIndex) => {
+    console.log(`>> selling? ${sellingAsset.show()}`);
     const availableSelling =
       args.availableSelling_?.amountOf(sellingAsset, 0n) ?? -1n;
-    if (availableSelling === 0n) return;
+    if (availableSelling === 0n) {
+      console.log(`none available for selling`);
+      return;
+    }
 
     let baseSelling = baseArgs_.get(sellingIndex);
     if (!baseSelling) {
@@ -65,7 +69,7 @@ export const findForDirac = (args: FindForDiracArgs): Swapping[] => {
     });
     if (!fittedSelling) return;
     if (fittedSelling === "cannotAdhere") {
-      console.error(`adherence violated for selling`);
+      console.warn(`adherence violated for selling`);
       // TODO consider a better notification here
       return;
     }
@@ -75,7 +79,7 @@ export const findForDirac = (args: FindForDiracArgs): Swapping[] => {
         asset: sellingAsset,
         available: availableSelling,
         min: minSelling,
-        adherenceImpacted: baseSelling.adherenceImpacted,
+        maxIntImpacted: baseSelling.maxIntImpacted,
       },
       funcs: {
         calcSpot_: baseSelling.calcSpot_,
@@ -89,8 +93,10 @@ export const findForDirac = (args: FindForDiracArgs): Swapping[] => {
       },
     };
 
+    console.log(`>> selling! ${sellingAsset.show()}`);
     assets.forEach((buyingAsset, buyingIndex) => {
       if (buyingIndex === sellingIndex) return;
+      console.log(`>> buying? ${buyingAsset.show()}`);
       assert(
         !buyingAsset.equals(sellingAsset),
         `buying and selling asset must be different: ${buyingAsset.show()} === ${sellingAsset.show()}`,
@@ -101,7 +107,10 @@ export const findForDirac = (args: FindForDiracArgs): Swapping[] => {
         if (args.buyableAssets && !args.buyableAssets.has(buyingAsset)) return;
         const availableBuying = args.availableBuying ??
           args.diracUtxo.available.amountOf(buyingAsset, 0n);
-        if (availableBuying === 0n) return;
+        if (availableBuying === 0n) {
+          console.log(`none available for buying`);
+          return;
+        }
 
         let baseBuying = baseArgs_.get(buyingIndex);
         if (!baseBuying) {
@@ -135,7 +144,7 @@ export const findForDirac = (args: FindForDiracArgs): Swapping[] => {
             asset: buyingAsset,
             available: availableBuying,
             min: args.minBuying,
-            adherenceImpacted: baseBuying.adherenceImpacted,
+            maxIntImpacted: baseBuying.maxIntImpacted,
           },
           funcs: {
             calcSpot_: baseBuying.calcSpot_,
@@ -196,6 +205,7 @@ export const findForDirac = (args: FindForDiracArgs): Swapping[] => {
         });
       };
 
+      console.log(`>> buying! ${buyingAsset.show()}`);
       let swapping = getSwappingForPair(buyingArgs, null);
 
       if (swapping) {
@@ -240,7 +250,11 @@ export const findForDirac = (args: FindForDiracArgs): Swapping[] => {
               if (maybeBetterFast) {
                 assert(maybeBetterSlow, `maybeBetterSlow not found`);
                 assert(
-                  maybeBetterFast.equals(maybeBetterSlow, true, false, true),
+                  maybeBetterFast.equals(
+                    maybeBetterSlow,
+                    true,
+                    ["inBuying", "minSelling"],
+                  ),
                   `maybeBetterFast must equal maybeBetterSlow:\n${maybeBetterFast.show()}\n!==\n${maybeBetterSlow.show()}`,
                 );
               } else assert(!maybeBetterSlow, `maybeBetterFast not found`);
@@ -258,15 +272,16 @@ export const findForDirac = (args: FindForDiracArgs): Swapping[] => {
             } else break;
           }
         }
+        console.log(`swapping found for pair\n`);
         swappings.push(swapping);
-      } else console.log(`no swapping found for pair`);
+      } else console.log(`no swapping found for pair\n`);
     });
   });
 
   const pairs = swappings.map((swapping) =>
     `${swapping.sellingAsset.concise()} -> ${swapping.buyingAsset.concise()}`
   );
-  console.log(`pairs:\n${pairs.join("\n")}`);
+  console.log(`\npairs:\n${pairs.join("\n")}\n`);
   pairs.forEach((pair, i) => {
     assert(pairs.lastIndexOf(pair) === i, `duplicate pair: ${pair}`);
   });

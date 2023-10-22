@@ -22,24 +22,33 @@ export const swappingForPair = (args: SwappingForPairArgs): Swapping | null => {
   if (args.sellingArgs.consts.asset.equals(args.buyingArgs.consts.asset)) {
     return null;
   }
-  console.log(`
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    args.buying.asset: ${args.buyingArgs.consts.asset.show()}
-    args.selling.asset: ${args.sellingArgs.consts.asset.show()}
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  `);
-  if (
-    args.expLimit !== null &&
-    bestMultiplicationsAhead(Number(args.buyingArgs.vars.exp)) +
-          bestMultiplicationsAhead(Number(args.sellingArgs.vars.exp)) >
-      args.expLimit
-  ) return null;
+  // console.log(`
+  //   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //   selling: ${args.sellingArgs.consts.asset.show()}
+  //   buying: ${args.buyingArgs.consts.asset.show()}
+  //   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // `);
+  if (args.expLimit !== null) {
+    const buyingMults = bestMultiplicationsAhead(
+      Number(args.buyingArgs.vars.exp),
+    );
+    const sellingMults = bestMultiplicationsAhead(
+      Number(args.sellingArgs.vars.exp),
+    );
+    if (buyingMults + sellingMults > args.expLimit) {
+      console.log(
+        `expLimit reached: ${buyingMults} + ${sellingMults} > ${args.expLimit}`,
+      );
+      return null;
+    }
+  }
 
-  let adherenceImpacted = args.buyingArgs.consts.adherenceImpacted || args.sellingArgs.consts.adherenceImpacted;
+  let maxIntImpacted = args.buyingArgs.consts.maxIntImpacted ||
+    args.sellingArgs.consts.maxIntImpacted;
   let fitted: PostFitAmnts | null = {
     buyingVars: args.buyingArgs.vars,
     sellingVars: args.sellingArgs.vars,
-    adherenceImpacted,
+    maxIntImpacted,
   };
 
   while (true) {
@@ -56,12 +65,14 @@ export const swappingForPair = (args: SwappingForPairArgs): Swapping | null => {
         vars: fitted.sellingVars,
       },
     });
-    if (fitted === null) return null;
-    else if (args.expLimit === null) {
-      adherenceImpacted ||= fitted.adherenceImpacted;
+    if (fitted === null) {
+      console.log(`could not fit minAmnts`);
+      return null;
+    } else if (args.expLimit === null) {
+      maxIntImpacted ||= fitted.maxIntImpacted;
       break;
     } else {
-      adherenceImpacted ||= fitted.adherenceImpacted;
+      maxIntImpacted ||= fitted.maxIntImpacted;
       const fittedExps = fitExpLimit({
         adhereMaxInteger: args.adhereMaxInteger,
         expLimit: args.expLimit,
@@ -71,10 +82,11 @@ export const swappingForPair = (args: SwappingForPairArgs): Swapping | null => {
         maxSelling: fitted.sellingVars.max,
         calcBuyingSpot: args.buyingArgs.funcs.calcSpot_,
         calcSellingSpot: args.sellingArgs.funcs.calcSpot_,
-        minSelling: args.sellingArgs.consts.min,
       });
-      if (fittedExps === null) return null;
-      else if (fittedExps === "unchanged") break;
+      if (fittedExps === null) {
+        console.log(`could not fit expLimit`);
+        return null;
+      } else if (fittedExps === "unchanged") break;
       else {
         if (fitted.buyingVars.exp !== fittedExps.buyingExp) {
           fitted.buyingVars.exp = fittedExps.buyingExp;
@@ -88,7 +100,7 @@ export const swappingForPair = (args: SwappingForPairArgs): Swapping | null => {
             fittedExps.sellingExp,
           );
         }
-        adherenceImpacted ||= fittedExps.adherenceImpacted;
+        maxIntImpacted ||= fittedExps.maxIntImpacted;
       }
     }
   }
@@ -130,7 +142,7 @@ export const swappingForPair = (args: SwappingForPairArgs): Swapping | null => {
 
   const swapping = Swapping.boundary(
     args.adhereMaxInteger,
-    adherenceImpacted,
+    maxIntImpacted,
     args.user,
     args.paramUtxo,
     args.diracUtxo,

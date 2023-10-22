@@ -24,9 +24,36 @@ import { Assets } from "../../types/general/derived/asset/assets.ts";
 import { Dirac } from "../../types/euclid/dirac.ts";
 import { calcSpot, countMultiplications } from "./swapfinding/helpers.ts";
 import { fitExpLimit } from "./swapfinding/fitExpLimit.ts";
-import { compareVariants, maxInteger } from "../../utils/constants.ts";
+import {
+  compareVariants,
+  maxInteger,
+  webappExpLimit,
+} from "../../utils/constants.ts";
 
 // const sellingADAtolerance = 0;
+
+// export interface SwappingArgs {
+//   readonly adhereMaxInteger: boolean,
+//   readonly maxIntImpacted: boolean,
+//   readonly expLimit: number | null,
+//   readonly expLimitImpacted: boolean,
+//   readonly user: User | null, // webapp needs undefined iirc
+//   readonly paramUtxo: ParamUtxo,
+//   readonly diracUtxo: DiracUtxo,
+//   readonly buyingAsset: Asset,
+//   readonly sellingAsset: Asset,
+//   readonly buyingAmnt: bigint,
+//   readonly sellingAmnt: bigint,
+//   readonly buyingSpot: bigint, // inverted
+//   readonly sellingSpot: bigint, // inverted
+//   readonly buyingExp: bigint,
+//   readonly sellingExp: bigint,
+//   readonly availableBuying: bigint, // for corruption-tests (cannot be taken from dirac because of subSwaps)
+//   readonly availableSelling: bigint | null, // for corruption-tests (cannot be left null or taken from user because of subSwaps). Null means no limit
+//   readonly minBuying_: bigint,
+//   readonly minSelling: bigint,
+//   readonly tmpMinBuying: bigint | null, // for optimiziation. Need to store this to make corruption-tests pass
+// }
 
 export class Swapping {
   public readonly spotPrice: number; // uninverted
@@ -36,7 +63,9 @@ export class Swapping {
 
   private constructor(
     public readonly adhereMaxInteger: boolean,
-    public readonly adherenceImpacted: boolean,
+    public readonly maxIntImpacted: boolean,
+    public readonly expLimit: number | null,
+    public readonly expLimitImpacted: boolean,
     public readonly user: User | null, // webapp needs undefined iirc
     public readonly paramUtxo: ParamUtxo,
     public readonly diracUtxo: DiracUtxo,
@@ -48,12 +77,11 @@ export class Swapping {
     public readonly sellingSpot: bigint, // inverted
     public readonly buyingExp: bigint,
     public readonly sellingExp: bigint,
-    private expLimit: number | null,
     private availableBuying: bigint, // for corruption-tests (cannot be taken from dirac because of subSwaps)
-    private availableSelling: bigint | null, // for corruption-tests (cannot be left null or taken from user because of subSwaps). Null means no limit
-    private minBuying_: bigint,
-    private minSelling: bigint,
-    private tmpMinBuying: bigint | null, // for optimiziation. Need to store this to make corruption-tests pass
+    private readonly availableSelling: bigint | null, // for corruption-tests (cannot be left null or taken from user because of subSwaps). Null means no limit
+    private readonly minBuying_: bigint,
+    private readonly minSelling: bigint,
+    private readonly tmpMinBuying: bigint | null, // for optimiziation. Need to store this to make corruption-tests pass
     runTests: boolean, // corruption-test-swappings don't run tests themselves.
   ) {
     assert(
@@ -139,7 +167,9 @@ export class Swapping {
   public show = (): string => {
     return `Swapping (
   adhereMaxInteger: ${this.adhereMaxInteger}
-  adherenceImpacted: ${this.adherenceImpacted}
+  maxIntImpacted:   ${this.maxIntImpacted}
+  expLimit:         ${this.expLimit}
+  expLimitImpacted: ${this.expLimitImpacted}
   paramUtxo: ${this.paramUtxo.show()}
   diracUtxo: ${this.diracUtxo.show()}
   buyingAsset:      ${this.buyingAsset.show()}
@@ -152,9 +182,10 @@ export class Swapping {
   (sellingA0:       ${this.sellingAmnt * this.buyingSpot})
   buyingExp:        ${this.buyingExp}
   sellingExp:       ${this.sellingExp}
+  buyingExpMults:   ${countMultiplications(Number(this.buyingExp))}
+  sellingExpMults:  ${countMultiplications(Number(this.sellingExp))}
   spotPrice:        ${this.spotPrice}
   eff.Price:        ${this.effectivePrice}
-  expLimit:         ${this.expLimit}
   availableBuying:  ${this.availableBuying}
   availableSelling: ${this.availableSelling}
   minBuying:        ${this.minBuying_}
@@ -166,9 +197,8 @@ export class Swapping {
 
   public equals = (
     other: Swapping,
-    compareAvailable: boolean,
-    compareMinHard: boolean,
     compareMinSoft: boolean,
+    ignore: string[],
   ): boolean => {
     const as = this.show().split("\n");
     const bs = other.show().split("\n");
@@ -180,14 +210,16 @@ export class Swapping {
     for (let i = 0; i < as.length; i++) {
       const a = as[i];
       const b = bs[i];
-      if (!compareAvailable && a.includes("available")) continue;
-      if (
-        !compareMinHard &&
-        (a.includes("minBuying") || a.includes("tmpMinBuying"))
-      ) continue;
-      if (!(compareMinHard || compareMinSoft) && a.includes("minSelling")) {
-        continue;
+      if (!compareMinSoft && a.includes("minSelling")) continue;
+
+      let skip = false;
+      for (const ign of ignore) {
+        if (a.includes(ign)) {
+          skip = true;
+          break;
+        }
       }
+      if (skip) continue;
       if (a !== b) {
         console.log(`mismatch: ${a} !== ${b}`);
         return false;
@@ -228,6 +260,10 @@ export class Swapping {
       this.diracUtxo.utxo,
       `diracUtxo.utxo must be defined - subsequents-issue?`,
     );
+    assert(
+      this.paramUtxo.utxo,
+      `paramUtxo.utxo must be defined`,
+    );
     const oldDirac = this.diracUtxo.dirac;
     const funds = this.diracUtxo.funds.clone; // TODO cloning probably not required here
     // console.log(`funds before: ${funds.show()}`)
@@ -258,12 +294,22 @@ export class Swapping {
       new DiracDatum(newDirac),
     );
     const datum_ = Data.to(datum);
+    const redeemer = Data.to(swapRedeemer);
+    // console.log("datum:", datum_);
+    // console.log("redeemer:", redeemer);
+    // console.log("utxo.txHash:", this.diracUtxo.utxo.txHash);
+    // console.log("utxo.outputIndex:", this.diracUtxo.utxo.outputIndex);
+    // console.log("utxo.assets:", this.diracUtxo.utxo.assets);
+    // console.log("utxo.address:", this.diracUtxo.utxo.address);
+    // console.log("utxo.datumHash:", this.diracUtxo.utxo.datumHash);
+    // console.log("utxo.datum:", this.diracUtxo.utxo.datum);
+    // console.log("utxo.scriptRef:", this.diracUtxo.utxo.scriptRef);
 
     const tx_ = tx
-      .readFrom([this.paramUtxo.utxo!])
+      .readFrom([this.paramUtxo.utxo])
       .collectFrom(
-        [this.diracUtxo.utxo!],
-        Data.to(swapRedeemer),
+        [this.diracUtxo.utxo],
+        redeemer,
       )
       .payToContract(
         this.user!.contract.address,
@@ -413,7 +459,11 @@ export class Swapping {
       if (subSwapA) {
         assert(subSwapB, `subSwapB must be defined, but got null`);
         assert(
-          subSwapA.equals(subSwapB, false, false, true), // NOTE compareMinSoft is new
+          subSwapA.equals(subSwapB, true, [
+            "available",
+            "inBuying",
+            "minSelling",
+          ]),
           `found difference in subSwap-functions:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`,
         );
         // assert(subSwapA.show() === subSwapB.show(), `SUCCESS! ... but only show()-difference:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
@@ -422,7 +472,7 @@ export class Swapping {
           subSwapB === null,
           `subSwapB must be null, but got:\n${subSwapB?.show()}`,
         );}
-      return subSwapB; // NOTE this is because minBuying and maxima are different, subSwapB has the correct one
+      return subSwapB; // NOTE this is because minBuying and available are different, subSwapB has the correct one TODO why? this a problem?
     }
 
     return subSwapA;
@@ -472,7 +522,9 @@ export class Swapping {
 
     const subSwap = new Swapping(
       this.adhereMaxInteger,
-      this.adherenceImpacted,
+      this.maxIntImpacted,
+      this.expLimit,
+      this.expLimitImpacted,
       this.user,
       this.paramUtxo,
       this.diracUtxo,
@@ -484,7 +536,6 @@ export class Swapping {
       this.sellingSpot,
       this.buyingExp,
       this.sellingExp,
-      this.expLimit,
       amntIsSold ? this.availableBuying : amount, // per definition of a subSwap
       amntIsSold ? amount : this.availableSelling, // per definition of a subSwap
       applyMinAmounts ? this.minBuying_ : 1n,
@@ -527,7 +578,7 @@ export class Swapping {
       `randomSubSwap(): failed to find a subSwap for ${this.show()}`,
     );
     assert(
-      this.equals(subSwap, false, true, true), // maxBuying changes per definition of a subSwap
+      this.equals(subSwap, true, ["available"]), // available changes per definition of a subSwap
       `subSwap with unchanged amounts should result in same Swapping, but got:\n${subSwap.show()}\nfrom\n${this.show()}`,
     );
     return subSwap;
@@ -535,7 +586,9 @@ export class Swapping {
 
   static boundary(
     adhereMaxInteger: boolean,
-    adherenceImpacted: boolean,
+    maxIntImpacted: boolean,
+    expLimit: number | null,
+    expLimitImpacted: boolean,
     user: User | null,
     paramUtxo: ParamUtxo,
     diracUtxo: DiracUtxo,
@@ -547,7 +600,6 @@ export class Swapping {
     sellingSpot: bigint,
     buyingExp: bigint,
     sellingExp: bigint,
-    expLimit: number | null,
     availableBuying: bigint,
     availableSelling: bigint,
     minBuying: bigint,
@@ -557,7 +609,9 @@ export class Swapping {
     console.log(`Swapping.boundary()`);
     return new Swapping(
       adhereMaxInteger,
-      adherenceImpacted,
+      maxIntImpacted,
+      expLimit,
+      expLimitImpacted,
       user,
       paramUtxo,
       diracUtxo,
@@ -569,7 +623,6 @@ export class Swapping {
       sellingSpot,
       buyingExp,
       sellingExp,
-      expLimit,
       availableBuying, //diracUtxo.available.amountOf(buyingAsset),
       availableSelling === -1n ? null : availableSelling, //user ? user.availableBalance!.amountOf(sellingAsset) : null,
       minBuying,
@@ -590,7 +643,12 @@ export class Swapping {
         user,
         maybeNdef(genPositive(i)),
         maybeNdef(genPositive(i)),
-        maybeNdef(Number(genPositive(50n))),
+        randomChoice([
+          undefined,
+          webappExpLimit,
+          Number(genPositive(50n)),
+          Number(genPositive()),
+        ]),
       );
       if (swappings.length > 0) break;
     }
@@ -815,7 +873,9 @@ export class Swapping {
     console.log(`Swapping.corrupted()`);
     return new Swapping(
       this.adhereMaxInteger,
-      this.adherenceImpacted,
+      this.maxIntImpacted,
+      this.expLimit,
+      this.expLimitImpacted,
       this.user,
       this.paramUtxo,
       this.diracUtxo,
@@ -827,7 +887,6 @@ export class Swapping {
       sellingSpot,
       buyingExp,
       sellingExp,
-      this.expLimit,
       this.availableBuying,
       this.availableSelling,
       this.minBuying_,
