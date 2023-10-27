@@ -1,0 +1,44 @@
+- for a given asset spot price, we want to to use the maximum delta, in order to reduce rounding errors
+- up to one of the assets will however have a lower delta, in order to approximate the value equation as closely as possible
+- the only way to increase the maximum delta for an asset is to worsen it's spot price
+- depending on the impact of the rounding error, that might make sense, as well as when we are not meeting the minimum amount
+
+
+- for each asset, we calculate, and tag as "lower bound" or "upper bound":
+  - the exp/spot/delta for the minimum amount
+  - the exp/spot/delta for the maximum amount
+  - the minimum/maximum exponent (depending on direction)
+  - the exp for the maximum spot price (maxInteger)
+
+- we reconcile those into a final per-asset upper and lower bound assignment (using infinities as defaults)
+
+- then, for each of those four assignments, we calculate the equivalent in the other asset (note: this might not be so simple)
+
+- now we have four assignments for the entire pair, tagged with "lower bound" or "upper bound"
+- we reconcile those into a single upper and a lower bound assignment, respectively
+
+now we have the following optimization problem:
+  - think of a grid where the axes are the spots/exps for each asset between the bounds
+  - for each point on each axis, meaning per-asset, calculate:
+    - number of multiplications for that single exponent
+    - maximum delta
+    - equivalent A0
+  then, for each grip-point, meaning per-pair:
+    - add number of multiplications and remove if expLimit is violated
+    - subtract A0 from each other and remove those that violate the value equation
+    - calculate the effective price and return the points that minimize that
+
+this can of course be optimized tremendously. Starting with:
+  - instead of looking at a grid, we only look at one axis
+  - for each point/exp/spot on that axis, we calculate the maximum delta
+  - we calculate the corresponding point for the other asset
+    - this will require some thought, as that depends both on delta and spot of that other asset, which are in turn luckily dependent on each other
+    - if the resulting pair-assignment violates expLimit, we look at bestMultsAhead:
+      - if this still violates expLimit, we can discard the point
+      - otherwise we only need to move in the direction of the secondary axis, as we're already enumerating the first one
+      - we can ascertain that this will make everything strictly worse, so as soon as we find a valid solution, we can return it
+        - TODO can we?
+      - further, once we hit an already known point on that secondary axis, we can quit
+
+  - now we already have only those grid-points that A) respect expLimit, B) respect the value-equation and C) exploit it maximally
+  - for those we can now again calculate effective prices, and return the optimum
