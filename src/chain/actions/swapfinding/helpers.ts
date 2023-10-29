@@ -134,12 +134,11 @@ interface FitAmntsArgs {
 }
 
 export const fitAmnts = (args: FitAmntsArgs): PostFitAmnts | null => {
-
-
   let fitted: PostFitAmnts | null = {
     buyingVars: args.buyingArgs.vars,
     sellingVars: args.sellingArgs.vars,
-    maxIntImpacted: args.buyingArgs.consts.maxIntImpacted || args.sellingArgs.consts.maxIntImpacted,
+    maxIntImpacted: args.buyingArgs.consts.maxIntImpacted ||
+      args.sellingArgs.consts.maxIntImpacted,
   };
 
   while (true) {
@@ -196,7 +195,7 @@ export const fitAmnts = (args: FitAmntsArgs): PostFitAmnts | null => {
     }
   }
   return fitted;
-}
+};
 
 // each power of 2 is a multiplication.
 export const countMultiplications = (exp: number): number => {

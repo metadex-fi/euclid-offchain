@@ -139,9 +139,8 @@ ${tt})`;
     allAssets.forEach((asset) => {
       // const jumpSize = new PPositive(1n, gMaxJumpSize).genData();
       const jumpSize = new PPositive(1n, maxSmallInteger).genData();
-      const js1 = jumpSize + 1n;
       const virtual = new PPositive(
-        ceilDiv(js1, maxSmallInteger),
+        ceilDiv(jumpSize + 1n, maxSmallInteger),
       ).genData();
 
       const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual);

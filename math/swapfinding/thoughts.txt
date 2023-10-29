@@ -10,7 +10,7 @@
   - the minimum/maximum exponent (depending on direction)
   - the exp for the maximum spot price (maxInteger)
 
-- we reconcile those into a final per-asset upper and lower bound assignment (using infinities as defaults)
+- we reconcile those into a final per-asset upper and lower bound assignment
 
 - then, for each of those four assignments, we calculate the equivalent in the other asset (note: this might not be so simple)
 
@@ -23,7 +23,7 @@ now we have the following optimization problem:
     - number of multiplications for that single exponent
     - maximum delta
     - equivalent A0
-  then, for each grip-point, meaning per-pair:
+  then, for each grid-point, meaning per-pair:
     - add number of multiplications and remove if expLimit is violated
     - subtract A0 from each other and remove those that violate the value equation
     - calculate the effective price and return the points that minimize that
