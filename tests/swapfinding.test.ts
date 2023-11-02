@@ -39,25 +39,25 @@ Deno.test("swapfinding_delta_spot", () => {
 });
 
 // note that this is not generally true, because of the rounding
-Deno.test("swapfinding_spot_delta", () => {
-  for (let i = 0; i < outerTrials; i++) {
-    const direction = randomChoice(["buying", "selling"]);
-    const constants = AssetConstants.generateFor(
-      direction as "buying" | "selling",
-    );
-    for (let j = 0; j < innerTrials; j++) {
-      const spot = genPositive();
-      const delta = constants.calcDeltaFromSpot(spot);
-      if (delta < 1n) continue;
-      const spot_ = constants.calcSpotFromDelta(delta);
-      const spot__ = constants.roundSpot(spot);
-      assert(
-        spot__ === spot_,
-        `spot: ${spot__} != ${spot_} of ${constants.toString()}, delta: ${delta}`,
-      );
-    }
-  }
-});
+// Deno.test("swapfinding_spot_delta", () => {
+//   for (let i = 0; i < outerTrials; i++) {
+//     const direction = randomChoice(["buying", "selling"]);
+//     const constants = AssetConstants.generateFor(
+//       direction as "buying" | "selling",
+//     );
+//     for (let j = 0; j < innerTrials; j++) {
+//       const spot = genPositive();
+//       const delta = constants.calcDeltaFromSpot(spot);
+//       if (delta < 1n) continue;
+//       const spot_ = constants.calcSpotFromDelta(delta);
+//       const spot__ = constants.roundSpot(spot);
+//       assert(
+//         spot__ === spot_,
+//         `spot: ${spot__} != ${spot_} of ${constants.toString()}, delta: ${delta}`,
+//       );
+//     }
+//   }
+// });
 
 Deno.test("swapfinding", () => {
   for (let i = 0; i < outerTrials; i++) {
@@ -66,9 +66,10 @@ Deno.test("swapfinding", () => {
       const sellingConstants = AssetConstants.generateFor("selling");
 
       const buyingPairBounds = AssetBounds.fromAssetConstants(buyingConstants)
-        ?.toPairBounds(sellingConstants);
-      const sellingPairBounds = AssetBounds.fromAssetConstants(sellingConstants)
-        ?.toPairBounds(buyingConstants);
+        .toPairBounds(sellingConstants);
+      const sellingPairBounds = AssetBounds.fromAssetConstants(
+        sellingConstants,
+      ).toPairBounds(buyingConstants);
 
       // const comparison = buyingPairBounds.compare(sellingPairBounds);
       // const finalBounds = comparison === -1

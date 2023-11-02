@@ -10,42 +10,41 @@ import { Param } from "../../../types/euclid/param.ts";
 import { maxSmallInteger } from "../../../types/euclid/smallValue.ts";
 
 const compareBigInts = (a: bigint, b: bigint): -1 | 0 | 1 =>
-  a === b ? 0 : a < b ? -1 : 1;
+  a === b ? 0 : (a < b ? -1 : 1);
 
 const compareAssignments = (
-  a: AssetAssignment | "any",
-  b: AssetAssignment | "any",
+  a: AssetAssignment | "Δ = 0" | "Δ = oo",
+  b: AssetAssignment | "Δ = 0" | "Δ = oo",
 ): -1 | 0 | 1 => {
-  if (a === "any" && b === "any") return 0; // if both are basically infinite, they are equal
-  if (a === "any") return 1; // if a is basically infinite, b is smaller
-  if (b === "any") return -1; // if b is basically infinite, a is smaller
+  if (a === "Δ = 0" && b === "Δ = 0") return 0;
+  if (a === "Δ = oo" && b === "Δ = oo") return 0;
+  if (a === "Δ = 0" || b === "Δ = oo") return 1;
+  if (b === "Δ = 0" || a === "Δ = oo") return -1;
   return a.compare(b);
 };
 
 const getBetterAssignment = (
-  a: AssetAssignment | "none" | "any",
-  b: AssetAssignment | "none" | "any",
-  which: "smaller" | "larger",
-): AssetAssignment | "none" | "any" => {
-  if (a === "none" || b === "none") return "none";
-  if (a === "any") return b;
-  if (b === "any") return a;
-  return a.compare(b) < 0 && which === "smaller" ? a : b;
+  a: AssetAssignment,
+  b: AssetAssignment,
+  which: "smaller delta" | "larger delta",
+): AssetAssignment => {
+  return (a.compare(b) < 0) === (which === "smaller delta") ? a : b;
 };
 
 export class AssetBounds {
   private constructor(
-    private readonly lowerBound: AssetAssignment | "any",
-    private readonly upperBound: AssetAssignment | "any",
+    private readonly lowerBound: AssetAssignment | "Δ = 0",
+    private readonly upperBound: AssetAssignment | "Δ = oo" | undefined,
     public readonly constants: AssetConstants,
   ) {
-    if (lowerBound !== "any" && upperBound !== "any") {
-      assert(lowerBound.compare(upperBound) <= 0);
-    }
-    if (lowerBound !== "any") {
+    assert(
+      compareAssignments(lowerBound, upperBound) <= 0,
+      `${lowerBound.toString()} > ${upperBound.toString()}`,
+    );
+    if (lowerBound instanceof AssetAssignment) {
       assert(lowerBound.constants.equals(constants));
     }
-    if (upperBound !== "any") {
+    if (upperBound instanceof AssetAssignment) {
       assert(upperBound.constants.equals(constants));
     }
   }
@@ -85,7 +84,7 @@ export class AssetBounds {
 
   static fromAssetConstants = (
     constants: AssetConstants,
-  ): AssetBounds | null => {
+  ): AssetBounds => {
     const fromExpBound = AssetAssignment.fromExpBound(constants);
     const fromMaxSpot = AssetAssignment.fromMaxSpot(constants);
     const fromMinDelta = AssetAssignment.fromMinDelta(constants);
@@ -103,29 +102,32 @@ export class AssetBounds {
       ? upperBuying
       : upperSelling;
 
-    let lowerBound: AssetAssignment | "none" | "any" = "any";
-    let upperBound: AssetAssignment | "none" | "any" = "any";
+    let lowerBound: AssetAssignment | undefined;
+    let upperBound: AssetAssignment | undefined;
 
     for (const bound of lowerBounds) {
-      if (bound instanceof AssetAssignment) assert(bound.boundary === "lower");
-      lowerBound = getBetterAssignment(lowerBound, bound, "smaller");
+      assert(bound.boundary === "lower");
+      if (lowerBound) {
+        lowerBound = getBetterAssignment(lowerBound, bound, "smaller delta");
+      } else lowerBound = bound;
     }
     for (const bound of upperBounds) {
-      if (bound instanceof AssetAssignment) assert(bound.boundary === "upper");
-      upperBound = getBetterAssignment(upperBound, bound, "larger");
+      assert(bound.boundary === "upper");
+      if (upperBound) {
+        upperBound = getBetterAssignment(upperBound, bound, "larger delta");
+      } else upperBound = bound;
     }
 
-    if (lowerBound === "none") return null; // means we can't swap.
-    if (upperBound === "none") {
-      assert(constants.direction === "selling");
-      return null;
-    } // means we can't swap. Comes from fromMaxSpot, selling case
-
+    assert(lowerBound);
+    assert(upperBound);
+    // if (compareAssignments(lowerBound, upperBound) > 0) return null;
+    // if (lowerBound.deltaValidity === "too big") return null;
+    // if (upperBound.deltaValidity === "too small") return null;
     return new AssetBounds(lowerBound, upperBound, constants);
   };
 
-  public toPairBounds = (otherConstants: AssetConstants): PairBounds => {
-    const otherBounds = this.otherDirectionEquivalent(otherConstants);
+  public toPairBounds = (otherConstants: AssetConstants): PairBounds | undefined => {
+    const otherBounds = this.otherAssetEquivalent(otherConstants);
     if (this.constants.direction === "buying") {
       assert(otherConstants.direction === "selling");
       return new PairBounds(this, otherBounds);
@@ -135,34 +137,36 @@ export class AssetBounds {
     }
   };
 
-  private otherDirectionEquivalent = (
+  private otherAssetEquivalent = (
     otherConstants: AssetConstants,
-  ): AssetBounds => {
-    const otherLowerBound = this.upperBound === "any"
-      ? "any"
-      : this.upperBound.otherDirectionEquivalent(
-        otherConstants,
-      );
-    const otherUpperBound = this.lowerBound === "any"
-      ? "any"
-      : this.lowerBound.otherDirectionEquivalent(
-        otherConstants,
-      );
+  ): AssetBounds | undefined => {
+    console.log("this:", this.toString());
+    console.log("otherConstants:", otherConstants.toString());
 
-    assert(
-      otherLowerBound !== "none",
-      `no other lower bound found for ${this.toString()}`,
-    );
-    assert(
-      otherUpperBound !== "none",
-      `no other upper bound found for ${this.toString()}`,
-    );
+    const otherLowerBound = this.lowerBound === "Δ = 0"
+      ? "Δ = 0"
+      : this.lowerBound.otherAssetEquivalent(otherConstants);
 
-    return new AssetBounds(otherLowerBound, otherUpperBound, this.constants);
+    console.log("otherLowerBound:", otherLowerBound?.toString());
+
+    const otherUpperBound = this.upperBound === "Δ = oo"
+      ? "Δ = oo"
+      : this.upperBound.otherAssetEquivalent(otherConstants);
+
+    console.log("otherUpperBound:", otherUpperBound?.toString());
+
+    assert(otherLowerBound !== undefined);
+    assert(otherLowerBound !== "Δ = oo");
+    assert(otherUpperBound !== "Δ = 0");
+
+    return new AssetBounds(otherLowerBound, otherUpperBound, otherConstants);
   };
 }
 
 export class AssetAssignment {
+  public readonly spotValidity: "valid" | "too big" | "too small"; // size does matter, after all
+  public readonly deltaValidity: "valid" | "too big" | "too small"; // er könnte etwas größer sein
+
   private constructor(
     public readonly boundary: "lower" | "upper",
     public readonly constants: AssetConstants,
@@ -170,39 +174,33 @@ export class AssetAssignment {
     private readonly spot: bigint,
     private readonly delta: bigint,
   ) {
-    assert(
-      this.spot > 0n,
-      `spot must be positive: ${this.spot} of ${this.toString()}`,
-    );
-    assert(
-      this.spot <= maxInteger,
-      `spot > maxInteger: ${this.spot} > ${maxInteger} of ${this.toString()}`,
-    );
+    if (spot <= 0n) this.spotValidity = "too small";
+    else if (spot > maxInteger) this.spotValidity = "too big";
+    else this.spotValidity = "valid";
 
-    assert(
-      this.delta >= constants.minDelta,
-      `delta must be >= min: ${this.delta} < ${constants.minDelta} of ${this.toString()}`,
-    );
-    assert(
-      this.delta <= constants.maxDelta,
-      `delta must be <= max: ${this.delta} < ${constants.maxDelta} of ${this.toString()}`,
-    );
+    if (delta < constants.minDelta) this.deltaValidity = "too small";
+    else if (delta > constants.maxDelta) this.deltaValidity = "too big";
+    else this.deltaValidity = "valid";
   }
+
+  // public get valid(): boolean {
+  //   return this.spotValidity === "valid" && this.deltaValidity === "valid";
+  // }
 
   public toString = (): string => {
     return `AssetAssignment (
       boundary: ${this.boundary},
       constants: ${this.constants.toString()},
       exp: ${this.exp},
-      spot: ${this.spot},
-      delta: ${this.delta}
+      spot: ${this.spot} (${this.spotValidity}),
+      delta: ${this.delta} (${this.deltaValidity}),
     )`;
   };
 
   public equals = (other: AssetAssignment): boolean =>
     this.compare(other) === 0;
 
-  // we order by deltas
+  // we order by deltas. -1 means this has the smaller delta
   public compare = (other: AssetAssignment): -1 | 0 | 1 => {
     assert(this.constants.equals(other.constants));
     const compareExps = this.constants.direction === "buying"
@@ -227,189 +225,124 @@ export class AssetAssignment {
   // This should be the only one calling the constructor, as, due to rounding,
   // conversions between exp, spot and delta are not always reversible.
   // Exp should be that bottleneck, as that's what we ultimately send to the contract.
-  static fromExp(
+  private static fromExp(
     boundary: "lower" | "upper",
     constants: AssetConstants,
     exp: bigint,
-    checkMinSpot: null | "none" | "any",
-    checkMaxSpot: null | "none" | "any",
-    checkMinDelta: null | "none" | "any",
-    checkMaxDelta: null | "fit" | "any",
-  ): AssetAssignment | "none" | "any" {
+  ): AssetAssignment {
     const spot = constants.calcSpotFromExp(exp);
-    if (checkMinSpot && spot < 1n) return checkMinSpot;
-    if (checkMaxSpot && spot > maxInteger) return checkMaxSpot;
-    let delta = constants.calcDeltaFromSpot(spot);
-    if (checkMinDelta && delta < constants.minDelta) return checkMinDelta;
-    if (checkMaxDelta && delta > constants.maxDelta) {
-      if (checkMaxDelta === "fit") delta = constants.maxDelta;
-      else return checkMaxDelta;
-    }
+    const delta = constants.calcDeltaFromSpot(spot);
     return new AssetAssignment(boundary, constants, exp, spot, delta);
   }
 
   // lower bound for both deltas
   static fromExpBound = (
     constants: AssetConstants,
-  ): AssetAssignment | "none" | "any" => {
+  ): AssetAssignment => {
     const amm = constants.calcAmm();
-    if (amm > maxInteger) return "any"; // already captured by fromMaxSpot in this case
     assert(amm > 0n, `amm should always be positive: ${amm}`);
     const exp_ = constants.calcExpFromSpot(amm);
     const exp = BigInt(
       constants.direction === "buying" ? Math.floor(exp_) : Math.ceil(exp_),
     );
-    return AssetAssignment.fromExp(
-      "lower",
-      constants,
-      exp,
-      null, // NOTE not investigated yet
-      "none", // if the spot closest to the amm exceeds maxInteger: we can't swap
-      "any", // if the spot closest to the amm does not enable minimum delta: we defer to fromMinDelta
-      "fit", // if the spot closest to the amm already exceeds maximum delta: we have to swap less than the maximum
-    );
+    return AssetAssignment.fromExp("lower", constants, exp);
   };
 
   // lower bound for for buying-delta, upper bound for selling-delta
   static fromMaxSpot = (
     constants: AssetConstants,
-  ): AssetAssignment | "none" | "any" => {
-    let exp = BigInt(Math.ceil(constants.calcExpFromSpot(maxInteger)));
-    let spot: bigint;
-    while (true) {
-      spot = constants.calcSpotFromExp(exp);
-      if (spot >= maxInteger) exp--;
-      else break;
-    }
-    assert(spot > 0n, `spot must be positive: ${spot}`); // NOTE not investigated yet
+  ): AssetAssignment => {
+    const exp = BigInt(Math.ceil(constants.calcExpFromSpot(maxInteger)));
     return AssetAssignment.fromExp(
       constants.direction === "buying" ? "lower" : "upper",
       constants,
       exp,
-      null, // we assert it above
-      null, // we lower exp until this fits
-      constants.direction === "buying" // (hint: increase selling-delta by increasing selling-price)
-        ? "any" // buying case: if the largest spot does not enable minimum delta: we might find a lower one that does
-        : "none", // selling case: if even the largest spot does not enable minimum delta: we can't swap
-      constants.direction === "buying" // (hint: decrease buying-delta by increasing buying-price)
-        ? "fit" // buying case: if even the largest spot exceeds maximum delta: we have to swap less than the maximum
-        : "any", // selling case: if the largest spot exceeds maximum delta: we might find a lower one that doesn't
     );
+  };
+
+  private static fromDelta = (
+    boundary: "lower" | "upper",
+    constants: AssetConstants,
+    delta: bigint,
+  ): AssetAssignment => {
+    const spot = constants.calcSpotFromDelta(delta);
+    // we round away from the amm-price, such that the delta will be included
+    const exp = constants.direction === "buying"
+      ? BigInt(Math.floor(constants.calcExpFromSpot(spot)))
+      : BigInt(Math.ceil(constants.calcExpFromSpot(spot)));
+    return AssetAssignment.fromExp(boundary, constants, exp);
   };
 
   // lower bound for both deltas
   static fromMinDelta = (
     constants: AssetConstants,
-  ): AssetAssignment | "none" => {
-    let spot = constants.calcSpotFromDelta(constants.minDelta);
-    let exp = BigInt(Math.ceil(constants.calcExpFromSpot(spot)));
-    while (true) {
-      spot = constants.calcSpotFromExp(exp);
-      const delta = constants.calcDeltaFromSpot(spot);
-      if (delta >= constants.minDelta) break;
-      else if (constants.direction === "buying") exp--;
-      else exp++;
-    }
-    const assignment = AssetAssignment.fromExp(
-      "lower",
-      constants,
-      exp,
-      null, // NOTE not investigated yet
-      "none", // if the smallest delta requires too large a spot price: we can't swap
-      null, // we adjust exp above until this fits
-      "fit", // if the exp for the minimum delta exceeds the maximum delta: we cut the delta at its maximum
-    );
-    assert(assignment !== "any"); // implied by the parameters above
-    return assignment;
+  ): AssetAssignment => {
+    return AssetAssignment.fromDelta("lower", constants, constants.minDelta);
   };
 
   // upper bound for both deltas
   static fromMaxDelta = (
     constants: AssetConstants,
-  ): AssetAssignment | "any" => {
-    let spot = constants.calcSpotFromDelta(constants.maxDelta);
-    // we round towards the amm price, such that maxDelta won't be exceeded
-    let exp = constants.direction === "buying"
-      ? BigInt(Math.ceil(constants.calcExpFromSpot(spot)))
-      : BigInt(Math.floor(constants.calcExpFromSpot(spot)));
-    while (true) {
-      spot = constants.calcSpotFromExp(exp);
-      const delta = constants.calcDeltaFromSpot(spot);
-      if (delta >= constants.minDelta) break;
-      if (constants.direction === "buying") exp--;
-      else exp++;
-    }
-    const assignment = AssetAssignment.fromExp(
-      "upper",
-      constants,
-      exp,
-      null, // NOTE not investigated yet
-      "any", // if the spot for maximum delta exceeds maxInteger: we defer to fromMaxSpot
-      null, // we adjust exp above until this fits
-      "fit", // if the exp for the minimum or maximum delta exceeds the maximum delta: we cut the delta at its maximum
-    );
-    assert(assignment !== "none"); // implied by the parameters above
-    return assignment;
+  ): AssetAssignment => {
+    return AssetAssignment.fromDelta("upper", constants, constants.maxDelta);
   };
 
-  public otherDirectionEquivalent = (
+  private get boundedDelta(): bigint {
+    if (this.deltaValidity === "valid") return this.delta;
+    else if (this.deltaValidity === "too small") return this.constants.minDelta;
+    else return this.constants.maxDelta;
+  }
+
+  public otherAssetEquivalent = (
     otherConstants: AssetConstants,
-  ): AssetAssignment | "none" | "any" => {
+  ): AssetAssignment | "Δ = 0" | "Δ = oo" | undefined => {
     if (this.constants.direction === "buying") {
       assert(otherConstants.direction === "selling");
     } else {
       assert(otherConstants.direction === "buying");
     }
     const otherDelta = otherConstants.calcEquivalentDelta(
-      this.delta,
+      this.boundedDelta,
       this.constants.liquidity,
       this.constants.weight,
     );
-    if (otherDelta === "oo") return "any";
+    console.log("otherDelta:", otherDelta);
+    if (otherDelta === undefined) return undefined;
+
     const otherSpot = otherConstants.calcSpotFromDelta(otherDelta);
-    const otherExp = BigInt(
-      Math.ceil(otherConstants.calcExpFromSpot(otherSpot)),
+    console.log("otherSpot:", otherSpot);
+    const otherExp_ = Math.ceil(otherConstants.calcExpFromSpot(otherSpot));
+    console.log("otherExp_:", otherExp_);
+    if (!isFinite(otherExp_)) return otherExp_ < 0 ? "Δ = 0" : "Δ = oo";
+    const otherExp = BigInt(otherExp_);
+    return AssetAssignment.fromExp(
+      this.boundary,
+      otherConstants,
+      otherExp,
     );
-    if (this.boundary === "lower") {
-      return AssetAssignment.fromExp(
-        "upper",
-        otherConstants,
-        otherExp,
-        null, // NOTE not investigated yet
-        null, // NOTE not investigated yet
-        null, // if the equivalent delta is less than the other direction's minimum, we TODO
-        null, // NOTE not investigated yet
-      );
-    } else {
-      return AssetAssignment.fromExp(
-        "lower",
-        otherConstants,
-        otherExp,
-        null, // NOTE not investigated yet
-        null, // NOTE not investigated yet
-        null, // NOTE not investigated yet
-        null, // NOTE not investigated yet
-      );
-    }
   };
 }
 
 export class AssetConstants {
+  public readonly liquidity: bigint;
   constructor(
     public readonly direction: "buying" | "selling",
     public readonly minDelta: bigint,
     public readonly maxDelta: bigint,
-    public readonly liquidity: bigint,
+    public readonly virtual: bigint,
+    public readonly balance: bigint,
     public readonly weight: bigint,
     private readonly jumpSize: bigint,
     private readonly anchor: bigint,
   ) {
     assert(minDelta > 0n);
     assert(maxDelta >= minDelta);
-    assert(liquidity > 0n);
+    assert(virtual > 0n);
+    assert(balance >= 0n);
     assert(weight > 0n);
     assert(jumpSize > 0n);
     assert(anchor > 0n);
+    this.liquidity = balance + virtual;
   }
 
   public toString = (): string => {
@@ -417,6 +350,8 @@ export class AssetConstants {
       direction: ${this.direction},
       minDelta: ${this.minDelta},
       maxDelta: ${this.maxDelta},
+      virtual: ${this.virtual},
+      balance: ${this.balance},
       liquidity: ${this.liquidity},
       weight: ${this.weight},
       jumpSize: ${this.jumpSize},
@@ -432,7 +367,6 @@ export class AssetConstants {
     const balance = direction === "buying"
       ? genPositive(maxInteger - virtual)
       : genNonNegative(maxInteger - virtual);
-    const liquidity = virtual + balance;
     const maxDelta = direction === "buying" ? balance : genPositive();
     const minDelta = genPositive(maxDelta);
     const anchor = genPositive();
@@ -440,7 +374,8 @@ export class AssetConstants {
       direction,
       minDelta,
       maxDelta,
-      liquidity,
+      virtual,
+      balance,
       weight,
       jumpSize,
       anchor,
@@ -451,7 +386,8 @@ export class AssetConstants {
     this.direction === other.direction &&
     this.minDelta === other.minDelta &&
     this.maxDelta === other.maxDelta &&
-    this.liquidity === other.liquidity &&
+    this.virtual === other.virtual &&
+    this.balance === other.balance &&
     this.weight === other.weight &&
     this.jumpSize === other.jumpSize &&
     this.anchor === other.anchor;
@@ -469,10 +405,10 @@ export class AssetConstants {
       : this.weight * (this.liquidity + delta);
 
   // mainly for testing, but should have implications for the code as well
-  public roundSpot = (spot: bigint): bigint =>
-    this.direction === "buying"
-      ? -(-spot / this.weight) * this.weight
-      : (spot / this.weight) * this.weight;
+  // public roundSpot = (spot: bigint): bigint =>
+  //   this.direction === "buying"
+  //     ? -(-spot / this.weight) * this.weight
+  //     : (spot / this.weight) * this.weight;
 
   public calcSpotFromExp = (exp: bigint): bigint =>
     (0 <= exp)
@@ -498,7 +434,7 @@ export class AssetConstants {
     otherDelta: bigint,
     otherLiquidity: bigint,
     otherWeight: bigint,
-  ): bigint | "oo" => {
+  ): bigint | undefined => {
     const w_delta_1 = this.weight * otherDelta;
     const w_delta_2 = otherDelta * otherWeight;
     const w_l = otherWeight * otherLiquidity;
@@ -508,7 +444,7 @@ export class AssetConstants {
       return numerator / denominator;
     } else {
       const denominator = -w_delta_1 - w_delta_2 + w_l;
-      if (denominator === 0n) return "oo";
+      if (denominator <= 0n) return undefined;
       return ceilDiv(numerator, denominator);
     }
   };
