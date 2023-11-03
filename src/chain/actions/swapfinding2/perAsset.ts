@@ -126,7 +126,9 @@ export class AssetBounds {
     return new AssetBounds(lowerBound, upperBound, constants);
   };
 
-  public toPairBounds = (otherConstants: AssetConstants): PairBounds | undefined => {
+  public toPairBounds = (
+    otherConstants: AssetConstants,
+  ): PairBounds | undefined => {
     const otherBounds = this.otherAssetEquivalent(otherConstants);
     if (this.constants.direction === "buying") {
       assert(otherConstants.direction === "selling");
@@ -235,7 +237,9 @@ export class AssetAssignment {
     return new AssetAssignment(boundary, constants, exp, spot, delta);
   }
 
-  // lower bound for both deltas
+  // lower bound for both deltas. Some issues with this:
+  // - actually a bound on spot
+  // - subsumed by the post-swap-amm-bound
   static fromExpBound = (
     constants: AssetConstants,
   ): AssetAssignment => {
