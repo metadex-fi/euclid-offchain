@@ -710,18 +710,17 @@ export class Swapping {
     return true;
   }
 
-  static buyingAssetForSale(
+  static pricesFitAmm(
     spotBuying: bigint,
     spotSelling: bigint,
     buyingAmm: bigint,
     sellingAmm: bigint,
-    oldNew: string,
   ): boolean {
     const fitsBuying = spotBuying <= buyingAmm;
     const fitsSelling = sellingAmm <= spotSelling;
     if (!fitsBuying) {
       console.error(
-        `buyingAssetForSale (${oldNew}): 
+        `pricesFitAmm: 
         buyingAmm  ${buyingAmm} > 
         spotBuying ${spotBuying}`,
       );
@@ -729,7 +728,7 @@ export class Swapping {
     }
     if (!fitsSelling) {
       console.error(
-        `buyingAssetForSale (${oldNew}):
+        `pricesFitAmm:
         sellingAmm  ${sellingAmm} > 
         spotSelling ${spotSelling}`,
       );
@@ -788,8 +787,8 @@ export class Swapping {
     const buyingLiquidity = balanceBuying + virtualBuying;
     const sellingLiquidity = balanceSelling + virtualSelling;
 
-    const oldBuyingAmm = buyingWeight * buyingLiquidity;
-    const oldSellingAmm = sellingWeight * sellingLiquidity;
+    // const oldBuyingAmm = buyingWeight * buyingLiquidity;
+    // const oldSellingAmm = sellingWeight * sellingLiquidity;
 
     const newBuyingAmm = buyingWeight * (buyingLiquidity - this.buyingAmnt);
     const newSellingAmm = sellingWeight * (sellingLiquidity + this.sellingAmnt);
@@ -817,19 +816,11 @@ export class Swapping {
         this.sellingSpot,
         "selling",
       ) &&
-      Swapping.buyingAssetForSale(
-        this.buyingSpot,
-        this.sellingSpot,
-        oldBuyingAmm,
-        oldSellingAmm,
-        "old",
-      ) &&
-      Swapping.buyingAssetForSale(
+      Swapping.pricesFitAmm(
         this.buyingSpot,
         this.sellingSpot,
         newBuyingAmm,
         newSellingAmm,
-        "new",
       ) &&
       Swapping.valueEquation(
         this.buyingSpot,
