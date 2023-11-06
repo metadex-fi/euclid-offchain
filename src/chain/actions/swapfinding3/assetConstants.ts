@@ -9,10 +9,14 @@ import { maxSmallInteger } from "../../../types/euclid/smallValue.ts";
 import { Param } from "../../../types/euclid/param.ts";
 import { maxInteger } from "../../../utils/constants.ts";
 
-export class AssetConstants {
+export type OtherAssetType<AssetType extends "buying" | "selling"> =
+  AssetType extends "buying" ? "selling"
+    : "buying";
+
+export class AssetConstants<AssetType extends "buying" | "selling"> {
   public readonly liquidity: bigint;
   private constructor(
-    public readonly direction: "buying" | "selling",
+    public readonly assetType: AssetType,
     public readonly minDelta: bigint,
     public readonly maxDelta: bigint,
     public readonly virtual: bigint,
@@ -32,8 +36,8 @@ export class AssetConstants {
     assert(weight > 0n);
   }
 
-  static new = (
-    direction: "buying" | "selling",
+  static new = <AssetType extends "buying" | "selling">(
+    assetType: AssetType,
     minDelta: bigint,
     maxDelta: bigint,
     virtual: bigint,
@@ -42,22 +46,22 @@ export class AssetConstants {
     anchor: bigint,
     weight: bigint,
     sellingWeight?: bigint,
-  ): AssetConstants => {
-    if (direction === "buying") {
+  ): AssetConstants<AssetType> => {
+    if (assetType === "buying") {
       assert(maxDelta <= balance);
       assert(sellingWeight !== undefined);
     } else assert(sellingWeight === undefined);
 
     maxDelta = AssetConstants.fitMaxDelta(
       maxDelta,
-      direction,
+      assetType,
       balance + virtual,
       weight,
       sellingWeight,
     );
 
     return new AssetConstants(
-      direction,
+      assetType,
       minDelta,
       maxDelta,
       virtual,
@@ -68,18 +72,18 @@ export class AssetConstants {
     );
   };
 
-  static generateBuying = (sellingWeight: bigint): AssetConstants =>
+  static generateBuying = (sellingWeight: bigint): AssetConstants<"buying"> =>
     AssetConstants.generateFor("buying", sellingWeight);
 
-  static generateSelling = (): AssetConstants =>
+  static generateSelling = (): AssetConstants<"selling"> =>
     AssetConstants.generateFor("selling");
 
   // TODO synchronize this with Param
-  private static generateFor = (
-    direction: "buying" | "selling",
+  private static generateFor = <AssetType extends "buying" | "selling">(
+    assetType: AssetType,
     sellingWeight?: bigint,
-  ): AssetConstants => {
-    if (direction === "buying") assert(sellingWeight !== undefined);
+  ): AssetConstants<AssetType> => {
+    if (assetType === "buying") assert(sellingWeight !== undefined);
     else assert(sellingWeight === undefined);
 
     while (true) {
@@ -88,14 +92,14 @@ export class AssetConstants {
       const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual);
       const weight = minWeight + genNonNegative(maxWeight - minWeight);
 
-      const balance = direction === "buying"
+      const balance = assetType === "buying"
         ? genPositive(maxInteger - virtual)
         : genNonNegative(maxInteger - virtual);
 
       const liquidity = balance + virtual;
       const maxDelta = AssetConstants.fitMaxDelta(
-        direction === "buying" ? balance : genPositive(),
-        direction,
+        assetType === "buying" ? balance : genPositive(),
+        assetType,
         liquidity,
         weight,
         sellingWeight,
@@ -105,7 +109,7 @@ export class AssetConstants {
       const minDelta = genPositive(maxDelta);
       const anchor = genPositive(); // TODO minAnchorPrices?
       return AssetConstants.new(
-        direction,
+        assetType,
         minDelta,
         maxDelta,
         virtual,
@@ -120,7 +124,7 @@ export class AssetConstants {
 
   public toString = (): string => `
     AssetConstants (
-      direction: ${this.direction},
+      assetType: ${this.assetType},
       minDelta: ${this.minDelta},
       maxDelta: ${this.maxDelta},
       virtual: ${this.virtual},
@@ -131,8 +135,8 @@ export class AssetConstants {
       anchor: ${this.anchor}
     )`;
 
-  public equals = (other: AssetConstants): boolean =>
-    this.direction === other.direction &&
+  public equals = (other: AssetConstants<AssetType>): boolean =>
+    this.assetType === other.assetType &&
     this.minDelta === other.minDelta &&
     this.maxDelta === other.maxDelta &&
     this.virtual === other.virtual &&
@@ -141,17 +145,17 @@ export class AssetConstants {
     this.jumpSize === other.jumpSize &&
     this.anchor === other.anchor;
 
-  private static fitMaxDelta = (
+  private static fitMaxDelta = <AssetType extends "buying" | "selling">(
     maxDelta: bigint,
-    direction: "buying" | "selling",
+    assetType: AssetType,
     liquidity: bigint,
     weight: bigint,
     sellingWeight?: bigint,
   ): bigint => {
-    if (direction === "buying") assert(sellingWeight !== undefined);
+    if (assetType === "buying") assert(sellingWeight !== undefined);
     else assert(sellingWeight === undefined);
 
-    maxDelta = direction === "buying"
+    maxDelta = assetType === "buying"
       ? min(
         maxDelta,
         AssetConstants.calcMaxDeltaBuying(liquidity, weight, sellingWeight!),
@@ -159,7 +163,7 @@ export class AssetConstants {
       : maxDelta;
 
     const maxIntegerSpotDelta = AssetConstants.calcMaxIntegerSpotDelta(
-      direction,
+      assetType,
       liquidity,
       weight,
     );
@@ -170,13 +174,15 @@ export class AssetConstants {
     return maxDelta;
   };
 
-  private static calcMaxIntegerSpotDelta = (
-    direction: "buying" | "selling",
+  private static calcMaxIntegerSpotDelta = <
+    AssetType extends "buying" | "selling",
+  >(
+    assetType: AssetType,
     liquidity: bigint,
     weight: bigint,
   ): bigint | null => {
     const delta = AssetConstants.calcDeltaFromSpot_(
-      direction,
+      assetType,
       liquidity,
       weight,
       maxInteger,
@@ -185,14 +191,14 @@ export class AssetConstants {
     else return delta;
   };
 
-  private static calcDeltaFromSpot_ = (
-    direction: "buying" | "selling",
+  private static calcDeltaFromSpot_ = <AssetType extends "buying" | "selling">(
+    assetType: AssetType,
     liquidity: bigint,
     weight: bigint,
     spot: bigint,
   ): bigint => {
     let numerator = spot - liquidity * weight;
-    if (direction === "buying") numerator = -numerator;
+    if (assetType === "buying") numerator = -numerator;
     // rounding towards zero in both cases, as we are interested
     // in the maximum delta-capacity of a given spot price
     return numerator / weight;
@@ -200,14 +206,14 @@ export class AssetConstants {
 
   public calcDeltaFromSpot = (spot: bigint): bigint =>
     AssetConstants.calcDeltaFromSpot_(
-      this.direction,
+      this.assetType,
       this.liquidity,
       this.weight,
       spot,
     );
 
   public calcSpotFromDelta = (delta: bigint): bigint =>
-    this.direction === "buying"
+    this.assetType === "buying"
       ? this.weight * (this.liquidity - delta)
       : this.weight * (this.liquidity + delta);
 
@@ -233,14 +239,15 @@ export class AssetConstants {
 
   public calcEquivalentDelta = (
     otherDelta: bigint,
-    otherConstants: AssetConstants,
+    otherWeight: bigint,
+    otherLiquidity: bigint,
   ): bigint => {
     const w_delta_1 = this.weight * otherDelta;
-    const w_delta_2 = otherDelta * otherConstants.weight;
-    const w_l = otherConstants.weight * otherConstants.liquidity;
+    const w_delta_2 = otherDelta * otherWeight;
+    const w_l = otherWeight * otherLiquidity;
     const numerator = w_delta_1 * this.liquidity;
     let delta: bigint;
-    if (this.direction === "buying") {
+    if (this.assetType === "buying") {
       const denominator = w_delta_1 + w_delta_2 + w_l;
       delta = numerator / denominator;
     } else {

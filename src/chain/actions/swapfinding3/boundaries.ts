@@ -1,121 +1,203 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { AssetConstants } from "./assetConstants.ts";
-import { max, min } from "../../../utils/generators.ts";
+import { AssetConstants, OtherAssetType } from "./assetConstants.ts";
+import { min } from "../../../utils/generators.ts";
+import { maxInteger } from "../../../utils/constants.ts";
 
-export class AssetBoundary {
+export class AssetBoundary<
+  SpotExpType extends null | bigint,
+  BoundType extends "lower" | "upper",
+  AssetType extends "buying" | "selling",
+> {
   private constructor(
-    public readonly boundary: "minimized" | "maximized",
+    public readonly boundType: BoundType,
+    public readonly constants: AssetConstants<AssetType>,
     public readonly delta: bigint,
-    public readonly spot: bigint | null,
-    public readonly exp: bigint | null,
-    public readonly constants: AssetConstants,
+    public readonly spot: SpotExpType,
+    public readonly exp: SpotExpType,
   ) {
     assert(delta >= constants.minDelta);
     assert(delta <= constants.maxDelta);
+    assert(typeof spot === typeof exp);
+    if (spot !== null) {
+      assert(spot > 0n);
+      assert(spot <= maxInteger); // because we are updating the anchorprices
+    }
   }
 
-  static new = (
-    boundary: "minimized" | "maximized",
+  static raw = <
+    BoundType extends "lower" | "upper",
+    AssetType extends "buying" | "selling",
+  >(
+    boundType: BoundType,
     delta: bigint,
-    constants: AssetConstants,
-  ): AssetBoundary | bigint => {
+    constants: AssetConstants<AssetType>,
+  ): AssetBoundary<null, BoundType, AssetType> | bigint => {
     if (delta < constants.minDelta) {
       return delta - constants.minDelta;
     } else if (delta > constants.maxDelta) {
       return delta - constants.maxDelta;
     }
-    return new AssetBoundary(boundary, delta, null, null, constants);
+    return new AssetBoundary(boundType, constants, delta, null, null);
   };
 
-  public toString = (): string => `delta: ${this.delta}`;
-  // public toString = (): string => `
-  //   AssetBoundary (
-  //     delta: ${this.delta},
-  //     constants: ${this.constants.toString()}
-  //   )`;
+  // public toString = (): string => `delta: ${this.delta}`;
+  public toString = (): string => `
+    RawAssetBoundary (
+      boundType: ${this.boundType},
+      constants: ${this.constants.toString()},
+      delta: ${this.delta},
+      spot: ${this.spot},
+      exp: ${this.exp}
+    )`;
 
-  public otherDirectionEquivalent = (
-    otherConstants: AssetConstants,
-  ): AssetBoundary | bigint => {
-    assert(this.constants.direction !== otherConstants.direction);
-
+  public otherRawEquivalent = (
+    otherConstants: AssetConstants<OtherAssetType<AssetType>>,
+  ):
+    | AssetBoundary<null, BoundType, OtherAssetType<AssetType>>
+    | bigint => {
+    assert(this.constants.assetType !== otherConstants.assetType);
     const otherDelta = otherConstants.calcEquivalentDelta(
       this.delta,
-      this.constants,
+      this.constants.weight,
+      this.constants.liquidity,
     );
-    return AssetBoundary.new(this.boundary, otherDelta, otherConstants);
+    return AssetBoundary.raw(
+      this.boundType,
+      otherDelta,
+      otherConstants,
+    );
   };
 
   // increasing delta to maximum capacity of the spot required to fit minimal delta
-  public maximize = (): AssetBoundary => {
+  public fitToExp = (): AssetBoundary<bigint, BoundType, AssetType> => {
     const spot = this.constants.calcSpotFromDelta(this.delta);
     const exp = this.constants.calcExpFromSpot(spot);
-    let exp_ = this.constants.direction === "buying"
+    let exp_ = this.constants.assetType === "buying"
       ? BigInt(Math.floor(exp))
       : BigInt(Math.ceil(exp));
     let spot_ = this.constants.calcSpotFromExp(exp_);
-    if (this.constants.direction === "buying") {
-      if (spot_ > spot) { // assuming rounding errors
-        exp_--;
+    if (this.constants.assetType === "buying") {
+      if (spot_ > spot) {
+        exp_--; // assuming rounding errors
         spot_ = this.constants.calcSpotFromExp(exp_);
         assert(spot_ <= spot);
       }
-    } else if (spot_ < spot) { // assuming rounding errors
-      exp_++;
+    } else if (spot_ < spot && spot_ < maxInteger) {
+      exp_++; // assuming rounding errors
       spot_ = this.constants.calcSpotFromExp(exp_);
       assert(spot_ >= spot);
     }
+    let maxIntegerCrossed = false;
+    if (spot_ > maxInteger) { // <- NEXT UP: this should only be required once; 
+      // we need it more often when we have a lower bound that's actually higher than the upper one.
+      // so the question becomes in what order to smash the bounds against each other resp. fit them to exp
+      maxIntegerCrossed = true;
+      exp_--;
+      spot_ = this.constants.calcSpotFromExp(exp_);
+    }
     const delta = this.constants.calcDeltaFromSpot(spot_);
-    assert(delta >= this.delta);
+    if (!maxIntegerCrossed) assert(delta >= this.delta);
     const delta_ = min(delta, this.constants.maxDelta);
-    const maxxed = new AssetBoundary(
-      "maximized",
+    return new AssetBoundary(
+      this.boundType, // TODO this was upper before
+      this.constants,
       delta_,
       spot_,
       exp_,
-      this.constants,
     );
-    return maxxed;
+  };
+
+  public withFitFrom = (
+    fitAssetBoundary: AssetBoundary<bigint, BoundType, AssetType>,
+  ): AssetBoundary<bigint, BoundType, AssetType> => {
+    assert(this.boundType === fitAssetBoundary.boundType);
+    assert(this.constants.equals(fitAssetBoundary.constants));
+    assert(this.spot === null);
+    assert(this.exp === null);
+    const withFit = new AssetBoundary(
+      this.boundType,
+      this.constants,
+      this.delta,
+      fitAssetBoundary.spot,
+      fitAssetBoundary.exp,
+    );
+    return withFit;
   };
 }
 
-export class PairBounds {
+export class PairBounds<BoundType extends "lower" | "upper"> {
+  public readonly boundType: BoundType;
   private constructor(
-    public readonly boundary: "minimized" | "maximized",
-    public readonly buying: AssetBoundary,
-    public readonly selling: AssetBoundary,
+    public readonly buying: AssetBoundary<bigint, BoundType, "buying">,
+    public readonly selling: AssetBoundary<bigint, BoundType, "selling">,
   ) {
-    assert(buying.constants.direction === "buying");
-    assert(selling.constants.direction === "selling");
-    assert(buying.boundary === boundary);
-    assert(selling.boundary === boundary);
+    this.boundType = buying.boundType;
+    assert(selling.boundType === buying.boundType);
+    assert(typeof buying.spot === typeof selling.spot);
+    assert(typeof buying.exp === typeof selling.exp);
   }
 
-  static new = (
-    boundary: "minimized" | "maximized",
-    assetBoundary: AssetBoundary,
-    otherConstants: AssetConstants,
-  ): PairBounds | bigint => {
-    const otherBoundary = assetBoundary.otherDirectionEquivalent(
+  static new = <
+    BoundType extends "lower" | "upper",
+    FromAssetType extends "buying" | "selling",
+  >(
+    rawAssetBoundary: AssetBoundary<null, BoundType, FromAssetType>,
+    otherConstants: AssetConstants<OtherAssetType<FromAssetType>>,
+  ): PairBounds<BoundType> | bigint => {
+    /*
+    given an unfitted boundary for a single asset, we
+      - calculate the unfitted equivalent for the other asset
+        - if this is not possible, we return the difference to the nearest delta
+      - fit both to exp, which likely increases delta (except if we are hitting spot > maxInteger)
+        - there are good reasons for postponing this until here
+      - determine the smaller aka limiting one
+      - calculate the equivalent delta for the other asset
+      - assert this would still result in the same exps/spots for that other asset
+      - create a new boundary for the other asset with the found delta, spot and exp
+    */
+
+    const rawOtherBoundary = rawAssetBoundary.otherRawEquivalent(
       otherConstants,
     );
-    if (typeof otherBoundary === "bigint") return otherBoundary;
-    if (assetBoundary.constants.direction === "buying") {
-      return new PairBounds(boundary, assetBoundary, otherBoundary);
+    if (typeof rawOtherBoundary === "bigint") return rawOtherBoundary;
+
+    let fitAssetBoundary = rawAssetBoundary.fitToExp();
+    let fitOtherBoundary = rawOtherBoundary.fitToExp();
+    if (fitAssetBoundary.delta < fitOtherBoundary.delta) {
+      const rawOther = fitAssetBoundary.otherRawEquivalent(
+        otherConstants,
+      );
+      assert(typeof rawOther !== "bigint");
+      fitOtherBoundary = rawOther.withFitFrom(fitOtherBoundary);
+    } else if (fitAssetBoundary.delta > fitOtherBoundary.delta) {
+      const raw = fitOtherBoundary.otherRawEquivalent(
+        //@ts-ignore typechecker can't into double AssetType flips
+        rawAssetBoundary.constants,
+      );
+      assert(typeof raw !== "bigint");
+      //@ts-ignore typechecker can't into double AssetType flips
+      fitAssetBoundary = raw.withFitFrom(fitAssetBoundary);
+    }
+
+    if (rawAssetBoundary.constants.assetType === "buying") {
+      assert(rawOtherBoundary.constants.assetType === "selling");
+      // @ts-ignore we check this in the if above
+      return new PairBounds(rawAssetBoundary, rawOtherBoundary);
     } else {
-      return new PairBounds(boundary, otherBoundary, assetBoundary);
+      assert(rawOtherBoundary.constants.assetType === "buying");
+      // @ts-ignore we check this in the if above
+      return new PairBounds(rawOtherBoundary, rawAssetBoundary);
     }
   };
 
   public toString = (): string => `
     PairBounds (
-      boundary: ${this.boundary},
+      boundType: ${this.boundType},
       buying: ${this.buying.toString()},
       selling: ${this.selling.toString()}
     )`;
 
-  public leq = (other: PairBounds): boolean => {
-    assert(other.boundary === "maximized");
+  public leq = (other: PairBounds<"upper">): boolean => {
     if (this.buying.delta == other.buying.delta) {
       return this.selling.delta <= other.selling.delta;
     } else if (this.buying.delta < other.buying.delta) {
@@ -126,123 +208,100 @@ export class PairBounds {
       return false;
     }
   };
-
-  public maximize = (): PairBounds => {
-    const maxxedBuying = this.buying.maximize();
-    const maxxedSelling = this.selling.maximize();
-
-    const fromMaxxedBuying = PairBounds.new(
-      "maximized",
-      maxxedBuying,
-      maxxedSelling.constants,
-    );
-    const fromMaxxedSelling = PairBounds.new(
-      "maximized",
-      maxxedSelling,
-      maxxedBuying.constants,
-    );
-    // we need them to be boundary: "maximized" such that stricterBounds picks the lower one
-    const maxxed = stricterBounds(fromMaxxedBuying, fromMaxxedSelling);
-    assert(maxxed !== null);
-    if (this.boundary === "maximized") {
-      assert(this.buying.delta === maxxed.buying.delta);
-      assert(this.selling.delta === maxxed.selling.delta);
-    }
-    return maxxed;
-  };
 }
 
-const stricterBounds = (
-  a: PairBounds | bigint,
-  b: PairBounds | bigint,
-): PairBounds | null => {
-  if (typeof a === "bigint" && typeof b === "bigint") {
-    assert((a < 0n && b > 0n) || (a > 0n && b < 0n), `${a}, ${b}`); // the delta-to-delta-lines should never cross
-    return null;
+const betterBounds = <BoundType extends "lower" | "upper">(
+  a: PairBounds<BoundType> | bigint,
+  b: PairBounds<BoundType> | bigint,
+  which: "smaller" | "larger",
+): PairBounds<BoundType> | null => {
+  if (typeof a === "bigint") {
+    if (typeof b === "bigint") {
+      assert((a < 0n && b > 0n) || (a > 0n && b < 0n), `${a}, ${b}`); // the delta-to-delta-lines should never cross
+      return null; // this means no overlap
+    }
+    return b;
   }
-  if (!(a instanceof PairBounds)) return b as PairBounds;
-  if (!(b instanceof PairBounds)) return a;
-  assert(a.boundary === b.boundary);
-  return (a.boundary === "minimized") === (a.buying.delta > b.buying.delta)
-    ? a
-    : b;
+  if (typeof b === "bigint") return a;
+  return (which === "larger") === (a.buying.delta > b.buying.delta) ? a : b;
 };
 
 export class SwappingBounds {
   private constructor(
-    public readonly lowerBounds: PairBounds,
-    public readonly upperBounds: PairBounds,
+    public readonly lowerBounds: PairBounds<"lower">,
+    public readonly upperBounds: PairBounds<"upper">,
   ) {
-    assert(lowerBounds.boundary === "maximized"); // because they are maxxed
-    assert(upperBounds.boundary === "maximized");
+    assert(lowerBounds.boundType === "lower");
+    assert(upperBounds.boundType === "upper");
     assert(lowerBounds.leq(upperBounds));
   }
 
   static new = (
-    buyingConstants: AssetConstants,
-    sellingConstants: AssetConstants,
-  ): SwappingBounds | PairBounds | null => {
-    const minBuying = AssetBoundary.new(
-      "minimized",
+    buyingConstants: AssetConstants<"buying">,
+    sellingConstants: AssetConstants<"selling">,
+  ): SwappingBounds | PairBounds<"upper" | "lower"> | null => {
+    const minBuying = AssetBoundary.raw(
+      "lower",
       buyingConstants.minDelta,
       buyingConstants,
     );
     assert(typeof minBuying !== "bigint");
     const lowerFromBuying = PairBounds.new(
-      "minimized",
       minBuying,
       sellingConstants,
     );
 
-    const minSelling = AssetBoundary.new(
-      "minimized",
+    const minSelling = AssetBoundary.raw(
+      "lower",
       sellingConstants.minDelta,
       sellingConstants,
     );
     assert(typeof minSelling !== "bigint");
     const lowerFromSelling = PairBounds.new(
-      "minimized",
       minSelling,
       buyingConstants,
     );
 
-    let lowerBounds = stricterBounds(lowerFromBuying, lowerFromSelling);
+    const lowerBounds = betterBounds(
+      lowerFromBuying,
+      lowerFromSelling,
+      "larger",
+    );
     if (lowerBounds === null) return null; // no overlap -> no valid swap
 
-    const maxBuying = AssetBoundary.new(
-      "maximized",
+    const maxBuying = AssetBoundary.raw(
+      "upper",
       buyingConstants.maxDelta,
       buyingConstants,
     );
     assert(typeof maxBuying !== "bigint");
     const upperFromBuying = PairBounds.new(
-      "maximized",
       maxBuying,
       sellingConstants,
     );
 
-    const maxSelling = AssetBoundary.new(
-      "maximized",
+    const maxSelling = AssetBoundary.raw(
+      "upper",
       sellingConstants.maxDelta,
       sellingConstants,
     );
     assert(typeof maxSelling !== "bigint");
     const upperFromSelling = PairBounds.new(
-      "maximized",
       maxSelling,
       buyingConstants,
     );
 
-    let upperBounds = stricterBounds(upperFromBuying, upperFromSelling);
+    const upperBounds = betterBounds(
+      upperFromBuying,
+      upperFromSelling,
+      "smaller",
+    );
     if (upperBounds === null) { // TODO consider fixing this
       // if we have lowerBounds, we should have upperBounds;
       // this here should only happen due to rounding issues:
       assert(upperFromSelling === 1n); // (the other side just didn't come up yet)
       return null;
     }
-
-    lowerBounds = lowerBounds.maximize();
-    upperBounds = upperBounds.maximize();
 
     // console.log("lowerBounds", lowerBounds?.toString());
     // console.log("upperBounds", upperBounds?.toString());
@@ -264,11 +323,11 @@ export class SwappingBounds {
 
     console.log(
       "selling range:",
-      upperBounds.selling.delta - lowerBounds.selling.delta,
+      upperBounds.selling.exp - lowerBounds.selling.exp,
     );
     console.log(
       "buying range:",
-      upperBounds.buying.delta - lowerBounds.buying.delta,
+      upperBounds.buying.exp - lowerBounds.buying.exp,
     );
 
     return new SwappingBounds(
