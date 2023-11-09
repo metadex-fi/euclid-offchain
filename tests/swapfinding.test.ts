@@ -15,14 +15,11 @@ const innerTrials = 100;
 Deno.test("swapfinding", () => {
   for (let i = 0; i < outerTrials; i++) {
     for (let j = 0; j < innerTrials; j++) {
-      const sellingConstants = AssetConstants.generateSelling();
-      const buyingConstants = AssetConstants.generateBuying(
-        sellingConstants.weight,
-      );
+      const constants = AssetConstants.generatePair();
 
       const swappingBoundaries = SwappingBounds.new(
-        buyingConstants,
-        sellingConstants,
+        constants.buying,
+        constants.selling,
       );
       // const buyingPairBounds = AssetBounds.fromAssetConstants(buyingConstants)
       //   .toPairBounds(sellingConstants);

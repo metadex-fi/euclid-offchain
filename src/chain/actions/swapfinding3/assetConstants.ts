@@ -3,6 +3,7 @@ import {
   ceilDiv,
   genNonNegative,
   genPositive,
+  max,
   min,
 } from "../../../utils/generators.ts";
 import { maxSmallInteger } from "../../../types/euclid/smallValue.ts";
@@ -15,6 +16,7 @@ export type OtherAssetType<AssetType extends "buying" | "selling"> =
 
 export class AssetConstants<AssetType extends "buying" | "selling"> {
   public readonly liquidity: bigint;
+  public readonly amm: bigint;
   private constructor(
     public readonly assetType: AssetType,
     public readonly minDelta: bigint,
@@ -26,9 +28,10 @@ export class AssetConstants<AssetType extends "buying" | "selling"> {
     public readonly anchor: bigint,
   ) {
     this.liquidity = balance + virtual;
+    this.amm = this.liquidity * weight;
 
     assert(minDelta > 0n);
-    assert(maxDelta >= minDelta);
+    assert(maxDelta >= minDelta, `${maxDelta} < ${minDelta}`);
     assert(virtual > 0n);
     assert(balance >= 0n);
     assert(jumpSize > 0n);
@@ -52,10 +55,11 @@ export class AssetConstants<AssetType extends "buying" | "selling"> {
       assert(sellingWeight !== undefined);
     } else assert(sellingWeight === undefined);
 
+    const amm = (balance + virtual) * weight;
     maxDelta = AssetConstants.fitMaxDelta(
       maxDelta,
       assetType,
-      balance + virtual,
+      amm,
       weight,
       sellingWeight,
     );
@@ -72,54 +76,58 @@ export class AssetConstants<AssetType extends "buying" | "selling"> {
     );
   };
 
-  static generateBuying = (sellingWeight: bigint): AssetConstants<"buying"> =>
-    AssetConstants.generateFor("buying", sellingWeight);
-
-  static generateSelling = (): AssetConstants<"selling"> =>
-    AssetConstants.generateFor("selling");
+  static generatePair = (): {
+    buying: AssetConstants<"buying">;
+    selling: AssetConstants<"selling">;
+  } => {
+    while (true) {
+      const selling = AssetConstants.generateFor("selling");
+      if (selling === null) continue;
+      const buying = AssetConstants.generateFor("buying", selling.weight);
+      if (buying !== null) return { buying, selling };
+    }
+  };
 
   // TODO synchronize this with Param
   private static generateFor = <AssetType extends "buying" | "selling">(
     assetType: AssetType,
     sellingWeight?: bigint,
-  ): AssetConstants<AssetType> => {
+  ): AssetConstants<AssetType> | null => {
     if (assetType === "buying") assert(sellingWeight !== undefined);
     else assert(sellingWeight === undefined);
 
-    while (true) {
-      const jumpSize = genPositive(maxSmallInteger);
-      const virtual = genPositive(ceilDiv(jumpSize + 1n, maxSmallInteger));
-      const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual);
-      const weight = minWeight + genNonNegative(maxWeight - minWeight);
+    const jumpSize = genPositive(maxSmallInteger);
+    const virtual = genPositive(ceilDiv(jumpSize + 1n, maxSmallInteger));
+    const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual);
+    const weight = minWeight + genNonNegative(maxWeight - minWeight);
 
-      const balance = assetType === "buying"
-        ? genPositive(maxInteger - virtual)
-        : genNonNegative(maxInteger - virtual);
+    const balance = assetType === "buying"
+      ? genPositive(maxInteger - virtual)
+      : genNonNegative(maxInteger - virtual);
 
-      const liquidity = balance + virtual;
-      const maxDelta = AssetConstants.fitMaxDelta(
-        assetType === "buying" ? balance : genPositive(),
-        assetType,
-        liquidity,
-        weight,
-        sellingWeight,
-      );
+    const amm = (balance + virtual) * weight;
+    const maxDelta = AssetConstants.fitMaxDelta(
+      assetType === "buying" ? balance : genPositive(),
+      assetType,
+      amm,
+      weight,
+      sellingWeight,
+    );
 
-      if (maxDelta < 1n) continue;
-      const minDelta = genPositive(maxDelta);
-      const anchor = genPositive(); // TODO minAnchorPrices?
-      return AssetConstants.new(
-        assetType,
-        minDelta,
-        maxDelta,
-        virtual,
-        balance,
-        jumpSize,
-        anchor,
-        weight,
-        sellingWeight,
-      );
-    }
+    if (maxDelta < 1n) return null;
+    const minDelta = genPositive(maxDelta);
+    const anchor = genPositive(); // TODO minAnchorPrices?
+    return AssetConstants.new(
+      assetType,
+      minDelta,
+      maxDelta,
+      virtual,
+      balance,
+      jumpSize,
+      anchor,
+      weight,
+      sellingWeight,
+    );
   };
 
   public toString = (): string => `
@@ -148,7 +156,7 @@ export class AssetConstants<AssetType extends "buying" | "selling"> {
   private static fitMaxDelta = <AssetType extends "buying" | "selling">(
     maxDelta: bigint,
     assetType: AssetType,
-    liquidity: bigint,
+    amm: bigint,
     weight: bigint,
     sellingWeight?: bigint,
   ): bigint => {
@@ -158,47 +166,32 @@ export class AssetConstants<AssetType extends "buying" | "selling"> {
     maxDelta = assetType === "buying"
       ? min(
         maxDelta,
-        AssetConstants.calcMaxDeltaBuying(liquidity, weight, sellingWeight!),
+        AssetConstants.calcMaxDeltaBuying(amm, weight, sellingWeight!),
       )
       : maxDelta;
 
-    const maxIntegerSpotDelta = AssetConstants.calcMaxIntegerSpotDelta(
+    const maxIntegerSpotDelta = AssetConstants.calcDeltaFromSpot_(
       assetType,
-      liquidity,
-      weight,
-    );
-    maxDelta = maxIntegerSpotDelta
-      ? min(maxDelta, maxIntegerSpotDelta)
-      : maxDelta;
-
-    return maxDelta;
-  };
-
-  private static calcMaxIntegerSpotDelta = <
-    AssetType extends "buying" | "selling",
-  >(
-    assetType: AssetType,
-    liquidity: bigint,
-    weight: bigint,
-  ): bigint | null => {
-    const delta = AssetConstants.calcDeltaFromSpot_(
-      assetType,
-      liquidity,
+      amm,
       weight,
       maxInteger,
     );
-    if (delta < 0n) return null; // when amm > maxInteger
-    else return delta;
+    return min(maxDelta, maxIntegerSpotDelta);
   };
 
   private static calcDeltaFromSpot_ = <AssetType extends "buying" | "selling">(
     assetType: AssetType,
-    liquidity: bigint,
+    amm: bigint,
     weight: bigint,
     spot: bigint,
   ): bigint => {
-    let numerator = spot - liquidity * weight;
+    let numerator = spot - amm;
     if (assetType === "buying") numerator = -numerator;
+
+    // if the spot price is already on the wrong side of the amm,
+    // we can do nothing. This can happen when i.e. amm > maxInteger
+    numerator = max(numerator, 0n);
+
     // rounding towards zero in both cases, as we are interested
     // in the maximum delta-capacity of a given spot price
     return numerator / weight;
@@ -207,7 +200,7 @@ export class AssetConstants<AssetType extends "buying" | "selling"> {
   public calcDeltaFromSpot = (spot: bigint): bigint =>
     AssetConstants.calcDeltaFromSpot_(
       this.assetType,
-      this.liquidity,
+      this.amm,
       this.weight,
       spot,
     );
@@ -259,17 +252,14 @@ export class AssetConstants<AssetType extends "buying" | "selling"> {
     return delta;
   };
 
-  public calcAmm = (): bigint => this.liquidity * this.weight;
-
   private static calcMaxDeltaBuying = (
-    buyingLiquidity: bigint,
+    buyingAmm: bigint,
     buyingWeight: bigint,
     sellingWeight: bigint,
   ): bigint => {
-    const numerator = buyingLiquidity * buyingWeight;
     const denominator = buyingWeight + sellingWeight;
-    const fraction = numerator / denominator;
-    if (numerator % denominator === 0n) return fraction - 1n;
+    const fraction = buyingAmm / denominator;
+    if (buyingAmm % denominator === 0n) return fraction - 1n;
     else return fraction;
   };
 }

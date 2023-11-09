@@ -88,7 +88,7 @@ export class AssetBoundary<
       assert(spot_ >= spot);
     }
     let maxIntegerCrossed = false;
-    if (spot_ > maxInteger) { // <- NEXT UP: this should only be required once; 
+    if (spot_ > maxInteger) { // <- NEXT UP: this should only be required once;
       // we need it more often when we have a lower bound that's actually higher than the upper one.
       // so the question becomes in what order to smash the bounds against each other resp. fit them to exp
       maxIntegerCrossed = true;
@@ -125,7 +125,9 @@ export class AssetBoundary<
   };
 }
 
-export class PairBounds<BoundType extends "lower" | "upper"> {
+export class PairBounds<
+  BoundType extends "lower" | "upper",
+> {
   public readonly boundType: BoundType;
   private constructor(
     public readonly buying: AssetBoundary<bigint, BoundType, "buying">,
