@@ -105,15 +105,18 @@ export const calcAssetOptions = (
   let edgeExp: bigint;
   let excessEdgeExp: bigint;
   let otherEdgeExp: bigint;
+  let skipped = 0;
   if (assetType === "buying") {
     for (let exp = maxExp; exp >= minExp; exp--) {
       const newOption = calcOptionFromExp(exp);
       if (previousOption) {
-        assert(
-          previousOption.delta <= newOption.delta,
-          `${previousOption.delta} > ${newOption.delta}`,
-        );
+        // if (previousOption.delta === newOption.delta) {
+        //   skipped++;
+        //   continue;
+        // }
+        assert(previousOption.spot > newOption.spot);
         assert(previousOption.a0 < newOption.a0); // expecting this to fail, if not: this is not the most efficient implementation
+        // assert(previousOption.delta !== newOption.delta, `${newOption.delta}`);
       }
       previousOption = newOption;
       options.push(newOption);
@@ -125,10 +128,39 @@ export const calcAssetOptions = (
     for (let exp = minExp; exp <= maxExp; exp++) {
       const newOption = calcOptionFromExp(exp);
       if (previousOption) {
+        // if (previousOption.delta === newOption.delta) {
+        //   skipped++;
+        //   continue;
+        // }
+        // if (previousOption.a0 === newOption.a0) {
+        //   assert(
+        //     previousOption.spot === newOption.spot,
+        //     `${previousOption.a0}\n${previousOption.spot} !== ${newOption.spot}\n${previousOption.delta} vs. ${newOption.delta}`,
+        //   );
+        //   assert(
+        //     previousOption.delta === newOption.delta,
+        //     `${previousOption.delta} !== ${newOption.delta}`,
+        //   );
+        //   skipped++;
+        //   continue;
+        // }
+        if (previousOption.spot === newOption.spot) {
+          assert(
+            previousOption.delta === newOption.delta,
+            `${previousOption.delta} !== ${newOption.delta}`,
+          );
+          skipped++;
+          continue;
+        }
         assert(
-          previousOption.delta <= newOption.delta,
-          `${previousOption.delta} > ${newOption.delta}`,
+          previousOption.spot < newOption.spot,
+          `${previousOption.spot} >= ${newOption.spot} for ${previousOption.exp} and ${newOption.exp}`,
         );
+        if (previousOption.a0 === newOption.a0) {
+          assert(previousOption.delta < newOption.delta);
+          skipped++;
+          continue;
+        }
         // assert(
         //   previousOption.delta * newOption.spot <=
         //     newOption.delta * previousOption.spot,
@@ -145,6 +177,13 @@ export const calcAssetOptions = (
     edgeExp = maxExp + 1n;
     excessEdgeExp = maxExp + 2n;
     otherEdgeExp = minExp - 1n;
+  }
+  if (skipped) {
+    console.log(
+      `${
+        100 * skipped / Math.abs(Number(maxExp - minExp))
+      }% skipped: ${skipped} / ${Math.abs(Number(maxExp - minExp))}`,
+    );
   }
   const edgeSpot = calcSpotFromExp(edgeExp);
   if (edgeSpot <= maxInteger) {
@@ -168,8 +207,15 @@ export const calcAssetOptions = (
   } catch (_e) {
     // expected
   }
-  if (options.length) console.log(`${options.length} ${assetType}-options`);
-  return options.sort((a, b) => a.a0 - b.a0);
+  // if (options.length) console.log(`${options.length} ${assetType}-options`);
+  if (assetType === "selling") {
+    options.sort((a, b) => a.a0 - b.a0);
+    for (let i = 0; i < options.length - 1; i++) {
+      assert(options[i].a0 < options[i + 1].a0);
+    }
+  }
+
+  return options;
 };
 
 export const swapsForPair = (
@@ -196,6 +242,6 @@ export const swapsForPair = (
       buyingOption = buyingOptions.shift();
     }
   }
-  if (options.length) console.log(`-> ${options.length} pair-options`);
+  // if (options.length) console.log(`-> ${options.length} pair-options`);
   return options;
 };
