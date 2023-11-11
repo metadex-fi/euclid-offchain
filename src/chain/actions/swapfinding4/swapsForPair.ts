@@ -1,6 +1,7 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { maxInteger, maxIntRoot } from "../../../utils/constants.ts";
 import {
+  ceilDiv,
   genNonNegative,
   genPositive,
   min,
@@ -8,6 +9,8 @@ import {
   strictDiv,
 } from "../../../utils/generators.ts";
 import { maxSmallInteger } from "../../../types/euclid/smallValue.ts";
+import { PPositive } from "../../../types/general/derived/bounded/positive.ts";
+import { Param } from "../../../types/euclid/param.ts";
 
 interface AssetOption {
   exp: bigint;
@@ -21,12 +24,26 @@ interface PairOption {
   sellingOption: AssetOption;
 }
 
-export const genAssetParams = () => {
+export const genWildAssetParams = () => {
+  const jumpSize = genPositive(maxSmallInteger);
   const virtual = genPositive(maxInteger);
   const balance = genNonNegative(maxInteger - virtual);
   const locked = genNonNegative(balance);
   const weight = genPositive(randomChoice([maxInteger, maxIntRoot]));
+  const anchor = genPositive(maxInteger);
+  const minDelta = genPositive(maxInteger);
+  return { virtual, balance, locked, weight, jumpSize, anchor, minDelta };
+};
+
+export const genTightAssetParams = () => {
   const jumpSize = genPositive(maxSmallInteger);
+  const virtual = new PPositive(
+    ceilDiv(jumpSize + 1n, maxSmallInteger),
+  ).genData();
+  const balance = genNonNegative(maxInteger - virtual);
+  const locked = genNonNegative(balance);
+  const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual);
+  const weight = new PPositive(minWeight, maxWeight).genData();
   const anchor = genPositive(maxInteger);
   const minDelta = genPositive(maxInteger);
   return { virtual, balance, locked, weight, jumpSize, anchor, minDelta };
@@ -213,7 +230,12 @@ export const calcAssetOptions = (
   if (assetType === "selling") {
     options.sort((a, b) => a.a0 - b.a0); // buying is already asserted to be sorted on creation
     for (let i = 0; i < options.length - 1; i++) {
-      assert(options[i].a0 < options[i + 1].a0); // to ensure we are not getting the same a0 again
+      if (options[i].a0 === options[i + 1].a0) {
+        assert(options[i].spot < options[i + 1].spot);
+        assert(options[i].delta < options[i + 1].delta);
+        options.splice(i, 1);
+        i--;
+      }
     }
   } else if (options.length > 1) {
     assert(options[options.length - 2].a0 < options[options.length - 1].a0); // for the edge-option
