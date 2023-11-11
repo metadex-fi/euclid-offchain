@@ -49,6 +49,11 @@ export function ceilDiv(a: bigint, b: bigint): bigint {
   return a / b + bonus;
 }
 
+export function strictDiv(a: bigint, b: bigint): bigint {
+  const malus = a % b === 0n ? 1n : 0n;
+  return a / b - malus;
+}
+
 export function randomChoice<T>(alternatives: T[]): T {
   return randomIndexedChoice(alternatives)[0];
 }
