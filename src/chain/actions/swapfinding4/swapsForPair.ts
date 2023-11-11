@@ -1,9 +1,10 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { maxInteger } from "../../../utils/constants.ts";
+import { maxInteger, maxIntRoot } from "../../../utils/constants.ts";
 import {
   genNonNegative,
   genPositive,
   min,
+  randomChoice,
   strictDiv,
 } from "../../../utils/generators.ts";
 import { maxSmallInteger } from "../../../types/euclid/smallValue.ts";
@@ -24,7 +25,7 @@ export const genAssetParams = () => {
   const virtual = genPositive(maxInteger);
   const balance = genNonNegative(maxInteger - virtual);
   const locked = genNonNegative(balance);
-  const weight = genPositive(maxInteger);
+  const weight = genPositive(randomChoice([maxInteger, maxIntRoot]));
   const jumpSize = genPositive(maxSmallInteger);
   const anchor = genPositive(maxInteger);
   const minDelta = genPositive(maxInteger);
@@ -144,6 +145,7 @@ export const calcAssetOptions = (
         //   skipped++;
         //   continue;
         // }
+        assert(previousOption.delta <= newOption.delta);
         if (previousOption.spot === newOption.spot) {
           assert(
             previousOption.delta === newOption.delta,
@@ -159,7 +161,7 @@ export const calcAssetOptions = (
         if (previousOption.a0 === newOption.a0) {
           assert(previousOption.delta < newOption.delta);
           skipped++;
-          continue;
+          continue; // since we prefer a smaller selling-delta
         }
         // assert(
         //   previousOption.delta * newOption.spot <=
@@ -178,13 +180,13 @@ export const calcAssetOptions = (
     excessEdgeExp = maxExp + 2n;
     otherEdgeExp = minExp - 1n;
   }
-  if (skipped) {
-    console.log(
-      `${
-        100 * skipped / Math.abs(Number(maxExp - minExp))
-      }% skipped: ${skipped} / ${Math.abs(Number(maxExp - minExp))}`,
-    );
-  }
+  // if (skipped) {
+  //   console.log(
+  //     `${
+  //       100 * skipped / Math.abs(Number(maxExp - minExp))
+  //     }% skipped: ${skipped} / ${Math.abs(Number(maxExp - minExp))}`,
+  //   );
+  // }
   const edgeSpot = calcSpotFromExp(edgeExp);
   if (edgeSpot <= maxInteger) {
     const delta = maxDelta;
@@ -209,10 +211,12 @@ export const calcAssetOptions = (
   }
   // if (options.length) console.log(`${options.length} ${assetType}-options`);
   if (assetType === "selling") {
-    options.sort((a, b) => a.a0 - b.a0);
+    options.sort((a, b) => a.a0 - b.a0); // buying is already asserted to be sorted on creation
     for (let i = 0; i < options.length - 1; i++) {
-      assert(options[i].a0 < options[i + 1].a0);
+      assert(options[i].a0 < options[i + 1].a0); // to ensure we are not getting the same a0 again
     }
+  } else if (options.length > 1) {
+    assert(options[options.length - 2].a0 < options[options.length - 1].a0); // for the edge-option
   }
 
   return options;
@@ -222,12 +226,13 @@ export const swapsForPair = (
   buyingOptions: AssetOption[],
   sellingOptions: AssetOption[],
 ): PairOption[] => {
+  const bs = buyingOptions.length;
+  const ss = sellingOptions.length;
   let buyingOption = buyingOptions.shift();
   let sellingOption = sellingOptions.shift();
 
   const options: PairOption[] = [];
-  while (true) {
-    if (!buyingOption || !sellingOption) break;
+  while (buyingOption && sellingOption) {
     if (sellingOption.a0 < buyingOption.a0) {
       sellingOption = sellingOptions.shift();
     } else if (
@@ -242,6 +247,11 @@ export const swapsForPair = (
       buyingOption = buyingOptions.shift();
     }
   }
-  // if (options.length) console.log(`-> ${options.length} pair-options`);
+  // if (options.length)
+  if (bs && ss) {
+    console.log(
+      `${bs}, ${ss} -> ${options.length} pair-options`,
+    );
+  }
   return options;
 };
