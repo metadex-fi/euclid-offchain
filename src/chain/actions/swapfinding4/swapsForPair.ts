@@ -128,7 +128,7 @@ export class AssetOptions {
     if (Number(maxExp) === maxExp_) maxExp -= 1n;
     this.maxExp = maxExp;
 
-    const options: AssetOption[] = [];
+    let options: AssetOption[] = [];
     let previousOption: AssetOption | undefined;
     let edgeExp: bigint;
     let excessEdgeExp: bigint;
@@ -136,74 +136,11 @@ export class AssetOptions {
     let skipped = 0;
 
     if (assetType === "buying") {
-      // for (let exp = maxExp; exp >= minExp; exp--) {
-      //   const newOption = this.calcOptionFromExp(exp);
-      //   if (previousOption) {
-      //     // if (previousOption.delta === newOption.delta) {
-      //     //   skipped++;
-      //     //   continue;
-      //     // }
-      //     assert(previousOption.spot > newOption.spot);
-      //     assert(previousOption.a0 < newOption.a0); // expecting this to fail, if not: this is not the most efficient implementation
-      //     // assert(previousOption.delta !== newOption.delta, `${newOption.delta}`);
-      //   }
-      //   previousOption = newOption;
-      //   options.push(newOption);
-      // }
       edgeExp = minExp - 1n;
       excessEdgeExp = minExp - 2n;
       otherEdgeExp = maxExp + 1n;
     } else {
-      for (let exp = minExp; exp <= maxExp; exp++) {
-        const newOption = this.calcOptionFromExp(exp);
-        if (previousOption) {
-          // if (previousOption.delta === newOption.delta) {
-          //   skipped++;
-          //   continue;
-          // }
-          // if (previousOption.a0 === newOption.a0) {
-          //   assert(
-          //     previousOption.spot === newOption.spot,
-          //     `${previousOption.a0}\n${previousOption.spot} !== ${newOption.spot}\n${previousOption.delta} vs. ${newOption.delta}`,
-          //   );
-          //   assert(
-          //     previousOption.delta === newOption.delta,
-          //     `${previousOption.delta} !== ${newOption.delta}`,
-          //   );
-          //   skipped++;
-          //   continue;
-          // }
-          assert(previousOption.delta <= newOption.delta);
-          if (previousOption.spot === newOption.spot) {
-            assert(
-              previousOption.delta === newOption.delta,
-              `${previousOption.delta} !== ${newOption.delta}`,
-            );
-            skipped++;
-            continue;
-          }
-          assert(
-            previousOption.spot < newOption.spot,
-            `${previousOption.spot} >= ${newOption.spot} for ${previousOption.exp} and ${newOption.exp}`,
-          );
-          if (previousOption.a0 === newOption.a0) {
-            assert(previousOption.delta < newOption.delta);
-            skipped++;
-            continue; // since we prefer a smaller selling-delta
-          }
-          // assert(
-          //   previousOption.delta * newOption.spot <=
-          //     newOption.delta * previousOption.spot,
-          //   `${previousOption.delta} * ${newOption.spot} > ${newOption.delta} * ${previousOption.spot}\n${
-          //     previousOption.delta * newOption.spot
-          //   } > ${
-          //     newOption.delta * previousOption.spot
-          //   }\n${previousOption.a0} > ${newOption.a0}`,
-          // ); // expecting this to fail, if not: this is not the most efficient implementation
-        }
-        previousOption = newOption;
-        options.push(newOption);
-      }
+      options = this.calcOptionsFromExps();
       edgeExp = maxExp + 1n;
       excessEdgeExp = maxExp + 2n;
       otherEdgeExp = minExp - 1n;
@@ -249,25 +186,71 @@ export class AssetOptions {
   }
 
   // gives inaccurate result
-  private calcSpotFromExp_ = (exp: bigint): bigint =>
-    BigInt(
-      Math.floor(Number(this.anchor) * this.jumpMultiplier ** Number(exp)),
-    );
+  // private calcSpotFromExp_ = (exp: bigint): bigint =>
+  //   BigInt(
+  //     Math.floor(Number(this.anchor) * this.jumpMultiplier ** Number(exp)),
+  //   );
 
   private calcSpotFromExp = (exp: bigint): bigint =>
     exp < 0n
       ? (this.anchor * (this.jumpSize ** -exp)) / ((this.jumpSize + 1n) ** -exp)
       : (this.anchor * ((this.jumpSize + 1n) ** exp)) / (this.jumpSize ** exp);
 
+  private calcOptionsFromExps = (): AssetOption[] => {
+    const options: AssetOption[] = [];
+    if (this.minExp > this.maxExp) return options;
+    const jumpSizePlusOne = this.jumpSize + 1n;
+    let numerator = this.anchor;
+    let denominator = 1n;
+    if (this.minExp < 0n) {
+      numerator *= this.jumpSize ** -this.minExp;
+      denominator *= jumpSizePlusOne ** -this.minExp;
+    } else {
+      numerator *= jumpSizePlusOne ** this.minExp;
+      denominator *= this.jumpSize ** this.minExp;
+    }
+    let spot = numerator / denominator;
+    let previousOption = this.calcOptionFromSpot(this.minExp, spot);
+    options.push(previousOption);
+    // console.log(this.minExp, spot);
+    for (let exp = this.minExp + 1n; exp <= this.maxExp; exp++) {
+      numerator *= jumpSizePlusOne;
+      denominator *= this.jumpSize;
+      spot = numerator / denominator;
+      // const spot_ = this.calcSpotFromExp(exp);
+      // // console.log(exp, spot);
+      // assert(spot === spot_, `${spot} !== ${spot_}`);
+      const newOption = this.calcOptionFromSpot(exp, spot);
+
+      assert(previousOption.delta <= newOption.delta);
+      if (previousOption.spot === newOption.spot) {
+        assert(
+          previousOption.delta === newOption.delta,
+          `${previousOption.delta} !== ${newOption.delta}`,
+        );
+        continue;
+      }
+      assert(
+        previousOption.spot < newOption.spot,
+        `${previousOption.spot} >= ${newOption.spot} for ${previousOption.exp} and ${newOption.exp}`,
+      );
+      if (previousOption.a0 === newOption.a0) {
+        assert(previousOption.delta < newOption.delta);
+        continue; // since we prefer a smaller selling-delta
+      }
+
+      previousOption = newOption;
+      options.push(newOption);
+    }
+    return options;
+  };
+
   private calcDeltaCapacityFromSpot = (spot: bigint): bigint =>
     this.assetType === "buying"
       ? (this.amm - spot) / this.weight
       : (spot - this.amm) / this.weight;
 
-  private calcOptionFromExp = (exp: bigint): AssetOption => {
-    const spot = this.calcSpotFromExp(exp);
-    // const spot_ = this.calcSpotFromExp_(exp);
-    // assert(spot === spot_, `${spot} !== ${spot_}`);
+  private calcOptionFromSpot = (exp: bigint, spot: bigint): AssetOption => {
     assert(spot >= this.minSpot, `${spot} < ${this.minSpot}`);
     assert(spot <= this.maxSpot, `${spot} > ${this.maxSpot}`);
 
@@ -277,6 +260,11 @@ export class AssetOptions {
 
     const a0 = Number(delta) / Number(spot);
     return { exp, spot, delta, a0 };
+  };
+
+  private calcOptionFromExp = (exp: bigint): AssetOption => {
+    const spot = this.calcSpotFromExp(exp);
+    return this.calcOptionFromSpot(exp, spot);
   };
 
   private calcEdgeOptionFromExp = (exp: bigint): AssetOption | null => {
