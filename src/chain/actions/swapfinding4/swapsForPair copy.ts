@@ -63,21 +63,6 @@ export const genTightAssetParams = () => {
   return { virtual, balance, locked, weight, jumpSize, anchor, minDelta };
 };
 
-// each power of 2 is a multiplication.
-export const countMultiplications = (exp: number): number => {
-  exp = Math.abs(exp);
-
-  const binaryRepresentation = exp.toString(2).slice(1);
-  const b = binaryRepresentation.length; // Total bits
-  const k = (binaryRepresentation.match(/1/g) || []).length; // Count of '1' bits
-
-  return b + k;
-};
-
-// best we can do to decrease the number of multiplications is reaching the next power of 2
-export const bestMultiplicationsAhead = (exp: number): number =>
-  Math.abs(exp - 1).toString(2).length;
-
 export class AssetOptions {
   private readonly available: bigint;
   private readonly liquidity: bigint;
@@ -102,7 +87,6 @@ export class AssetOptions {
     private readonly anchor: bigint,
     private readonly minDelta: bigint,
     private readonly sellingMaxDeltaOrWeight: bigint, // selling-maxDelta if selling, selling-weight if buying
-    private readonly expLimit = 11,
   ) {
     this.available = balance - locked;
     this.liquidity = virtual + balance;
@@ -154,7 +138,7 @@ export class AssetOptions {
       excessEdgeExp = minExp - 2n;
       otherEdgeExp = maxExp + 1n;
     } else {
-      options = this.calcSellingOptions();
+      options = this.calcOptionsFromExps();
       edgeExp = maxExp + 1n;
       excessEdgeExp = maxExp + 2n;
       otherEdgeExp = minExp - 1n;
@@ -206,7 +190,7 @@ export class AssetOptions {
       ? (this.anchor * (this.jumpSize ** -exp)) / ((this.jumpSize + 1n) ** -exp)
       : (this.anchor * ((this.jumpSize + 1n) ** exp)) / (this.jumpSize ** exp);
 
-  private calcSellingOptions = (): AssetOption[] => {
+  private calcOptionsFromExps = (): AssetOption[] => {
     const options: AssetOption[] = [];
     if (this.minExp > this.maxExp) return options;
     const jumpSizePlusOne = this.jumpSize + 1n;
@@ -221,19 +205,14 @@ export class AssetOptions {
     }
     let spot = numerator / denominator;
     let previousOption = this.calcOptionFromSpot(this.minExp, spot);
-    if (countMultiplications(Number(this.minExp)) <= this.expLimit) {
-      options.push(previousOption);
-    }
+    options.push(previousOption);
+    // console.log(this.minExp, spot);
     for (let exp = this.minExp + 1n; exp <= this.maxExp; exp++) {
       numerator *= jumpSizePlusOne;
       denominator *= this.jumpSize;
-      if (countMultiplications(Number(exp)) > this.expLimit) {
-        if (bestMultiplicationsAhead(Number(exp)) > this.expLimit) break;
-        continue;
-      }
-
       spot = numerator / denominator;
       // const spot_ = this.calcSpotFromExp(exp);
+      // // console.log(exp, spot);
       // assert(spot === spot_, `${spot} !== ${spot_}`);
       const newOption = this.calcOptionFromSpot(exp, spot);
 
@@ -253,9 +232,6 @@ export class AssetOptions {
         assert(previousOption.delta < newOption.delta);
         continue; // since we prefer a smaller selling-delta
       }
-
-      // const a0Ratio = newOption.a0 / previousOption.a0;
-      // console.log(a0Ratio);
 
       previousOption = newOption;
       options.push(newOption);

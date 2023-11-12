@@ -15,6 +15,7 @@ Deno.test("swapfinding tight", () => {
   let genDurations = 0;
   let durations = 0;
   let durations_ = 0;
+  // while(true) {
   for (let i = 0; i < 10000; i++) {
     const buyingParams = genTightAssetParams();
     const sellingParams = genTightAssetParams();
