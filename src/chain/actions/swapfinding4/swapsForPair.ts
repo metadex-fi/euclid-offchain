@@ -19,10 +19,23 @@ interface AssetOption {
   a0: number;
 }
 
-interface PairOption {
-  buyingOption: AssetOption;
-  sellingOption: AssetOption;
+export const assetOptionsEqual = (a: AssetOption, b: AssetOption): boolean =>
+  a.exp === b.exp && a.spot === b.spot && a.delta === b.delta && a.a0 === b.a0;
+
+class PairOption {
+  public readonly effectivePrice: number;
+  constructor(
+    public readonly buyingOption: AssetOption,
+    public readonly sellingOption: AssetOption,
+  ) {
+    this.effectivePrice = Number(buyingOption.delta) /
+      Number(sellingOption.delta);
+  }
 }
+
+export const pairOptionsEqual = (a: PairOption, b: PairOption): boolean =>
+  assetOptionsEqual(a.buyingOption, b.buyingOption) &&
+  assetOptionsEqual(a.sellingOption, b.sellingOption);
 
 export const genWildAssetParams = () => {
   const jumpSize = genPositive(maxSmallInteger);
@@ -57,6 +70,7 @@ export class AssetOptions {
   private readonly minSpot: bigint;
   private readonly maxSpot: bigint;
   private readonly options: AssetOption[];
+  private headIndex = 0;
 
   constructor(
     private readonly assetType: "buying" | "selling",
@@ -255,24 +269,26 @@ export class AssetOptions {
   }
 
   public get length(): number {
-    return this.options.length;
+    return this.options.length - this.headIndex;
   }
 
   public get head(): AssetOption | undefined {
-    if (this.options.length) {
-      return this.options[0];
+    if (this.options.length > this.headIndex) {
+      return this.options[this.headIndex];
     } else return undefined;
   }
 
   public shift = (): AssetOption | undefined => {
-    return this.options.shift();
+    const head = this.head;
+    this.headIndex++;
+    return head;
   };
 
-  public getCorrespondingSellingOption = (
+  public getCorrSellingOption = (
     buyingOption: AssetOption,
   ): AssetOption | undefined => {
     assert(this.assetType === "selling");
-    let start = 0;
+    let start = this.headIndex;
     let end = this.options.length - 1;
     let index: number | undefined = undefined;
     let result: AssetOption | undefined = undefined;
@@ -291,21 +307,21 @@ export class AssetOptions {
         start = mid + 1;
       }
     }
-    if (index) this.options.splice(0, index + 1);
+    if (index) this.headIndex = index + 1;
     return result;
   };
 
-  public getCorrespondingBuyingOption = (
+  public getCorrBuyingOption = (
     sellingOption: AssetOption,
   ): AssetOption | undefined => {
     assert(this.assetType === "buying");
-    let start = 0;
+    let start = this.headIndex;
     let end = this.options.length - 1;
     let index: number | undefined = undefined;
     let result: AssetOption | undefined = undefined;
 
     while (start <= end) {
-      const mid = Math.floor((start + end) / 2);
+      const mid = Math.ceil((start + end) / 2);
       const buyingOption = this.options[mid];
 
       if (buyingOption.a0 <= sellingOption.a0) {
@@ -318,10 +334,44 @@ export class AssetOptions {
         end = mid - 1;
       }
     }
-    if (index) this.options.splice(0, index + 1);
+    if (index) this.headIndex = index + 1;
     return result;
   };
 }
+
+// export const swapsForPair = (
+//   buyingOptions: AssetOptions,
+//   sellingOptions: AssetOptions,
+// ): PairOption[] => {
+//   const bs = buyingOptions.length;
+//   const ss = sellingOptions.length;
+
+//   let buyingOption: AssetOption | undefined = undefined;
+//   let sellingOption: AssetOption | undefined = undefined;
+
+//   const options: PairOption[] = [];
+//   while (true) {
+//     if (buyingOptions.length < sellingOptions.length) {
+//       buyingOption = buyingOptions.shift();
+//       if (!buyingOption) break;
+//       sellingOption = sellingOptions.getCorrSellingOption(buyingOption);
+//       if (!sellingOption) break;
+//     } else {
+//       sellingOption = sellingOptions.shift();
+//       if (!sellingOption) break;
+//       buyingOption = buyingOptions.getCorrBuyingOption(sellingOption);
+//       if (!buyingOption) break;
+//     }
+//     options.push(new PairOption(buyingOption, sellingOption));
+//   }
+//   // if (options.length)
+//   if (bs && ss) {
+//     console.log(
+//       `${bs}, ${ss} -> ${options.length} pair-options (A)`,
+//     );
+//   }
+//   return options;
+// };
 
 export const swapsForPair = (
   buyingOptions: AssetOptions,
@@ -335,7 +385,7 @@ export const swapsForPair = (
   const options: PairOption[] = [];
   while (buyingOption && sellingOption) {
     if (sellingOption.a0 < buyingOption.a0) {
-      sellingOption = sellingOptions.getCorrespondingSellingOption(
+      sellingOption = sellingOptions.getCorrSellingOption(
         buyingOption,
       );
       if (!sellingOption) break;
@@ -344,12 +394,13 @@ export const swapsForPair = (
       buyingOptions.head === undefined ||
       buyingOptions.head.a0 > sellingOption.a0
     ) {
-      //
+      // match
     } else {
-      buyingOption = buyingOptions.getCorrespondingBuyingOption(sellingOption);
+      assert(sellingOption.a0 > buyingOption.a0);
+      buyingOption = buyingOptions.getCorrBuyingOption(sellingOption);
       if (!buyingOption) break;
     }
-    options.push({ buyingOption, sellingOption });
+    options.push(new PairOption(buyingOption, sellingOption));
     buyingOption = buyingOptions.shift();
     sellingOption = sellingOptions.shift();
   }
@@ -380,7 +431,7 @@ export const swapsForPair_ = (
       buyingOptions.head === undefined ||
       buyingOptions.head.a0 > sellingOption.a0
     ) {
-      options.push({ buyingOption, sellingOption });
+      options.push(new PairOption(buyingOption, sellingOption));
       buyingOption = buyingOptions.shift();
       sellingOption = sellingOptions.shift();
     } else {

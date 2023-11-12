@@ -3,6 +3,7 @@ import {
   AssetOptions,
   genTightAssetParams,
   genWildAssetParams,
+  pairOptionsEqual,
   swapsForPair,
   swapsForPair_,
 } from "../src/chain/actions/swapfinding4/swapsForPair.ts";
@@ -66,58 +67,125 @@ Deno.test("swapfinding tight", () => {
       maxSellingDelta,
     );
     const pairOptions_ = swapsForPair_(buyingOptions_, sellingOptions_);
+    if (pairOptions.length !== pairOptions_.length) {
+      console.log(
+        `missed ${pairOptions.length - pairOptions_.length}`,
+      );
+      pairOptions.forEach((pairOption) =>
+        console.log(pairOption.effectivePrice)
+      );
+      console.log("vs");
+      pairOptions_.forEach((pairOption) =>
+        console.log(pairOption.effectivePrice)
+      );
+      // break;
+    } else {
+      for (let i = 0; i < pairOptions.length; i++) {
+        if (pairOptions[i].effectivePrice < pairOptions_[i].effectivePrice) {
+          console.log("better price");
+          console.log("=============");
+          console.log(pairOptions[i]);
+          console.log("-------------");
+          console.log(pairOptions_[i]);
+        } else {
+          assert(pairOptionsEqual(pairOptions[i], pairOptions_[i]));
+        }
+        // assert(pairOptions[i].effectivePrice <= pairOptions_[i].effectivePrice);
+      }
+    }
     assert(
       pairOptions.length >= pairOptions_.length,
       `${pairOptions.length} < ${pairOptions_.length}`,
     );
-    if (pairOptions.length > pairOptions_.length) {
-      console.log(
-        `missed ${pairOptions.length - pairOptions_.length}`,
-      );
-      console.log(pairOptions);
-      console.log(pairOptions_);
-      break;
-    } else {
-      for (let i = 0; i < pairOptions.length; i++) {
-        assert(
-          pairOptions[i].equals(pairOptions_[i]),
-          `${pairOptions[i]} != ${pairOptions_[i]}`,
-        );
-      }
-    }
   }
 });
 
-// Deno.test("swapfinding wild", () => {
-//   for (let i = 0; i < 10000; i++) {
-//     const buyingParams = genWildAssetParams();
-//     const sellingParams = genWildAssetParams();
+Deno.test("swapfinding wild", () => {
+  for (let i = 0; i < 10000; i++) {
+    const buyingParams = genWildAssetParams();
+    const sellingParams = genWildAssetParams();
 
-//     const buyingOptions = calcAssetOptions(
-//       "buying",
-//       buyingParams.virtual,
-//       buyingParams.locked,
-//       buyingParams.balance,
-//       buyingParams.weight,
-//       buyingParams.jumpSize,
-//       buyingParams.anchor,
-//       buyingParams.minDelta,
-//       sellingParams.weight,
-//     );
+    const buyingOptions = new AssetOptions(
+      "buying",
+      buyingParams.virtual,
+      buyingParams.locked,
+      buyingParams.balance,
+      buyingParams.weight,
+      buyingParams.jumpSize,
+      buyingParams.anchor,
+      buyingParams.minDelta,
+      sellingParams.weight,
+    );
 
-//     const sellingOptions = calcAssetOptions(
-//       "selling",
-//       sellingParams.virtual,
-//       sellingParams.locked,
-//       sellingParams.balance,
-//       sellingParams.weight,
-//       sellingParams.jumpSize,
-//       sellingParams.anchor,
-//       sellingParams.minDelta,
-//       sellingParams.minDelta +
-//         genNonNegative(maxInteger - sellingParams.minDelta),
-//     );
+    const maxSellingDelta = sellingParams.minDelta +
+      genNonNegative(maxInteger - sellingParams.minDelta);
+    const sellingOptions = new AssetOptions(
+      "selling",
+      sellingParams.virtual,
+      sellingParams.locked,
+      sellingParams.balance,
+      sellingParams.weight,
+      sellingParams.jumpSize,
+      sellingParams.anchor,
+      sellingParams.minDelta,
+      maxSellingDelta,
+    );
 
-//     const pairOptions = swapsForPair(buyingOptions, sellingOptions);
-//   }
-// });
+    const pairOptions = swapsForPair(buyingOptions, sellingOptions);
+
+    const buyingOptions_ = new AssetOptions(
+      "buying",
+      buyingParams.virtual,
+      buyingParams.locked,
+      buyingParams.balance,
+      buyingParams.weight,
+      buyingParams.jumpSize,
+      buyingParams.anchor,
+      buyingParams.minDelta,
+      sellingParams.weight,
+    );
+
+    const sellingOptions_ = new AssetOptions(
+      "selling",
+      sellingParams.virtual,
+      sellingParams.locked,
+      sellingParams.balance,
+      sellingParams.weight,
+      sellingParams.jumpSize,
+      sellingParams.anchor,
+      sellingParams.minDelta,
+      maxSellingDelta,
+    );
+    const pairOptions_ = swapsForPair_(buyingOptions_, sellingOptions_);
+    if (pairOptions.length !== pairOptions_.length) {
+      console.log(
+        `missed ${pairOptions.length - pairOptions_.length}`,
+      );
+      pairOptions.forEach((pairOption) =>
+        console.log(pairOption.effectivePrice)
+      );
+      console.log("vs");
+      pairOptions_.forEach((pairOption) =>
+        console.log(pairOption.effectivePrice)
+      );
+      // break;
+    } else {
+      for (let i = 0; i < pairOptions.length; i++) {
+        if (pairOptions[i].effectivePrice < pairOptions_[i].effectivePrice) {
+          console.log("better price");
+          console.log("=============");
+          console.log(pairOptions[i]);
+          console.log("-------------");
+          console.log(pairOptions_[i]);
+        } else {
+          assert(pairOptionsEqual(pairOptions[i], pairOptions_[i]));
+        }
+        // assert(pairOptions[i].effectivePrice <= pairOptions_[i].effectivePrice);
+      }
+    }
+    assert(
+      pairOptions.length >= pairOptions_.length,
+      `${pairOptions.length} < ${pairOptions_.length}`,
+    );
+  }
+});
