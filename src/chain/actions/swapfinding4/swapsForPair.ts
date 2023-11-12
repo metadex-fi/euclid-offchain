@@ -28,8 +28,9 @@ class PairOption {
     public readonly buyingOption: AssetOption,
     public readonly sellingOption: AssetOption,
   ) {
-    this.effectivePrice = Number(buyingOption.delta) /
-      Number(sellingOption.delta);
+    assert(buyingOption.a0 <= sellingOption.a0);
+    this.effectivePrice = Number(sellingOption.delta) /
+      Number(buyingOption.delta);
   }
 }
 
@@ -69,7 +70,7 @@ export class AssetOptions {
   private readonly maxDelta: bigint;
   private readonly minSpot: bigint;
   private readonly maxSpot: bigint;
-  private readonly options: AssetOption[];
+  private readonly options: AssetOption[]; // TODO make private again
   private headIndex = 0;
 
   constructor(
@@ -385,10 +386,8 @@ export const swapsForPair = (
   const options: PairOption[] = [];
   while (buyingOption && sellingOption) {
     if (sellingOption.a0 < buyingOption.a0) {
-      sellingOption = sellingOptions.getCorrSellingOption(
-        buyingOption,
-      );
-      if (!sellingOption) break;
+      sellingOption = sellingOptions.getCorrSellingOption(buyingOption);
+      continue;
     } else if (
       sellingOption.a0 === buyingOption.a0 ||
       buyingOptions.head === undefined ||
@@ -404,15 +403,38 @@ export const swapsForPair = (
     buyingOption = buyingOptions.shift();
     sellingOption = sellingOptions.shift();
   }
+  // // if (options.length)
+  // if (bs && ss) {
+  //   console.log(
+  //     `${bs}, ${ss} -> ${options.length} pair-options (A)`,
+  //   );
+  // }
+  // return options;
+
+  const options_: PairOption[] = [];
+  options.forEach((option) => {
+    if (
+      !options.some((otherOption) => {
+        return (otherOption.effectivePrice < option.effectivePrice &&
+          otherOption.buyingOption.delta >= option.buyingOption.delta) ||
+          (otherOption.effectivePrice <= option.effectivePrice &&
+            otherOption.buyingOption.delta > option.buyingOption.delta);
+      })
+    ) {
+      options_.push(option);
+    }
+  });
+
   // if (options.length)
   if (bs && ss) {
     console.log(
-      `${bs}, ${ss} -> ${options.length} pair-options (A)`,
+      `${bs}, ${ss} -> ${options_.length} pair-options (A)`,
     );
   }
-  return options;
+  return options_;
 };
 
+// seems to equal exhaustive version
 export const swapsForPair_ = (
   buyingOptions: AssetOptions,
   sellingOptions: AssetOptions,
@@ -438,11 +460,81 @@ export const swapsForPair_ = (
       buyingOption = buyingOptions.shift();
     }
   }
+  // // if (options.length)
+  // if (bs && ss) {
+  //   console.log(
+  //     `${bs}, ${ss} -> ${options.length} pair-options (B)`,
+  //   );
+  // }
+  // return options;
+
+  const options_: PairOption[] = [];
+  options.forEach((option) => {
+    if (
+      !options.some((otherOption) => {
+        return (otherOption.effectivePrice < option.effectivePrice &&
+          otherOption.buyingOption.delta >= option.buyingOption.delta) ||
+          (otherOption.effectivePrice <= option.effectivePrice &&
+            otherOption.buyingOption.delta > option.buyingOption.delta);
+      })
+    ) {
+      options_.push(option);
+    }
+  });
+
   // if (options.length)
   if (bs && ss) {
     console.log(
-      `${bs}, ${ss} -> ${options.length} pair-options (B)`,
+      `${bs}, ${ss} -> ${options_.length} pair-options (B)`,
     );
   }
-  return options;
+  return options_;
 };
+
+// export const swapsForPairExhaustive = (
+//   buyingOptions: AssetOptions,
+//   sellingOptions: AssetOptions,
+// ): PairOption[] => {
+//   const bs = buyingOptions.length;
+//   const ss = sellingOptions.length;
+//   const options: PairOption[] = [];
+//   buyingOptions.options.forEach((buyingOption) => {
+//     sellingOptions.options.forEach((sellingOption) => {
+//       if (buyingOption.a0 <= sellingOption.a0) {
+//         const newOption = new PairOption(buyingOption, sellingOption);
+//         let add = true;
+//         for (const oldOption of options) {
+//           if (
+//             oldOption.effectivePrice <= newOption.effectivePrice &&
+//             oldOption.buyingOption.delta >= newOption.buyingOption.delta
+//           ) {
+//             add = false;
+//             break;
+//           }
+//         }
+//         if (add) options.push(newOption);
+//       }
+//     });
+//   });
+//   const options_: PairOption[] = [];
+//   options.forEach((option) => {
+//     if (
+//       !options.some((otherOption) => {
+//         return (otherOption.effectivePrice < option.effectivePrice &&
+//           otherOption.buyingOption.delta >= option.buyingOption.delta) ||
+//           (otherOption.effectivePrice <= option.effectivePrice &&
+//             otherOption.buyingOption.delta > option.buyingOption.delta);
+//       })
+//     ) {
+//       options_.push(option);
+//     }
+//   });
+
+//   // if (options.length)
+//   if (bs && ss) {
+//     console.log(
+//       `${bs}, ${ss} -> ${options_.length} pair-options (B)`,
+//     );
+//   }
+//   return options_;
+// };
