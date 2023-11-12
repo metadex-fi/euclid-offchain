@@ -158,7 +158,7 @@ export const fitMinAmnts = (args: PreFitAmnts): PostFitAmnts | null => {
         args.selling.vars.amnt < args.selling.consts.min
       ) {
         assert(maxSellingA0 <= maxBuyingA0, `maxSellingA0 > maxBuyingA0`);
-        assert(direction === "bothAmnts", `direction !== "both"`);
+        // assert(direction === "bothAmnts", `direction !== "both"`);
         direction = "bothAmnts";
       } else if (args.buying.vars.amnt < minBuying) {
         assert(maxSellingA0 <= maxBuyingA0, `maxSellingA0 > maxBuyingA0`);

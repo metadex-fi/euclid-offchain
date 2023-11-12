@@ -143,6 +143,8 @@ export const swappingForPair = (args: SwappingForPairArgs): Swapping | null => {
   const swapping = Swapping.boundary(
     args.adhereMaxInteger,
     maxIntImpacted,
+    args.expLimit ?? null,
+    false, // TODO
     args.user,
     args.paramUtxo,
     args.diracUtxo,
@@ -154,7 +156,6 @@ export const swappingForPair = (args: SwappingForPairArgs): Swapping | null => {
     fitted.sellingVars.spot,
     fitted.buyingVars.exp,
     fitted.sellingVars.exp,
-    args.expLimit ?? null,
     args.buyingArgs.consts.available,
     args.sellingArgs.consts.available,
     args.buyingArgs.consts.min,

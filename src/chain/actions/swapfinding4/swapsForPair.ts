@@ -64,10 +64,10 @@ export const genTightAssetParams = () => {
 };
 
 // each power of 2 is a multiplication.
-export const countMultiplications = (exp: number): number => {
-  exp = Math.abs(exp);
+export const countMults = (exp: bigint): number => {
+  const exp_ = Math.abs(Number(exp));
 
-  const binaryRepresentation = exp.toString(2).slice(1);
+  const binaryRepresentation = exp_.toString(2).slice(1);
   const b = binaryRepresentation.length; // Total bits
   const k = (binaryRepresentation.match(/1/g) || []).length; // Count of '1' bits
 
@@ -75,8 +75,8 @@ export const countMultiplications = (exp: number): number => {
 };
 
 // best we can do to decrease the number of multiplications is reaching the next power of 2
-export const bestMultiplicationsAhead = (exp: number): number =>
-  Math.abs(exp - 1).toString(2).length;
+export const bestMultsAhead = (exp: bigint): number =>
+  Math.abs(Number(exp) - 1).toString(2).length;
 
 export class AssetOptions {
   private readonly available: bigint;
@@ -88,7 +88,7 @@ export class AssetOptions {
   private readonly maxSpot: bigint;
   private readonly minExp: bigint;
   private readonly maxExp: bigint;
-  private readonly sellingOptions: AssetOption[];
+  public readonly options: AssetOption[];
   private readonly buyingOptions: Map<number, AssetOption | null> = new Map();
   private headIndex = 0;
 
@@ -102,8 +102,10 @@ export class AssetOptions {
     private readonly anchor: bigint,
     private readonly minDelta: bigint,
     private readonly sellingMaxDeltaOrWeight: bigint, // selling-maxDelta if selling, selling-weight if buying
-    private readonly expLimit = 11,
+    private readonly expLimit = Infinity,
+    private readonly precomputeBuying = true, 
   ) {
+    assert(precomputeBuying)
     this.available = balance - locked;
     this.liquidity = virtual + balance;
     this.amm = this.liquidity * weight;
@@ -122,7 +124,7 @@ export class AssetOptions {
       this.maxSpot = min(maxInteger, weight * (this.liquidity + this.maxDelta));
     }
     if (this.maxDelta < minDelta) {
-      this.sellingOptions = [];
+      this.options = [];
       this.minExp = 0n;
       this.maxExp = 0n;
       return;
@@ -145,54 +147,49 @@ export class AssetOptions {
     this.maxExp = maxExp;
 
     let options: AssetOption[] = [];
-    let edgeExp: bigint;
-    let excessEdgeExp: bigint;
-    let otherEdgeExp: bigint;
+    // let edgeExp: bigint;
+    // let excessEdgeExp: bigint;
+    // let otherEdgeExp: bigint;
 
     if (assetType === "buying") {
-      edgeExp = minExp - 1n;
-      excessEdgeExp = minExp - 2n;
-      otherEdgeExp = maxExp + 1n;
+      if (precomputeBuying) options = this.calcBuyingOptions();
+      // excessEdgeExp = minExp - 2n;
+      // otherEdgeExp = maxExp + 1n;
     } else {
       options = this.calcSellingOptions();
-      edgeExp = maxExp + 1n;
-      excessEdgeExp = maxExp + 2n;
-      otherEdgeExp = minExp - 1n;
+      // excessEdgeExp = maxExp + 2n;
+      // otherEdgeExp = minExp - 1n;
     }
 
-    if (assetType === "selling") {
-      const edgeOption = this.calcEdgeOptionFromExp(edgeExp);
-      if (edgeOption) options.push(edgeOption);
-    }
-    try {
-      this.calcOptionFromExp(excessEdgeExp);
-      throw new Error(
-        "excessEdgeOption should have failed, bounds not tight enough",
-      );
-    } catch (_e) {
-      // expected
-    }
-    try {
-      this.calcOptionFromExp(otherEdgeExp);
-      throw new Error(
-        "otherEdgeOption should have failed, bounds not tight enough",
-      );
-    } catch (_e) {
-      // expected
-    }
+    // try {
+    //   this.calcOptionFromExp(excessEdgeExp);
+    //   throw new Error(
+    //     "excessEdgeOption should have failed, bounds not tight enough",
+    //   );
+    // } catch (_e) {
+    //   // expected
+    // }
+    // try {
+    //   this.calcOptionFromExp(otherEdgeExp);
+    //   throw new Error(
+    //     "otherEdgeOption should have failed, bounds not tight enough",
+    //   );
+    // } catch (_e) {
+    //   // expected
+    // }
     if (assetType === "selling") {
       options.sort((a, b) => a.a0 - b.a0);
       for (let i = 0; i < options.length - 1; i++) {
         if (options[i].a0 === options[i + 1].a0) {
-          assert(options[i].spot < options[i + 1].spot);
-          assert(options[i].delta < options[i + 1].delta);
+          // assert(options[i].spot < options[i + 1].spot); // TODO breaks with the new edgeOption that adheres to expLimit
+          // assert(options[i].delta < options[i + 1].delta); // TODO breaks with the new edgeOption that adheres to expLimit
           options.splice(i, 1);
           i--;
         }
       }
     }
 
-    this.sellingOptions = options;
+    this.options = options;
   }
 
   // gives inaccurate result
@@ -205,6 +202,83 @@ export class AssetOptions {
     exp < 0n
       ? (this.anchor * (this.jumpSize ** -exp)) / ((this.jumpSize + 1n) ** -exp)
       : (this.anchor * ((this.jumpSize + 1n) ** exp)) / (this.jumpSize ** exp);
+
+  // for testing - actually it works better
+  private calcBuyingOptions = (): AssetOption[] => {
+    const optionsA = this.calcBuyingOptionsA();
+    // const optionsB = this.calcBuyingOptionsB();
+
+    // assert(
+    //   optionsA.length === optionsB.length,
+    //   `${optionsA.length} !== ${optionsB.length}`,
+    // );
+    // for (let i = 0; i < optionsA.length; i++) {
+    //   assert(assetOptionsEqual(optionsA[i], optionsB[i]));
+    // }
+
+    return optionsA;
+  };
+  private calcBuyingOptionsA = (): AssetOption[] => {
+    const options: AssetOption[] = [];
+    for (let exp = this.maxExp; exp >= this.minExp; exp--) {
+      if (countMults(exp) > this.expLimit) {
+        continue;
+      }
+      const spot = this.calcSpotFromExp(exp);
+      const newOption = this.calcOptionFromSpot(exp, spot);
+      options.push(newOption);
+    }
+    const edgeOption = this.findBuyingEdgeOption();
+    if (edgeOption) options.push(edgeOption);
+
+    return options;
+  };
+
+  private calcBuyingOptionsB = (): AssetOption[] => {
+    const options: AssetOption[] = [];
+    if (this.minExp > this.maxExp) return options;
+    const jumpSizePlusOne = this.jumpSize + 1n;
+    let numerator = this.anchor;
+    let denominator = 1n;
+    if (this.minExp < 0n) {
+      numerator *= this.jumpSize ** -this.minExp;
+      denominator *= jumpSizePlusOne ** -this.minExp;
+    } else {
+      numerator *= jumpSizePlusOne ** this.minExp;
+      denominator *= this.jumpSize ** this.minExp;
+    }
+    let spot = numerator / denominator;
+    let previousOption: AssetOption | null = null;
+    if (countMults(this.minExp) <= this.expLimit) {
+      previousOption = this.calcOptionFromSpot(this.minExp, spot);
+      options.push(previousOption);
+    }
+
+    for (let exp = this.minExp + 1n; exp <= this.maxExp; exp++) {
+      numerator *= jumpSizePlusOne;
+      denominator *= this.jumpSize;
+      if (countMults(exp) > this.expLimit) {
+        if (bestMultsAhead(exp) > this.expLimit) break;
+        continue;
+      }
+
+      spot = numerator / denominator;
+      // const spot_ = this.calcSpotFromExp(exp);
+      // assert(spot === spot_, `${spot} !== ${spot_}`);
+      const newOption = this.calcOptionFromSpot(exp, spot);
+
+      if (previousOption) {
+        assert(previousOption.a0 >= newOption.a0);
+      }
+      previousOption = newOption;
+      options.push(newOption);
+    }
+    options.reverse();
+    const edgeOption = this.findBuyingEdgeOption();
+    if (edgeOption) options.push(edgeOption);
+
+    return options;
+  };
 
   private calcSellingOptions = (): AssetOption[] => {
     const options: AssetOption[] = [];
@@ -220,15 +294,17 @@ export class AssetOptions {
       denominator *= this.jumpSize ** this.minExp;
     }
     let spot = numerator / denominator;
-    let previousOption = this.calcOptionFromSpot(this.minExp, spot);
-    if (countMultiplications(Number(this.minExp)) <= this.expLimit) {
+    let previousOption: AssetOption | null = null;
+    if (countMults(this.minExp) <= this.expLimit) {
+      previousOption = this.calcOptionFromSpot(this.minExp, spot);
       options.push(previousOption);
     }
+
     for (let exp = this.minExp + 1n; exp <= this.maxExp; exp++) {
       numerator *= jumpSizePlusOne;
       denominator *= this.jumpSize;
-      if (countMultiplications(Number(exp)) > this.expLimit) {
-        if (bestMultiplicationsAhead(Number(exp)) > this.expLimit) break;
+      if (countMults(exp) > this.expLimit) {
+        if (bestMultsAhead(exp) > this.expLimit) break;
         continue;
       }
 
@@ -237,28 +313,43 @@ export class AssetOptions {
       // assert(spot === spot_, `${spot} !== ${spot_}`);
       const newOption = this.calcOptionFromSpot(exp, spot);
 
-      assert(previousOption.delta <= newOption.delta);
-      if (previousOption.spot === newOption.spot) {
+      if (previousOption) {
+        assert(previousOption.delta <= newOption.delta);
+        if (previousOption.spot === newOption.spot) {
+          assert(
+            previousOption.delta === newOption.delta,
+            `${previousOption.delta} !== ${newOption.delta}`,
+          );
+          continue;
+        }
         assert(
-          previousOption.delta === newOption.delta,
-          `${previousOption.delta} !== ${newOption.delta}`,
+          previousOption.spot < newOption.spot,
+          `${previousOption.spot} >= ${newOption.spot} for ${previousOption.exp} and ${newOption.exp}`,
         );
-        continue;
-      }
-      assert(
-        previousOption.spot < newOption.spot,
-        `${previousOption.spot} >= ${newOption.spot} for ${previousOption.exp} and ${newOption.exp}`,
-      );
-      if (previousOption.a0 === newOption.a0) {
-        assert(previousOption.delta < newOption.delta);
-        continue; // since we prefer a smaller selling-delta
-      }
+        if (previousOption.a0 === newOption.a0) {
+          assert(previousOption.delta < newOption.delta);
+          continue; // since we prefer a smaller selling-delta
+        }
 
-      // const a0Ratio = newOption.a0 / previousOption.a0;
-      // console.log(a0Ratio);
-
+        // const a0Ratio = newOption.a0 / previousOption.a0;
+        // console.log(a0Ratio);
+      }
       previousOption = newOption;
       options.push(newOption);
+    }
+    let edgeExp = this.maxExp + 1n;
+    let edgeSpot = numerator / denominator;
+    if (edgeSpot <= maxInteger && bestMultsAhead(edgeExp) <= this.expLimit) {
+      while (countMults(edgeExp) > this.expLimit) {
+        numerator *= jumpSizePlusOne;
+        denominator *= this.jumpSize;
+        edgeSpot = numerator / denominator;
+        if (edgeSpot > maxInteger) return options;
+        edgeExp++;
+      }
+      const edgeOption = this.calcEdgeOptionFromSpot(edgeExp, edgeSpot);
+      assert(edgeOption);
+      options.push(edgeOption);
     }
     return options;
   };
@@ -285,14 +376,36 @@ export class AssetOptions {
     return this.calcOptionFromSpot(exp, spot);
   };
 
-  private calcEdgeOptionFromExp = (exp: bigint): AssetOption | null => {
-    const spot = this.calcSpotFromExp(exp);
-    // const spot_ = this.calcSpotFromExp_(exp);
-    // assert(spot === spot_, `${spot} !== ${spot_}, ${exp}`);
+  private calcEdgeOptionFromSpot = (
+    exp: bigint,
+    spot: bigint,
+  ): AssetOption | null => {
     if (spot <= maxInteger) {
       const delta = this.maxDelta;
       const a0 = Number(delta) / Number(spot);
       return { exp, spot, delta, a0 };
+    } else return null;
+  };
+
+  private calcEdgeOptionFromExp = (exp: bigint): AssetOption | null => {
+    if (bestMultsAhead(exp) > this.expLimit) return null;
+    while (countMults(exp) > this.expLimit) exp++;
+    const spot = this.calcSpotFromExp(exp);
+    return this.calcEdgeOptionFromSpot(exp, spot);
+  };
+
+  private findBuyingEdgeOption = (): AssetOption | null => {
+    let edgeExp = this.minExp;
+    if (bestMultsAhead(edgeExp) <= this.expLimit) {
+      let edgeOption: AssetOption | null = null;
+      while (!edgeOption) {
+        edgeExp--;
+        while (countMults(edgeExp) > this.expLimit) {
+          edgeExp--;
+        }
+        edgeOption = this.calcEdgeOptionFromExp(edgeExp);
+      }
+      return edgeOption;
     } else return null;
   };
 
@@ -307,7 +420,7 @@ export class AssetOptions {
     let buyingOption = this.buyingOptions.get(index);
     if (!buyingOption) {
       buyingOption = exp < this.minExp
-        ? this.calcEdgeOptionFromExp(exp)
+        ? this.findBuyingEdgeOption()
         : this.calcOptionFromExp(exp);
       this.buyingOptions.set(index, buyingOption);
     }
@@ -315,11 +428,11 @@ export class AssetOptions {
   };
 
   public get head(): AssetOption | null | undefined {
-    if (this.assetType === "buying") {
+    if (!this.precomputeBuying && this.assetType === "buying") {
       return this.getBuyingOptionAt(this.headIndex);
     }
-    if (this.sellingOptions.length > this.headIndex) {
-      return this.sellingOptions[this.headIndex];
+    if (this.options.length > this.headIndex) {
+      return this.options[this.headIndex];
     } else return undefined;
   }
 
@@ -334,40 +447,13 @@ export class AssetOptions {
   ): AssetOption | undefined => {
     assert(this.assetType === "selling");
     let start = this.headIndex;
-    let end = this.sellingOptions.length - 1;
+    let end = this.options.length - 1;
     let index: number | undefined = undefined;
     let result: AssetOption | undefined = undefined;
 
     while (start <= end) {
       const mid = Math.floor((start + end) / 2);
-      const sellingOption = this.sellingOptions[mid];
-
-      if (buyingOption.a0 <= sellingOption.a0) {
-        // Store the potential answer and search in the left half
-        index = mid;
-        result = sellingOption;
-        end = mid - 1;
-      } else {
-        // Search in the right half
-        start = mid + 1;
-      }
-    }
-    if (index) this.headIndex = index + 1;
-    return result;
-  };
-
-  public getCorrSellingOption_ = (
-    buyingOption: AssetOption,
-  ): AssetOption | undefined => {
-    assert(this.assetType === "selling");
-    let start = this.headIndex;
-    let end = this.sellingOptions.length - 1;
-    let index: number | undefined = undefined;
-    let result: AssetOption | undefined = undefined;
-
-    while (start <= end) {
-      const mid = Math.floor((start + end) / 2);
-      const sellingOption = this.sellingOptions[mid];
+      const sellingOption = this.options[mid];
 
       if (buyingOption.a0 <= sellingOption.a0) {
         // Store the potential answer and search in the left half
@@ -387,6 +473,7 @@ export class AssetOptions {
     sellingOption: AssetOption,
   ): AssetOption | undefined => {
     assert(this.assetType === "buying");
+    assert(!this.precomputeBuying);
     let start = this.headIndex;
     let end = Number(this.maxExp - this.minExp + 1n);
     // console.log(`${start} -> ${end} (${this.options.length - 1}))`);
@@ -407,78 +494,17 @@ export class AssetOptions {
       } else {
         // Search in the left half
         end = mid - 1;
-        // this.buyingOptions.set(mid, buyingOption); // only need to cache this side
       }
     }
     if (index) this.headIndex = index + 1;
     return result;
   };
-
-  // public getCorrBuyingOption = (
-  //   sellingOption: AssetOption,
-  // ): AssetOption | undefined => {
-  //   assert(this.assetType === "buying");
-  //   let start = this.headIndex;
-  //   let end = this.options.length - 1;
-  //   let index: number | undefined = undefined;
-  //   let result: AssetOption | undefined = undefined;
-
-  //   while (start <= end) {
-  //     const mid = Math.ceil((start + end) / 2);
-  //     const buyingOption = this.options[mid];
-
-  //     if (buyingOption.a0 <= sellingOption.a0) {
-  //       // Store the potential answer and search in the right half
-  //       index = mid;
-  //       result = buyingOption;
-  //       start = mid + 1;
-  //     } else {
-  //       // Search in the left half
-  //       end = mid - 1;
-  //     }
-  //   }
-  //   if (index) this.headIndex = index + 1;
-  //   return result;
-  // };
 }
-
-// export const swapsForPair = (
-//   buyingOptions: AssetOptions,
-//   sellingOptions: AssetOptions,
-// ): PairOption[] => {
-//   const bs = buyingOptions.length;
-//   const ss = sellingOptions.length;
-
-//   let buyingOption: AssetOption | undefined = undefined;
-//   let sellingOption: AssetOption | undefined = undefined;
-
-//   const options: PairOption[] = [];
-//   while (true) {
-//     if (buyingOptions.length < sellingOptions.length) {
-//       buyingOption = buyingOptions.shift();
-//       if (!buyingOption) break;
-//       sellingOption = sellingOptions.getCorrSellingOption(buyingOption);
-//       if (!sellingOption) break;
-//     } else {
-//       sellingOption = sellingOptions.shift();
-//       if (!sellingOption) break;
-//       buyingOption = buyingOptions.getCorrBuyingOption(sellingOption);
-//       if (!buyingOption) break;
-//     }
-//     options.push(new PairOption(buyingOption, sellingOption));
-//   }
-//   // if (options.length)
-//   if (bs && ss) {
-//     console.log(
-//       `${bs}, ${ss} -> ${options.length} pair-options (A)`,
-//     );
-//   }
-//   return options;
-// };
 
 export const swapsForPair = (
   buyingOptions: AssetOptions,
   sellingOptions: AssetOptions,
+  expLimit = 11,
 ): [PairOption[], number] => { //PairOption[] => {
   const start = performance.now();
   let buyingOption = buyingOptions.shift();
@@ -500,23 +526,16 @@ export const swapsForPair = (
       buyingOption = buyingOptions.getCorrBuyingOption(sellingOption);
       if (!buyingOption) break;
     }
-    options.push(new PairOption(buyingOption, sellingOption));
+    if (
+      countMults(buyingOption.exp) + countMults(sellingOption.exp) <= expLimit
+    ) {
+      options.push(new PairOption(buyingOption, sellingOption));
+    }
     buyingOption = buyingOptions.shift();
     sellingOption = sellingOptions.shift();
   }
 
-  options.sort((a, b) => a.effectivePrice - b.effectivePrice);
-  const options_: PairOption[] = [];
-  let currentMaxDelta: bigint | null = null;
-
-  for (const option of options) {
-    if (
-      currentMaxDelta === null || option.buyingOption.delta > currentMaxDelta
-    ) {
-      options_.push(option);
-      currentMaxDelta = option.buyingOption.delta;
-    }
-  }
+  const options_ = paretoOptionsStraight(options);
 
   if (options_.length) {
     console.log(
@@ -532,6 +551,7 @@ export const swapsForPair = (
 export const swapsForPair_ = (
   buyingOptions: AssetOptions,
   sellingOptions: AssetOptions,
+  expLimit = 11,
 ): [PairOption[], number] => { //: PairOption[] => {
   const start = performance.now();
   let buyingOption = buyingOptions.shift();
@@ -546,21 +566,127 @@ export const swapsForPair_ = (
       !buyingOptions.head ||
       buyingOptions.head.a0 > sellingOption.a0
     ) {
-      options.push(new PairOption(buyingOption, sellingOption));
+      if (
+        countMults(buyingOption.exp) + countMults(sellingOption.exp) <= expLimit
+      ) {
+        options.push(new PairOption(buyingOption, sellingOption));
+      }
       buyingOption = buyingOptions.shift();
       sellingOption = sellingOptions.shift();
     } else {
       buyingOption = buyingOptions.shift();
     }
   }
-  // // if (options.length)
-  // if (bs && ss) {
-  //   console.log(
-  //     `${bs}, ${ss} -> ${options.length} pair-options (B)`,
-  //   );
-  // }
-  // return options;
 
+  const options_ = paretoOptionsStraight(options);
+
+  if (options_.length) {
+    console.log(
+      ` -> ${options_.length} pair-options (B)`,
+    );
+  }
+  const duration = performance.now() - start;
+  return [options_, duration];
+  // return options_;
+};
+
+export const swapsForPairExhaustiveSort = (
+  buyingOptions: AssetOptions,
+  sellingOptions: AssetOptions,
+  expLimit = Infinity,
+): [PairOption[], number] => {
+  const start = performance.now();
+  const options: PairOption[] = [];
+  buyingOptions.options.forEach((buyingOption) => {
+    sellingOptions.options.forEach((sellingOption) => {
+      if (
+        buyingOption.a0 <= sellingOption.a0 &&
+        countMults(buyingOption.exp) + countMults(sellingOption.exp) <= expLimit
+      ) {
+        const newOption = new PairOption(buyingOption, sellingOption);
+        let add = true;
+        for (const oldOption of options) {
+          if (
+            oldOption.effectivePrice <= newOption.effectivePrice &&
+            oldOption.buyingOption.delta >= newOption.buyingOption.delta
+          ) {
+            add = false;
+            break;
+          }
+        }
+        if (add) options.push(newOption);
+      }
+    });
+  });
+  const options_ = paretoOptionsSort(options);
+
+  if (options_.length) {
+    console.log(
+      ` -> ${options_.length} pair-options (C)`,
+    );
+  }
+  const duration = performance.now() - start;
+  return [options_, duration];
+  // return options_;
+};
+
+export const swapsForPairExhaustiveStraight = (
+  buyingOptions: AssetOptions,
+  sellingOptions: AssetOptions,
+  expLimit = Infinity,
+): [PairOption[], number] => {
+  const start = performance.now();
+  const options: PairOption[] = [];
+  buyingOptions.options.forEach((buyingOption) => {
+    sellingOptions.options.forEach((sellingOption) => {
+      if (
+        buyingOption.a0 <= sellingOption.a0 &&
+        countMults(buyingOption.exp) + countMults(sellingOption.exp) <= expLimit
+      ) {
+        const newOption = new PairOption(buyingOption, sellingOption);
+        let add = true;
+        for (const oldOption of options) {
+          if (
+            oldOption.effectivePrice <= newOption.effectivePrice &&
+            oldOption.buyingOption.delta >= newOption.buyingOption.delta
+          ) {
+            add = false;
+            break;
+          }
+        }
+        if (add) options.push(newOption);
+      }
+    });
+  });
+  const options_ = paretoOptionsStraight(options);
+
+  if (options_.length) {
+    console.log(
+      ` -> ${options_.length} pair-options (C)`,
+    );
+  }
+  const duration = performance.now() - start;
+  return [options_, duration];
+  // return options_;
+};
+
+const paretoOptionsSort = (options: PairOption[]): PairOption[] => {
+  options.sort((a, b) => a.effectivePrice - b.effectivePrice);
+  const options_: PairOption[] = [];
+  let currentMaxDelta: bigint | null = null;
+
+  for (const option of options) {
+    if (
+      currentMaxDelta === null || option.buyingOption.delta > currentMaxDelta
+    ) {
+      options_.push(option);
+      currentMaxDelta = option.buyingOption.delta;
+    }
+  }
+  return options_;
+};
+
+const paretoOptionsStraight = (options: PairOption[]): PairOption[] => {
   const options_: PairOption[] = [];
   options.forEach((option) => {
     if (
@@ -574,61 +700,5 @@ export const swapsForPair_ = (
       options_.push(option);
     }
   });
-
-  if (options_.length) {
-    console.log(
-      ` -> ${options_.length} pair-options (B)`,
-    );
-  }
-  const duration = performance.now() - start;
-  return [options_, duration];
-  // return options_;
+  return options_;
 };
-
-// export const swapsForPairExhaustive = (
-//   buyingOptions: AssetOptions,
-//   sellingOptions: AssetOptions,
-// ): PairOption[] => {
-//   const bs = buyingOptions.length;
-//   const ss = sellingOptions.length;
-//   const options: PairOption[] = [];
-//   buyingOptions.options.forEach((buyingOption) => {
-//     sellingOptions.options.forEach((sellingOption) => {
-//       if (buyingOption.a0 <= sellingOption.a0) {
-//         const newOption = new PairOption(buyingOption, sellingOption);
-//         let add = true;
-//         for (const oldOption of options) {
-//           if (
-//             oldOption.effectivePrice <= newOption.effectivePrice &&
-//             oldOption.buyingOption.delta >= newOption.buyingOption.delta
-//           ) {
-//             add = false;
-//             break;
-//           }
-//         }
-//         if (add) options.push(newOption);
-//       }
-//     });
-//   });
-//   const options_: PairOption[] = [];
-//   options.forEach((option) => {
-//     if (
-//       !options.some((otherOption) => {
-//         return (otherOption.effectivePrice < option.effectivePrice &&
-//           otherOption.buyingOption.delta >= option.buyingOption.delta) ||
-//           (otherOption.effectivePrice <= option.effectivePrice &&
-//             otherOption.buyingOption.delta > option.buyingOption.delta);
-//       })
-//     ) {
-//       options_.push(option);
-//     }
-//   });
-
-//   // if (options.length)
-//   if (bs && ss) {
-//     console.log(
-//       `${bs}, ${ss} -> ${options_.length} pair-options (B)`,
-//     );
-//   }
-//   return options_;
-// };

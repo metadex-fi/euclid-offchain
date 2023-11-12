@@ -964,7 +964,7 @@ export class Swapping {
           maxSelling: this.availableSelling,
           calcBuyingSpot,
           calcSellingSpot,
-          minSelling: this.minSelling,
+          // minSelling: this.minSelling,
         });
         if (fittedExps === null) return null;
         else if (fittedExps === "unchanged") break;
@@ -1053,7 +1053,7 @@ export class Swapping {
           maxSelling: this.availableSelling,
           calcBuyingSpot,
           calcSellingSpot,
-          minSelling: this.minSelling,
+          // minSelling: this.minSelling,
         });
         if (fittedExps === null) return null;
         else if (fittedExps === "unchanged") break;
