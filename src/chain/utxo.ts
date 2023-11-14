@@ -25,7 +25,10 @@ import {
   maxInteger,
   // webappExpLimit,
 } from "../utils/constants.ts";
-import { AssetOptions, swapsForPairExhaustiveStraight } from "./actions/swapfinding4/swapsForPair.ts";
+import {
+  AssetOptions,
+  swapsForPairExhaustiveStraight,
+} from "./actions/swapfinding4/swapsForPair.ts";
 
 // export const getMinBalance = (asset: Asset): bigint =>
 //   asset.equals(Asset.ADA) ? 10000000n : 0n; // TODO arbitary aka both excessive and edge-casing
@@ -252,23 +255,27 @@ export class DiracUtxo {
     paramUtxo: ParamUtxo,
     optimizeAmnts: boolean,
     minBuying = 1n,
-    minSelling_ = 1n,
-    availableSelling_?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
+    minSelling = 1n,
+    availableSelling?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
     buyableAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
     availableBuying?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
     expLimit?: number,
   ): Swapping[] => {
+    assert(adhereMaxInteger, `!adhereMaxInteger not implemented yet`);
     const param = paramUtxo.param;
-    const dirac = this.dirac
+    const dirac = this.dirac;
     const assets = param.assets;
+    const swappings: Swapping[] = [];
     assets.forEach((sellingAsset, sellingIndex) => {
       const virtualSelling = param.virtual.amountOf(sellingAsset);
-      const weightSelling = param.weights.amountOf(sellingAsset)
-      const jumpSizeSelling = param.jumpSizes.amountOf(sellingAsset)
-      const anchorSelling = dirac.anchorPrices.amountOf(sellingAsset)
+      const weightSelling = param.weights.amountOf(sellingAsset);
+      const jumpSizeSelling = param.jumpSizes.amountOf(sellingAsset);
+      const anchorSelling = dirac.anchorPrices.amountOf(sellingAsset);
       const balanceSelling = this.funds.amountOf(sellingAsset, 0n);
-      const lockedSelling = balanceSelling - this.available.amountOf(sellingAsset, 0n);
-      const maxDeltaSelling = availableSelling_?.amountOf(sellingAsset, 0n) ?? maxInteger; // TODO
+      const lockedSelling = balanceSelling -
+        this.available.amountOf(sellingAsset, 0n);
+      const availableSelling_ = availableSelling?.amountOf(sellingAsset, 0n) ??
+        -1n; // TODO
       const sellingOptions = new AssetOptions(
         "selling",
         virtualSelling,
@@ -277,19 +284,22 @@ export class DiracUtxo {
         weightSelling,
         jumpSizeSelling,
         anchorSelling,
-        minSelling_,
-        maxDeltaSelling,
+        minSelling,
+        availableSelling_,
         expLimit,
-      )
+      );
       if (sellingOptions.options.length === 0) return;
       assets.forEach((buyingAsset, buyingIndex) => {
         if (sellingIndex === buyingIndex) return;
+        if (buyableAssets && !buyableAssets.has(buyingAsset)) return;
         const virtualBuying = param.virtual.amountOf(buyingAsset);
-        const weightBuying = param.weights.amountOf(buyingAsset)
-        const jumpSizeBuying = param.jumpSizes.amountOf(buyingAsset)
-        const anchorBuying = dirac.anchorPrices.amountOf(buyingAsset)
+        const weightBuying = param.weights.amountOf(buyingAsset);
+        const jumpSizeBuying = param.jumpSizes.amountOf(buyingAsset);
+        const anchorBuying = dirac.anchorPrices.amountOf(buyingAsset);
         const balanceBuying = this.funds.amountOf(buyingAsset, 0n);
-        const lockedBuying = balanceBuying - this.available.amountOf(buyingAsset, 0n);
+        const availableBuying_ = availableBuying ??
+          this.available.amountOf(buyingAsset, 0n);
+        const lockedBuying = balanceBuying - availableBuying_;
         const buyingOptions = new AssetOptions(
           "buying",
           virtualBuying,
@@ -301,14 +311,45 @@ export class DiracUtxo {
           minBuying,
           weightSelling,
           expLimit,
-        )
+        );
         if (buyingOptions.options.length === 0) return;
-        const pairOptions = swapsForPairExhaustiveStraight(buyingOptions, sellingOptions, expLimit) // NOTE seeing what happens if we simply return all the paretos
-        
+        const [pairOptions, _duration] = swapsForPairExhaustiveStraight(
+          buyingOptions,
+          sellingOptions,
+          expLimit,
+        ); // NOTE seeing what happens if we simply return all the paretos
+
+        pairOptions.forEach((pairOption) => {
+          console.log(sellingOptions.jumpSize);
+          console.log(sellingOptions.anchor);
+          console.log(pairOption.sellingOption);
+          swappings.push(Swapping.boundary(
+            adhereMaxInteger,
+            false, // TODO FIXME
+            expLimit ?? null,
+            // expLimitImpacted,
+            user,
+            paramUtxo,
+            this,
+            buyingAsset,
+            sellingAsset,
+            pairOption.buyingOption.delta,
+            pairOption.sellingOption.delta,
+            pairOption.buyingOption.spot,
+            pairOption.sellingOption.spot,
+            pairOption.buyingOption.exp,
+            pairOption.sellingOption.exp,
+            availableBuying_,
+            availableSelling_,
+            minBuying,
+            minSelling,
+            null, // TODO can we remove this?
+          ));
+        });
       });
     });
-
-  }
+    return swappings;
+  };
 
   public swappingsFor_ = (
     adhereMaxInteger: boolean,

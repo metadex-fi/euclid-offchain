@@ -65,7 +65,7 @@ export class Swapping {
     public readonly adhereMaxInteger: boolean,
     public readonly maxIntImpacted: boolean,
     public readonly expLimit: number | null,
-    public readonly expLimitImpacted: boolean,
+    // public readonly expLimitImpacted: boolean,
     public readonly user: User | null, // webapp needs undefined iirc
     public readonly paramUtxo: ParamUtxo,
     public readonly diracUtxo: DiracUtxo,
@@ -109,11 +109,11 @@ export class Swapping {
       `sellingSpot must be positive: ${this.show()}`,
     );
     assert(
-      !adhereMaxInteger || buyingSpot <= maxInteger,
+      (!adhereMaxInteger) || buyingSpot <= maxInteger,
       `buyingSpot must be <= maxInteger: ${this.show()}`,
     );
     assert(
-      !adhereMaxInteger || sellingSpot <= maxInteger,
+      (!adhereMaxInteger) || sellingSpot <= maxInteger,
       `sellingSpot must be <= maxInteger: ${this.show()}`,
     );
     assert(
@@ -164,12 +164,89 @@ export class Swapping {
     return "Swapping";
   }
 
+  static boundary(
+    adhereMaxInteger: boolean,
+    maxIntImpacted: boolean,
+    expLimit: number | null,
+    // expLimitImpacted: boolean,
+    user: User | null,
+    paramUtxo: ParamUtxo,
+    diracUtxo: DiracUtxo,
+    buyingAsset: Asset,
+    sellingAsset: Asset,
+    buyingAmnt: bigint,
+    sellingAmnt: bigint,
+    buyingSpot: bigint,
+    sellingSpot: bigint,
+    buyingExp: bigint,
+    sellingExp: bigint,
+    availableBuying: bigint,
+    availableSelling: bigint,
+    minBuying: bigint,
+    minSelling: bigint,
+    tmpMinBuying: bigint | null,
+  ): Swapping {
+    console.log(`Swapping.boundary()`);
+    return new Swapping(
+      adhereMaxInteger,
+      maxIntImpacted,
+      expLimit,
+      // expLimitImpacted,
+      user,
+      paramUtxo,
+      diracUtxo,
+      buyingAsset,
+      sellingAsset,
+      buyingAmnt,
+      sellingAmnt,
+      buyingSpot,
+      sellingSpot,
+      buyingExp,
+      sellingExp,
+      availableBuying, //diracUtxo.available.amountOf(buyingAsset),
+      availableSelling === -1n ? null : availableSelling, //user ? user.availableBalance!.amountOf(sellingAsset) : null,
+      minBuying,
+      minSelling,
+      tmpMinBuying,
+      true,
+    );
+  }
+
+  // TODO don't forget to update (poll) chain state somewhere beforehand
+  static genOfUser(user: User): Swapping | null {
+    // console.log(`attempting to swap`);
+    let swappings: Swapping[] = [];
+    // TODO probably too much
+    for (let i = maxInteger; i > 1n; i /= 10n) {
+      swappings = user.contract!.state!.swappingsFor(
+        true,
+        user,
+        maybeNdef(genPositive(i)),
+        maybeNdef(genPositive(i)),
+        randomChoice([
+          undefined,
+          webappExpLimit,
+          Number(genPositive(50n)),
+          Number(genPositive()),
+        ]),
+      );
+      if (swappings.length > 0) break;
+    }
+    // console.log(`\tswappings: ${swappings}`);
+    if (swappings.length < 1) return null;
+    // console.log(`Swapping`);
+    const choice = randomChoice(swappings);
+    return choice; // TODO revert
+    if (Math.random() < 0.5) return choice;
+    else return choice.randomSubSwap();
+  }
+
   public show = (): string => {
+    // expLimitImpacted: ${this.expLimitImpacted}
     return `Swapping (
   adhereMaxInteger: ${this.adhereMaxInteger}
   maxIntImpacted:   ${this.maxIntImpacted}
   expLimit:         ${this.expLimit}
-  expLimitImpacted: ${this.expLimitImpacted}
   paramUtxo: ${this.paramUtxo.show()}
   diracUtxo: ${this.diracUtxo.show()}
   buyingAsset:      ${this.buyingAsset.show()}
@@ -524,7 +601,7 @@ export class Swapping {
       this.adhereMaxInteger,
       this.maxIntImpacted,
       this.expLimit,
-      this.expLimitImpacted,
+      // this.expLimitImpacted,
       this.user,
       this.paramUtxo,
       this.diracUtxo,
@@ -583,83 +660,6 @@ export class Swapping {
     );
     return subSwap;
   };
-
-  static boundary(
-    adhereMaxInteger: boolean,
-    maxIntImpacted: boolean,
-    expLimit: number | null,
-    expLimitImpacted: boolean,
-    user: User | null,
-    paramUtxo: ParamUtxo,
-    diracUtxo: DiracUtxo,
-    buyingAsset: Asset,
-    sellingAsset: Asset,
-    buyingAmnt: bigint,
-    sellingAmnt: bigint,
-    buyingSpot: bigint,
-    sellingSpot: bigint,
-    buyingExp: bigint,
-    sellingExp: bigint,
-    availableBuying: bigint,
-    availableSelling: bigint,
-    minBuying: bigint,
-    minSelling: bigint,
-    tmpMinBuying: bigint | null,
-  ): Swapping {
-    console.log(`Swapping.boundary()`);
-    return new Swapping(
-      adhereMaxInteger,
-      maxIntImpacted,
-      expLimit,
-      expLimitImpacted,
-      user,
-      paramUtxo,
-      diracUtxo,
-      buyingAsset,
-      sellingAsset,
-      buyingAmnt,
-      sellingAmnt,
-      buyingSpot,
-      sellingSpot,
-      buyingExp,
-      sellingExp,
-      availableBuying, //diracUtxo.available.amountOf(buyingAsset),
-      availableSelling === -1n ? null : availableSelling, //user ? user.availableBalance!.amountOf(sellingAsset) : null,
-      minBuying,
-      minSelling,
-      tmpMinBuying,
-      true,
-    );
-  }
-
-  // TODO don't forget to update (poll) chain state somewhere beforehand
-  static genOfUser(user: User): Swapping | null {
-    // console.log(`attempting to swap`);
-    let swappings: Swapping[] = [];
-    // TODO probably too much
-    for (let i = maxInteger; i > 1n; i /= 10n) {
-      swappings = user.contract!.state!.swappingsFor(
-        true,
-        user,
-        maybeNdef(genPositive(i)),
-        maybeNdef(genPositive(i)),
-        randomChoice([
-          undefined,
-          webappExpLimit,
-          Number(genPositive(50n)),
-          Number(genPositive()),
-        ]),
-      );
-      if (swappings.length > 0) break;
-    }
-    // console.log(`\tswappings: ${swappings}`);
-    if (swappings.length < 1) return null;
-    // console.log(`Swapping`);
-    const choice = randomChoice(swappings);
-    // return choice; // TODO revert
-    if (Math.random() < 0.5) return choice;
-    else return choice.randomSubSwap();
-  }
 
   // private static pricesFitDirac(
   //   spotBuying: bigint,
@@ -833,6 +833,7 @@ export class Swapping {
 
   // try to make it wrong with minimal changes
   public corruptAll = (): Swapping[] => {
+    return []; // TODO revert
     return [
       this.corruptBoughtSpot(),
       this.corruptSoldSpot(),
@@ -866,7 +867,7 @@ export class Swapping {
       this.adhereMaxInteger,
       this.maxIntImpacted,
       this.expLimit,
-      this.expLimitImpacted,
+      // this.expLimitImpacted,
       this.user,
       this.paramUtxo,
       this.diracUtxo,

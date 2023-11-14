@@ -14,7 +14,6 @@
 // import { maxInteger } from "../src/utils/constants.ts";
 // import { genNonNegative } from "../src/utils/generators.ts";
 
-
 // Deno.test("swapfinding previous", () => {
 //   let genBuying = 0;
 //   let genSelling = 0;
@@ -23,8 +22,6 @@
 //   // while(true) {
 //   const iterations = 10000;
 //   for (let i = 0; i < iterations; i++) {
-
-
 
 //   }
 //   console.log("genBuying:", genBuying / iterations);
