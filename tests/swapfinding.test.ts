@@ -10,7 +10,7 @@ import {
   paretoOptionsStraight,
   swapsForPairBinary,
   swapsForPairExhaustive,
-  swapsForPairLinear,
+  // swapsForPairLinear,
   // swapsForPairExhaustive,
 } from "../src/chain/actions/swapfinding4/swapsForPair.ts";
 import { maxInteger } from "../src/utils/constants.ts";
@@ -38,7 +38,7 @@ Deno.test("swapfinding tight", () => {
   let binary = 0;
   let exhaustiveSort = 0;
   let exhaustiveStraight = 0;
-  // while(true) {
+  const expLimit = 11;
   const iterations = 100;
   const maxOptions = 100;
   for (let i = 0; i < iterations; i++) {
@@ -62,7 +62,7 @@ Deno.test("swapfinding tight", () => {
         buyingParams.anchor,
         buyingParams.minDelta,
         sellingParams.weight,
-        Infinity,
+        expLimit,
         true,
       );
 
@@ -81,7 +81,7 @@ Deno.test("swapfinding tight", () => {
         sellingParams.anchor,
         sellingParams.minDelta,
         maxSellingDelta,
-        Infinity,
+        expLimit,
       );
 
       if (sellingOptions.options.length > maxOptions) continue;
@@ -102,7 +102,7 @@ Deno.test("swapfinding tight", () => {
       buyingParams.anchor,
       buyingParams.minDelta,
       sellingParams.weight,
-      Infinity,
+      expLimit,
       true,
     );
     genBuying += performance.now() - start;
@@ -118,23 +118,23 @@ Deno.test("swapfinding tight", () => {
       sellingParams.anchor,
       sellingParams.minDelta,
       maxSellingDelta,
-      Infinity,
+      expLimit,
     );
     genSelling += performance.now() - start;
 
     console.log(buyingOptions.options.length, sellingOptions.options.length);
 
     const [optionsBinary, durationBinary] = swapsForPairBinary(
-      buyingOptions,
-      sellingOptions,
-      Infinity,
+      buyingOptions_,
+      sellingOptions_,
+      expLimit,
     );
     binary += durationBinary;
 
     const [optionsExhaustive, durationExhaustive] = swapsForPairExhaustive(
-      buyingOptions_,
-      sellingOptions_,
-      Infinity,
+      buyingOptions,
+      sellingOptions,
+      expLimit,
     );
     exhaustiveSort += durationExhaustive;
     exhaustiveStraight += durationExhaustive;
@@ -143,10 +143,10 @@ Deno.test("swapfinding tight", () => {
       optionsExhaustive,
     );
     exhaustiveSort += durationSort;
-    // const [optionsExhaustiveStraight, durationStraight] = paretoOptionsStraight(
-    //   optionsExhaustive,
-    // );
-    // exhaustiveStraight += durationStraight;
+    const [optionsExhaustiveStraight, durationStraight] = paretoOptionsStraight(
+      optionsExhaustive,
+    );
+    exhaustiveStraight += durationStraight;
 
     // This fails, which means we have to indeed look at all the spread options
     // optionsExhaustiveSort.forEach((option) =>
@@ -155,7 +155,7 @@ Deno.test("swapfinding tight", () => {
 
     // optionsExhaustiveSort = deduplicate(optionsExhaustiveSort);
 
-    for (const otherOptions of [optionsBinary]) {
+    for (const otherOptions of [optionsExhaustiveStraight, optionsBinary]) {
       console.log("comparing");
       if (optionsExhaustiveSort.length !== otherOptions.length) {
         console.log(
