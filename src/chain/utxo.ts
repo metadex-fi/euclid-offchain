@@ -261,6 +261,7 @@ export class DiracUtxo {
     availableBuying?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
     expLimit?: number,
   ): Swapping[] => {
+    console.log("diracUtxo.swappingsFor()");
     assert(adhereMaxInteger, `!adhereMaxInteger not implemented yet`);
     const param = paramUtxo.param;
     const dirac = this.dirac;
@@ -289,6 +290,7 @@ export class DiracUtxo {
         expLimit,
       );
       if (sellingOptions.options.length === 0) return;
+      console.log("sellingOptions:", sellingOptions);
       assets.forEach((buyingAsset, buyingIndex) => {
         if (sellingIndex === buyingIndex) return;
         if (buyableAssets && !buyableAssets.has(buyingAsset)) return;
@@ -309,10 +311,11 @@ export class DiracUtxo {
           jumpSizeBuying,
           anchorBuying,
           minBuying,
-          weightSelling,
+          weightSelling, // TODO if it weren't for this, we would not have to do this in the inner loop
           expLimit,
         );
         if (buyingOptions.options.length === 0) return;
+        console.log("buyingOptions:", buyingOptions);
         const [pairOptions, _duration] = swapsForPairExhaustiveStraight(
           buyingOptions,
           sellingOptions,
@@ -363,7 +366,7 @@ export class DiracUtxo {
     availableBuying?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
     expLimit?: number,
   ): Swapping[] => {
-    console.log("diracUtxo.swappingsFor()");
+    console.log("diracUtxo.swappingsFor_()");
     assert(minBuying > 0n, `minBuying <= 0n: ${minBuying}`);
     assert(minSelling_ > 0n, `minSelling_ <= 0n: ${minSelling_}`);
     const swappings = findForDirac({

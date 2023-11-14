@@ -236,7 +236,7 @@ export class Swapping {
     if (swappings.length < 1) return null;
     // console.log(`Swapping`);
     const choice = randomChoice(swappings);
-    return choice; // TODO revert
+    // return choice; // TODO revert
     if (Math.random() < 0.5) return choice;
     else return choice.randomSubSwap();
   }

@@ -155,17 +155,17 @@ export class AssetOptions {
 
     let options: AssetOption[] = [];
     // let edgeExp: bigint;
-    let excessEdgeExp: bigint;
-    let otherEdgeExp: bigint;
+    // let excessEdgeExp: bigint;
+    // let otherEdgeExp: bigint;
 
     if (assetType === "buying") {
       if (precomputeBuying) options = this.calcBuyingOptions();
-      excessEdgeExp = minExp - 2n;
-      otherEdgeExp = maxExp + 1n;
+      // excessEdgeExp = minExp - 2n;
+      // otherEdgeExp = maxExp + 1n;
     } else {
       options = this.calcSellingOptions();
-      excessEdgeExp = maxExp + 2n;
-      otherEdgeExp = minExp - 1n;
+      // excessEdgeExp = maxExp + 2n;
+      // otherEdgeExp = minExp - 1n;
     }
 
     // TODO verify this once in a while
@@ -412,17 +412,20 @@ export class AssetOptions {
   private findBuyingEdgeOption = (): AssetOption | null => {
     if (this.maxDelta === "oo") return null;
     let edgeExp = this.minExp;
-    if (bestMultsAhead(edgeExp) <= this.expLimit) {
-      let edgeOption: AssetOption | null = null;
-      while (!edgeOption) {
-        edgeExp--;
-        while (countMults(edgeExp) > this.expLimit) {
-          edgeExp--;
-        }
-        edgeOption = this.calcEdgeOptionFromExp(edgeExp);
+    // if (bestMultsAhead(edgeExp) <= this.expLimit) {
+    let edgeOption: AssetOption | null = null;
+    while (!edgeOption) {
+      edgeExp--;
+      if (edgeExp < 0n && bestMultsAhead(edgeExp) > this.expLimit) {
+        return null;
       }
-      return edgeOption;
-    } else return null;
+      while (countMults(edgeExp) > this.expLimit) {
+        edgeExp--;
+      }
+      edgeOption = this.calcEdgeOptionFromExp(edgeExp);
+    }
+    return edgeOption;
+    // } else return null;
   };
 
   private getBuyingOptionAt = (
