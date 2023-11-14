@@ -1,18 +1,20 @@
-// import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-// import {
-//   AssetOptions,
-//   countMults,
-//   genTightAssetParams,
-//   genWildAssetParams,
-//   pairOptionsEqual,
-//   swapsForPair,
-//   swapsForPair_,
-//   swapsForPairExhaustiveSort,
-//   swapsForPairExhaustiveStraight,
-//   // swapsForPairExhaustive,
-// } from "../src/chain/actions/swapfinding4/swapsForPair.ts";
-// import { maxInteger } from "../src/utils/constants.ts";
-// import { genNonNegative } from "../src/utils/generators.ts";
+import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import {
+  AssetOptions,
+  countMults,
+  // deduplicate,
+  genTightAssetParams,
+  genWildAssetParams,
+  pairOptionsEqual,
+  paretoOptionsSort,
+  paretoOptionsStraight,
+  swapsForPairBinary,
+  swapsForPairExhaustive,
+  swapsForPairLinear,
+  // swapsForPairExhaustive,
+} from "../src/chain/actions/swapfinding4/swapsForPair.ts";
+import { maxInteger } from "../src/utils/constants.ts";
+import { genNonNegative } from "../src/utils/generators.ts";
 
 // Deno.test("swapfinding previous", () => {
 //   let genBuying = 0;
@@ -30,298 +32,198 @@
 //   console.log("durations_:", durations_ / iterations);
 // });
 
-// Deno.test("swapfinding tight", () => {
-//   let genBuying = 0;
-//   let genSelling = 0;
-//   let durations = 0;
-//   let durations_ = 0;
-//   // while(true) {
-//   const iterations = 10000;
-//   for (let i = 0; i < iterations; i++) {
-//     const buyingParams = genTightAssetParams();
-//     const sellingParams = genTightAssetParams();
+Deno.test("swapfinding tight", () => {
+  let genBuying = 0;
+  let genSelling = 0;
+  let binary = 0;
+  let exhaustiveSort = 0;
+  let exhaustiveStraight = 0;
+  // while(true) {
+  const iterations = 100;
+  const maxOptions = 100;
+  for (let i = 0; i < iterations; i++) {
+    let buyingParams;
+    let sellingParams;
+    let maxSellingDelta;
+    let buyingOptions: AssetOptions;
+    let sellingOptions: AssetOptions;
 
-//     const buyingOptions = new AssetOptions(
-//       "buying",
-//       buyingParams.virtual,
-//       buyingParams.locked,
-//       buyingParams.balance,
-//       buyingParams.weight,
-//       buyingParams.jumpSize,
-//       buyingParams.anchor,
-//       buyingParams.minDelta,
-//       sellingParams.weight,
-//       11,
-//       true,
-//     );
+    while (true) {
+      buyingParams = genTightAssetParams();
+      sellingParams = genTightAssetParams();
 
-//     const maxSellingDelta = sellingParams.minDelta +
-//       genNonNegative(maxInteger - sellingParams.minDelta);
-//     // const maxSellingDelta = maxInteger;
-//     const sellingOptions = new AssetOptions(
-//       "selling",
-//       sellingParams.virtual,
-//       sellingParams.locked,
-//       sellingParams.balance,
-//       sellingParams.weight,
-//       sellingParams.jumpSize,
-//       sellingParams.anchor,
-//       sellingParams.minDelta,
-//       maxSellingDelta,
-//       11,
-//     );
+      buyingOptions = new AssetOptions(
+        "buying",
+        buyingParams.virtual,
+        buyingParams.locked,
+        buyingParams.balance,
+        buyingParams.weight,
+        buyingParams.jumpSize,
+        buyingParams.anchor,
+        buyingParams.minDelta,
+        sellingParams.weight,
+        Infinity,
+        true,
+      );
 
-//     let start = performance.now();
-//     const buyingOptions_ = new AssetOptions(
-//       "buying",
-//       buyingParams.virtual,
-//       buyingParams.locked,
-//       buyingParams.balance,
-//       buyingParams.weight,
-//       buyingParams.jumpSize,
-//       buyingParams.anchor,
-//       buyingParams.minDelta,
-//       sellingParams.weight,
-//       11,
-//       true,
-//     );
-//     genBuying += performance.now() - start;
-//     start = performance.now();
+      if (buyingOptions.options.length > maxOptions) continue;
 
-//     const sellingOptions_ = new AssetOptions(
-//       "selling",
-//       sellingParams.virtual,
-//       sellingParams.locked,
-//       sellingParams.balance,
-//       sellingParams.weight,
-//       sellingParams.jumpSize,
-//       sellingParams.anchor,
-//       sellingParams.minDelta,
-//       maxSellingDelta,
-//       11,
-//     );
-//     genSelling += performance.now() - start;
+      maxSellingDelta = sellingParams.minDelta +
+        genNonNegative(maxInteger - sellingParams.minDelta);
+      // const maxSellingDelta = maxInteger;
+      sellingOptions = new AssetOptions(
+        "selling",
+        sellingParams.virtual,
+        sellingParams.locked,
+        sellingParams.balance,
+        sellingParams.weight,
+        sellingParams.jumpSize,
+        sellingParams.anchor,
+        sellingParams.minDelta,
+        maxSellingDelta,
+        Infinity,
+      );
 
-//     const [pairOptions, duration] = swapsForPairExhaustiveStraight(
-//       buyingOptions,
-//       sellingOptions,
-//       Infinity,
-//     );
-//     durations += duration;
+      if (sellingOptions.options.length > maxOptions) continue;
 
-//     const [pairOptions_, duration_] = swapsForPairExhaustiveSort(
-//       buyingOptions_,
-//       sellingOptions_,
-//       Infinity,
-//     );
-//     durations_ += duration_;
+      if (
+        buyingOptions.options.length > 0 && sellingOptions.options.length > 0
+      ) break;
+    }
 
-//     if (pairOptions.length !== pairOptions_.length) {
-//       console.log(
-//         `missed ${pairOptions.length - pairOptions_.length}`,
-//       );
-//       // pairOptions.forEach((pairOption) =>
-//       //   console.log(
-//       //     pairOption,
-//       //     countMults(pairOption.buyingOption.exp),
-//       //     countMults(pairOption.sellingOption.exp),
-//       //   )
-//       // );
-//       // console.log("vs");
-//       // pairOptions_.forEach((pairOption) =>
-//       //   console.log(
-//       //     pairOption,
-//       //     countMults(pairOption.buyingOption.exp),
-//       //     countMults(pairOption.sellingOption.exp),
-//       //   )
-//       // );
-//       // throw new Error(`missed ${pairOptions.length - pairOptions_.length}`);
-//       // break;
-//     } else {
-//       for (let i = 0; i < pairOptions.length; i++) {
-//         if (pairOptions[i].effectivePrice < pairOptions_[i].effectivePrice) {
-//           console.log("better price");
-//           for (let j = 0; j < pairOptions.length; j++) {
-//             if (i === j) console.log("============= (here)");
-//             else console.log("=============");
-//             console.log(pairOptions[j]);
-//             console.log("-------------");
-//             console.log(pairOptions_[j]);
-//           }
-//           // throw new Error("better price");
-//         } else if (
-//           pairOptions[i].effectivePrice > pairOptions_[i].effectivePrice
-//         ) {
-//           console.log("worse price");
-//           for (let j = 0; j < pairOptions.length; j++) {
-//             if (i === j) console.log("============= (here)");
-//             else console.log("=============");
-//             console.log(pairOptions[j]);
-//             console.log("-------------");
-//             console.log(pairOptions_[j]);
-//           }
-//           // throw new Error("worse price");
-//         } else {
-//           // assert(pairOptionsEqual(pairOptions[i], pairOptions_[i]));
-//         }
-//         // assert(pairOptions[i].effectivePrice <= pairOptions_[i].effectivePrice);
-//       }
-//     }
-//     assert(
-//       pairOptions.length >= pairOptions_.length,
-//       `${pairOptions.length} < ${pairOptions_.length}`,
-//     );
-//   }
-//   console.log("genBuying:", genBuying / iterations);
-//   console.log("genSelling:", genSelling / iterations);
-//   console.log("durations:", durations / iterations);
-//   console.log("durations_:", durations_ / iterations);
-// });
+    let start = performance.now();
+    const buyingOptions_ = new AssetOptions(
+      "buying",
+      buyingParams.virtual,
+      buyingParams.locked,
+      buyingParams.balance,
+      buyingParams.weight,
+      buyingParams.jumpSize,
+      buyingParams.anchor,
+      buyingParams.minDelta,
+      sellingParams.weight,
+      Infinity,
+      true,
+    );
+    genBuying += performance.now() - start;
+    start = performance.now();
 
-// Deno.test("swapfinding wild", () => {
-//   let genBuying = 0;
-//   let genSelling = 0;
-//   let durations = 0;
-//   let durations_ = 0;
-//   // while(true) {
-//   const iterations = 10000;
-//   for (let i = 0; i < iterations; i++) {
-//     const buyingParams = genWildAssetParams();
-//     const sellingParams = genWildAssetParams();
+    const sellingOptions_ = new AssetOptions(
+      "selling",
+      sellingParams.virtual,
+      sellingParams.locked,
+      sellingParams.balance,
+      sellingParams.weight,
+      sellingParams.jumpSize,
+      sellingParams.anchor,
+      sellingParams.minDelta,
+      maxSellingDelta,
+      Infinity,
+    );
+    genSelling += performance.now() - start;
 
-//     const buyingOptions = new AssetOptions(
-//       "buying",
-//       buyingParams.virtual,
-//       buyingParams.locked,
-//       buyingParams.balance,
-//       buyingParams.weight,
-//       buyingParams.jumpSize,
-//       buyingParams.anchor,
-//       buyingParams.minDelta,
-//       sellingParams.weight,
-//       11,
-//       true,
-//     );
+    console.log(buyingOptions.options.length, sellingOptions.options.length);
 
-//     const maxSellingDelta = sellingParams.minDelta +
-//       genNonNegative(maxInteger - sellingParams.minDelta);
-//     // const maxSellingDelta = maxInteger;
-//     const sellingOptions = new AssetOptions(
-//       "selling",
-//       sellingParams.virtual,
-//       sellingParams.locked,
-//       sellingParams.balance,
-//       sellingParams.weight,
-//       sellingParams.jumpSize,
-//       sellingParams.anchor,
-//       sellingParams.minDelta,
-//       maxSellingDelta,
-//       11,
-//     );
+    const [optionsBinary, durationBinary] = swapsForPairBinary(
+      buyingOptions,
+      sellingOptions,
+      Infinity,
+    );
+    binary += durationBinary;
 
-//     let start = performance.now();
-//     const buyingOptions_ = new AssetOptions(
-//       "buying",
-//       buyingParams.virtual,
-//       buyingParams.locked,
-//       buyingParams.balance,
-//       buyingParams.weight,
-//       buyingParams.jumpSize,
-//       buyingParams.anchor,
-//       buyingParams.minDelta,
-//       sellingParams.weight,
-//       11,
-//       true,
-//     );
-//     genBuying += performance.now() - start;
-//     start = performance.now();
+    const [optionsExhaustive, durationExhaustive] = swapsForPairExhaustive(
+      buyingOptions_,
+      sellingOptions_,
+      Infinity,
+    );
+    exhaustiveSort += durationExhaustive;
+    exhaustiveStraight += durationExhaustive;
 
-//     const sellingOptions_ = new AssetOptions(
-//       "selling",
-//       sellingParams.virtual,
-//       sellingParams.locked,
-//       sellingParams.balance,
-//       sellingParams.weight,
-//       sellingParams.jumpSize,
-//       sellingParams.anchor,
-//       sellingParams.minDelta,
-//       maxSellingDelta,
-//       11,
-//     );
-//     genSelling += performance.now() - start;
+    const [optionsExhaustiveSort, durationSort] = paretoOptionsSort(
+      optionsExhaustive,
+    );
+    exhaustiveSort += durationSort;
+    // const [optionsExhaustiveStraight, durationStraight] = paretoOptionsStraight(
+    //   optionsExhaustive,
+    // );
+    // exhaustiveStraight += durationStraight;
 
-//     const [pairOptions, duration] = swapsForPairExhaustiveStraight(
-//       buyingOptions,
-//       sellingOptions,
-//       11,
-//     );
-//     durations += duration;
+    // This fails, which means we have to indeed look at all the spread options
+    // optionsExhaustiveSort.forEach((option) =>
+    //   assert(option.buyingOption.maximized || option.sellingOption.maximized)
+    // );
 
-//     const [pairOptions_, duration_] = swapsForPairExhaustiveSort(
-//       buyingOptions_,
-//       sellingOptions_,
-//       11,
-//     );
-//     durations_ += duration_;
+    // optionsExhaustiveSort = deduplicate(optionsExhaustiveSort);
 
-//     if (pairOptions.length !== pairOptions_.length) {
-//       console.log(
-//         `missed ${pairOptions.length - pairOptions_.length}`,
-//       );
-//       // pairOptions.forEach((pairOption) =>
-//       //   console.log(
-//       //     pairOption,
-//       //     countMults(pairOption.buyingOption.exp),
-//       //     countMults(pairOption.sellingOption.exp),
-//       //   )
-//       // );
-//       // console.log("vs");
-//       // pairOptions_.forEach((pairOption) =>
-//       //   console.log(
-//       //     pairOption,
-//       //     countMults(pairOption.buyingOption.exp),
-//       //     countMults(pairOption.sellingOption.exp),
-//       //   )
-//       // );
-//       // throw new Error(`missed ${pairOptions.length - pairOptions_.length}`);
-//       // break;
-//     } else {
-//       for (let i = 0; i < pairOptions.length; i++) {
-//         if (pairOptions[i].effectivePrice < pairOptions_[i].effectivePrice) {
-//           console.log("better price");
-//           for (let j = 0; j < pairOptions.length; j++) {
-//             if (i === j) console.log("============= (here)");
-//             else console.log("=============");
-//             console.log(pairOptions[j]);
-//             console.log("-------------");
-//             console.log(pairOptions_[j]);
-//           }
-//           // throw new Error("better price");
-//         } else if (
-//           pairOptions[i].effectivePrice > pairOptions_[i].effectivePrice
-//         ) {
-//           console.log("worse price");
-//           for (let j = 0; j < pairOptions.length; j++) {
-//             if (i === j) console.log("============= (here)");
-//             else console.log("=============");
-//             console.log(pairOptions[j]);
-//             console.log("-------------");
-//             console.log(pairOptions_[j]);
-//           }
-//           // throw new Error("worse price");
-//         } else {
-//           // assert(pairOptionsEqual(pairOptions[i], pairOptions_[i]));
-//         }
-//         // assert(pairOptions[i].effectivePrice <= pairOptions_[i].effectivePrice);
-//       }
-//     }
-//     assert(
-//       pairOptions.length >= pairOptions_.length,
-//       `${pairOptions.length} < ${pairOptions_.length}`,
-//     );
-//   }
-//   console.log("genBuying:", genBuying / iterations);
-//   console.log("genSelling:", genSelling / iterations);
-//   console.log("durations:", durations / iterations);
-//   console.log("durations_:", durations_ / iterations);
-// });
+    for (const otherOptions of [optionsBinary]) {
+      console.log("comparing");
+      if (optionsExhaustiveSort.length !== otherOptions.length) {
+        console.log(
+          `missed ${optionsExhaustiveSort.length - otherOptions.length}`,
+        );
+        optionsExhaustiveSort.forEach((pairOption) =>
+          console.log(
+            pairOption,
+            countMults(pairOption.buyingOption.exp),
+            countMults(pairOption.sellingOption.exp),
+          )
+        );
+        console.log("\nvs\n");
+        otherOptions.forEach((pairOption) =>
+          console.log(
+            pairOption,
+            countMults(pairOption.buyingOption.exp),
+            countMults(pairOption.sellingOption.exp),
+          )
+        );
+        // throw new Error(
+        //   `missed ${optionsExhaustiveSort.length - optionsBinary.length}`,
+        // );
+        // break;
+      } //else {
+      //   for (let i = 0; i < pairOptionsSort.length; i++) {
+      //     if (
+      //       pairOptionsSort[i].effectivePrice <
+      //         pairOptionsStraight[i].effectivePrice
+      //     ) {
+      //       console.log("better price");
+      //       for (let j = 0; j < pairOptionsSort.length; j++) {
+      //         if (i === j) console.log("============= (here)");
+      //         else console.log("=============");
+      //         console.log(pairOptionsSort[j]);
+      //         console.log("-------------");
+      //         console.log(pairOptionsStraight[j]);
+      //       }
+      //       // throw new Error("better price");
+      //     } else if (
+      //       pairOptionsSort[i].effectivePrice >
+      //         pairOptionsStraight[i].effectivePrice
+      //     ) {
+      //       console.log("worse price");
+      //       for (let j = 0; j < pairOptionsSort.length; j++) {
+      //         if (i === j) console.log("============= (here)");
+      //         else console.log("=============");
+      //         console.log(pairOptionsSort[j]);
+      //         console.log("-------------");
+      //         console.log(pairOptionsStraight[j]);
+      //       }
+      //       // throw new Error("worse price");
+      //     } else {
+      //       // assert(pairOptionsEqual(pairOptionsSort[i], pairOptionsStraight[i]));
+      //     }
+      //     // assert(pairOptionsSort[i].effectivePrice <= pairOptionsStraight[i].effectivePrice);
+      //   }
+      // }
+      assert(
+        optionsExhaustiveSort.length === otherOptions.length,
+        `${optionsExhaustiveSort.length} !== ${otherOptions.length}`,
+      );
+      console.log("match");
+    }
+  }
+  console.log("genBuying:", genBuying / iterations);
+  console.log("genSelling:", genSelling / iterations);
+  console.log("binary + sort:", binary / iterations);
+  console.log("exhaustive + sort:", exhaustiveSort / iterations);
+  console.log("exhaustive + straight:", exhaustiveStraight / iterations);
+});

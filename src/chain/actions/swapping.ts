@@ -225,9 +225,9 @@ export class Swapping {
         maybeNdef(genPositive(i)),
         randomChoice([
           undefined,
-          webappExpLimit,
-          Number(genPositive(50n)),
-          Number(genPositive()),
+          // webappExpLimit, // TODO revery
+          // Number(genPositive(50n)),
+          // Number(genPositive()),
         ]),
       );
       if (swappings.length > 0) break;
@@ -236,7 +236,7 @@ export class Swapping {
     if (swappings.length < 1) return null;
     // console.log(`Swapping`);
     const choice = randomChoice(swappings);
-    // return choice; // TODO revert
+    return choice; // TODO revert
     if (Math.random() < 0.5) return choice;
     else return choice.randomSubSwap();
   }
@@ -255,8 +255,8 @@ export class Swapping {
   sellingAmnt:      ${this.sellingAmnt}
   buyingSpot:       ${this.buyingSpot}
   sellingSpot:      ${this.sellingSpot}
-  (buyingA0:        ${this.buyingAmnt * this.sellingSpot})
-  (sellingA0:       ${this.sellingAmnt * this.buyingSpot})
+  (buyingA0:        ${Number(this.buyingAmnt) / Number(this.buyingSpot)})
+  (sellingA0:       ${Number(this.sellingAmnt) / Number(this.sellingSpot)})
   buyingExp:        ${this.buyingExp}
   sellingExp:       ${this.sellingExp}
   buyingExpMults:   ${countMultiplications(Number(this.buyingExp))}
@@ -833,10 +833,9 @@ export class Swapping {
 
   // try to make it wrong with minimal changes
   public corruptAll = (): Swapping[] => {
-    return []; // TODO revert
     return [
-      this.corruptBoughtSpot(),
-      this.corruptSoldSpot(),
+      // this.corruptBoughtSpot(),// TODO revert
+      // this.corruptSoldSpot(),
 
       this.corruptSoldAmnt(false),
       this.corruptBoughtAmnt(false),

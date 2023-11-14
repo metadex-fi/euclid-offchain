@@ -266,6 +266,7 @@ export class DiracUtxo {
     const param = paramUtxo.param;
     const dirac = this.dirac;
     const assets = param.assets;
+    const expLimit_ = expLimit ?? Infinity;
     const swappings: Swapping[] = [];
     assets.forEach((sellingAsset, sellingIndex) => {
       const virtualSelling = param.virtual.amountOf(sellingAsset);
@@ -276,7 +277,7 @@ export class DiracUtxo {
       const lockedSelling = balanceSelling -
         this.available.amountOf(sellingAsset, 0n);
       const availableSelling_ = availableSelling?.amountOf(sellingAsset, 0n) ??
-        -1n; // TODO
+        -1n;
       const sellingOptions = new AssetOptions(
         "selling",
         virtualSelling,
@@ -287,10 +288,10 @@ export class DiracUtxo {
         anchorSelling,
         minSelling,
         availableSelling_,
-        expLimit,
+        expLimit_,
       );
       if (sellingOptions.options.length === 0) return;
-      console.log("sellingOptions:", sellingOptions);
+      // console.log("sellingOptions:", sellingOptions);
       assets.forEach((buyingAsset, buyingIndex) => {
         if (sellingIndex === buyingIndex) return;
         if (buyableAssets && !buyableAssets.has(buyingAsset)) return;
@@ -312,20 +313,28 @@ export class DiracUtxo {
           anchorBuying,
           minBuying,
           weightSelling, // TODO if it weren't for this, we would not have to do this in the inner loop
-          expLimit,
+          expLimit_,
         );
         if (buyingOptions.options.length === 0) return;
-        console.log("buyingOptions:", buyingOptions);
+        // console.log("buyingOptions:", buyingOptions);
         const [pairOptions, _duration] = swapsForPairExhaustiveStraight(
           buyingOptions,
           sellingOptions,
-          expLimit,
-        ); // NOTE seeing what happens if we simply return all the paretos
+          expLimit_,
+        );
+
+        if (pairOptions.length === 0) return;
+        let bestPrice = pairOptions[0].effectivePrice;
+        for (let i = 1; i < pairOptions.length; i++) {
+          const pairOption = pairOptions[i];
+          if (pairOption.effectivePrice < bestPrice) {
+            bestPrice = pairOption.effectivePrice;
+          }
+        }
 
         pairOptions.forEach((pairOption) => {
-          console.log(sellingOptions.jumpSize);
-          console.log(sellingOptions.anchor);
-          console.log(pairOption.sellingOption);
+          if (pairOption.effectivePrice > bestPrice) return; // TODO what about the other paretos?
+          console.log("best:", pairOption);
           swappings.push(Swapping.boundary(
             adhereMaxInteger,
             false, // TODO FIXME
