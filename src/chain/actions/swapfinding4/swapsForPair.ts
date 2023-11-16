@@ -13,6 +13,7 @@ import { PPositive } from "../../../types/general/derived/bounded/positive.ts";
 import { Param } from "../../../types/euclid/param.ts";
 
 class AssetOption {
+  public readonly mults: number;
   constructor(
     readonly exp: bigint,
     readonly spot: bigint,
@@ -21,6 +22,7 @@ class AssetOption {
     readonly maximized: boolean,
   ) {
     assert(spot > 0n);
+    this.mults = countMults(exp); // TODO somewhat ineffient
   }
 }
 
@@ -518,29 +520,29 @@ export class AssetOptions {
   //   return head;
   // };
 
-  public getCorrSellingOption = (
-    buyingOption: AssetOption,
-  ): AssetOption | undefined => {
-    assert(this.assetType === "selling");
-    let start = 0; //this.headIndex;
-    let end = this.options.length - 1;
-    let result: AssetOption | undefined = undefined;
+  // public getCorrSellingOption = (
+  //   buyingOption: AssetOption,
+  // ): AssetOption | undefined => {
+  //   assert(this.assetType === "selling");
+  //   let start = 0; //this.headIndex;
+  //   let end = this.options.length - 1;
+  //   let result: AssetOption | undefined = undefined;
 
-    while (start <= end) {
-      const mid = Math.floor((start + end) / 2);
-      const sellingOption = this.options[mid];
+  //   while (start <= end) {
+  //     const mid = Math.floor((start + end) / 2);
+  //     const sellingOption = this.options[mid];
 
-      if (buyingOption.a0 <= sellingOption.a0) {
-        // Store the potential answer and search in the left half
-        result = sellingOption;
-        end = mid - 1;
-      } else {
-        // Search in the right half
-        start = mid + 1;
-      }
-    }
-    return result;
-  };
+  //     if (buyingOption.a0 <= sellingOption.a0) {
+  //       // Store the potential answer and search in the left half for an even better one
+  //       result = sellingOption;
+  //       end = mid - 1;
+  //     } else {
+  //       // Search in the right half
+  //       start = mid + 1;
+  //     }
+  //   }
+  //   return result;
+  // };
 
   public getCorrBuyingOption = (
     sellingOption: AssetOption,
@@ -552,27 +554,46 @@ export class AssetOptions {
   private getCorrBuyingOptionStrict = (
     sellingOption: AssetOption,
     buyingOptions: AssetOption[],
+    expLimit = this.expLimit - sellingOption.mults,
+    start = 0,
+    end = buyingOptions.length - 1,
   ): AssetOption | undefined => {
     assert(this.assetType === "buying");
-
-    const expLimit = this.expLimit - countMults(sellingOption.exp);
     assert(expLimit >= 0);
-    const buyingOptions_ = buyingOptions.filter(
-      (buyingOption) => countMults(buyingOption.exp) <= expLimit,
-    );
+    // const buyingOptions_ = buyingOptions.filter(
+    //   (buyingOption) => countMults(buyingOption.exp) <= expLimit,
+    // );
 
-    let start = 0;
-    let end = buyingOptions_.length - 1;
+    // let start = 0;
+    // let end = buyingOptions.length - 1;
     let result: AssetOption | undefined = undefined;
 
     while (start <= end) {
       const mid = Math.floor((start + end) / 2);
-      const buyingOption = buyingOptions_[mid];
+      const buyingOption = buyingOptions[mid];
 
       if (buyingOption.a0 <= sellingOption.a0) {
-        // Store the potential answer and search in the right half
-        result = buyingOption;
-        start = mid + 1;
+        if (buyingOption.mults > expLimit) {
+          // if our potential solution violates the expLimit, try to find a better one in the right half
+          const better = this.getCorrBuyingOptionStrict(
+            sellingOption,
+            buyingOptions,
+            expLimit,
+            mid + 1,
+            end,
+          );
+          if (better) {
+            // if we find one, return it
+            return better;
+          } else {
+            // otherwise continue in the left half
+            end = mid - 1;
+          }
+        } else {
+          // Store the potential answer and search in the right half for an even better one
+          result = buyingOption;
+          start = mid + 1;
+        }
       } else {
         // Search in the left half
         end = mid - 1;
@@ -675,11 +696,7 @@ export const swapsForPairBinary = (
   for (const sellingOption of sellingOptions.options) {
     const buyingOption = buyingOptions.getCorrBuyingOption(sellingOption);
     if (!buyingOption) continue;
-    // if (
-    //   countMults(buyingOption.exp) + countMults(sellingOption.exp) <= expLimit
-    // ) {
     options.push(new PairOption(buyingOption, sellingOption));
-    // }
   }
 
   const duration = performance.now() - start;
@@ -796,7 +813,7 @@ export const swapsForPairExhaustive = (
     sellingOptions.options.forEach((sellingOption) => {
       if (
         buyingOption.a0 <= sellingOption.a0 &&
-        countMults(buyingOption.exp) + countMults(sellingOption.exp) <= expLimit
+        buyingOption.mults + sellingOption.mults <= expLimit
       ) {
         const newOption = new PairOption(buyingOption, sellingOption);
         let add = true;
