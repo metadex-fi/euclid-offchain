@@ -617,30 +617,8 @@ export class AssetOptions {
         end = mid - 1;
       }
     }
-    // const fromLinear = this.getCorrBuyingOptionLinear(
-    //   sellingOption,
-    //   buyingOptions,
-    // );
-    // if (result) {
-    //   assert(fromLinear && assetOptionsEqual(result, fromLinear));
-    // } else assert(!fromLinear);
     return result;
   };
-
-  // for testing
-  // private getCorrBuyingOptionLinear = (
-  //   sellingOption: AssetOption,
-  //   buyingOptions: AssetOption[],
-  // ): AssetOption | undefined => {
-  //   assert(this.assetType === "buying");
-  //   for (let i = 0; i < buyingOptions.length; i++) {
-  //     if (buyingOptions[i].a0 > sellingOption.a0) {
-  //       if (i > 0) return buyingOptions[i - 1];
-  //       else return undefined;
-  //     }
-  //   }
-  //   return buyingOptions[buyingOptions.length - 1];
-  // };
 
   private getCorrBuyingOptionLazy = (
     sellingOption: AssetOption,

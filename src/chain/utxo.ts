@@ -27,7 +27,7 @@ import {
 } from "../utils/constants.ts";
 import {
   AssetOptions,
-  swapsForPairExhaustiveStraight,
+  swapsForPairBinary,
 } from "./actions/swapfinding4/swapsForPair.ts";
 
 // export const getMinBalance = (asset: Asset): bigint =>
@@ -317,10 +317,9 @@ export class DiracUtxo {
         );
         if (buyingOptions.options.length === 0) return;
         // console.log("buyingOptions:", buyingOptions);
-        const [pairOptions, _duration] = swapsForPairExhaustiveStraight(
+        const [pairOptions, _duration] = swapsForPairBinary(
           buyingOptions,
           sellingOptions,
-          expLimit_,
         );
 
         if (pairOptions.length === 0) return;
