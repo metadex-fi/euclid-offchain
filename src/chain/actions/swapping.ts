@@ -834,8 +834,8 @@ export class Swapping {
   // try to make it wrong with minimal changes
   public corruptAll = (): Swapping[] => {
     return [
-      // this.corruptBoughtSpot(),// TODO revert
-      // this.corruptSoldSpot(),
+      this.corruptBoughtSpot(), // TODO revert
+      this.corruptSoldSpot(),
 
       this.corruptSoldAmnt(false),
       this.corruptBoughtAmnt(false),
