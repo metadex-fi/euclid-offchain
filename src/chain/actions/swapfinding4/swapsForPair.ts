@@ -197,15 +197,17 @@ export class AssetOptions {
       options.sort((a, b) => a.a0 - b.a0);
       for (let i = 0; i < options.length - 1; i++) {
         if (options[i].a0 === options[i + 1].a0) {
-          // assert(options[i].spot < options[i + 1].spot); // TODO breaks with the new edgeOption that adheres to expLimit
-          // assert(options[i].delta < options[i + 1].delta); // TODO breaks with the new edgeOption that adheres to expLimit
-          options.splice(i, 1); // TODO why did we do this again?
-          i--;
+          assert(options[i].spot < options[i + 1].spot); // TODO breaks with the new edgeOption that adheres to expLimit
+          assert(options[i].delta < options[i + 1].delta); // TODO breaks with the new edgeOption that adheres to expLimit
+          // options.splice(i, 1); // TODO why did we do this again?
+          // i--;
         }
       }
     } else if (strictBuying) {
       for (let i = 0; i < options.length - 2; i++) {
         assert(options[i].a0 < options[i + 1].a0);
+        // assert(options[i].spot < options[i + 1].spot); // TODO breaks with the new edgeOption that adheres to expLimit
+        // assert(options[i].delta < options[i + 1].delta); // TODO breaks with the new edgeOption that adheres to expLimit
       }
     }
 
@@ -600,61 +602,22 @@ export class AssetOptions {
   };
 }
 
-export const swapsForPairBinary = (
-  buyingOptions: AssetOptions,
-  sellingOptions: AssetOptions,
-  expLimit: number,
-): [PairOption[], number] => { //PairOption[] => {
-  const start = performance.now();
-  // let buyingOption = buyingOptions.shift();
-  // let sellingOption = sellingOptions.shift();
-
-  const options: PairOption[] = [];
-  for (const buyingOption of buyingOptions.options) {
-    const sellingOption = sellingOptions.getCorrSellingOption(buyingOption);
-    if (!sellingOption) continue;
-    if (
-      countMults(buyingOption.exp) + countMults(sellingOption.exp) <= expLimit
-    ) {
-      options.push(new PairOption(buyingOption, sellingOption));
-    } else {
-      // console.log("dropped", buyingOption, sellingOption);
-    }
-  }
-
-  const duration = performance.now() - start;
-  // const options_ = options;
-  // const duration_ = 0;
-  const [options_, duration_] = paretoOptionsSort(options);
-
-  if (options_.length) {
-    console.log(
-      ` -> ${options_.length} pair-options (binary)`,
-    );
-  }
-  return [options_, duration + duration_];
-  // return options_;
-};
-
+// for some reason this fails, while the variant iterating over sellingOptions works (with explimit Infinity)
 // export const swapsForPairBinary = (
 //   buyingOptions: AssetOptions,
 //   sellingOptions: AssetOptions,
 //   expLimit: number,
 // ): [PairOption[], number] => { //PairOption[] => {
 //   const start = performance.now();
-//   // let buyingOption = buyingOptions.shift();
-//   // let sellingOption = sellingOptions.shift();
 
 //   const options: PairOption[] = [];
-//   for (const sellingOption of sellingOptions.options) {
-//     const buyingOption = buyingOptions.getCorrBuyingOption(sellingOption);
-//     if (!buyingOption) continue;
+//   for (const buyingOption of buyingOptions.options) {
+//     const sellingOption = sellingOptions.getCorrSellingOption(buyingOption);
+//     if (!sellingOption) continue;
 //     if (
 //       countMults(buyingOption.exp) + countMults(sellingOption.exp) <= expLimit
 //     ) {
 //       options.push(new PairOption(buyingOption, sellingOption));
-//     } else {
-//       console.log("dropped", buyingOption, sellingOption);
 //     }
 //   }
 
@@ -671,6 +634,38 @@ export const swapsForPairBinary = (
 //   return [options_, duration + duration_];
 //   // return options_;
 // };
+
+export const swapsForPairBinary = (
+  buyingOptions: AssetOptions,
+  sellingOptions: AssetOptions,
+  expLimit: number,
+): [PairOption[], number] => { //PairOption[] => {
+  const start = performance.now();
+
+  const options: PairOption[] = [];
+  for (const sellingOption of sellingOptions.options) {
+    const buyingOption = buyingOptions.getCorrBuyingOption(sellingOption);
+    if (!buyingOption) continue;
+    if (
+      countMults(buyingOption.exp) + countMults(sellingOption.exp) <= expLimit
+    ) {
+      options.push(new PairOption(buyingOption, sellingOption));
+    }
+  }
+
+  const duration = performance.now() - start;
+  // const options_ = options;
+  // const duration_ = 0;
+  const [options_, duration_] = paretoOptionsSort(options);
+
+  if (options_.length) {
+    console.log(
+      ` -> ${options_.length} pair-options (binary)`,
+    );
+  }
+  return [options_, duration + duration_];
+  // return options_;
+};
 
 // export const swapsForPairBinary_ = (
 //   buyingOptions: AssetOptions,

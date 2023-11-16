@@ -38,7 +38,7 @@ Deno.test("swapfinding tight", () => {
   let binary = 0;
   let exhaustiveSort = 0;
   let exhaustiveStraight = 0;
-  const expLimit = 11;
+  const expLimit = Infinity; //11;
   const iterations = 100;
   const maxOptions = 100;
   for (let i = 0; i < iterations; i++) {
@@ -155,70 +155,33 @@ Deno.test("swapfinding tight", () => {
 
     // optionsExhaustiveSort = deduplicate(optionsExhaustiveSort);
 
+    const baseOptions = optionsExhaustiveSort;
+    console.log("exhaustive Options", baseOptions.length);
     for (const otherOptions of [optionsBinary]) {
-      console.log("comparing");
-      if (optionsExhaustiveSort.length !== otherOptions.length) {
-        console.log(
-          `missed ${optionsExhaustiveSort.length - otherOptions.length}`,
-        );
-        optionsExhaustiveSort.forEach((pairOption) =>
-          console.log(
-            pairOption,
-            countMults(pairOption.buyingOption.exp),
-            countMults(pairOption.sellingOption.exp),
-          )
-        );
-        console.log("\nvs\n");
-        otherOptions.forEach((pairOption) =>
-          console.log(
-            pairOption,
-            countMults(pairOption.buyingOption.exp),
-            countMults(pairOption.sellingOption.exp),
-          )
-        );
-        // throw new Error(
-        //   `missed ${optionsExhaustiveSort.length - optionsBinary.length}`,
-        // );
-        // break;
-      } //else {
-      //   for (let i = 0; i < pairOptionsSort.length; i++) {
-      //     if (
-      //       pairOptionsSort[i].effectivePrice <
-      //         pairOptionsStraight[i].effectivePrice
-      //     ) {
-      //       console.log("better price");
-      //       for (let j = 0; j < pairOptionsSort.length; j++) {
-      //         if (i === j) console.log("============= (here)");
-      //         else console.log("=============");
-      //         console.log(pairOptionsSort[j]);
-      //         console.log("-------------");
-      //         console.log(pairOptionsStraight[j]);
-      //       }
-      //       // throw new Error("better price");
-      //     } else if (
-      //       pairOptionsSort[i].effectivePrice >
-      //         pairOptionsStraight[i].effectivePrice
-      //     ) {
-      //       console.log("worse price");
-      //       for (let j = 0; j < pairOptionsSort.length; j++) {
-      //         if (i === j) console.log("============= (here)");
-      //         else console.log("=============");
-      //         console.log(pairOptionsSort[j]);
-      //         console.log("-------------");
-      //         console.log(pairOptionsStraight[j]);
-      //       }
-      //       // throw new Error("worse price");
-      //     } else {
-      //       // assert(pairOptionsEqual(pairOptionsSort[i], pairOptionsStraight[i]));
-      //     }
-      //     // assert(pairOptionsSort[i].effectivePrice <= pairOptionsStraight[i].effectivePrice);
-      //   }
-      // }
-      assert(
-        optionsExhaustiveSort.length === otherOptions.length,
-        `${optionsExhaustiveSort.length} !== ${otherOptions.length}`,
+      console.log("other Options", otherOptions.length);
+      const extraBase = baseOptions.filter((baseOption) =>
+        !otherOptions.some((otherOption) =>
+          baseOption.effectivePrice === otherOption.effectivePrice &&
+          baseOption.buyingOption.delta === otherOption.buyingOption.delta
+        )
       );
-      console.log("match");
+      const extraOther = otherOptions.filter((otherOption) =>
+        !baseOptions.some((baseOption) =>
+          baseOption.effectivePrice === otherOption.effectivePrice &&
+          baseOption.buyingOption.delta === otherOption.buyingOption.delta
+        )
+      );
+      const match = baseOptions.filter((baseOption) =>
+        otherOptions.some((otherOption) =>
+          baseOption.effectivePrice === otherOption.effectivePrice &&
+          baseOption.buyingOption.delta === otherOption.buyingOption.delta
+        )
+      );
+      console.log("\nextra exhaustive:", extraBase);
+      console.log("\nextra other:", extraOther);
+      console.log("\nmatch:", match);
+      assert(extraBase.length === 0);
+      assert(extraOther.length === 0);
     }
   }
   console.log("genBuying:", genBuying / iterations);
