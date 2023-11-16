@@ -40,8 +40,8 @@ Deno.test("swapfinding tight", () => {
   let exhaustiveStraight = 0;
   const expLimit = 11;
   // const expLimit = Infinity;
-  const iterations = 100;
-  const maxOptions = 100;
+  const iterations = 500;
+  const maxOptions = 500;
   for (let i = 0; i < iterations; i++) {
     let buyingParams;
     let sellingParams;
@@ -125,8 +125,10 @@ Deno.test("swapfinding tight", () => {
 
     console.log(buyingOptions.options.length, sellingOptions.options.length);
 
-    buyingOptions.options.forEach((buyingOption) =>
+    buyingOptions.options.forEach((buyingOption) => {
+      assert(buyingOption.mults === countMults(buyingOption.exp));
       sellingOptions.options.forEach((sellingOption) => {
+        assert(sellingOption.mults === countMults(sellingOption.exp));
         if (buyingOption.a0 === sellingOption.a0) {
           assert(
             buyingOption.delta * sellingOption.spot ===
@@ -143,8 +145,8 @@ Deno.test("swapfinding tight", () => {
               sellingOption.delta * buyingOption.spot,
           );
         }
-      })
-    );
+      });
+    });
 
     const [optionsBinary, durationBinary] = swapsForPairBinary(
       buyingOptions_,
@@ -178,9 +180,9 @@ Deno.test("swapfinding tight", () => {
     // optionsExhaustiveSort = deduplicate(optionsExhaustiveSort);
 
     const baseOptions = optionsExhaustiveSort;
-    console.log("exhaustive Options", baseOptions.length);
+    // console.log("exhaustive Options", baseOptions.length);
     for (const otherOptions of [optionsBinary]) {
-      console.log("other Options", otherOptions.length);
+      // console.log("other Options", otherOptions.length);
       const extraBase = baseOptions.filter((baseOption) =>
         !otherOptions.some((otherOption) =>
           baseOption.effectivePrice === otherOption.effectivePrice &&
@@ -199,11 +201,13 @@ Deno.test("swapfinding tight", () => {
           baseOption.buyingOption.delta === otherOption.buyingOption.delta
         )
       );
-      console.log("\nextra exhaustive:", extraBase);
-      console.log("\nextra other:", extraOther);
-      console.log("\nmatch:", match);
-      assert(extraBase.length === 0);
-      assert(extraOther.length === 0);
+      if (extraBase.length > 0 || extraOther.length > 0) {
+        console.log("\nextra exhaustive:", extraBase);
+        console.log("\nextra other:", extraOther);
+        console.log("\nmatch:", match);
+        assert(extraBase.length === 0);
+        assert(extraOther.length === 0);
+      }
     }
   }
   console.log("genBuying:", genBuying / iterations);

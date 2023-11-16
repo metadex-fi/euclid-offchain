@@ -13,16 +13,15 @@ import { PPositive } from "../../../types/general/derived/bounded/positive.ts";
 import { Param } from "../../../types/euclid/param.ts";
 
 class AssetOption {
-  public readonly mults: number;
   constructor(
     readonly exp: bigint,
     readonly spot: bigint,
     readonly delta: bigint,
     readonly a0: number,
+    readonly mults: number,
     readonly maximized: boolean,
   ) {
     assert(spot > 0n);
-    this.mults = countMults(exp); // TODO somewhat ineffient
   }
 }
 
@@ -248,11 +247,12 @@ export class AssetOptions {
     let previousOption: AssetOption | null = null;
     let fromDelta = this.minDelta;
     for (let exp = this.maxExp; exp >= this.minExp; exp--) {
-      if (countMults(exp) > this.expLimit) {
+      const mults = countMults(exp);
+      if (mults > this.expLimit) {
         continue;
       }
       const spot = this.calcSpotFromExp(exp);
-      const newOption = this.calcOptionFromSpot(exp, spot);
+      const newOption = this.calcOptionFromSpot(exp, spot, mults);
       if (previousOption) {
         assert(previousOption.spot > newOption.spot);
         assert(previousOption.a0 <= newOption.a0);
@@ -330,8 +330,9 @@ export class AssetOptions {
     let spot = numerator / denominator;
     let previousOption: AssetOption | null = null;
     let fromDelta = this.minDelta;
-    if (countMults(this.minExp) <= this.expLimit) {
-      previousOption = this.calcOptionFromSpot(this.minExp, spot);
+    const mults = countMults(this.minExp);
+    if (mults <= this.expLimit) {
+      previousOption = this.calcOptionFromSpot(this.minExp, spot, mults);
       options.push(...this.spreadOption(fromDelta, previousOption));
       fromDelta = previousOption.delta + 1n;
     }
@@ -339,7 +340,8 @@ export class AssetOptions {
     for (let exp = this.minExp + 1n; exp <= this.maxExp; exp++) {
       numerator *= jumpSizePlusOne;
       denominator *= this.jumpSize;
-      if (countMults(exp) > this.expLimit) {
+      const mults = countMults(exp);
+      if (mults > this.expLimit) {
         // if (bestMultsAhead(exp) > this.expLimit) break; // TODO FIXME
         continue;
       }
@@ -347,7 +349,7 @@ export class AssetOptions {
       spot = numerator / denominator;
       // const spot_ = this.calcSpotFromExp(exp);
       // assert(spot === spot_, `${spot} !== ${spot_}`);
-      const newOption = this.calcOptionFromSpot(exp, spot);
+      const newOption = this.calcOptionFromSpot(exp, spot, mults);
 
       if (previousOption) {
         assert(previousOption.delta <= newOption.delta);
@@ -379,15 +381,21 @@ export class AssetOptions {
     denominator *= this.jumpSize;
     let edgeSpot = numerator / denominator;
     if (edgeSpot <= maxInteger && bestMultsAhead(edgeExp) <= this.expLimit) {
-      while (countMults(edgeExp) > this.expLimit) {
+      let edgeMults = countMults(edgeExp);
+      while (edgeMults > this.expLimit) {
         // console.log(edgeExp, countMults(edgeExp), bestMultsAhead(edgeExp));
         numerator *= jumpSizePlusOne;
         denominator *= this.jumpSize;
         edgeSpot = numerator / denominator;
         if (edgeSpot > maxInteger) return options;
         edgeExp++;
+        edgeMults = countMults(edgeExp);
       }
-      const edgeOption = this.calcEdgeOptionFromSpot(edgeExp, edgeSpot);
+      const edgeOption = this.calcEdgeOptionFromSpot(
+        edgeExp,
+        edgeSpot,
+        edgeMults,
+      );
       if (edgeOption) options.push(...this.spreadOption(fromDelta, edgeOption));
       else assert(this.maxDelta === "oo");
     }
@@ -399,7 +407,11 @@ export class AssetOptions {
       ? (this.amm - spot) / this.weight
       : (spot - this.amm) / this.weight;
 
-  private calcOptionFromSpot = (exp: bigint, spot: bigint): AssetOption => {
+  private calcOptionFromSpot = (
+    exp: bigint,
+    spot: bigint,
+    mults: number,
+  ): AssetOption => {
     assert(spot >= this.minSpot, `${spot} < ${this.minSpot}`);
     assert(spot <= this.maxSpot, `${spot} > ${this.maxSpot}`);
 
@@ -414,7 +426,7 @@ export class AssetOptions {
     );
 
     const a0 = Number(delta) / Number(spot);
-    return new AssetOption(exp, spot, delta, a0, true);
+    return new AssetOption(exp, spot, delta, a0, mults, true);
   };
 
   private spreadOption = (
@@ -435,6 +447,7 @@ export class AssetOptions {
           option.spot,
           delta,
           a0,
+          option.mults,
           false,
         ),
       );
@@ -451,20 +464,25 @@ export class AssetOptions {
   private calcEdgeOptionFromSpot = (
     exp: bigint,
     spot: bigint,
+    mults: number,
   ): AssetOption | null => {
     if (spot <= maxInteger && this.maxDelta !== "oo") {
       const delta = this.maxDelta;
       const a0 = Number(delta) / Number(spot);
-      return new AssetOption(exp, spot, delta, a0, true);
+      return new AssetOption(exp, spot, delta, a0, mults, true);
     } else return null;
   };
 
   private calcEdgeOptionFromExp = (exp: bigint): AssetOption | null => {
     if (bestMultsAhead(exp) > this.expLimit) return null;
-    while (countMults(exp) > this.expLimit) exp++;
+    let mults = countMults(exp);
+    while (mults > this.expLimit) {
+      exp++;
+      mults = countMults(exp);
+    }
     const spot = this.calcSpotFromExp(exp);
     assert(spot > 0n);
-    return this.calcEdgeOptionFromSpot(exp, spot);
+    return this.calcEdgeOptionFromSpot(exp, spot, mults);
   };
 
   private findBuyingEdgeOption = (): AssetOption | null => {
