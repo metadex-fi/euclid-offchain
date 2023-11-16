@@ -197,13 +197,13 @@ export class AssetOptions {
       options.sort((a, b) => a.a0 - b.a0);
       for (let i = 0; i < options.length - 1; i++) {
         if (options[i].a0 === options[i + 1].a0) {
-          assert(options[i].spot < options[i + 1].spot); // TODO breaks with the new edgeOption that adheres to expLimit
-          assert(options[i].delta < options[i + 1].delta); // TODO breaks with the new edgeOption that adheres to expLimit
+          assert(options[i].spot < options[i + 1].spot);
+          assert(options[i].delta < options[i + 1].delta);
           // options.splice(i, 1); // TODO why did we do this again?
           // i--;
         }
       }
-    } else if (strictBuying) {
+    } else {
       for (let i = 0; i < options.length - 2; i++) {
         assert(options[i].a0 < options[i + 1].a0);
         // assert(options[i].spot < options[i + 1].spot); // TODO breaks with the new edgeOption that adheres to expLimit
@@ -338,7 +338,7 @@ export class AssetOptions {
       numerator *= jumpSizePlusOne;
       denominator *= this.jumpSize;
       if (countMults(exp) > this.expLimit) {
-        if (bestMultsAhead(exp) > this.expLimit) break;
+        // if (bestMultsAhead(exp) > this.expLimit) break; // TODO FIXME
         continue;
       }
 
@@ -554,13 +554,20 @@ export class AssetOptions {
     buyingOptions: AssetOption[],
   ): AssetOption | undefined => {
     assert(this.assetType === "buying");
+
+    const expLimit = this.expLimit - countMults(sellingOption.exp);
+    assert(expLimit >= 0);
+    const buyingOptions_ = buyingOptions.filter(
+      (buyingOption) => countMults(buyingOption.exp) <= expLimit,
+    );
+
     let start = 0;
-    let end = buyingOptions.length - 1;
+    let end = buyingOptions_.length - 1;
     let result: AssetOption | undefined = undefined;
 
     while (start <= end) {
       const mid = Math.floor((start + end) / 2);
-      const buyingOption = buyingOptions[mid];
+      const buyingOption = buyingOptions_[mid];
 
       if (buyingOption.a0 <= sellingOption.a0) {
         // Store the potential answer and search in the right half
@@ -571,8 +578,30 @@ export class AssetOptions {
         end = mid - 1;
       }
     }
+    // const fromLinear = this.getCorrBuyingOptionLinear(
+    //   sellingOption,
+    //   buyingOptions,
+    // );
+    // if (result) {
+    //   assert(fromLinear && assetOptionsEqual(result, fromLinear));
+    // } else assert(!fromLinear);
     return result;
   };
+
+  // for testing
+  // private getCorrBuyingOptionLinear = (
+  //   sellingOption: AssetOption,
+  //   buyingOptions: AssetOption[],
+  // ): AssetOption | undefined => {
+  //   assert(this.assetType === "buying");
+  //   for (let i = 0; i < buyingOptions.length; i++) {
+  //     if (buyingOptions[i].a0 > sellingOption.a0) {
+  //       if (i > 0) return buyingOptions[i - 1];
+  //       else return undefined;
+  //     }
+  //   }
+  //   return buyingOptions[buyingOptions.length - 1];
+  // };
 
   private getCorrBuyingOptionLazy = (
     sellingOption: AssetOption,
@@ -638,7 +667,7 @@ export class AssetOptions {
 export const swapsForPairBinary = (
   buyingOptions: AssetOptions,
   sellingOptions: AssetOptions,
-  expLimit: number,
+  // expLimit: number,
 ): [PairOption[], number] => { //PairOption[] => {
   const start = performance.now();
 
@@ -646,11 +675,11 @@ export const swapsForPairBinary = (
   for (const sellingOption of sellingOptions.options) {
     const buyingOption = buyingOptions.getCorrBuyingOption(sellingOption);
     if (!buyingOption) continue;
-    if (
-      countMults(buyingOption.exp) + countMults(sellingOption.exp) <= expLimit
-    ) {
-      options.push(new PairOption(buyingOption, sellingOption));
-    }
+    // if (
+    //   countMults(buyingOption.exp) + countMults(sellingOption.exp) <= expLimit
+    // ) {
+    options.push(new PairOption(buyingOption, sellingOption));
+    // }
   }
 
   const duration = performance.now() - start;

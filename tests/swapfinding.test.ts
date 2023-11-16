@@ -38,7 +38,8 @@ Deno.test("swapfinding tight", () => {
   let binary = 0;
   let exhaustiveSort = 0;
   let exhaustiveStraight = 0;
-  const expLimit = Infinity; //11;
+  const expLimit = 11;
+  // const expLimit = Infinity;
   const iterations = 100;
   const maxOptions = 100;
   for (let i = 0; i < iterations; i++) {
@@ -124,10 +125,31 @@ Deno.test("swapfinding tight", () => {
 
     console.log(buyingOptions.options.length, sellingOptions.options.length);
 
+    buyingOptions.options.forEach((buyingOption) =>
+      sellingOptions.options.forEach((sellingOption) => {
+        if (buyingOption.a0 === sellingOption.a0) {
+          assert(
+            buyingOption.delta * sellingOption.spot ===
+              sellingOption.delta * buyingOption.spot,
+          );
+        } else if (buyingOption.a0 < sellingOption.a0) {
+          assert(
+            buyingOption.delta * sellingOption.spot <
+              sellingOption.delta * buyingOption.spot,
+          );
+        } else {
+          assert(
+            buyingOption.delta * sellingOption.spot >
+              sellingOption.delta * buyingOption.spot,
+          );
+        }
+      })
+    );
+
     const [optionsBinary, durationBinary] = swapsForPairBinary(
       buyingOptions_,
       sellingOptions_,
-      expLimit,
+      // Infinity, //expLimit,
     );
     binary += durationBinary;
 
