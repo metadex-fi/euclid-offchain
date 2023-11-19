@@ -56,7 +56,7 @@ import {
 // }
 
 export class Swapping {
-  public readonly spotPrice: number; // uninverted
+  // public readonly spotPrice: number; // uninverted
   public readonly effectivePrice: number; // uninverted
   public previous?: Swapping;
   public subsequent?: Swapping;
@@ -65,7 +65,7 @@ export class Swapping {
     public readonly adhereMaxInteger: boolean,
     public readonly maxIntImpacted: boolean,
     public readonly expLimit: number | null,
-    // public readonly expLimitImpacted: boolean,
+    public readonly expLimitImpacted: boolean,
     public readonly user: User | null, // webapp needs undefined iirc
     public readonly paramUtxo: ParamUtxo,
     public readonly diracUtxo: DiracUtxo,
@@ -73,10 +73,9 @@ export class Swapping {
     public readonly sellingAsset: Asset,
     public readonly buyingAmnt: bigint,
     public readonly sellingAmnt: bigint,
-    public readonly buyingSpot: bigint, // inverted
-    public readonly sellingSpot: bigint, // inverted
-    public readonly buyingExp: bigint,
-    public readonly sellingExp: bigint,
+    // public readonly buyingSpot: bigint, // inverted
+    // public readonly sellingSpot: bigint, // inverted
+    public readonly exponent: bigint,
     private availableBuying: bigint, // for corruption-tests (cannot be taken from dirac because of subSwaps)
     private readonly availableSelling: bigint | null, // for corruption-tests (cannot be left null or taken from user because of subSwaps). Null means no limit
     private readonly minBuying_: bigint,
@@ -100,22 +99,22 @@ export class Swapping {
       sellingAmnt >= minSelling,
       `sellingAmnt too low: ${this.show()}`,
     );
-    assert(
-      buyingSpot > 0n,
-      `buyingSpot must be positive: ${this.show()}`,
-    );
-    assert(
-      sellingSpot > 0n,
-      `sellingSpot must be positive: ${this.show()}`,
-    );
-    assert(
-      (!adhereMaxInteger) || buyingSpot <= maxInteger,
-      `buyingSpot must be <= maxInteger: ${this.show()}`,
-    );
-    assert(
-      (!adhereMaxInteger) || sellingSpot <= maxInteger,
-      `sellingSpot must be <= maxInteger: ${this.show()}`,
-    );
+    // assert(
+    //   buyingSpot > 0n,
+    //   `buyingSpot must be positive: ${this.show()}`,
+    // );
+    // assert(
+    //   sellingSpot > 0n,
+    //   `sellingSpot must be positive: ${this.show()}`,
+    // );
+    // assert(
+    //   (!adhereMaxInteger) || buyingSpot <= maxInteger,
+    //   `buyingSpot must be <= maxInteger: ${this.show()}`,
+    // );
+    // assert(
+    //   (!adhereMaxInteger) || sellingSpot <= maxInteger,
+    //   `sellingSpot must be <= maxInteger: ${this.show()}`,
+    // );
     assert(
       minBuying_ > 0n,
       `minBuying must be positive: ${this.show()}`,
@@ -136,22 +135,21 @@ export class Swapping {
       );
     }
     if (expLimit !== null) {
-      const buyingMults = countMultiplications(Number(buyingExp));
-      const sellingMults = countMultiplications(Number(sellingExp));
+      const mults = countMultiplications(Number(exponent));
       assert(
-        buyingMults + sellingMults <= expLimit,
-        `exponents must have ${buyingMults} + ${sellingMults} <= ${expLimit} multiplications: ${this.show()}`,
+        mults <= expLimit,
+        `exponents must have ${mults} <= ${expLimit} multiplications: ${this.show()}`,
       );
     }
 
-    this.spotPrice = Number(sellingSpot) / Number(buyingSpot);
+    // this.spotPrice = Number(sellingSpot) / Number(buyingSpot);
     this.effectivePrice = Number(sellingAmnt) / Number(buyingAmnt);
 
     if (runTests) {
-      assert(
-        this.spotPrice <= this.effectivePrice,
-        `spotPrice > effectivePrice: ${this.show()}`,
-      );
+      // assert(
+      //   this.spotPrice <= this.effectivePrice,
+      //   `spotPrice > effectivePrice: ${this.show()}`,
+      // );
       assert(this.validates(), `Swapping does not validate: ${this.show()}`);
     }
   }
@@ -168,7 +166,7 @@ export class Swapping {
     adhereMaxInteger: boolean,
     maxIntImpacted: boolean,
     expLimit: number | null,
-    // expLimitImpacted: boolean,
+    expLimitImpacted: boolean,
     user: User | null,
     paramUtxo: ParamUtxo,
     diracUtxo: DiracUtxo,
@@ -176,10 +174,9 @@ export class Swapping {
     sellingAsset: Asset,
     buyingAmnt: bigint,
     sellingAmnt: bigint,
-    buyingSpot: bigint,
-    sellingSpot: bigint,
-    buyingExp: bigint,
-    sellingExp: bigint,
+    // buyingSpot: bigint,
+    // sellingSpot: bigint,
+    exponent: bigint,
     availableBuying: bigint,
     availableSelling: bigint,
     minBuying: bigint,
@@ -191,7 +188,7 @@ export class Swapping {
       adhereMaxInteger,
       maxIntImpacted,
       expLimit,
-      // expLimitImpacted,
+      expLimitImpacted,
       user,
       paramUtxo,
       diracUtxo,
@@ -199,10 +196,9 @@ export class Swapping {
       sellingAsset,
       buyingAmnt,
       sellingAmnt,
-      buyingSpot,
-      sellingSpot,
-      buyingExp,
-      sellingExp,
+      // buyingSpot,
+      // sellingSpot,
+      exponent,
       availableBuying, //diracUtxo.available.amountOf(buyingAsset),
       availableSelling === -1n ? null : availableSelling, //user ? user.availableBalance!.amountOf(sellingAsset) : null,
       minBuying,
@@ -243,6 +239,15 @@ export class Swapping {
 
   public show = (): string => {
     // expLimitImpacted: ${this.expLimitImpacted}
+    // buyingSpot:       ${this.buyingSpot}
+    // sellingSpot:      ${this.sellingSpot}
+    // buyingExp:        ${this.buyingExp}
+    // sellingExp:       ${this.sellingExp}
+    // (buyingA0:        ${Number(this.buyingAmnt) / Number(this.buyingSpot)})
+    // (sellingA0:       ${Number(this.sellingAmnt) / Number(this.sellingSpot)})
+    // buyingExpMults:   ${countMultiplications(Number(this.buyingExp))}
+    // sellingExpMults:  ${countMultiplications(Number(this.sellingExp))}
+    // spotPrice:        ${this.spotPrice}
     return `Swapping (
   adhereMaxInteger: ${this.adhereMaxInteger}
   maxIntImpacted:   ${this.maxIntImpacted}
@@ -253,15 +258,6 @@ export class Swapping {
   sellingAsset:     ${this.sellingAsset.show()}
   buyingAmnt:       ${this.buyingAmnt}
   sellingAmnt:      ${this.sellingAmnt}
-  buyingSpot:       ${this.buyingSpot}
-  sellingSpot:      ${this.sellingSpot}
-  (buyingA0:        ${Number(this.buyingAmnt) / Number(this.buyingSpot)})
-  (sellingA0:       ${Number(this.sellingAmnt) / Number(this.sellingSpot)})
-  buyingExp:        ${this.buyingExp}
-  sellingExp:       ${this.sellingExp}
-  buyingExpMults:   ${countMultiplications(Number(this.buyingExp))}
-  sellingExpMults:  ${countMultiplications(Number(this.sellingExp))}
-  spotPrice:        ${this.spotPrice}
   eff.Price:        ${this.effectivePrice}
   availableBuying:  ${this.availableBuying}
   availableSelling: ${this.availableSelling}
@@ -319,8 +315,17 @@ export class Swapping {
     const oldDirac = this.diracUtxo.dirac;
 
     const newAnchorPrices = oldDirac.anchorPrices.clone; // TODO cloning neccessary?
-    newAnchorPrices.setAmountOf(this.buyingAsset, this.buyingSpot);
-    newAnchorPrices.setAmountOf(this.sellingAsset, this.sellingSpot);
+    const js = this.paramUtxo.param.jumpSize;
+    const jspp = js + 1n;
+    const exp = this.exponent;
+    const jse = exp >= 0n ? js ** exp : jspp ** -exp;
+    const jsppe = exp >= 0n ? jspp ** exp : js ** -exp;
+    const oldAnchorBuying = oldDirac.anchorPrices.amountOf(this.buyingAsset);
+    const oldAnchorSelling = oldDirac.anchorPrices.amountOf(this.sellingAsset);
+    const newAnchorBuying = (oldAnchorBuying * jsppe) / jse;
+    const newAnchorSelling = (oldAnchorSelling * jsppe) / jse;
+    newAnchorPrices.setAmountOf(this.buyingAsset, newAnchorBuying);
+    newAnchorPrices.setAmountOf(this.sellingAsset, newAnchorSelling);
 
     return new Dirac(
       oldDirac.owner,
@@ -358,10 +363,7 @@ export class Swapping {
         new Swap(
           this.buyingAsset,
           this.sellingAsset,
-          new BoughtSold(
-            this.buyingExp,
-            this.sellingExp,
-          ),
+          this.exponent,
         ),
       ),
     );
@@ -601,7 +603,7 @@ export class Swapping {
       this.adhereMaxInteger,
       this.maxIntImpacted,
       this.expLimit,
-      // this.expLimitImpacted,
+      this.expLimitImpacted,
       this.user,
       this.paramUtxo,
       this.diracUtxo,
@@ -611,8 +613,7 @@ export class Swapping {
       sellingAmnt,
       this.buyingSpot,
       this.sellingSpot,
-      this.buyingExp,
-      this.sellingExp,
+      this.exponent,
       amntIsSold ? this.availableBuying : amount, // per definition of a subSwap
       amntIsSold ? amount : this.availableSelling, // per definition of a subSwap
       applyMinAmounts ? this.minBuying_ : 1n,
@@ -661,120 +662,11 @@ export class Swapping {
     return subSwap;
   };
 
-  // private static pricesFitDirac(
-  //   spotBuying: bigint,
-  //   spotSelling: bigint,
-  //   buyingLowest: bigint,
-  //   sellingLowest: bigint,
-  //   buyingJumpSize: bigint,
-  //   sellingJumpSize: bigint,
-  // ): boolean {
-  //   const fitBuying = (spotBuying - buyingLowest) % buyingJumpSize === 0n;
-  //   const fitSelling = (spotSelling - sellingLowest) % sellingJumpSize === 0n;
-  //   if (!fitBuying) {
-  //     console.log(
-  //       `pricesFitDirac:
-  //       buying ${spotBuying}
-  //       not fit for ${buyingLowest}
-  //       with jump ${buyingJumpSize}`,
-  //     );
-  //   }
-  //   if (!fitSelling) {
-  //     console.log(
-  //       `pricesFitDirac:
-  //       selling ${spotSelling}
-  //       not fit for ${sellingLowest}
-  //       with jump ${sellingJumpSize}`,
-  //     );
-  //   }
-  //   return fitBuying && fitSelling;
-  // }
-
-  static exponentsYieldPrice(
-    anchor: bigint,
-    js: bigint,
-    exp: bigint,
-    spot: bigint,
-    buySell: string,
-  ): boolean {
-    const spot_ = calcSpot(anchor, js)(exp);
-
-    if (spot !== spot_) {
-      console.error(
-        `exponentsYieldPrice (${buySell}):
-        spot ${spot} != ${spot_} 
-        for anchor ${anchor}, js ${js}, exp ${exp}`,
-      );
-      return false;
-    }
-    return true;
-  }
-
-  static pricesFitAmm(
-    spotBuying: bigint,
-    spotSelling: bigint,
-    buyingAmm: bigint,
-    sellingAmm: bigint,
-  ): boolean {
-    const fitsBuying = spotBuying <= buyingAmm;
-    const fitsSelling = sellingAmm <= spotSelling;
-    if (!fitsBuying) {
-      console.error(
-        `pricesFitAmm: 
-        buyingAmm  ${buyingAmm} > 
-        spotBuying ${spotBuying}`,
-      );
-      return false;
-    }
-    if (!fitsSelling) {
-      console.error(
-        `pricesFitAmm:
-        sellingAmm  ${sellingAmm} > 
-        spotSelling ${spotSelling}`,
-      );
-      return false;
-    }
-    return true;
-  }
-
-  static valueEquation(
-    spotBuying: bigint,
-    spotSelling: bigint,
-    buyingAmount: bigint,
-    sellingAmount: bigint,
-  ): boolean {
-    const addedBuyingA0 = buyingAmount * spotSelling;
-    const addedSellingA0 = sellingAmount * spotBuying;
-
-    if (addedBuyingA0 > addedSellingA0) {
-      console.error(
-        `valueEquation: 
-        addedBuyingA0  ${addedBuyingA0} > 
-        addedSellingA0 ${addedSellingA0}`,
-      );
-      return false;
-    }
-    return true;
-  }
-
+  // TODO update to single jumpSize/Exponent version
   public validates(): boolean {
-    // public readonly user: User | undefined, // TODO why can this be undefined again?
-    // public readonly paramUtxo: ParamUtxo,
-    // public readonly diracUtxo: DiracUtxo,
-    // public readonly buyingAsset: Asset,
-    // public readonly sellingAsset: Asset,
-    // public readonly buyingAmnt: bigint,
-    // public readonly sellingAmnt: bigint,
-    // public readonly buyingSpot: bigint, // inverted
-    // public readonly sellingSpot: bigint, // inverted
-    // public readonly buyingExp: bigint,
-    // public readonly sellingExp: bigint,
-
     const param = this.paramUtxo.param;
     const buyingWeight = param.weights.amountOf(this.buyingAsset);
     const sellingWeight = param.weights.amountOf(this.sellingAsset);
-    const jsBuying = param.jumpSizes.amountOf(this.buyingAsset);
-    const jsSelling = param.jumpSizes.amountOf(this.sellingAsset);
     const virtualBuying = param.virtual.amountOf(this.buyingAsset);
     const virtualSelling = param.virtual.amountOf(this.sellingAsset);
 
@@ -787,340 +679,307 @@ export class Swapping {
     const buyingLiquidity = balanceBuying + virtualBuying;
     const sellingLiquidity = balanceSelling + virtualSelling;
 
-    // const oldBuyingAmm = buyingWeight * buyingLiquidity;
-    // const oldSellingAmm = sellingWeight * sellingLiquidity;
-
     const newBuyingAmm = buyingWeight * (buyingLiquidity - this.buyingAmnt);
     const newSellingAmm = sellingWeight * (sellingLiquidity + this.sellingAmnt);
 
-    return true &&
-      // Swapping.pricesFitDirac(
-      //   spotBuying,
-      //   spotSelling,
-      //   buyingLowest,x
-      //   sellingLowest,
-      //   buyingJumpSize,
-      //   sellingJumpSize,
-      // ) &&
-      Swapping.exponentsYieldPrice(
-        anchorBuying,
-        jsBuying,
-        this.buyingExp,
-        this.buyingSpot,
-        "buying",
-      ) &&
-      Swapping.exponentsYieldPrice(
-        anchorSelling,
-        jsSelling,
-        this.sellingExp,
-        this.sellingSpot,
-        "selling",
-      ) &&
-      Swapping.pricesFitAmm(
-        this.buyingSpot,
-        this.sellingSpot,
-        newBuyingAmm,
-        newSellingAmm,
-      ) &&
-      Swapping.valueEquation(
-        this.buyingSpot,
-        this.sellingSpot,
-        this.buyingAmnt,
-        this.sellingAmnt,
-      );
-    // TODO othersUnchanged - con: this is implicit
+    const exp = this.exponent;
+    const js = param.jumpSize;
+    const jspp = js + 1n;
+    const jse = exp >= 0n ? js ** exp : jspp ** -exp;
+    const jsppe = exp >= 0n ? jspp ** exp : js ** -exp;
+
+    const pricesFitBuying = anchorBuying * jsppe <= newBuyingAmm * jse;
+    const pricesFitSelling = anchorSelling * jsppe >= newSellingAmm * jse;
+    const valueEquation = this.sellingAmnt * anchorBuying * jse <=
+      this.buyingAmnt * anchorSelling * jsppe;
+
+    return pricesFitBuying && pricesFitSelling && valueEquation;
   }
 
   // try to make it wrong with minimal changes
-  public corruptAll = (): Swapping[] => {
-    return [
-      this.corruptBoughtSpot(), // TODO revert
-      this.corruptSoldSpot(),
+  // public corruptAll = (): Swapping[] => {
+  //   return [
+  //     this.corruptBoughtSpot(), // TODO revert
+  //     this.corruptSoldSpot(),
 
-      this.corruptSoldAmnt(false),
-      this.corruptBoughtAmnt(false),
-      // TODO revert from time to time
-      this.corruptSoldAmnt(true),
-      this.corruptBoughtAmnt(true),
-      // this.corruptSoldAmnt(true),
-      // this.corruptBoughtAmnt(true),
-      // this.corruptSoldAmnt(true),
-      // this.corruptBoughtAmnt(true),
-      // this.corruptSoldAmnt(true),
-      // this.corruptBoughtAmnt(true),
-      // this.corruptSoldAmnt(true),
-      // this.corruptBoughtAmnt(true),
-    ].filter((s) => s) as Swapping[];
-  };
+  //     this.corruptSoldAmnt(false),
+  //     this.corruptBoughtAmnt(false),
+  //     // TODO revert from time to time
+  //     this.corruptSoldAmnt(true),
+  //     this.corruptBoughtAmnt(true),
+  //     // this.corruptSoldAmnt(true),
+  //     // this.corruptBoughtAmnt(true),
+  //     // this.corruptSoldAmnt(true),
+  //     // this.corruptBoughtAmnt(true),
+  //     // this.corruptSoldAmnt(true),
+  //     // this.corruptBoughtAmnt(true),
+  //     // this.corruptSoldAmnt(true),
+  //     // this.corruptBoughtAmnt(true),
+  //   ].filter((s) => s) as Swapping[];
+  // };
 
-  private corrupted = (
-    buyingAmnt: bigint,
-    sellingAmnt: bigint,
-    buyingSpot: bigint,
-    sellingSpot: bigint,
-    buyingExp: bigint,
-    sellingExp: bigint,
-  ): Swapping => {
-    console.log(`Swapping.corrupted()`);
-    return new Swapping(
-      this.adhereMaxInteger,
-      this.maxIntImpacted,
-      this.expLimit,
-      // this.expLimitImpacted,
-      this.user,
-      this.paramUtxo,
-      this.diracUtxo,
-      this.buyingAsset,
-      this.sellingAsset,
-      buyingAmnt,
-      sellingAmnt,
-      buyingSpot,
-      sellingSpot,
-      buyingExp,
-      sellingExp,
-      this.availableBuying,
-      this.availableSelling,
-      this.minBuying_,
-      this.minSelling,
-      this.tmpMinBuying,
-      false,
-    );
-  };
+  // private corrupted = (
+  //   buyingAmnt: bigint,
+  //   sellingAmnt: bigint,
+  //   buyingSpot: bigint,
+  //   sellingSpot: bigint,
+  //   exponent: bigint,
+  // ): Swapping => {
+  //   console.log(`Swapping.corrupted()`);
+  //   return new Swapping(
+  //     this.adhereMaxInteger,
+  //     this.maxIntImpacted,
+  //     this.expLimit,
+  //     this.expLimitImpacted,
+  //     this.user,
+  //     this.paramUtxo,
+  //     this.diracUtxo,
+  //     this.buyingAsset,
+  //     this.sellingAsset,
+  //     buyingAmnt,
+  //     sellingAmnt,
+  //     buyingSpot,
+  //     sellingSpot,
+  //     exponent,
+  //     this.availableBuying,
+  //     this.availableSelling,
+  //     this.minBuying_,
+  //     this.minSelling,
+  //     this.tmpMinBuying,
+  //     false,
+  //   );
+  // };
 
-  public corruptBoughtAmnt = (random: boolean): Swapping | null => {
-    console.log(`trying to corrupt bought amount...`);
-    if (this.buyingAmnt === this.availableBuying) return null;
-    const amnt = random
-      ? genPositive(this.availableBuying - this.buyingAmnt)
-      : 1n;
-    console.log(`... by ${amnt}`);
-    const boughtTooMuch = this.corrupted(
-      this.buyingAmnt + amnt,
-      this.sellingAmnt,
-      this.buyingSpot,
-      this.sellingSpot,
-      this.buyingExp,
-      this.sellingExp,
-    );
-    assert(
-      !boughtTooMuch.validates(),
-      `buying ${amnt} more should fail offchain validation: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`,
-    );
-    console.log(`returning corruptBoughtAmnt`);
-    return boughtTooMuch;
-  };
+  // public corruptBoughtAmnt = (random: boolean): Swapping | null => {
+  //   console.log(`trying to corrupt bought amount...`);
+  //   if (this.buyingAmnt === this.availableBuying) return null;
+  //   const amnt = random
+  //     ? genPositive(this.availableBuying - this.buyingAmnt)
+  //     : 1n;
+  //   console.log(`... by ${amnt}`);
+  //   const boughtTooMuch = this.corrupted(
+  //     this.buyingAmnt + amnt,
+  //     this.sellingAmnt,
+  //     this.buyingSpot,
+  //     this.sellingSpot,
+  //     this.exponent,
+  //   );
+  //   assert(
+  //     !boughtTooMuch.validates(),
+  //     `buying ${amnt} more should fail offchain validation: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`,
+  //   );
+  //   console.log(`returning corruptBoughtAmnt`);
+  //   return boughtTooMuch;
+  // };
 
-  public corruptSoldAmnt = (random: boolean): Swapping | null => {
-    console.log(`trying to corrupt sold amount...`);
-    if (this.sellingAmnt === this.minSelling) return null;
-    const amnt = random ? genPositive(this.sellingAmnt - this.minSelling) : 1n;
-    console.log(`... by ${amnt}`);
-    const soldTooLittle = this.corrupted(
-      this.buyingAmnt,
-      this.sellingAmnt - amnt,
-      this.buyingSpot,
-      this.sellingSpot,
-      this.buyingExp,
-      this.sellingExp,
-    );
-    assert(
-      !soldTooLittle.validates(),
-      `selling ${amnt} less should fail offchain validation: ${this.show()}\n~~~>\n${soldTooLittle.show()}`,
-    );
-    console.log(`returning corruptSoldAmnt`);
-    return soldTooLittle;
-  };
+  // public corruptSoldAmnt = (random: boolean): Swapping | null => {
+  //   console.log(`trying to corrupt sold amount...`);
+  //   if (this.sellingAmnt === this.minSelling) return null;
+  //   const amnt = random ? genPositive(this.sellingAmnt - this.minSelling) : 1n;
+  //   console.log(`... by ${amnt}`);
+  //   const soldTooLittle = this.corrupted(
+  //     this.buyingAmnt,
+  //     this.sellingAmnt - amnt,
+  //     this.buyingSpot,
+  //     this.sellingSpot,
+  //     this.exponent,
+  //   );
+  //   assert(
+  //     !soldTooLittle.validates(),
+  //     `selling ${amnt} less should fail offchain validation: ${this.show()}\n~~~>\n${soldTooLittle.show()}`,
+  //   );
+  //   console.log(`returning corruptSoldAmnt`);
+  //   return soldTooLittle;
+  // };
 
-  private calcSpot = (buySell: "buying" | "selling"): (s: bigint) => bigint => {
-    const param = this.paramUtxo.param;
-    const dirac = this.diracUtxo.dirac;
-    const asset = buySell === "buying" ? this.buyingAsset : this.sellingAsset;
-    const anchor = dirac.anchorPrices.amountOf(asset);
-    const js = param.jumpSizes.amountOf(asset);
-    return calcSpot(anchor, js);
-  };
+  // private calcSpot = (buySell: "buying" | "selling"): (s: bigint) => bigint => {
+  //   const param = this.paramUtxo.param;
+  //   const dirac = this.diracUtxo.dirac;
+  //   const asset = buySell === "buying" ? this.buyingAsset : this.sellingAsset;
+  //   const anchor = dirac.anchorPrices.amountOf(asset);
+  //   const js = param.jumpSize;
+  //   return calcSpot(anchor, js);
+  // };
 
-  public corruptBoughtSpot = (nested = 0): Swapping | null => {
-    console.log("corrupting bought spot...");
+  // public corruptBoughtSpot = (nested = 0): Swapping | null => {
+  //   console.log("corrupting bought spot...");
 
-    let buyingExp = this.buyingExp;
-    let sellingExp = this.sellingExp;
-    let buyingSpot = this.buyingSpot;
-    let sellingSpot = this.sellingSpot;
-    const calcBuyingSpot = this.calcSpot("buying");
-    while (buyingSpot <= this.buyingSpot) {
-      buyingExp++;
-      buyingSpot = calcBuyingSpot(buyingExp);
-    }
-    if (this.expLimit !== null) {
-      const calcSellingSpot = this.calcSpot("selling");
-      while (true) {
-        const fittedExps = fitExpLimit({
-          adhereMaxInteger: this.adhereMaxInteger,
-          expLimit: this.expLimit,
-          buyingExp,
-          sellingExp,
-          maxBuying: this.availableBuying,
-          maxSelling: this.availableSelling,
-          calcBuyingSpot,
-          calcSellingSpot,
-          // minSelling: this.minSelling,
-        });
-        if (fittedExps === null) return null;
-        else if (fittedExps === "unchanged") break;
-        else {
-          const newBuyingSpot = calcBuyingSpot(fittedExps.buyingExp);
-          if (newBuyingSpot <= this.buyingSpot) {
-            buyingExp++;
-          } else {
-            buyingExp = fittedExps.buyingExp;
-            sellingExp = fittedExps.sellingExp;
-            buyingSpot = newBuyingSpot;
-            sellingSpot = calcSellingSpot(fittedExps.sellingExp);
-            break;
-          }
-        }
-      }
-    }
+  //   let exponent = this.exponent;
+  //   let buyingSpot = this.buyingSpot;
+  //   let sellingSpot = this.sellingSpot;
+  //   const calcBuyingSpot = this.calcSpot("buying");
+  //   while (buyingSpot <= this.buyingSpot) {
+  //     exponent++;
+  //     buyingSpot = calcBuyingSpot(exponent);
+  //   }
+  //   if (this.expLimit !== null) {
+  //     const calcSellingSpot = this.calcSpot("selling");
+  //     while (true) {
+  //       const fittedExps = fitExpLimit({
+  //         adhereMaxInteger: this.adhereMaxInteger,
+  //         expLimit: this.expLimit,
+  //         buyingExp,
+  //         sellingExp,
+  //         maxBuying: this.availableBuying,
+  //         maxSelling: this.availableSelling,
+  //         calcBuyingSpot,
+  //         calcSellingSpot,
+  //         // minSelling: this.minSelling,
+  //       });
+  //       if (fittedExps === null) return null;
+  //       else if (fittedExps === "unchanged") break;
+  //       else {
+  //         const newBuyingSpot = calcBuyingSpot(fittedExps.buyingExp);
+  //         if (newBuyingSpot <= this.buyingSpot) {
+  //           buyingExp++;
+  //         } else {
+  //           buyingExp = fittedExps.buyingExp;
+  //           sellingExp = fittedExps.sellingExp;
+  //           buyingSpot = newBuyingSpot;
+  //           sellingSpot = calcSellingSpot(fittedExps.sellingExp);
+  //           break;
+  //         }
+  //       }
+  //     }
+  //   }
 
-    // NOTE prices are inverted
-    assert(
-      buyingSpot > this.buyingSpot,
-      `seems like buyingExp is being changed in the wrong direction`,
-    );
+  //   // NOTE prices are inverted
+  //   assert(
+  //     buyingSpot > this.buyingSpot,
+  //     `seems like buyingExp is being changed in the wrong direction`,
+  //   );
 
-    if (
-      buyingSpot > 0n && (!this.adhereMaxInteger || buyingSpot <= maxInteger)
-    ) {
-      const buyingSpotTooHigh = this.corrupted(
-        this.buyingAmnt,
-        this.sellingAmnt,
-        buyingSpot,
-        sellingSpot,
-        buyingExp,
-        sellingExp,
-      );
+  //   if (
+  //     buyingSpot > 0n && (!this.adhereMaxInteger || buyingSpot <= maxInteger)
+  //   ) {
+  //     const buyingSpotTooHigh = this.corrupted(
+  //       this.buyingAmnt,
+  //       this.sellingAmnt,
+  //       buyingSpot,
+  //       sellingSpot,
+  //       buyingExp,
+  //       sellingExp,
+  //     );
 
-      if (buyingSpotTooHigh.validates()) {
-        // console.log(`bought spot corruption succeeded: ${nested}`);
-        // buyingSpotTooHigh.corruptBoughtSpot(nested + 1);
-        // if (
-        //   !this.sellingAsset.equals(Asset.ADA) || nested >= sellingADAtolerance
-        // ) {
-        throw new Error(
-          `raising inverted buying price should fail offchain validation: ${this.show()}\n~~~>\n${buyingSpotTooHigh.show()}`,
-        );
-        // }
-      } else console.log(`bought spot corruption failed: ${nested}`);
+  //     if (buyingSpotTooHigh.validates()) {
+  //       // console.log(`bought spot corruption succeeded: ${nested}`);
+  //       // buyingSpotTooHigh.corruptBoughtSpot(nested + 1);
+  //       // if (
+  //       //   !this.sellingAsset.equals(Asset.ADA) || nested >= sellingADAtolerance
+  //       // ) {
+  //       throw new Error(
+  //         `raising inverted buying price should fail offchain validation: ${this.show()}\n~~~>\n${buyingSpotTooHigh.show()}`,
+  //       );
+  //       // }
+  //     } else console.log(`bought spot corruption failed: ${nested}`);
 
-      // TODO FIXME (not urgent, it never failed)
-      // assert(
-      //   Swapping.exponentsYieldPrice(
-      //     anchorBuying,
-      //     jsBuying,
-      //     buyingExp,
-      //     buyingSpot,
-      //     "buying",
-      //   ),
-      //   `buyingSpotTooHigh should still yield the correct price: ${buyingSpotTooHigh.show()}`,
-      // );
-      console.log(`returning corruptBoughtSpot`);
-      return buyingSpotTooHigh;
-    } else return null;
-  };
+  //     // TODO FIXME (not urgent, it never failed)
+  //     // assert(
+  //     //   Swapping.exponentsYieldPrice(
+  //     //     anchorBuying,
+  //     //     jsBuying,
+  //     //     buyingExp,
+  //     //     buyingSpot,
+  //     //     "buying",
+  //     //   ),
+  //     //   `buyingSpotTooHigh should still yield the correct price: ${buyingSpotTooHigh.show()}`,
+  //     // );
+  //     console.log(`returning corruptBoughtSpot`);
+  //     return buyingSpotTooHigh;
+  //   } else return null;
+  // };
 
-  public corruptSoldSpot = (nested = 0): Swapping | null => {
-    console.log("corrupting sold spot...");
+  // public corruptSoldSpot = (nested = 0): Swapping | null => {
+  //   console.log("corrupting sold spot...");
 
-    let buyingExp = this.buyingExp;
-    let sellingExp = this.sellingExp;
-    let buyingSpot = this.buyingSpot;
-    let sellingSpot = this.sellingSpot;
-    const calcSellingSpot = this.calcSpot("selling");
-    while (sellingSpot >= this.sellingSpot) {
-      sellingExp--;
-      sellingSpot = calcSellingSpot(sellingExp);
-    }
-    if (this.expLimit !== null) {
-      const calcBuyingSpot = this.calcSpot("buying");
-      while (true) {
-        const fittedExps = fitExpLimit({
-          adhereMaxInteger: this.adhereMaxInteger,
-          expLimit: this.expLimit,
-          buyingExp,
-          sellingExp,
-          maxBuying: this.availableBuying,
-          maxSelling: this.availableSelling,
-          calcBuyingSpot,
-          calcSellingSpot,
-          // minSelling: this.minSelling,
-        });
-        if (fittedExps === null) return null;
-        else if (fittedExps === "unchanged") break;
-        else {
-          const newSellingSpot = calcSellingSpot(fittedExps.sellingExp);
-          if (newSellingSpot >= this.sellingSpot) {
-            sellingExp--;
-          } else {
-            buyingExp = fittedExps.buyingExp;
-            sellingExp = fittedExps.sellingExp;
-            buyingSpot = calcBuyingSpot(fittedExps.buyingExp);
-            sellingSpot = newSellingSpot;
-            break;
-          }
-        }
-      }
-    }
+  //   let exponent = this.exponent;
+  //   let buyingSpot = this.buyingSpot;
+  //   let sellingSpot = this.sellingSpot;
+  //   const calcSellingSpot = this.calcSpot("selling");
+  //   while (sellingSpot >= this.sellingSpot) {
+  //     exponent--;
+  //     sellingSpot = calcSellingSpot(exponent);
+  //   }
+  //   if (this.expLimit !== null) {
+  //     const calcBuyingSpot = this.calcSpot("buying");
+  //     while (true) {
+  //       const fittedExps = fitExpLimit({
+  //         adhereMaxInteger: this.adhereMaxInteger,
+  //         expLimit: this.expLimit,
+  //         buyingExp,
+  //         sellingExp,
+  //         maxBuying: this.availableBuying,
+  //         maxSelling: this.availableSelling,
+  //         calcBuyingSpot,
+  //         calcSellingSpot,
+  //         // minSelling: this.minSelling,
+  //       });
+  //       if (fittedExps === null) return null;
+  //       else if (fittedExps === "unchanged") break;
+  //       else {
+  //         const newSellingSpot = calcSellingSpot(fittedExps.sellingExp);
+  //         if (newSellingSpot >= this.sellingSpot) {
+  //           sellingExp--;
+  //         } else {
+  //           buyingExp = fittedExps.buyingExp;
+  //           sellingExp = fittedExps.sellingExp;
+  //           buyingSpot = calcBuyingSpot(fittedExps.buyingExp);
+  //           sellingSpot = newSellingSpot;
+  //           break;
+  //         }
+  //       }
+  //     }
+  //   }
 
-    // NOTE prices are inverted
-    assert(
-      sellingSpot < this.sellingSpot,
-      `seems like sellingExp is being changed in the wrong direction`,
-    );
+  //   // NOTE prices are inverted
+  //   assert(
+  //     sellingSpot < this.sellingSpot,
+  //     `seems like sellingExp is being changed in the wrong direction`,
+  //   );
 
-    if (
-      sellingSpot > 0n &&
-      (!this.adhereMaxInteger || sellingSpot <= maxInteger)
-    ) {
-      const buyingA0 = this.buyingAmnt * sellingSpot;
-      const sellingA0 = this.sellingAmnt * this.buyingSpot;
-      const swapA0 = min(sellingA0, buyingA0);
-      if (swapA0 < sellingSpot) return null;
+  //   if (
+  //     sellingSpot > 0n &&
+  //     (!this.adhereMaxInteger || sellingSpot <= maxInteger)
+  //   ) {
+  //     const buyingA0 = this.buyingAmnt * sellingSpot;
+  //     const sellingA0 = this.sellingAmnt * this.buyingSpot;
+  //     const swapA0 = min(sellingA0, buyingA0);
+  //     if (swapA0 < sellingSpot) return null;
 
-      const sellingSpotTooLow = this.corrupted(
-        this.buyingAmnt,
-        this.sellingAmnt,
-        buyingSpot,
-        sellingSpot,
-        buyingExp,
-        sellingExp,
-      );
+  //     const sellingSpotTooLow = this.corrupted(
+  //       this.buyingAmnt,
+  //       this.sellingAmnt,
+  //       buyingSpot,
+  //       sellingSpot,
+  //       buyingExp,
+  //       sellingExp,
+  //     );
 
-      if (sellingSpotTooLow.validates()) {
-        // console.log(`sold spot corruption succeeded: ${nested}`);
-        // sellingSpotTooLow.corruptSoldSpot(nested + 1);
-        // if (
-        //   !this.sellingAsset.equals(Asset.ADA) || nested >= sellingADAtolerance
-        // ) {
-        throw new Error(
-          `lowering inverted selling price should fail offchain validation: ${this.show()}\n~~~>\n${sellingSpotTooLow.show()}`,
-        );
-        // }
-      } else console.log(`sold spot corruption failed: ${nested}`);
+  //     if (sellingSpotTooLow.validates()) {
+  //       // console.log(`sold spot corruption succeeded: ${nested}`);
+  //       // sellingSpotTooLow.corruptSoldSpot(nested + 1);
+  //       // if (
+  //       //   !this.sellingAsset.equals(Asset.ADA) || nested >= sellingADAtolerance
+  //       // ) {
+  //       throw new Error(
+  //         `lowering inverted selling price should fail offchain validation: ${this.show()}\n~~~>\n${sellingSpotTooLow.show()}`,
+  //       );
+  //       // }
+  //     } else console.log(`sold spot corruption failed: ${nested}`);
 
-      // TODO FIXME (not urgent, it never failed)
-      // assert(
-      //   Swapping.exponentsYieldPrice(
-      //     anchorSelling,
-      //     jsSelling,
-      //     sellingExp,
-      //     sellingSpot,
-      //     "selling",
-      //   ),
-      //   `sellingSpotTooLow should still yield the correct price: ${sellingSpotTooLow.show()}`,
-      // );
-      console.log(`returning corruptSoldSpot`);
-      return sellingSpotTooLow;
-    } else return null;
-  };
+  //     // TODO FIXME (not urgent, it never failed)
+  //     // assert(
+  //     //   Swapping.exponentsYieldPrice(
+  //     //     anchorSelling,
+  //     //     jsSelling,
+  //     //     sellingExp,
+  //     //     sellingSpot,
+  //     //     "selling",
+  //     //   ),
+  //     //   `sellingSpotTooLow should still yield the correct price: ${sellingSpotTooLow.show()}`,
+  //     // );
+  //     console.log(`returning corruptSoldSpot`);
+  //     return sellingSpotTooLow;
+  //   } else return null;
+  // };
 }

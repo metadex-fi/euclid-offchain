@@ -10,7 +10,7 @@ import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
 import { PInteger } from "../general/fundamental/primitive/integer.ts";
 import { ceilDiv, min } from "../../utils/generators.ts";
 import { Value } from "../general/derived/value/value.ts";
-import { maxSmallInteger, PSmallValue, SmallValue } from "./smallValue.ts";
+import { maxSmallInteger } from "./smallValue.ts";
 import { maxInteger, maxIntRoot } from "../../utils/constants.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
@@ -23,23 +23,23 @@ export class Param {
     public readonly owner: KeyHash,
     public readonly virtual: EuclidValue, // NOTE need those to be nonzero for multiplicative ticks
     public readonly weights: EuclidValue, //SmallValue // NOTE those are actually inverted
-    public readonly jumpSizes: SmallValue,
+    public readonly jumpSize: bigint,
     public readonly active: bigint,
   ) {
     Param.asserts(this);
   }
 
-  static minAnchorPrice = (
+  static minAnchorPrice = (jumpSize: bigint) =>
+  (
     virtual: bigint,
     weight: bigint,
-    jumpSize: bigint,
   ) => (virtual * weight * jumpSize) / (jumpSize + 1n);
 
   public get minAnchorPrices(): EuclidValue {
-    const f = Value.newUnionWith(Param.minAnchorPrice);
+    const f = Value.newUnionWith(Param.minAnchorPrice(this.jumpSize));
 
     return EuclidValue.fromValue(
-      f(this.virtual.unsigned, this.weights.unsigned, this.jumpSizes.unsigned),
+      f(this.virtual.unsigned, this.weights.unsigned),
     );
   }
 
@@ -52,7 +52,7 @@ export class Param {
       this.owner,
       this.virtual,
       this.weights,
-      this.jumpSizes,
+      this.jumpSize,
       this.active ? 0n : 1n,
     );
   }
@@ -67,21 +67,18 @@ export class Param {
 ${ttf}owner: ${this.owner.toString()}, 
 ${ttf}virtual: ${this.virtual.concise(ttf)}, 
 ${ttf}weights: ${this.weights.concise(ttf)}
-${ttf}jumpSizes: ${this.jumpSizes.concise(ttf)}, 
+${ttf}jumpSize: ${this.jumpSize}, 
 ${ttf}active: ${this.active.toString()}
 ${tt})`;
   };
 
   static asserts(param: Param): void {
-    const assets = param.jumpSizes.assets;
+    const assets = param.virtual.assets;
     assert(
       assets.equals(param.weights.assets),
-      "assets of jumpSizes and weights must match",
+      "assets of virtual and weights must match",
     );
-    assert(
-      param.virtual.assets.subsetOf(assets),
-      `assets of virtual must be a subset of assets of jumpSizes and weights, but ${param.virtual.assets.show()}\nis not a subset of ${assets.show()}`,
-    );
+
     // const minAnchorPrices = param.maxAnchorPrices;
     // const maxAnchorPrices = minAnchorPrices.plus(param.jumpSizes);
 
@@ -132,13 +129,11 @@ ${tt})`;
     owner: KeyHash,
     allAssets: Assets,
   ): Param {
-    const jumpSizes = new PositiveValue();
     const weights = new PositiveValue();
     const virtuals = new PositiveValue();
 
+    const jumpSize = new PPositive(1n, maxSmallInteger).genData();
     allAssets.forEach((asset) => {
-      // const jumpSize = new PPositive(1n, gMaxJumpSize).genData();
-      const jumpSize = new PPositive(1n, maxSmallInteger).genData();
       const virtual = new PPositive(
         ceilDiv(jumpSize + 1n, maxSmallInteger),
       ).genData();
@@ -146,7 +141,6 @@ ${tt})`;
       const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual);
       const weight = new PPositive(minWeight, maxWeight).genData();
 
-      jumpSizes.initAmountOf(asset, jumpSize);
       virtuals.initAmountOf(asset, virtual);
       weights.initAmountOf(asset, weight);
     });
@@ -155,7 +149,7 @@ ${tt})`;
       owner,
       new EuclidValue(virtuals),
       new EuclidValue(weights), //new SmallValue(new EuclidValue(weights)),
-      new SmallValue(new EuclidValue(jumpSizes)),
+      jumpSize,
       1n, // TODO include active-status in testing
     );
   }
@@ -234,7 +228,7 @@ export class PParam extends PObject<Param> {
         owner: PKeyHash.ptype,
         virtual: PEuclidValue.ptype,
         weights: PEuclidValue.ptype, //PSmallValue.ptype,
-        jumpSizes: PSmallValue.ptype,
+        jumpSize: PInteger.ptype,
         active: PInteger.ptype,
       }),
       Param,

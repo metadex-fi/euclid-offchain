@@ -104,13 +104,13 @@ export class Opening {
   };
 
   // get the adjusted anchor price for the first dirac, for a single asset
-  private static firstAnchorPrice = (
+  private static firstAnchorPrice = (jumpSize: bigint) =>
+  (
     balance: bigint,
     virtual: bigint,
     weight: bigint,
-    jumpSize: bigint,
   ): bigint => {
-    const baseAnchor = Param.minAnchorPrice(virtual, weight, jumpSize);
+    const baseAnchor = Param.minAnchorPrice(jumpSize)(virtual, weight);
     const finalAnchor = Opening.adjustAnchorPrice(
       baseAnchor,
       balance,
@@ -126,11 +126,15 @@ export class Opening {
     balance: Value,
     virtual: Value,
     weights: Value,
-    jumpSizes: Value,
+    jumpSize: bigint,
   ): EuclidValue => {
-    const f = Value.newUnionWith(Opening.firstAnchorPrice, undefined, 0n);
+    const f = Value.newUnionWith(
+      Opening.firstAnchorPrice(jumpSize),
+      undefined,
+      0n,
+    );
     return EuclidValue.fromValue(
-      f(balance, virtual, weights, jumpSizes),
+      f(balance, virtual, weights),
     );
   };
 
@@ -140,7 +144,8 @@ export class Opening {
     const deposit = this.deposit.unsigned;
     const virtual = this.param.virtual.unsigned;
     const weights = this.param.weights.unsigned;
-    const jumpSizes = this.param.jumpSizes.unsigned;
+    const jumpSize = this.param.jumpSize;
+    const jumpMultiplier = 1 + (1 / Number(jumpSize));
     const paramNFT = this.user.nextParamNFT.next(); // TODO remove next()
     const paramUtxo = ParamUtxo.open(this.param, paramNFT);
 
@@ -150,7 +155,7 @@ export class Opening {
       balance,
       virtual,
       weights,
-      jumpSizes,
+      jumpSize,
     );
 
     // TODO consider checking if balance has assets left over
@@ -175,15 +180,12 @@ export class Opening {
     // UPDATE: then, jump enough times to approximate the initial amm-price (TODO)
     assets.forEach((asset) => {
       const ticks = this.numTicks.amountOf(asset);
-      const jumpMultiplier = 1 +
-        (1 / Number(jumpSizes.amountOf(asset)));
       const tickMultiplier = jumpMultiplier ** (1 / Number(ticks));
       const diracs_ = new Array<Dirac>();
 
       const weight = weights.amountOf(asset);
       const balance_ = balance.amountOf(asset, 0n);
       const virtual_ = virtual.amountOf(asset);
-      const jumpSize = jumpSizes.amountOf(asset);
 
       /* TODO important: assert everywhere that anchorPrices allow for the required tickSizes - consider:
 
@@ -273,7 +275,7 @@ export class Opening {
       const maxTicks_ = Opening.maxTicks(
         param.virtual.amountOf(asset),
         param.weights.amountOf(asset),
-        param.jumpSizes.amountOf(asset),
+        param.jumpSize,
       );
       // console.log(`maxTicks: ${maxTicks}`);
       // console.log(`maxTicks_: ${maxTicks_}`);
@@ -303,10 +305,9 @@ export class Opening {
     weight: bigint,
     jumpSize: bigint,
   ) => {
-    const minAnchorPrice = Param.minAnchorPrice(
+    const minAnchorPrice = Param.minAnchorPrice(jumpSize)(
       virtual,
       weight,
-      jumpSize,
     );
     const jumpMultiplier = 1 +
       (1 / Number(jumpSize));

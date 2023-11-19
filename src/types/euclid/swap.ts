@@ -1,13 +1,13 @@
 import { Asset, PAsset } from "../general/derived/asset/asset.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
 import { PRecord } from "../general/fundamental/container/record.ts";
-import { BoughtSold, PBoughtSold } from "./boughtSold.ts";
+import { PInteger } from "../general/fundamental/primitive/integer.ts";
 
 export class Swap {
   constructor(
     public readonly boughtAsset: Asset,
     public readonly soldAsset: Asset,
-    public readonly prices: BoughtSold,
+    public readonly exponent: bigint,
   ) {}
 }
 
@@ -17,7 +17,7 @@ export class PSwap extends PObject<Swap> {
       new PRecord({
         boughtAsset: PAsset.ptype,
         soldAsset: PAsset.ptype,
-        prices: PBoughtSold.ptype,
+        exponent: PInteger.ptype,
       }),
       Swap,
     );

@@ -27,7 +27,7 @@ import {
 } from "../utils/constants.ts";
 import {
   AssetOptions,
-  swapsForPairBinary,
+  // swapsForPairBinary,
 } from "./actions/swapfinding4/swapsForPair.ts";
 
 // export const getMinBalance = (asset: Asset): bigint =>
@@ -261,105 +261,106 @@ export class DiracUtxo {
     availableBuying?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
     expLimit?: number,
   ): Swapping[] => {
-    console.log("diracUtxo.swappingsFor()");
-    assert(adhereMaxInteger, `!adhereMaxInteger not implemented yet`);
-    const param = paramUtxo.param;
-    const dirac = this.dirac;
-    const assets = param.assets;
-    const expLimit_ = expLimit ?? Infinity;
-    const swappings: Swapping[] = [];
-    assets.forEach((sellingAsset, sellingIndex) => {
-      const virtualSelling = param.virtual.amountOf(sellingAsset);
-      const weightSelling = param.weights.amountOf(sellingAsset);
-      const jumpSizeSelling = param.jumpSizes.amountOf(sellingAsset);
-      const anchorSelling = dirac.anchorPrices.amountOf(sellingAsset);
-      const balanceSelling = this.funds.amountOf(sellingAsset, 0n);
-      const lockedSelling = balanceSelling -
-        this.available.amountOf(sellingAsset, 0n);
-      const availableSelling_ = availableSelling?.amountOf(sellingAsset, 0n) ??
-        -1n;
-      const sellingOptions = new AssetOptions(
-        "selling",
-        virtualSelling,
-        lockedSelling,
-        balanceSelling,
-        weightSelling,
-        jumpSizeSelling,
-        anchorSelling,
-        minSelling,
-        availableSelling_,
-        expLimit_,
-      );
-      if (sellingOptions.options.length === 0) return;
-      // console.log("sellingOptions:", sellingOptions);
-      assets.forEach((buyingAsset, buyingIndex) => {
-        if (sellingIndex === buyingIndex) return;
-        if (buyableAssets && !buyableAssets.has(buyingAsset)) return;
-        const virtualBuying = param.virtual.amountOf(buyingAsset);
-        const weightBuying = param.weights.amountOf(buyingAsset);
-        const jumpSizeBuying = param.jumpSizes.amountOf(buyingAsset);
-        const anchorBuying = dirac.anchorPrices.amountOf(buyingAsset);
-        const balanceBuying = this.funds.amountOf(buyingAsset, 0n);
-        const availableBuying_ = availableBuying ??
-          this.available.amountOf(buyingAsset, 0n);
-        const lockedBuying = balanceBuying - availableBuying_;
-        const buyingOptions = new AssetOptions(
-          "buying",
-          virtualBuying,
-          lockedBuying,
-          balanceBuying,
-          weightBuying,
-          jumpSizeBuying,
-          anchorBuying,
-          minBuying,
-          weightSelling, // TODO if it weren't for this, we would not have to do this in the inner loop
-          expLimit_,
-        );
-        if (buyingOptions.options.length === 0) return;
-        // console.log("buyingOptions:", buyingOptions);
-        const [pairOptions, _duration] = swapsForPairBinary(
-          buyingOptions,
-          sellingOptions,
-        );
+    throw new Error("not updated yet");
+    // console.log("diracUtxo.swappingsFor()");
+    // assert(adhereMaxInteger, `!adhereMaxInteger not implemented yet`);
+    // const param = paramUtxo.param;
+    // const dirac = this.dirac;
+    // const assets = param.assets;
+    // const expLimit_ = expLimit ?? Infinity;
+    // const swappings: Swapping[] = [];
+    // assets.forEach((sellingAsset, sellingIndex) => {
+    //   const virtualSelling = param.virtual.amountOf(sellingAsset);
+    //   const weightSelling = param.weights.amountOf(sellingAsset);
+    //   const jumpSizeSelling = param.jumpSizes.amountOf(sellingAsset);
+    //   const anchorSelling = dirac.anchorPrices.amountOf(sellingAsset);
+    //   const balanceSelling = this.funds.amountOf(sellingAsset, 0n);
+    //   const lockedSelling = balanceSelling -
+    //     this.available.amountOf(sellingAsset, 0n);
+    //   const availableSelling_ = availableSelling?.amountOf(sellingAsset, 0n) ??
+    //     -1n;
+    //   const sellingOptions = new AssetOptions(
+    //     "selling",
+    //     virtualSelling,
+    //     lockedSelling,
+    //     balanceSelling,
+    //     weightSelling,
+    //     jumpSizeSelling,
+    //     anchorSelling,
+    //     minSelling,
+    //     availableSelling_,
+    //     expLimit_,
+    //   );
+    //   if (sellingOptions.options.length === 0) return;
+    //   // console.log("sellingOptions:", sellingOptions);
+    //   assets.forEach((buyingAsset, buyingIndex) => {
+    //     if (sellingIndex === buyingIndex) return;
+    //     if (buyableAssets && !buyableAssets.has(buyingAsset)) return;
+    //     const virtualBuying = param.virtual.amountOf(buyingAsset);
+    //     const weightBuying = param.weights.amountOf(buyingAsset);
+    //     const jumpSizeBuying = param.jumpSizes.amountOf(buyingAsset);
+    //     const anchorBuying = dirac.anchorPrices.amountOf(buyingAsset);
+    //     const balanceBuying = this.funds.amountOf(buyingAsset, 0n);
+    //     const availableBuying_ = availableBuying ??
+    //       this.available.amountOf(buyingAsset, 0n);
+    //     const lockedBuying = balanceBuying - availableBuying_;
+    //     const buyingOptions = new AssetOptions(
+    //       "buying",
+    //       virtualBuying,
+    //       lockedBuying,
+    //       balanceBuying,
+    //       weightBuying,
+    //       jumpSizeBuying,
+    //       anchorBuying,
+    //       minBuying,
+    //       weightSelling, // TODO if it weren't for this, we would not have to do this in the inner loop
+    //       expLimit_,
+    //     );
+    //     if (buyingOptions.options.length === 0) return;
+    //     // console.log("buyingOptions:", buyingOptions);
+    //     const [pairOptions, _duration] = swapsForPairBinary(
+    //       buyingOptions,
+    //       sellingOptions,
+    //     );
 
-        if (pairOptions.length === 0) return;
-        let bestPrice = pairOptions[0].effectivePrice;
-        for (let i = 1; i < pairOptions.length; i++) {
-          const pairOption = pairOptions[i];
-          if (pairOption.effectivePrice < bestPrice) {
-            bestPrice = pairOption.effectivePrice;
-          }
-        }
+    //     if (pairOptions.length === 0) return;
+    //     let bestPrice = pairOptions[0].effectivePrice;
+    //     for (let i = 1; i < pairOptions.length; i++) {
+    //       const pairOption = pairOptions[i];
+    //       if (pairOption.effectivePrice < bestPrice) {
+    //         bestPrice = pairOption.effectivePrice;
+    //       }
+    //     }
 
-        pairOptions.forEach((pairOption) => {
-          if (pairOption.effectivePrice > bestPrice) return; // TODO what about the other paretos?
-          console.log("best:", pairOption);
-          swappings.push(Swapping.boundary(
-            adhereMaxInteger,
-            false, // TODO FIXME
-            expLimit ?? null,
-            // expLimitImpacted,
-            user,
-            paramUtxo,
-            this,
-            buyingAsset,
-            sellingAsset,
-            pairOption.buyingOption.delta,
-            pairOption.sellingOption.delta,
-            pairOption.buyingOption.spot,
-            pairOption.sellingOption.spot,
-            pairOption.buyingOption.exp,
-            pairOption.sellingOption.exp,
-            availableBuying_,
-            availableSelling_,
-            minBuying,
-            minSelling,
-            null, // TODO can we remove this?
-          ));
-        });
-      });
-    });
-    return swappings;
+    //     pairOptions.forEach((pairOption) => {
+    //       if (pairOption.effectivePrice > bestPrice) return; // TODO what about the other paretos?
+    //       console.log("best:", pairOption);
+    //       swappings.push(Swapping.boundary(
+    //         adhereMaxInteger,
+    //         false, // TODO FIXME
+    //         expLimit ?? null,
+    //         // expLimitImpacted,
+    //         user,
+    //         paramUtxo,
+    //         this,
+    //         buyingAsset,
+    //         sellingAsset,
+    //         pairOption.buyingOption.delta,
+    //         pairOption.sellingOption.delta,
+    //         pairOption.buyingOption.spot,
+    //         pairOption.sellingOption.spot,
+    //         pairOption.buyingOption.exp,
+    //         pairOption.sellingOption.exp,
+    //         availableBuying_,
+    //         availableSelling_,
+    //         minBuying,
+    //         minSelling,
+    //         null, // TODO can we remove this?
+    //       ));
+    //     });
+    //   });
+    // });
+    // return swappings;
   };
 
   public swappingsFor_ = (
