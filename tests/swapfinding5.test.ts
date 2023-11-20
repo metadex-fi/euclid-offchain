@@ -8,7 +8,6 @@ import { maxInteger } from "../src/utils/constants.ts";
 import {
   genNonNegative,
   genPositive,
-  min,
   randomChoice,
 } from "../src/utils/generators.ts";
 

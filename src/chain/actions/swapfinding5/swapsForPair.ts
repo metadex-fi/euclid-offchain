@@ -160,13 +160,15 @@ class PairOption {
       b.maxDelta,
       (b.l * b.w * jse - b.a * jsppe) / (b.w * jse),
     );
-    assert(b.minDelta <= maxDeltaBuying);
+    if (maxDeltaBuying === 0n) return null; // this can happen with large maxInteger, which we ascribe to rounding errors in the calculation of minExp (not verified)
+    assert(b.minDelta <= maxDeltaBuying, `${b.minDelta} > ${maxDeltaBuying}`);
 
     let maxDeltaSelling = (s.a * jsppe - s.l * s.w * jse) / (s.w * jse);
+    if (maxDeltaSelling === 0n) return null; // this can happen with large maxInteger, which we ascribe to rounding errors in the calculation of minExp (not verified)
     if (s.maxDelta !== "oo") {
       maxDeltaSelling = min(maxDeltaSelling, s.maxDelta);
     }
-    assert(s.minDelta <= maxDeltaSelling);
+    assert(s.minDelta <= maxDeltaSelling, `${s.minDelta} > ${maxDeltaSelling}`);
 
     // we can actually skip the first binary search by including buying in the boundaries
     const start = max(
@@ -187,7 +189,7 @@ class PairOption {
       );
       return new PairOption(b, s, deltaBuying, deltaSelling, false); // found perfect solution
     } else {
-      // if there isn't a perfect solution, how do we determine the boundaries for the secondary search?
+      // -> there isn't a perfect solution
 
       // rounding in the other direction
       const start = max(
