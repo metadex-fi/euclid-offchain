@@ -416,15 +416,15 @@ export class PairOptions {
     //   }
     // }
 
-    // passes -> solutions without rounding-error cannot be improved in regards to price by increasing exponent
+    // passes -> solutions without rounding-error have a strictly better price than all with higher exp
     for (let i = 0; i < this.options.length - 1; i++) {
       const first = this.options[i];
       if (first.perfect) {
         for (let j = i + 1; j < this.options.length; j++) {
           const second = this.options[j];
           assert(
-            first.effectivePrice <= second.effectivePrice,
-            `${first.effectivePrice} > ${second.effectivePrice} (${i}-${
+            first.effectivePrice < second.effectivePrice,
+            `${first.effectivePrice} >= ${second.effectivePrice} (${i}-${
               i + 1
             } / ${this.options.length})`,
           );
@@ -432,15 +432,15 @@ export class PairOptions {
       }
     }
 
-    // passes -> the first solution without rounding-error has the lowest price
+    // passes -> the first solution without rounding-error has the strictly best price
     for (let i = 0; i < this.options.length; i++) {
       const first = this.options[i];
       if (first.perfect) {
         for (let j = 0; j < i; j++) {
           const second = this.options[j];
           assert(
-            first.effectivePrice <= second.effectivePrice,
-            `${first.effectivePrice} > ${second.effectivePrice} (${i}-${
+            first.effectivePrice < second.effectivePrice,
+            `${first.effectivePrice} >= ${second.effectivePrice} (${i}-${
               i + 1
             } / ${this.options.length})`,
           );
