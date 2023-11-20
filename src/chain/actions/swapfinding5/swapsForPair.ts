@@ -103,115 +103,224 @@ class PairOption {
     assert(s.type === "selling");
     assert(deltaBuying >= b.minDelta, `${deltaBuying} < ${b.minDelta}`);
     assert(deltaSelling >= s.minDelta, `${deltaSelling} < ${s.minDelta}`);
-    // assert(b.maxDelta === b.available);
-    // assert(deltaBuying <= b.maxDelta, `${deltaBuying} > ${b.maxDelta}`);
-    // assert(
-    //   s.maxDelta === "oo" || deltaSelling <= s.maxDelta,
-    //   `${deltaSelling} > ${s.maxDelta}`,
-    // );
+    assert(b.maxDelta === b.available);
+    assert(deltaBuying <= b.maxDelta, `${deltaBuying} > ${b.maxDelta}`);
+    assert(
+      s.maxDelta === "oo" || deltaSelling <= s.maxDelta,
+      `${deltaSelling} > ${s.maxDelta}`,
+    );
     this.effectivePrice = Number(this.deltaSelling) / Number(this.deltaBuying);
   }
 
-  static fromSelling = (
+  /*
+
+  general strategy:
+
+  - we have upper and lower bounds for buying and selling (minDelta and maxDelta)
+  - for each asset, we first try to find a perfect solution, by trying to find the largest multiple of the denominator that satisfies the constraints
+    - we do that by binary search over the range of the asset's multiples of the denominator, and checking the bounds of the other asset within
+  - if that fails, we have one of the following scenarios:
+    - A: the smallest rounded value is too large
+      -> we use binary search to search the interval between the smallest value and the smallest rounded value for a solution
+        - as first condition we check that the resulting other delta is within the bounds
+        - to minimize rounding error:
+          - we look for a minimal solution for deltaBuying, as we have to round that one down,
+          - and a maximized one for deltaSelling, as we have to round that one up
+        - if that fails, there is no solution
+    - B: the largest rounded value is too small
+      -> we use binary search to search the interval between the largest rounded value and the maximum value for a solution
+        - as first condition we check that the resulting other delta is within the bounds
+        - to minimize rounding error:
+          - we look for a minimal solution for deltaBuying, as we have to round that one down,
+          - and a maximized one for deltaSelling, as we have to round that one up
+        - if that fails, there is no solution
+    - C: one rounded value is too small and the next one too large
+      -> we use binary search to search the interval between those two rounded values for a solution
+        - as first condition we check that the resulting other delta is within the bounds
+        - to minimize rounding error:
+          - we look for a minimal solution for deltaBuying, as we have to round that one down,
+          - and a maximized one for deltaSelling, as we have to round that one up
+        - if that fails, there is no solution
+
+    => the 2x3 cases only differ by the starting and ending points of the binary search, and the direction to optimize for
+    => we also need to note the rounded boundaries during the first binary search
+
+  */
+
+  static fromBoth = (
     b: AssetConstants,
     s: AssetConstants,
-    maxDeltaSelling: bigint,
+    jse: bigint, // = js ** exp
+    jsppe: bigint, // = js ** exp
     numerator: bigint, // = b.a * jse (reduced)
     denominator: bigint, // = s.a * jsppe (reduced)
   ): PairOption | null => {
-    assert(maxDeltaSelling >= s.minDelta, `${maxDeltaSelling} < ${s.minDelta}`);
+    assert(b.maxDelta === b.available);
+    const maxDeltaBuying = min(
+      b.maxDelta,
+      (b.l * b.w * jse - b.a * jsppe) / (b.w * jse),
+    );
+    assert(b.minDelta <= maxDeltaBuying);
 
-    // we want a deltaSelling that is a multiple of the denoniminator.
-    // if we can't get that because rounding down maxDeltaSelling would violate the minDelta,
-    // we pick the next larger value, which is s.minDelta.
-    // we do that because we're rounding down deltaBuying, and want to minimize rounding error.
-    // note that rounding up would exceed maxDeltaSelling, so we can't do that.
-    let deltaSelling = (maxDeltaSelling / denominator) * denominator;
-    let deltaBuying: bigint;
-    if (deltaSelling < s.minDelta) {
-      deltaSelling = s.minDelta;
-      deltaBuying = (deltaSelling * numerator) / denominator;
-      assert(
-        deltaSelling * numerator > deltaBuying * denominator,
-        `${deltaSelling} * ${numerator} <= ${deltaBuying} * ${denominator}`,
-      );
-    } else {
-      deltaBuying = (deltaSelling * numerator) / denominator;
+    let maxDeltaSelling = (s.a * jsppe - s.l * s.w * jse) / (s.w * jse);
+    if (s.maxDelta !== "oo") {
+      maxDeltaSelling = min(maxDeltaSelling, s.maxDelta);
+    }
+    assert(s.minDelta <= maxDeltaSelling);
+
+    // we can actually skip the first binary search by including buying in the boundaries
+    const start = max(
+      ceilDiv(s.minDelta, denominator),
+      ceilDiv(b.minDelta, numerator),
+    );
+    const end = min(
+      maxDeltaSelling / denominator,
+      maxDeltaBuying / numerator,
+    );
+
+    if (start <= end) {
+      const deltaSelling = end * denominator;
+      const deltaBuying = end * numerator;
       assert(
         deltaSelling * numerator === deltaBuying * denominator,
         `${deltaSelling} * ${numerator} !== ${deltaBuying} * ${denominator}`,
       );
-    }
-
-    if (deltaBuying >= b.minDelta) {
-      return new PairOption(b, s, deltaBuying, deltaSelling, true);
+      return new PairOption(b, s, deltaBuying, deltaSelling, false); // found perfect solution
     } else {
-      // using binary search to find the smallest deltaSelling that gives deltaBuying >= b.minDelta, to minimize rounding error
-      let start = deltaSelling + 1n;
-      let end = maxDeltaSelling;
-      let bestSelling: bigint | null = null;
-      let bestBuying: bigint | null = null;
-      while (start <= end) {
-        const mid = (start + end) / 2n;
-        const deltaBuying = (mid * numerator) / denominator;
-        if (deltaBuying >= b.minDelta) {
-          bestSelling = mid;
-          bestBuying = deltaBuying;
-          end = mid - 1n;
-        } else {
-          start = mid + 1n;
-        }
-      }
-      if (bestSelling) {
-        assert(bestBuying !== null);
-        assert(
-          bestSelling * numerator > bestBuying * denominator,
-          `${bestSelling} * ${numerator} <= ${bestBuying} * ${denominator}`,
-        );
-        return new PairOption(b, s, bestBuying, bestSelling, false);
-      } else {
-        return null; // means even maxDeltaSelling is too small
-      }
-    }
-  };
+      // if there isn't a perfect solution, how do we determine the boundaries for the secondary search?
 
-  static fromBuying = (
-    b: AssetConstants,
-    s: AssetConstants,
-    maxDeltaBuying: bigint,
-    numerator: bigint, // = s.a * jsppe (reduced)
-    denominator: bigint, // = b.a * jse (reduced)
-  ): PairOption | null => {
-    assert(maxDeltaBuying >= b.minDelta, `${maxDeltaBuying} < ${b.minDelta}`);
-
-    // we want a deltaBuying that is a multiple of the denoniminator.
-    // if we can't get that because rounding down maxDeltaBuying would violate the minDelta,
-    // we pick the next smaller value from rounding up, which is maxDeltaBuying.
-    // we do that because we're rounding up deltaSelling, and want to minimize rounding error.
-    // note that rounding up would exceed maxDeltaBuying, so we can't do that.
-    let deltaBuying = (maxDeltaBuying / denominator) * denominator;
-    if (deltaBuying >= b.minDelta) {
-      const deltaSelling = (deltaBuying * numerator) / denominator;
-      assert(
-        deltaSelling * denominator === deltaBuying * numerator,
-        `${deltaSelling} * ${denominator} !== ${deltaBuying} * ${numerator}`,
+      // rounding in the other direction
+      const start = max(
+        s.minDelta / denominator,
+        b.minDelta / numerator,
       );
-      if (deltaSelling >= s.minDelta) {
-        return new PairOption(b, s, deltaBuying, deltaSelling, true);
-      }
-    }
+      const end = min(
+        ceilDiv(maxDeltaSelling, denominator),
+        ceilDiv(maxDeltaBuying, numerator),
+      );
 
-    // we pick the next smaller value from rounding up, which is maxDeltaBuying.
-    deltaBuying = maxDeltaBuying;
-    const deltaSelling = ceilDiv(deltaBuying * numerator, denominator);
-    assert(
-      deltaSelling * denominator >= deltaBuying * numerator,
-      `${deltaSelling} * ${denominator} < ${deltaBuying} * ${numerator}`,
-    );
-    if (deltaSelling >= s.minDelta) {
-      return new PairOption(b, s, deltaBuying, deltaSelling, true);
-    } else {
-      return null; // means even maxDeltaBuying is too small
+      if (start <= end) {
+        let startSelling = max(s.minDelta, start * denominator);
+        let endSelling = min(maxDeltaSelling, end * denominator);
+        if (startSelling > endSelling) return null; // no overlap
+
+        let startBuying = max(b.minDelta, start * numerator);
+        let endBuying = min(maxDeltaBuying, end * numerator);
+        if (startBuying > endBuying) return null; // no overlap
+
+        let bestSellingFromSelling: bigint | null = null;
+        let bestBuyingFromSelling: bigint | null = null;
+        let bestPriceFromSelling: number | null = null;
+        // trying to find the smallest, in order to reduce rounding-down error in the division below
+        while (startSelling <= endSelling) {
+          const deltaSelling = (startSelling + endSelling) / 2n;
+          const deltaBuying = (deltaSelling / denominator) * numerator;
+          if (deltaBuying >= b.minDelta) {
+            if (deltaBuying <= maxDeltaBuying) {
+              bestSellingFromSelling = deltaSelling;
+              bestBuyingFromSelling = deltaBuying;
+            }
+            endSelling = deltaSelling - 1n;
+          } else {
+            startSelling = deltaSelling + 1n;
+          }
+        }
+        if (bestBuyingFromSelling) {
+          assert(bestSellingFromSelling);
+          assert(
+            bestSellingFromSelling * numerator >
+              bestBuyingFromSelling * denominator,
+            `${bestSellingFromSelling} * ${numerator} <= ${bestBuyingFromSelling} * ${denominator}`,
+          );
+          bestPriceFromSelling = Number(bestSellingFromSelling) /
+            Number(bestBuyingFromSelling);
+        }
+
+        let bestSellingFromBuying: bigint | null = null;
+        let bestBuyingFromBuying: bigint | null = null;
+        let bestPriceFromBuying: number | null = null;
+        // trying to find the largest, in order to reduce rounding-up error in the ceilDiv below
+        while (startBuying <= endBuying) {
+          const deltaBuying = (startBuying + endBuying) / 2n;
+          const deltaSelling = ceilDiv(deltaBuying * denominator, numerator);
+          if (deltaSelling <= maxDeltaSelling) {
+            if (deltaSelling >= s.minDelta) {
+              bestSellingFromBuying = deltaSelling;
+              bestBuyingFromBuying = deltaBuying;
+            }
+            startBuying = deltaBuying + 1n;
+          } else {
+            endBuying = deltaBuying - 1n;
+          }
+        }
+        if (bestBuyingFromBuying) {
+          assert(bestSellingFromBuying);
+          assert(
+            bestSellingFromBuying * numerator >
+              bestBuyingFromBuying * denominator,
+            `${bestSellingFromBuying} * ${numerator} <= ${bestBuyingFromBuying} * ${denominator}`,
+          );
+          bestPriceFromBuying = Number(bestSellingFromBuying) /
+            Number(bestBuyingFromBuying);
+        }
+
+        // TODO investigate which combinations do and should happen, respectively
+        if (bestPriceFromSelling === null) {
+          if (bestPriceFromBuying === null) {
+            return null; // no overlap -- TODO: should this be allowed?
+          } else {
+            return new PairOption(
+              b,
+              s,
+              bestBuyingFromBuying!,
+              bestSellingFromBuying!,
+              false,
+            );
+          }
+        } else {
+          if (
+            bestPriceFromBuying === null ||
+            bestPriceFromSelling < bestPriceFromBuying
+          ) {
+            return new PairOption(
+              b,
+              s,
+              bestBuyingFromSelling!,
+              bestSellingFromSelling!,
+              false,
+            );
+          } else if (bestPriceFromSelling > bestPriceFromBuying) {
+            return new PairOption(
+              b,
+              s,
+              bestBuyingFromBuying!,
+              bestSellingFromBuying!,
+              false,
+            );
+            // same prices, returning the one with the higher trade size
+          } else if (bestSellingFromSelling! > bestSellingFromBuying!) {
+            assert(bestBuyingFromSelling! > bestBuyingFromBuying!);
+            return new PairOption(
+              b,
+              s,
+              bestBuyingFromSelling!,
+              bestSellingFromSelling!,
+              false,
+            );
+          } else {
+            assert(bestBuyingFromSelling! <= bestBuyingFromBuying!);
+            return new PairOption(
+              b,
+              s,
+              bestBuyingFromBuying!,
+              bestSellingFromBuying!,
+              false,
+            );
+          }
+        }
+      } else {
+        return null; // no overlap by a long shot
+      }
     }
   };
 }
@@ -253,102 +362,23 @@ export class PairOptions {
     }
     let [numerator, denominator] = reduce(b.a * jse, s.a * jsppe);
     while (exp <= maxExp) {
-      // if (exp > minExp + 10n) break; // for testing
       if (countMults(exp) <= expLimit) {
-        let maxDeltaSelling = (s.a * jsppe - s.l * s.w * jse) /
-          (s.w * jse);
-        if (s.maxDelta !== "oo") {
-          maxDeltaSelling = min(maxDeltaSelling, s.maxDelta);
-        }
-        assert(b.maxDelta === b.available);
-        const maxDeltaBuying = min(
-          b.maxDelta,
-          (b.l * b.w * jse - b.a * jsppe) /
-            (b.w * jse),
-        );
-        let fromSelling: PairOption | null = null;
-        let fromSellingViolates = false;
-
-        fromSelling = PairOption.fromSelling(
+        const fromBoth = PairOption.fromBoth(
           b,
           s,
-          maxDeltaSelling,
+          jse,
+          jsppe,
           numerator,
           denominator,
         );
-        if (fromSelling) {
-          const ammSelling = s.w * (s.l + fromSelling.deltaSelling);
+
+        if (fromBoth) {
+          const ammSelling = s.w * (s.l + fromBoth.deltaSelling);
           assert(jse * ammSelling <= s.a * jsppe); // = adheres onchain
-          const ammBuying = b.w * (b.l - fromSelling.deltaBuying);
-          // assert(jse * ammBuying >= b.a * jsppe); // = adheres onchain
-          if (jse * ammBuying < b.a * jsppe) { // = violates onchain
-            assert(fromSelling.deltaBuying > maxDeltaBuying);
-            fromSellingViolates = true;
-            // console.log("fromSelling violates onchain");
-            fromSelling = null;
-          } // else assert(fromSelling.deltaBuying <= maxDeltaBuying); // fails when adding maxDeltas to AssetConstants
-        }
-
-        let fromBuying: PairOption | null = null;
-        let fromBuyingViolates = false;
-        fromBuying = PairOption.fromBuying(
-          b,
-          s,
-          maxDeltaBuying,
-          denominator,
-          numerator,
-        );
-        if (fromBuying) {
-          const ammBuying = b.w * (b.l - fromBuying.deltaBuying);
+          const ammBuying = b.w * (b.l - fromBoth.deltaBuying);
           assert(jse * ammBuying >= b.a * jsppe); // = adheres onchain
-          const ammSelling = s.w * (s.l + fromBuying.deltaSelling);
-          // assert(jse * ammSelling <= s.a * jsppe); // = adheres onchain
-          if (jse * ammSelling > s.a * jsppe) { // = violates onchain
-            assert(fromBuying.deltaSelling > maxDeltaSelling);
-            fromBuyingViolates = true;
-            // console.log("fromBuying violates onchain");
-            fromBuying = null;
-          } // else assert(fromBuying.deltaSelling <= maxDeltaSelling); // fails when adding maxDeltas to AssetConstants
-        }
 
-        // console.log("fromBuying:", fromBuyingViolates, fromBuying);
-        // console.log("fromSelling:", fromSellingViolates, fromSelling);
-
-        // assert(fromSelling || fromBuying); // empirically (false) <- unless we allow deltaBuying === 0n; as expected
-        // assert((!fromSelling) || (!fromBuying)); // empirically (false)
-        // assert(!fromSellingViolates); // empirically (false)
-        // assert(!fromBuyingViolates); // empirically (false)
-        if (fromBuyingViolates === fromSellingViolates) { // empirically
-          assert(!fromBuyingViolates);
-          // assert(fromBuying); // fails when adding maxDeltas to AssetConstants
-          // assert(fromSelling);  // fails when adding maxDeltas to AssetConstants
-          // assert(fromBuying.deltaBuying === fromSelling.deltaBuying); // fails when adding maxDeltas to AssetConstants
-          // assert(fromBuying.deltaSelling !== fromSelling.deltaSelling); // (false)
-          // assert(fromBuying.deltaSelling === fromSelling.deltaSelling); // (false)
-          // assert(fromBuying.deltaSelling >= fromSelling.deltaSelling); // (false)
-          // assert(fromBuying.deltaSelling <= fromSelling.deltaSelling);  // fails when adding maxDeltas to AssetConstants
-        }
-
-        /*
-        Implications:
-
-        - it can never happen that both approaches violate onchain
-        - it can (rarely) happen that both approaches yield a correct result
-          - they can be equal or different
-          - if that happens, fromBuying is always equal or better than fromSelling
-        - it can happen (often) that fromSelling does not find a deltaBuying > 0 and fromBuying violates onchain
-        - the violations only happen due to the delta of the other asset
-
-        below: with looping
-        */
-
-        if (fromBuying) {
-          this.options.push(fromBuying);
-        } else if (fromSelling) {
-          this.options.push(fromSelling);
-        } else {
-          // assert(fromBuyingViolates); // empirically
-          // assert(!fromSellingViolates); // empirically
+          this.options.push(fromBoth);
         }
       }
       exp++;
@@ -369,22 +399,52 @@ export class PairOptions {
       // assert(denominator === denominator_);
     }
 
-    // for (let i = 1; i < this.options.length - 1; i++) {
-    //   assert(
-    //     this.options[0].effectivePrice <= this.options[i + 1].effectivePrice,
-    //     `${this.options[i].effectivePrice} > ${
-    //       this.options[i + 1].effectivePrice
-    //     } (${0}-${i + 1} / ${this.options.length - 1})`,
-    //   );
+    // fails unless we add that perfect-clause
+    // for (let i = 0; i < this.options.length - 1; i++) {
+    //   const first = this.options[i];
+    //   const second = this.options[i + 1];
+    //   if (first.perfect) { // passes
+    //   // if (first.perfect || (!second.perfect)) { // fails
+    //     assert(
+    //       first.effectivePrice <= second.effectivePrice,
+    //       `${first.effectivePrice} > ${second.effectivePrice} (${i}-${
+    //         i + 1
+    //       } / ${this.options.length})`,
+    //     );
+    //   }
     // }
 
-    // for (let i = 0; i < this.options.length - 1; i++) {
-    //   assert(
-    //     this.options[i].effectivePrice <= this.options[i + 1].effectivePrice,
-    //     `${this.options[i].effectivePrice} > ${
-    //       this.options[i + 1].effectivePrice
-    //     } (${i}-${i + 1} / ${this.options.length - 1})`,
-    //   );
-    // }
+    // passes -> solutions without rounding-error cannot be improved in regards to price by increasing exponent
+    for (let i = 0; i < this.options.length - 1; i++) {
+      const first = this.options[i];
+      if (first.perfect) {
+        for (let j = i + 1; j < this.options.length; j++) {
+          const second = this.options[j];
+          assert(
+            first.effectivePrice <= second.effectivePrice,
+            `${first.effectivePrice} > ${second.effectivePrice} (${i}-${
+              i + 1
+            } / ${this.options.length})`,
+          );
+        }
+      }
+    }
+
+    // passes -> the first solution without rounding-error has the lowest price
+    for (let i = 0; i < this.options.length; i++) {
+      const first = this.options[i];
+      if (first.perfect) {
+        for (let j = 0; j < i; j++) {
+          const second = this.options[j];
+          assert(
+            first.effectivePrice <= second.effectivePrice,
+            `${first.effectivePrice} > ${second.effectivePrice} (${i}-${
+              i + 1
+            } / ${this.options.length})`,
+          );
+        }
+        break;
+      }
+    }
   }
 }
