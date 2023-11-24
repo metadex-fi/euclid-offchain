@@ -2,7 +2,7 @@ import {
   AssetConstants,
   genTightAssetParams,
   PairOptions,
-} from "../src/chain/actions/swapfinding5/swapsForPair.ts";
+} from "../src/chain/actions/swapfinding5/swapsForPair_linear.ts";
 import { maxSmallInteger } from "../src/types/euclid/smallValue.ts";
 import { maxInteger } from "../src/utils/constants.ts";
 import {
@@ -60,12 +60,14 @@ Deno.test("swapfinding tight", () => {
 
       break;
     }
+    console.log("iteration", i);
     const pairOptions = new PairOptions(
       buyingConstants,
       sellingConstants,
       jumpSize,
       Infinity,
     );
-    console.log(pairOptions.options.length);
+    // console.log(pairOptions.options.length);
+    console.log(pairOptions.bestPriceOption);
   }
 });

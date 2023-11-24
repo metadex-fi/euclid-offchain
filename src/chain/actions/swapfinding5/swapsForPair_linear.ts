@@ -154,7 +154,7 @@ class PairOption {
     maxDeltaSelling: bigint,
     numerator: bigint, // = b.a * jse (reduced)
     denominator: bigint, // = s.a * jsppe (reduced)
-    allowImperfection: boolean, // aka heresy-mode
+    allowImperfection: boolean,
   ): PairOption | null => {
     // we can actually skip the first binary search by including buying in the boundaries
     const start = max(
@@ -204,6 +204,7 @@ class PairOption {
         // trying to find the smallest, in order to reduce rounding-down error in the division below
         let deltaSelling = startSelling; // starting optimistically
         while (startSelling <= endSelling) {
+          console.log("selling", startSelling, endSelling, deltaSelling);
           // const deltaSelling = (startSelling + endSelling) / 2n;
           const deltaBuying = (deltaSelling / denominator) * numerator;
           if (deltaBuying >= b.minDelta) {
@@ -235,6 +236,7 @@ class PairOption {
         // trying to find the largest, in order to reduce rounding-up error in the ceilDiv below
         let deltaBuying = endBuying; // starting optimistically
         while (startBuying <= endBuying) {
+          console.log("buying", startBuying, endBuying, deltaBuying);
           // const deltaBuying = (startBuying + endBuying) / 2n;
           const deltaSelling = ceilDiv(deltaBuying * denominator, numerator);
           if (deltaSelling <= maxDeltaSelling) {
@@ -341,109 +343,165 @@ export class PairOptions {
         logJM,
     ));
 
+    const minExpSoft = 
+
     const maxExp = BigInt(Math.floor(
       (log(b.w * (b.v + b.b - b.minDelta)) - log(b.a)) /
         logJM,
     ));
 
-    console.log("minExp", minExp, "maxExp", maxExp);
-    for (const allowImperfection of [false]) { // TODO true case
-      const findBestPriceOption = (
-        start: bigint,
-        end: bigint,
-      ): PairOption | null => {
-        console.log("findBestPriceOption", start, end);
-        let bestPriceOption: PairOption | null = null;
-        while (start <= end) {
-          const exp = (start + end) / 2n;
-          console.log("start", start, "end", end, "exp", exp);
-          if (countMults(exp) <= expLimit) {
-            const jse = exp >= 0n ? js ** exp : jspp ** -exp;
-            const jsppe = exp >= 0n ? jspp ** exp : js ** -exp;
-            assert(b.maxDelta === b.available);
-            let maxDeltaBuying = (b.l * b.w * jse - b.a * jsppe) / (b.w * jse);
-            if (maxDeltaBuying > b.maxDelta) {
-              maxDeltaBuying = b.maxDelta;
-            }
-            if (maxDeltaBuying <= 0n) { // this can happen with large maxInteger, which we ascribe to rounding errors in the calculation of minExp
-              // assert(exp === minExp); // TODO
-              start = exp + 1n;
-              continue;
-            }
+    for (const allowImperfection of [false]) {
+      let exp = minExp;
+      let jse: bigint;
+      let jsppe: bigint;
+      const [js_, jspp_] = reduce(js, jspp);
+      if (exp < 0n) {
+        jse = jspp ** -exp;
+        jsppe = js ** -exp;
+      } else {
+        jse = js ** exp;
+        jsppe = jspp ** exp;
+      }
+      let [numerator, denominator] = reduce(b.a * jse, s.a * jsppe);
+      let buyingLimitReached = false;
+      let sellingLimitReached = false;
+      while (
+        exp <= maxExp // && (!buyingLimitReached) && (!sellingLimitReached)
+      ) {
+        console.log("exp", exp);
+        if (countMults(exp) <= expLimit) {
+          assert(b.maxDelta === b.available);
+          let maxDeltaBuying = (b.l * b.w * jse - b.a * jsppe) / (b.w * jse);
+          if (maxDeltaBuying > b.maxDelta) {
+            maxDeltaBuying = b.maxDelta;
+            buyingLimitReached = true;
+          }
+
+          if (maxDeltaBuying > 0n) { // this can happen with large maxInteger, which we ascribe to rounding errors in the calculation of minExp (not verified)
             assert(
               b.minDelta <= maxDeltaBuying,
               `${b.minDelta} > ${maxDeltaBuying}`,
             );
-            let maxDeltaSelling = (s.a * jsppe - s.l * s.w * jse) /
-              (s.w * jse);
+            let maxDeltaSelling = (s.a * jsppe - s.l * s.w * jse) / (s.w * jse);
             if (s.maxDelta !== "oo" && maxDeltaSelling > s.maxDelta) {
               maxDeltaSelling = s.maxDelta;
+              sellingLimitReached = true;
             }
-            if (maxDeltaSelling <= 0n) { // this can happen with large maxInteger, which we ascribe to rounding errors in the calculation of minExp
-              assert(exp === minExp);
-              start = exp + 1n;
-              continue;
-            }
-            assert(
-              s.minDelta <= maxDeltaSelling,
-              `${s.minDelta} > ${maxDeltaSelling}`,
-            );
-            const [numerator, denominator] = reduce(b.a * jse, s.a * jsppe);
-            const fromBoth = PairOption.fromBoth(
-              b,
-              s,
-              maxDeltaBuying,
-              maxDeltaSelling,
-              numerator,
-              denominator,
-              allowImperfection,
-            );
 
-            if (fromBoth) {
-              const ammSelling = s.w * (s.l + fromBoth.deltaSelling);
-              assert(jse * ammSelling <= s.a * jsppe); // = adheres onchain
-              const ammBuying = b.w * (b.l - fromBoth.deltaBuying);
-              assert(jse * ammBuying >= b.a * jsppe); // = adheres onchain
-              bestPriceOption = fromBoth;
-              end = exp - 1n;
-              continue;
+            if (maxDeltaSelling > 0n) { // this can happen with large maxInteger, which we ascribe to rounding errors in the calculation of minExp (not verified)
+              assert(
+                s.minDelta <= maxDeltaSelling,
+                `${s.minDelta} > ${maxDeltaSelling}`,
+              );
+              const fromBoth = PairOption.fromBoth(
+                b,
+                s,
+                maxDeltaBuying,
+                maxDeltaSelling,
+                numerator,
+                denominator,
+                allowImperfection,
+              );
 
-              // if (
-              //   (!bestPriceOption) ||
-              //   fromBoth.effectivePrice <= bestPriceOption.effectivePrice
-              // ) { // TODO consider equal case
-              //   bestPriceOption = fromBoth;
-              //   end = exp - 1n;
-              //   continue;
-              // } else {
-              //   start = exp + 1n;
-              //   continue;
-              // }
-            } else {
-              start = exp + 1n;
-              continue;
+              if (fromBoth) {
+                const ammSelling = s.w * (s.l + fromBoth.deltaSelling);
+                assert(jse * ammSelling <= s.a * jsppe); // = adheres onchain
+                const ammBuying = b.w * (b.l - fromBoth.deltaBuying);
+                assert(jse * ammBuying >= b.a * jsppe); // = adheres onchain
+
+                // this.options.push(fromBoth);
+                if (!allowImperfection) {
+                  this.bestPriceOption = fromBoth;
+                  break; // the solution without rounding error and smallest exponent has the strictly best price (see asserts below)
+                } else if (!this.bestPriceOption) {
+                  this.bestPriceOption = fromBoth;
+                } else if (
+                  this.bestPriceOption.effectivePrice > fromBoth.effectivePrice
+                ) {
+                  this.bestPriceOption = fromBoth;
+                  // throw new Error("hopefully never happens"); // happens
+                } else if (
+                  this.bestPriceOption.effectivePrice ===
+                    fromBoth.effectivePrice &&
+                  this.bestPriceOption.deltaSelling < fromBoth.deltaSelling
+                ) {
+                  assert(
+                    this.bestPriceOption.deltaBuying < fromBoth.deltaBuying,
+                  );
+                  this.bestPriceOption = fromBoth;
+                  throw new Error("hopefully never happens"); // seems to check out but doesn't matter if above happens
+                }
+              }
             }
           }
-          // end = exp - 1n;
-          // start = exp + 1n;
-          // // if exp has too many mults, or there is no solution:
-          // // first try to find one with a smaller exponent.
-          // // if that fails, try to find one with a larger exponent.
-          if (start < exp) {
-            console.log("leftSide");
-            const leftSide = findBestPriceOption(start, exp - 1n);
-            if (leftSide) return leftSide;
-          }
-          if (exp < end) {
-            console.log("rightSide");
-            return findBestPriceOption(exp + 1n, end);
-          }
-          return null;
         }
-        return bestPriceOption;
-      };
-      this.bestPriceOption = findBestPriceOption(minExp, maxExp);
+        exp++;
+        if (exp < 0n) {
+          jse /= jspp;
+          jsppe /= js;
+        } else if (exp === 0n) {
+          jse = 1n;
+          jsppe = 1n;
+        } else {
+          jse *= js;
+          jsppe *= jspp;
+        }
+        [numerator, denominator] = reduce(numerator * js_, denominator * jspp_);
+        // [numerator, denominator] = [numerator * js_, denominator * jspp_]; // doesn't work
+        // const [numerator_, denominator_] = reduce(b.a * jse, s.a * jsppe); // works
+        // assert(numerator === numerator_);
+        // assert(denominator === denominator_);
+      }
+      // if (this.options.length > 0) break; // the solution without rounding error and smallest exponent has the strictly best price (see asserts below)
       if (this.bestPriceOption) break; // the solution without rounding error and smallest exponent has the strictly best price (see asserts below)
     }
+
+    // fails unless we add that perfect-clause
+    // for (let i = 0; i < this.options.length - 1; i++) {
+    //   const first = this.options[i];
+    //   const second = this.options[i + 1];
+    //   if (first.perfect) { // passes
+    //   // if (first.perfect || (!second.perfect)) { // fails
+    //     assert(
+    //       first.effectivePrice <= second.effectivePrice,
+    //       `${first.effectivePrice} > ${second.effectivePrice} (${i}-${
+    //         i + 1
+    //       } / ${this.options.length})`,
+    //     );
+    //   }
+    // }
+
+    // passes -> solutions without rounding-error have a strictly better price than all with higher exp
+    // for (let i = 0; i < this.options.length - 1; i++) {
+    //   const first = this.options[i];
+    //   if (first.perfect) {
+    //     for (let j = i + 1; j < this.options.length; j++) {
+    //       const second = this.options[j];
+    //       assert(
+    //         first.effectivePrice < second.effectivePrice,
+    //         `${first.effectivePrice} >= ${second.effectivePrice} (${i}-${
+    //           i + 1
+    //         } / ${this.options.length})`,
+    //       );
+    //     }
+    //   }
+    // }
+
+    // passes -> the first solution without rounding-error has the strictly best price
+    // for (let i = 0; i < this.options.length; i++) {
+    //   const first = this.options[i];
+    //   if (first.perfect) {
+    //     for (let j = 0; j < i; j++) {
+    //       const second = this.options[j];
+    //       assert(
+    //         first.effectivePrice < second.effectivePrice,
+    //         `${first.effectivePrice} >= ${second.effectivePrice} (${i}-${
+    //           i + 1
+    //         } / ${this.options.length})`,
+    //       );
+    //     }
+    //     break;
+    //   }
+    // }
   }
 }

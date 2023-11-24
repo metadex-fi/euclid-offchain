@@ -147,7 +147,7 @@ export class Swapping {
 
     if (runTests) {
       // assert(
-      //   this.spotPrice <= this.effectivePrice,
+      //   this.1  <= this.effectivePrice,
       //   `spotPrice > effectivePrice: ${this.show()}`,
       // );
       assert(this.validates(), `Swapping does not validate: ${this.show()}`);
