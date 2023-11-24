@@ -10,7 +10,7 @@ import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
 import { PInteger } from "../general/fundamental/primitive/integer.ts";
 import { ceilDiv, min } from "../../utils/generators.ts";
 import { Value } from "../general/derived/value/value.ts";
-import { maxSmallInteger, SmallValue } from "./smallValue.ts";
+import { maxSmallInteger, PSmallValue, SmallValue } from "./smallValue.ts";
 import { maxInteger, maxIntRoot } from "../../utils/constants.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
@@ -73,12 +73,15 @@ ${tt})`;
   };
 
   static asserts(param: Param): void {
-    const assets = param.virtual.assets;
+    const assets = param.jumpSizes.assets;
     assert(
       assets.equals(param.weights.assets),
-      "assets of virtual and weights must match",
+      "assets of jumpSizes and weights must match",
     );
-
+    assert(
+      param.virtual.assets.subsetOf(assets),
+      `assets of virtual must be a subset of assets of jumpSizes and weights, but ${param.virtual.assets.show()}\nis not a subset of ${assets.show()}`,
+    );
     // const minAnchorPrices = param.maxAnchorPrices;
     // const maxAnchorPrices = minAnchorPrices.plus(param.jumpSizes);
 
@@ -129,11 +132,12 @@ ${tt})`;
     owner: KeyHash,
     allAssets: Assets,
   ): Param {
+    const jumpSizes = new PositiveValue();
     const weights = new PositiveValue();
     const virtuals = new PositiveValue();
-    const jumpSizes = new PositiveValue();
 
     allAssets.forEach((asset) => {
+      // const jumpSize = new PPositive(1n, gMaxJumpSize).genData();
       const jumpSize = new PPositive(1n, maxSmallInteger).genData();
       const virtual = new PPositive(
         ceilDiv(jumpSize + 1n, maxSmallInteger),
@@ -142,6 +146,7 @@ ${tt})`;
       const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual);
       const weight = new PPositive(minWeight, maxWeight).genData();
 
+      jumpSizes.initAmountOf(asset, jumpSize);
       virtuals.initAmountOf(asset, virtual);
       weights.initAmountOf(asset, weight);
     });
@@ -229,7 +234,7 @@ export class PParam extends PObject<Param> {
         owner: PKeyHash.ptype,
         virtual: PEuclidValue.ptype,
         weights: PEuclidValue.ptype, //PSmallValue.ptype,
-        jumpSize: PInteger.ptype,
+        jumpSizes: PSmallValue.ptype,
         active: PInteger.ptype,
       }),
       Param,
