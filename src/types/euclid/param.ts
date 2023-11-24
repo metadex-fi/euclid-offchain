@@ -10,7 +10,7 @@ import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
 import { PInteger } from "../general/fundamental/primitive/integer.ts";
 import { ceilDiv, min } from "../../utils/generators.ts";
 import { Value } from "../general/derived/value/value.ts";
-import { maxSmallInteger } from "./smallValue.ts";
+import { maxSmallInteger, SmallValue } from "./smallValue.ts";
 import { maxInteger, maxIntRoot } from "../../utils/constants.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
@@ -23,23 +23,23 @@ export class Param {
     public readonly owner: KeyHash,
     public readonly virtual: EuclidValue, // NOTE need those to be nonzero for multiplicative ticks
     public readonly weights: EuclidValue, //SmallValue // NOTE those are actually inverted
-    public readonly jumpSize: bigint,
+    public readonly jumpSizes: SmallValue,
     public readonly active: bigint,
   ) {
     Param.asserts(this);
   }
 
-  static minAnchorPrice = (jumpSize: bigint) =>
-  (
+  static minAnchorPrice = (
     virtual: bigint,
     weight: bigint,
+    jumpSize: bigint,
   ) => (virtual * weight * jumpSize) / (jumpSize + 1n);
 
   public get minAnchorPrices(): EuclidValue {
-    const f = Value.newUnionWith(Param.minAnchorPrice(this.jumpSize));
+    const f = Value.newUnionWith(Param.minAnchorPrice);
 
     return EuclidValue.fromValue(
-      f(this.virtual.unsigned, this.weights.unsigned),
+      f(this.virtual.unsigned, this.weights.unsigned, this.jumpSizes.unsigned),
     );
   }
 
@@ -52,7 +52,7 @@ export class Param {
       this.owner,
       this.virtual,
       this.weights,
-      this.jumpSize,
+      this.jumpSizes,
       this.active ? 0n : 1n,
     );
   }
@@ -67,7 +67,7 @@ export class Param {
 ${ttf}owner: ${this.owner.toString()}, 
 ${ttf}virtual: ${this.virtual.concise(ttf)}, 
 ${ttf}weights: ${this.weights.concise(ttf)}
-${ttf}jumpSize: ${this.jumpSize}, 
+${ttf}jumpSizes: ${this.jumpSizes.concise(ttf)}, 
 ${ttf}active: ${this.active.toString()}
 ${tt})`;
   };
@@ -131,9 +131,10 @@ ${tt})`;
   ): Param {
     const weights = new PositiveValue();
     const virtuals = new PositiveValue();
+    const jumpSizes = new PositiveValue();
 
-    const jumpSize = new PPositive(1n, maxSmallInteger).genData();
     allAssets.forEach((asset) => {
+      const jumpSize = new PPositive(1n, maxSmallInteger).genData();
       const virtual = new PPositive(
         ceilDiv(jumpSize + 1n, maxSmallInteger),
       ).genData();
@@ -149,7 +150,7 @@ ${tt})`;
       owner,
       new EuclidValue(virtuals),
       new EuclidValue(weights), //new SmallValue(new EuclidValue(weights)),
-      jumpSize,
+      new SmallValue(new EuclidValue(jumpSizes)),
       1n, // TODO include active-status in testing
     );
   }

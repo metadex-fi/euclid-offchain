@@ -7,7 +7,8 @@ export class Swap {
   constructor(
     public readonly boughtAsset: Asset,
     public readonly soldAsset: Asset,
-    public readonly exponent: bigint,
+    public readonly expBought: bigint,
+    public readonly expSold: bigint,
   ) {}
 }
 
@@ -17,7 +18,8 @@ export class PSwap extends PObject<Swap> {
       new PRecord({
         boughtAsset: PAsset.ptype,
         soldAsset: PAsset.ptype,
-        exponent: PInteger.ptype,
+        expBought: PInteger.ptype,
+        expSold: PInteger.ptype,
       }),
       Swap,
     );
