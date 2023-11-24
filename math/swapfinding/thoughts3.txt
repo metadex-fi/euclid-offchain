@@ -7,3 +7,24 @@ we learned a new apprach, which is that we can avoid rounding-errors by using mu
   of the other stuff that results when rearranging above equation
 - this unfortunately still requires choosing exponents first
 
+next approach:
+
+- exhaustive search over the four decision variables (exponents and deltas), discarding the ones that violate the 
+  constraints and noticing the optimal ones 
+- using this as ground truth, try to find patterns/optimizations and confirm them empirically
+
+sample patterns:
+- given a pair of exponents, we can calculate the spot price, which serves as a lower bound on effective price 
+  - further we can think about how we could, given a pair of exps and thus spot price, find deltas that match this exactly
+    - see the method of looking only at multiples of reduced numerator/denominator in the value equation
+
+- to improve upon the former, we could 
+  1. determine the exponents for the minDeltas
+  2. see what spot price that would result in 
+  3. for the given spot price, try to find a perfect pair of deltas using the method of reduction and upper bounds on
+      the deltas for the given exp
+  4. if we can't find one:
+    a. try to find the best imperfect solution for the given exp-pair
+    b. try increasing each exponent individually and iterate respectively (starting with the one resulting in the smaller spot price)
+
+- we can try to confirm certain areas of monotonicity
