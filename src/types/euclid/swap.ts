@@ -1,7 +1,7 @@
 import { Asset, PAsset } from "../general/derived/asset/asset.ts";
+import { PBounded } from "../general/derived/bounded/bounded.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
 import { PRecord } from "../general/fundamental/container/record.ts";
-import { PInteger } from "../general/fundamental/primitive/integer.ts";
 
 export class Swap {
   constructor(
@@ -18,8 +18,8 @@ export class PSwap extends PObject<Swap> {
       new PRecord({
         boughtAsset: PAsset.ptype,
         soldAsset: PAsset.ptype,
-        expBought: PInteger.ptype,
-        expSold: PInteger.ptype,
+        expBought: new PBounded(0n),
+        expSold: new PBounded(0n),
       }),
       Swap,
     );
