@@ -73,7 +73,7 @@ export const calcBaseArgs = (
   assert(liquidity > 0n, `liquidity <= 0n`); // assert is new, previously just returned null
   const calcDelta_ = calcDelta(weight, liquidity);
 
-  const jumpSize = param.jumpSize;
+  const jumpSize = param.jumpSizes.amountOf(asset);
   const anchor = diracUtxo.dirac.anchorPrices.amountOf(asset); // NOTE: inverted aka "price when selling for A0"
   const calcSpot_ = calcSpot(anchor, jumpSize);
 

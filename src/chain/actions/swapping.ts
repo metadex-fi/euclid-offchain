@@ -1,6 +1,5 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../lucid.mod.ts";
-import { BoughtSold } from "../../types/euclid/boughtSold.ts";
 import {
   PEuclidAction,
   SwapRedeemer,
@@ -358,10 +357,8 @@ export class Swapping {
         new Swap(
           this.buyingAsset,
           this.sellingAsset,
-          new BoughtSold(
-            this.buyingExp,
-            this.sellingExp,
-          ),
+          this.buyingExp,
+          this.sellingExp,
         ),
       ),
     );
