@@ -1,0 +1,9 @@
+this is after rolling back the failed single jumpsize/exp experiment
+
+we learned a new apprach, which is that we can avoid rounding-errors by using multiples of certain reduced values as the deltas. In particular:
+
+- given the value equation: delta_b * a_s * (j_s + 1)**e_s * j_b**e_b = delta_s * a_b * (j_b + 1)**e_b * j_s**e_s
+- we can, when calculating one delta given the other, avoid rounding-errors by setting the deltas to multiples of the numerator/denominator of the reduced fraction
+  of the other stuff that results when rearranging above equation
+- this unfortunately still requires choosing exponents first
+
