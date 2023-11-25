@@ -1,13 +1,50 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { ceilDiv, max, min } from "../../../utils/generators.ts";
-import { e } from "../../../../../webapp/.next/server/webpack-runtime.js";
+import {
+  ceilDiv,
+  genNonNegative,
+  genPositive,
+  max,
+  min,
+  randomChoice,
+} from "../../../utils/generators.ts";
+import { maxInteger, maxIntRoot } from "../../../utils/constants.ts";
+import { PPositive } from "../../../types/general/derived/bounded/positive.ts";
+import { maxSmallInteger } from "../../../types/euclid/smallValue.ts";
+import { Param } from "../../../types/euclid/param.ts";
+
+export const genWildAssetParams = () => {
+  const jumpSize = genPositive(maxSmallInteger);
+  const virtual = genPositive(maxInteger);
+  const balance = genNonNegative(maxInteger - virtual);
+  const locked = genNonNegative(balance);
+  const available = balance - locked;
+  const weight = genPositive(randomChoice([maxInteger, maxIntRoot]));
+  const anchor = genPositive(maxInteger);
+  const minDelta = genPositive(maxInteger);
+  return { virtual, balance, available, weight, anchor, jumpSize, minDelta };
+};
+
+export const genTightAssetParams = () => {
+  const jumpSize = genPositive(maxSmallInteger);
+  const virtual = new PPositive(
+    ceilDiv(jumpSize + 1n, maxSmallInteger),
+  ).genData();
+  const balance = genNonNegative(maxInteger - virtual);
+  const locked = genNonNegative(balance);
+  const available = balance - locked;
+  const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual);
+  const weight = new PPositive(minWeight, maxWeight).genData();
+  const anchor = genPositive(maxInteger);
+  const minDelta = genPositive(maxInteger);
+  return { virtual, balance, available, weight, anchor, jumpSize, minDelta };
+};
 
 export class AssetOption {
   readonly l: bigint;
+  readonly wl: bigint;
   readonly jspp: bigint;
-  readonly wa: bigint;
   readonly logJM: number;
-  readonly logWA: number;
+  readonly logAW: number;
   exp: bigint;
   jse: bigint;
   jsppe: bigint;
@@ -28,10 +65,10 @@ export class AssetOption {
     assert(maxDelta === "oo" || minDelta <= maxDelta);
     assert(minDelta > 0n);
     this.l = v + b;
+    this.wl = this.l * w;
     this.jspp = js + 1n;
-    this.wa = w * a;
     this.logJM = log(this.jspp) - log(this.js);
-    this.logWA = log(this.w * this.a);
+    this.logAW = log(this.a) - log(this.w);
 
     this.exp = this.minExpForDelta(this.minDelta);
     this.jse = js ** this.exp;
@@ -53,18 +90,18 @@ export class AssetOption {
 
   public minExpForDelta = (delta: bigint): bigint => {
     const numerator = this.type === "buying"
-      ? this.logWA - log(this.l - delta)
-      : log(this.l + delta) - this.logWA;
+      ? this.logAW - log(this.l - delta)
+      : log(this.l + delta) - this.logAW;
 
     const exp = BigInt(Math.ceil(numerator / this.logJM));
-    assert(exp >= 0n);
+    assert(exp >= 0n, `${exp} < 0`);
     return exp;
   };
 
   public maxDeltaForExp = (): bigint => {
     const maxDelta = this.type === "buying"
-      ? (this.l * this.jsppe - this.wa * this.jse) / this.jsppe
-      : (this.wa * this.jsppe - this.l * this.jse) / this.jse;
+      ? (this.wl * this.jsppe - this.a * this.jse) / (this.jsppe * this.w)
+      : (this.a * this.jsppe - this.wl * this.jse) / (this.jse * this.w);
     if (this.maxDelta === "oo") {
       return maxDelta;
     } else {
@@ -159,10 +196,12 @@ export class PairOptions {
     }];
 
     const checkNewOption = (
-      deltaBuying: bigint,
-      deltaSelling: bigint,
       expBuying: bigint,
       expSelling: bigint,
+    ) =>
+    (
+      deltaBuying: bigint,
+      deltaSelling: bigint,
       perfect: boolean,
     ) => {
       const effectivePrice = Number(deltaSelling) / Number(deltaBuying);
@@ -188,7 +227,9 @@ export class PairOptions {
     while (queue.length) {
       const { expBuying, expSelling } = queue.shift()!;
       if (countMults(expBuying) + countMults(expSelling) > expLimit) {
-        if (bestMultsAhead(expBuying) + bestMultsAhead(expSelling) <= expLimit) {
+        if (
+          bestMultsAhead(expBuying) + bestMultsAhead(expSelling) <= expLimit
+        ) {
           queue.push({ expBuying: expBuying + 1n, expSelling });
           queue.push({ expBuying, expSelling: expSelling + 1n });
         }
@@ -196,6 +237,7 @@ export class PairOptions {
       }
       s.setExp(expSelling);
       b.setExp(expBuying);
+      const checkNewOption_ = checkNewOption(expBuying, expSelling);
 
       const maxDeltaForExpSelling = s.maxDeltaForExp();
       const maxDeltaForExpBuying = b.maxDeltaForExp();
@@ -225,16 +267,14 @@ export class PairOptions {
       if (minMultiplier <= maxMultiplier) {
         const deltaBuying = maxMultiplier * buyingDeltaMultiplier;
         const deltaSelling = maxMultiplier * sellingDeltaMultiplier;
-        checkNewOption(
+        checkNewOption_(
           deltaBuying,
           deltaSelling,
-          expBuying,
-          expSelling,
           true,
         );
         continue; // if we found a perfect solution, we know that increasing exps will only make it worse
       } else {
-        // try to find imperfect solution if we can't find a perfect one
+        // try to find imperfect solution if we can't find a perfect one (TODO probably quite inefficient approach)
         const minSellingForMinBuying = ceilDiv(
           b.minDelta * buyingDeltaMultiplier,
           sellingDeltaMultiplier,
@@ -250,19 +290,15 @@ export class PairOptions {
           assert(maxBuyingForSelling >= b.minDelta);
 
           if (maxBuyingForSelling < maxDeltaForExpBuying) {
-            checkNewOption(
+            checkNewOption_(
               maxBuyingForSelling,
               deltaSelling,
-              expBuying,
-              expSelling,
               false,
             );
           } else {
-            checkNewOption(
+            checkNewOption_(
               maxDeltaForExpBuying,
               deltaSelling,
-              expBuying,
-              expSelling,
               false,
             );
             break;
@@ -277,5 +313,7 @@ export class PairOptions {
         queue.push({ expBuying, expSelling: expSelling + 1n });
       }
     }
+
+    this.bestPriceOption = bestPriceOption;
   }
 }
