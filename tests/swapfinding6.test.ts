@@ -67,6 +67,6 @@ Deno.test("swapfinding tight", () => {
       11,
     );
     // console.log(pairOptions.options.length);
-    console.log(pairOptions.bestPriceOption);
+    // console.log(pairOptions.bestPriceOption);
   }
 });
