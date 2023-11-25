@@ -23,8 +23,11 @@ sample patterns:
   2. see what spot price that would result in 
   3. for the given spot price, try to find a perfect pair of deltas using the method of reduction and upper bounds on
       the deltas for the given exp
+      -> if we find one, we can stop
   4. if we can't find one:
     a. try to find the best imperfect solution for the given exp-pair
-    b. try increasing each exponent individually and iterate respectively (starting with the one resulting in the smaller spot price)
+    b. try increasing each exponent individually and iterate respectively (step 3)
+        (starting with the one resulting in the smaller spot price)
+        -> if neither result in an equal or better spot price than the best previously found imperfect one, we can stop
 
 - we can try to confirm certain areas of monotonicity
