@@ -122,6 +122,21 @@ const reduce = (a: bigint, b: bigint): [bigint, bigint] => {
   return [a_, b_];
 };
 
+// each power of 2 is a multiplication.
+export const countMults = (exp: bigint): number => {
+  const exp_ = Math.abs(Number(exp));
+
+  const binaryRepresentation = exp_.toString(2).slice(1);
+  const b = binaryRepresentation.length; // Total bits
+  const k = (binaryRepresentation.match(/1/g) || []).length; // Count of '1' bits
+
+  return b + k;
+};
+
+// best we can do to decrease the number of multiplications is reaching the next power of 2
+export const bestMultsAhead = (exp: bigint): number =>
+  Math.abs(Number(exp) - 1).toString(2).length;
+
 export class PairOptions {
   readonly bestPriceOption: PairOption | null = null;
 
@@ -172,6 +187,13 @@ export class PairOptions {
 
     while (queue.length) {
       const { expBuying, expSelling } = queue.shift()!;
+      if (countMults(expBuying) + countMults(expSelling) > expLimit) {
+        if (bestMultsAhead(expBuying) + bestMultsAhead(expSelling) <= expLimit) {
+          queue.push({ expBuying: expBuying + 1n, expSelling });
+          queue.push({ expBuying, expSelling: expSelling + 1n });
+        }
+        continue;
+      }
       s.setExp(expSelling);
       b.setExp(expBuying);
 
