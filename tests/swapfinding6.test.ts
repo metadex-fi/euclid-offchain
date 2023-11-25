@@ -1,3 +1,4 @@
+import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import {
   AssetOption,
   genTightAssetParams,
@@ -61,12 +62,30 @@ Deno.test("swapfinding tight", () => {
       break;
     }
     console.log("iteration", i);
-    const pairOptions = new PairOptions(
-      buyingOption,
-      sellingOption,
-      11,
-    );
-    // console.log(pairOptions.options.length);
-    // console.log(pairOptions.bestPriceOption);
+
+    let bestPrice: number | undefined = undefined;
+    for (let i = 0n; i <= 7n; i++) {
+      const pairOptions = new PairOptions(
+        buyingOption,
+        sellingOption,
+        11,
+        10n ** i,
+      );
+      if (bestPrice === undefined) {
+        bestPrice = pairOptions.bestPriceOption?.effectivePrice;
+      } else {
+        assert(pairOptions.bestPriceOption);
+        if (pairOptions.bestPriceOption.effectivePrice < bestPrice) {
+          console.log(
+            "improved after",
+            i,
+            pairOptions.bestPriceOption?.effectivePrice,
+          );
+          bestPrice = pairOptions.bestPriceOption.effectivePrice;
+        }
+      }
+      // console.log(i, pairOptions.bestPriceOption?.effectivePrice);
+    }
+    if (bestPrice !== undefined) console.log("bestPrice", bestPrice);
   }
 });

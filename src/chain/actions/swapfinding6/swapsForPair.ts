@@ -182,6 +182,7 @@ export class PairOptions {
     b: AssetOption,
     s: AssetOption,
     expLimit: number,
+    perfectionism = 1000000n,
   ) {
     assert(b.type === "buying");
     assert(s.type === "selling");
@@ -191,7 +192,7 @@ export class PairOptions {
     const minExpBuying = b.minExpForDelta(b.minDelta);
 
     let bestPriceOption: PairOption | null = null;
-    let now = performance.now();
+    // let now = performance.now();
 
     const checkNewOption = (
       expBuying: bigint,
@@ -210,16 +211,16 @@ export class PairOptions {
           (deltaBuying > bestPriceOption.deltaBuying ||
             deltaSelling > bestPriceOption.deltaSelling))
       ) {
-        const duration = performance.now() - now;
-        now = performance.now();
-        console.log(
-          duration / 1000,
-          "s, found better price option",
-          perfect,
-          deltaBuying,
-          deltaSelling,
-          effectivePrice,
-        );
+        // const duration = performance.now() - now;
+        // now = performance.now();
+        // console.log(
+        //   duration / 1000,
+        //   "s, found better price option",
+        //   perfect,
+        //   deltaBuying,
+        //   deltaSelling,
+        //   effectivePrice,
+        // );
         // if (bestPriceOption) assert(!bestPriceOption.perfect);
         bestPriceOption = new PairOption(
           b,
@@ -256,14 +257,13 @@ export class PairOptions {
         else {
           const mDeltaBuying = best.deltaBuying * buyingDeltaMultiplier;
           const mDeltaSelling = best.deltaSelling * sellingDeltaMultiplier;
-          const granularity = 10000n;
-          const improvement = (granularity * (mDeltaSelling - mDeltaBuying)) /
+          const improvement = (perfectionism * (mDeltaSelling - mDeltaBuying)) /
             mDeltaSelling;
-          console.log(
-            "maximum possible improvement:",
-            100 * Number(improvement) / Number(granularity),
-            "%",
-          );
+          // console.log(
+          //   "maximum possible improvement:",
+          //   (100 * Number(improvement)) / Number(perfectionism),
+          //   "%",
+          // );
           if (improvement === 0n) return false; // good enough
         }
       }
@@ -297,6 +297,13 @@ export class PairOptions {
       }
       s.setExp(expSelling);
       b.setExp(expBuying);
+      if (
+        (b.a * b.jse) / b.jsppe > maxInteger ||
+        (s.a * s.jsppe) / s.jse > maxInteger
+      ) {
+        // console.log("maxInteger exceeded");
+        continue;
+      }
       const checkNewOption_ = checkNewOption(expBuying, expSelling);
 
       const maxDeltaForExpSelling = s.maxDeltaForExp();
@@ -440,15 +447,25 @@ export class PairOptions {
           assert(minDeltaSellingForNextBuying > deltaSelling);
           deltaSelling = minDeltaSellingForNextBuying;
         }
-        if (bestDeltaSelling !== null) {
-          console.log(
-            "bestDeltaSelling:",
-            bestDeltaSelling,
-            "of",
-            maxDeltaForExpSelling,
-          );
-          // assert(bestDeltaSelling === maxDeltaForExpSelling); // fails
-        }
+        // if (bestDeltaSelling !== null) {
+        //   {
+        //     console.log(
+        //       "bestDeltaSelling after:",
+        //       (100 * Number(bestDeltaSelling - minDeltaSelling)) /
+        //         Number(maxDeltaForExpSelling - minDeltaSelling),
+        //       "%",
+        //     );
+        //   }
+        //   // console.log(
+        //   //   "bestDeltaSelling:",
+        //   //   bestDeltaSelling,
+        //   //   "of",
+        //   //   minDeltaSelling,
+        //   //   "-",
+        //   //   maxDeltaForExpSelling,
+        //   // );
+        //   // assert(bestDeltaSelling === maxDeltaForExpSelling); // fails
+        // }
       }
 
       if (maxDeltaForExpBuying < b.maxDelta) {
