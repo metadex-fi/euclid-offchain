@@ -72,20 +72,37 @@ Deno.test("swapfinding tight", () => {
         10n ** i,
       );
       if (bestPrice === undefined) {
-        bestPrice = pairOptions.bestPriceOption?.effectivePrice;
+        bestPrice = pairOptions.bestAdheringOption?.effectivePrice;
+        console.log(
+          "intially",
+          i,
+          pairOptions.maxIntegerImpacted,
+          pairOptions.bestAdheringOption?.effectivePrice,
+          pairOptions.bestOverallOption?.effectivePrice,
+        );
       } else {
-        assert(pairOptions.bestPriceOption);
-        if (pairOptions.bestPriceOption.effectivePrice < bestPrice) {
+        assert(pairOptions.bestAdheringOption);
+        if (pairOptions.bestAdheringOption.effectivePrice < bestPrice) {
           console.log(
             "improved after",
             i,
-            pairOptions.bestPriceOption?.effectivePrice,
+            pairOptions.maxIntegerImpacted,
+            pairOptions.bestAdheringOption?.effectivePrice,
+            pairOptions.bestOverallOption?.effectivePrice,
           );
-          bestPrice = pairOptions.bestPriceOption.effectivePrice;
+          bestPrice = pairOptions.bestAdheringOption.effectivePrice;
+        } else {
+          console.log(
+            "same after",
+            i,
+            pairOptions.maxIntegerImpacted,
+            pairOptions.bestAdheringOption?.effectivePrice,
+            pairOptions.bestOverallOption?.effectivePrice,
+          );
         }
       }
       // console.log(i, pairOptions.bestPriceOption?.effectivePrice);
     }
-    if (bestPrice !== undefined) console.log("bestPrice", bestPrice);
+    if (bestPrice !== undefined) console.log("\tbestPrice", bestPrice);
   }
 });
