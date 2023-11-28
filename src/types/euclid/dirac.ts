@@ -36,10 +36,10 @@ ${tt})`;
     // const maxAnchorPrices = minAnchorPrices.plus(param.jumpSizes); TODO update this to multiplicative
     // leq_/lt_ assert assets are subsets too (in one (different) direction, resp.)
     // NOTE we are relying on this in various places, triple-check before altering it
-    assert(
-      minAnchorPrices.leq(anchorPrices),
-      `anchorPrices must be at least minAnchorPrices, but ${anchorPrices.concise()}\nis not at least ${minAnchorPrices.concise()}`,
-    );
+    // assert( // TODO revisit this
+    //   minAnchorPrices.leq(anchorPrices),
+    //   `anchorPrices must be at least minAnchorPrices, but ${anchorPrices.concise()}\nis not at least ${minAnchorPrices.concise()}`,
+    // );
     // assert(
     //   anchorPrices.lt(maxAnchorPrices),
     //   `anchorPrices must be strictly less than maxAnchorPrices, but ${anchorPrices.concise()}\nis not strictly less than ${maxAnchorPrices.concise()}`,

@@ -11,8 +11,8 @@ import { genNonNegative, max, min } from "../../utils/generators.ts";
 import { Pool } from "../pool.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
-import { calcExp, calcSpot } from "./swapfinding/helpers.ts";
 import { gMaxLength, maxInteger } from "../../utils/constants.ts";
+import { log } from "./swapfinding6/swapsForPair.ts";
 // complete settings for opening a pool
 export class Opening {
   constructor(
@@ -66,6 +66,11 @@ export class Opening {
   public succeeded = (_txCore: Lucid.C.Transaction) => {};
 
   // adjust the baseline anchor price for a single asset, in order to reduce required exponents when swapping
+  // we basically want the anchor price to be as close to the initial amm-price as possible;
+  // if it's slightly "better" (which means different things for buying/selling) this means the minimum
+  // exponent for the next swap will be 1 (because we need to worsen it at least once to get to the right
+  // side of the amm-price), otherwise 0
+  // TODO FIXME
   private static adjustAnchorPrice = (
     baseAnchor: bigint,
     balance: bigint,
@@ -74,33 +79,78 @@ export class Opening {
     jumpSize: bigint,
   ): bigint | null => {
     const amm = weight * (balance + virtual);
-    const jumpMultiplier = 1 + (1 / Number(jumpSize));
-    let exp = BigInt(Math.round(calcExp(
-      Number(baseAnchor),
-      Number(amm),
-      jumpMultiplier,
-    )));
-    let finalAnchor = baseAnchor;
-    const upperLimit = min(amm, maxInteger);
-    console.log("initial exp:", exp, "finalAnchor:", finalAnchor);
-    while (finalAnchor <= upperLimit) {
-      exp++;
-      finalAnchor = calcSpot(baseAnchor, jumpSize)(exp);
-      console.log("exp increased:", exp, "finalAnchor:", finalAnchor);
-    }
-    while (finalAnchor > upperLimit && finalAnchor >= baseAnchor) {
-      exp--;
-      finalAnchor = calcSpot(baseAnchor, jumpSize)(exp);
-      // console.log("exp decreased:", exp, "finalAnchor:", finalAnchor);
-    }
+    // const jumpMultiplier = 1 + (1 / Number(jumpSize));
+    // let exp = BigInt(Math.round(calcExp(
+    //   Number(baseAnchor),
+    //   Number(amm),
+    //   jumpMultiplier,
+    // )));
+    // let finalAnchor = baseAnchor;
 
-    console.log(`finalAnchor: ${finalAnchor} vs. baseAnchor: ${baseAnchor}`);
-    if (finalAnchor < baseAnchor) {
-      console.log(`returning null`);
-      return null;
+    const upperLimit = min(amm, maxInteger);
+    const logRatio = log(upperLimit) - log(baseAnchor);
+    const logJM = log(jumpSize + 1n) - log(jumpSize);
+    let exp: bigint;
+    let finalAnchor: bigint;
+    if (baseAnchor <= upperLimit) {
+      // if the base anchor is below the amm/maxInteger, we increase it
+      // as much as possible while staying below amm/maxInteger
+      exp = BigInt(Math.floor(logRatio / logJM));
+      finalAnchor = (baseAnchor * ((jumpSize + 1n) ** exp)) /
+        (jumpSize ** exp);
+    } else {
+      // TODO revisit this
+      // if the base anchor is above the amm/maxInteger, we decrease it
+      // as little as required to make it lower than amm/maxInteger
+      exp = BigInt(Math.ceil(logRatio / -logJM));
+      finalAnchor = (baseAnchor * (jumpSize ** exp)) /
+        ((jumpSize + 1n) ** exp);
     }
-    console.log(`returning finalAnchor: ${finalAnchor}`);
+    if (finalAnchor > upperLimit) { // presumably due to rounding-errors
+      finalAnchor = (finalAnchor * jumpSize) / (jumpSize + 1n);
+    } else {
+      while (true) {
+        const oneBigger = (finalAnchor * (jumpSize + 1n)) /
+          jumpSize;
+        if (oneBigger <= upperLimit) { // presumably due to rounding-errors
+          finalAnchor = oneBigger;
+        } else break;
+      }
+    }
+    assert(
+      finalAnchor <= upperLimit,
+      `finalAnchor must be <= upperLimit, but got ${finalAnchor} > ${upperLimit} (exp: ${exp}, baseAnchor: ${baseAnchor}, upperLimit: ${upperLimit})`,
+    );
+    const tightness = 1n;
+    const bigger = (finalAnchor * ((jumpSize + 1n) ** tightness)) /
+      (jumpSize ** tightness);
+    assert(
+      bigger > upperLimit,
+      `finalAnchor could be bigger: ${finalAnchor} * ${
+        jumpSize + 1n
+      } ** ${tightness} / ${jumpSize} ** ${tightness} = ${bigger} <= ${upperLimit} (exp: ${exp}, baseAnchor: ${baseAnchor}, upperLimit: ${upperLimit})`,
+    );
     return finalAnchor;
+
+    // console.log("initial exp:", exp, "finalAnchor:", finalAnchor);
+    // while (finalAnchor <= upperLimit) {
+    //   exp++;
+    //   finalAnchor = calcSpot(baseAnchor, jumpSize)(exp);
+    //   console.log("exp increased:", exp, "finalAnchor:", finalAnchor);
+    // }
+    // while (finalAnchor > upperLimit && finalAnchor >= baseAnchor) {
+    //   exp--;
+    //   finalAnchor = calcSpot(baseAnchor, jumpSize)(exp);
+    //   // console.log("exp decreased:", exp, "finalAnchor:", finalAnchor);
+    // }
+
+    // console.log(`finalAnchor: ${finalAnchor} vs. baseAnchor: ${baseAnchor}`);
+    // if (finalAnchor < baseAnchor) {
+    //   console.log(`returning null`); // TODO revisit this
+    //   return null;
+    // }
+    // console.log(`returning finalAnchor: ${finalAnchor}`);
+    // return finalAnchor;
   };
 
   // get the adjusted anchor price for the first dirac, for a single asset

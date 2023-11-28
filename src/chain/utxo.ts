@@ -17,18 +17,16 @@ import { Data, f, PConstanted, t } from "../types/general/fundamental/type.ts";
 import { Swapping } from "./actions/swapping.ts";
 import { Contract } from "./contract.ts";
 import { User } from "./user.ts";
-import { findForDirac } from "./actions/swapfinding/findForDirac.ts";
 import { ceilDiv, max, min } from "../utils/generators.ts";
-import { calcDelta, calcExp, calcSpot } from "./actions/swapfinding/helpers.ts";
 import {
   compareVariants,
   maxInteger,
   // webappExpLimit,
 } from "../utils/constants.ts";
 import {
-  AssetOptions,
-  // swapsForPairBinary,
-} from "./actions/swapfinding4/swapsForPair.ts";
+  AssetOption,
+  PairOptions,
+} from "./actions/swapfinding6/swapsForPair.ts";
 
 // export const getMinBalance = (asset: Asset): bigint =>
 //   asset.equals(Asset.ADA) ? 10000000n : 0n; // TODO arbitary aka both excessive and edge-casing
@@ -133,10 +131,10 @@ export class PreDiracUtxo {
     const tt = tabs + t;
     const ttf = tt + f;
     return `PreDiracUtxo (
-  ${ttf}utxo: {this.utxo.concise(ttf)}
-  ${ttf}datum: {this.datum.concise(ttf)}
-  ${ttf}preDirac: ${this.preDirac.concise(ttf)}
-  ${tt})`;
+${ttf}utxo: {this.utxo.concise(ttf)}
+${ttf}datum: {this.datum.concise(ttf)}
+${ttf}preDirac: ${this.preDirac.concise(ttf)}
+${tt})`;
   };
 }
 
@@ -240,228 +238,202 @@ export class DiracUtxo {
       swapping.posteriorDirac,
       this.funds
         .normedPlus(
-          PositiveValue.singleton(swapping.sellingAsset, swapping.sellingAmnt),
+          PositiveValue.singleton(
+            swapping.sellingAsset,
+            swapping.option.deltaSelling,
+          ),
         )
         .normedMinus(
-          PositiveValue.singleton(swapping.buyingAsset, swapping.buyingAmnt),
+          PositiveValue.singleton(
+            swapping.buyingAsset,
+            swapping.option.deltaBuying,
+          ),
         ),
       //TODO note that the utxo is missing, this should result from the tx, which we don't have yet
     );
   };
 
   public swappingsFor = (
-    adhereMaxInteger: boolean,
     user: User | null,
     paramUtxo: ParamUtxo,
-    optimizeAmnts: boolean,
     minBuying = 1n,
     minSelling = 1n,
     availableSelling?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
     buyableAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
     availableBuying?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
-    expLimit?: number,
+    expLimit = Infinity,
   ): Swapping[] => {
-    throw new Error("not updated yet");
-    // console.log("diracUtxo.swappingsFor()");
-    // assert(adhereMaxInteger, `!adhereMaxInteger not implemented yet`);
-    // const param = paramUtxo.param;
-    // const dirac = this.dirac;
-    // const assets = param.assets;
-    // const expLimit_ = expLimit ?? Infinity;
-    // const swappings: Swapping[] = [];
-    // assets.forEach((sellingAsset, sellingIndex) => {
-    //   const virtualSelling = param.virtual.amountOf(sellingAsset);
-    //   const weightSelling = param.weights.amountOf(sellingAsset);
-    //   const jumpSizeSelling = param.jumpSizes.amountOf(sellingAsset);
-    //   const anchorSelling = dirac.anchorPrices.amountOf(sellingAsset);
-    //   const balanceSelling = this.funds.amountOf(sellingAsset, 0n);
-    //   const lockedSelling = balanceSelling -
-    //     this.available.amountOf(sellingAsset, 0n);
-    //   const availableSelling_ = availableSelling?.amountOf(sellingAsset, 0n) ??
-    //     -1n;
-    //   const sellingOptions = new AssetOptions(
-    //     "selling",
-    //     virtualSelling,
-    //     lockedSelling,
-    //     balanceSelling,
-    //     weightSelling,
-    //     jumpSizeSelling,
-    //     anchorSelling,
-    //     minSelling,
-    //     availableSelling_,
-    //     expLimit_,
-    //   );
-    //   if (sellingOptions.options.length === 0) return;
-    //   // console.log("sellingOptions:", sellingOptions);
-    //   assets.forEach((buyingAsset, buyingIndex) => {
-    //     if (sellingIndex === buyingIndex) return;
-    //     if (buyableAssets && !buyableAssets.has(buyingAsset)) return;
-    //     const virtualBuying = param.virtual.amountOf(buyingAsset);
-    //     const weightBuying = param.weights.amountOf(buyingAsset);
-    //     const jumpSizeBuying = param.jumpSizes.amountOf(buyingAsset);
-    //     const anchorBuying = dirac.anchorPrices.amountOf(buyingAsset);
-    //     const balanceBuying = this.funds.amountOf(buyingAsset, 0n);
-    //     const availableBuying_ = availableBuying ??
-    //       this.available.amountOf(buyingAsset, 0n);
-    //     const lockedBuying = balanceBuying - availableBuying_;
-    //     const buyingOptions = new AssetOptions(
-    //       "buying",
-    //       virtualBuying,
-    //       lockedBuying,
-    //       balanceBuying,
-    //       weightBuying,
-    //       jumpSizeBuying,
-    //       anchorBuying,
-    //       minBuying,
-    //       weightSelling, // TODO if it weren't for this, we would not have to do this in the inner loop
-    //       expLimit_,
-    //     );
-    //     if (buyingOptions.options.length === 0) return;
-    //     // console.log("buyingOptions:", buyingOptions);
-    //     const [pairOptions, _duration] = swapsForPairBinary(
-    //       buyingOptions,
-    //       sellingOptions,
-    //     );
+    console.log("diracUtxo.swappingsFor()");
+    const param = paramUtxo.param;
+    const dirac = this.dirac;
+    const assets = param.assets;
+    const expLimit_ = expLimit ?? Infinity;
+    const swappings: Swapping[] = [];
+    assets.forEach((sellingAsset, sellingIndex) => {
+      const virtualSelling = param.virtual.amountOf(sellingAsset);
+      const weightSelling = param.weights.amountOf(sellingAsset);
+      const jumpSizeSelling = param.jumpSizes.amountOf(sellingAsset);
+      const anchorSelling = dirac.anchorPrices.amountOf(sellingAsset);
+      const balanceSelling = this.funds.amountOf(sellingAsset, 0n);
+      const availableSelling_ = availableSelling?.amountOf(sellingAsset, 0n) ??
+        -1n;
+      if (availableSelling_ === 0n) return;
+      if (availableSelling_ !== -1n && minSelling > availableSelling_) return;
+      assets.forEach((buyingAsset, buyingIndex) => {
+        if (sellingIndex === buyingIndex) return;
+        if (buyableAssets && !buyableAssets.has(buyingAsset)) return;
+        const virtualBuying = param.virtual.amountOf(buyingAsset);
+        const weightBuying = param.weights.amountOf(buyingAsset);
+        const jumpSizeBuying = param.jumpSizes.amountOf(buyingAsset);
+        const anchorBuying = dirac.anchorPrices.amountOf(buyingAsset);
+        const balanceBuying = this.funds.amountOf(buyingAsset, 0n);
+        const availableBuying_ = availableBuying ??
+          this.available.amountOf(buyingAsset, 0n);
+        if (minBuying > availableBuying_) return;
 
-    //     if (pairOptions.length === 0) return;
-    //     let bestPrice = pairOptions[0].effectivePrice;
-    //     for (let i = 1; i < pairOptions.length; i++) {
-    //       const pairOption = pairOptions[i];
-    //       if (pairOption.effectivePrice < bestPrice) {
-    //         bestPrice = pairOption.effectivePrice;
-    //       }
-    //     }
+        const sellingOption = AssetOption.initial( // TODO don't need to repeat this in the inner loop (probably needs some fixing first)
+          "selling",
+          virtualSelling,
+          balanceSelling,
+          weightSelling,
+          anchorSelling,
+          jumpSizeSelling,
+          minSelling,
+          availableSelling_ === -1n ? "oo" : availableSelling_,
+        );
+        const buyingOption = AssetOption.initial( // TODO don't need to repeat this in the inner loop (probably needs some fixing first)
+          "buying",
+          virtualBuying,
+          balanceBuying,
+          weightBuying,
+          anchorBuying,
+          jumpSizeBuying,
+          minBuying,
+          availableBuying_,
+        );
+        const pairOptions = new PairOptions(
+          buyingOption,
+          sellingOption,
+          expLimit_,
+        );
 
-    //     pairOptions.forEach((pairOption) => {
-    //       if (pairOption.effectivePrice > bestPrice) return; // TODO what about the other paretos?
-    //       console.log("best:", pairOption);
-    //       swappings.push(Swapping.boundary(
-    //         adhereMaxInteger,
-    //         false, // TODO FIXME
-    //         expLimit ?? null,
-    //         // expLimitImpacted,
-    //         user,
-    //         paramUtxo,
-    //         this,
-    //         buyingAsset,
-    //         sellingAsset,
-    //         pairOption.buyingOption.delta,
-    //         pairOption.sellingOption.delta,
-    //         pairOption.buyingOption.spot,
-    //         pairOption.sellingOption.spot,
-    //         pairOption.buyingOption.exp,
-    //         pairOption.sellingOption.exp,
-    //         availableBuying_,
-    //         availableSelling_,
-    //         minBuying,
-    //         minSelling,
-    //         null, // TODO can we remove this?
-    //       ));
-    //     });
-    //   });
-    // });
-    // return swappings;
-  };
+        const option = pairOptions.bestAdheringOption;
+        if (option === null) return;
 
-  public swappingsFor_ = (
-    adhereMaxInteger: boolean,
-    user: User | null,
-    paramUtxo: ParamUtxo,
-    optimizeAmnts: boolean,
-    minBuying = 1n,
-    minSelling_ = 1n,
-    availableSelling_?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
-    buyableAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
-    availableBuying?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
-    expLimit?: number,
-  ): Swapping[] => {
-    console.log("diracUtxo.swappingsFor_()");
-    assert(minBuying > 0n, `minBuying <= 0n: ${minBuying}`);
-    assert(minSelling_ > 0n, `minSelling_ <= 0n: ${minSelling_}`);
-    const swappings = findForDirac({
-      adhereMaxInteger,
-      user,
-      paramUtxo,
-      diracUtxo: this,
-      optimizeAmnts,
-      minBuying,
-      minSelling_,
-      availableSelling_: availableSelling_ ?? null,
-      buyableAssets: buyableAssets ?? null,
-      availableBuying: availableBuying ?? null,
-      expLimit: expLimit ?? null,
+        swappings.push(Swapping.boundary(
+          user,
+          paramUtxo,
+          this,
+          buyingAsset,
+          sellingAsset,
+          option,
+          pairOptions.maxIntegerImpacted,
+          expLimit,
+        ));
+      });
     });
-
-    // if (compareVariants) {
-    //   let swappings_: Swapping[];
-    //   const ignore: string[] = [];
-    //   if (expLimit === undefined) {
-    //     // return swappings;
-    //     console.log("calculating variant with oldSwappingsFor()");
-    //     swappings_ = this.oldSwappingsFor(
-    //       adhereMaxInteger,
-    //       user ?? undefined,
-    //       paramUtxo,
-    //       optimizeAmnts,
-    //       minBuying,
-    //       minSelling_,
-    //       availableSelling_,
-    //       buyableAssets,
-    //       availableBuying,
-    //     );
-    //   } else {
-    //     return swappings;
-    //     // if (expLimit < webappExpLimit) return swappings;
-    //     // console.log("calculating variant with expLimit:", expLimit);
-    //     // ignore = [
-    //     //   "expLimit",
-    //     //   "Exp",
-    //     //   "Spot",
-    //     //   "Price",
-    //     //   "Amnt",
-    //     //   "A0",
-    //     //   "tmpMinBuying",
-    //     // ]; // NOTE most of those are not irrelevant
-    //     // swappings_ = this.swappingsFor(
-    //     //   adhereMaxInteger,
-    //     //   user,
-    //     //   paramUtxo,
-    //     //   optimizeAmnts,
-    //     //   minBuying,
-    //     //   minSelling_,
-    //     //   availableSelling_,
-    //     //   buyableAssets,
-    //     //   availableBuying,
-    //     //   // expLimit <- only difference
-    //     // );
-    //   }
-    //   console.log("expLimit:", expLimit);
-    //   assert(
-    //     swappings_.length === swappings.length,
-    //     `length mismatch:\nvariant:\n${
-    //       swappings_.map((s) => s.show()).join("\n")
-    //     }\nactual:\n${swappings.map((s) => s.show()).join("\n")}`,
-    //   );
-    //   const notFound: Swapping[] = [];
-    //   swappings.forEach((swapping) => {
-    //     const i = swappings_.findIndex((s) => s.equals(swapping, true, ignore));
-    //     if (i === -1) notFound.push(swapping);
-    //     else swappings_.splice(i, 1);
-    //   });
-    //   // if (expLimit !== undefined) {
-    //   //   // NOTE this is not correct
-    //   //   swappings_ = swappings_.filter((s) => !s.maxIntImpacted);
-    //   // }
-    //   assert(
-    //     notFound.length === 0 && swappings_.length === 0,
-    //     `swappings mismatch:\nvariant:\n${
-    //       swappings_.map((s) => s.show()).join("\n")
-    //     }\nactual:\n${notFound.map((s) => s.show()).join("\n")}`,
-    //   );
-    // }
-
     return swappings;
   };
+
+  // public swappingsFor_ = (
+  //   adhereMaxInteger: boolean,
+  //   user: User | null,
+  //   paramUtxo: ParamUtxo,
+  //   optimizeAmnts: boolean,
+  //   minBuying = 1n,
+  //   minSelling_ = 1n,
+  //   availableSelling_?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
+  //   buyableAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
+  //   availableBuying?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
+  //   expLimit?: number,
+  // ): Swapping[] => {
+  //   console.log("diracUtxo.swappingsFor_()");
+  //   assert(minBuying > 0n, `minBuying <= 0n: ${minBuying}`);
+  //   assert(minSelling_ > 0n, `minSelling_ <= 0n: ${minSelling_}`);
+  //   const swappings = findForDirac({
+  //     adhereMaxInteger,
+  //     user,
+  //     paramUtxo,
+  //     diracUtxo: this,
+  //     optimizeAmnts,
+  //     minBuying,
+  //     minSelling_,
+  //     availableSelling_: availableSelling_ ?? null,
+  //     buyableAssets: buyableAssets ?? null,
+  //     availableBuying: availableBuying ?? null,
+  //     expLimit: expLimit ?? null,
+  //   });
+
+  //   // if (compareVariants) {
+  //   //   let swappings_: Swapping[];
+  //   //   const ignore: string[] = [];
+  //   //   if (expLimit === undefined) {
+  //   //     // return swappings;
+  //   //     console.log("calculating variant with oldSwappingsFor()");
+  //   //     swappings_ = this.oldSwappingsFor(
+  //   //       adhereMaxInteger,
+  //   //       user ?? undefined,
+  //   //       paramUtxo,
+  //   //       optimizeAmnts,
+  //   //       minBuying,
+  //   //       minSelling_,
+  //   //       availableSelling_,
+  //   //       buyableAssets,
+  //   //       availableBuying,
+  //   //     );
+  //   //   } else {
+  //   //     return swappings;
+  //   //     // if (expLimit < webappExpLimit) return swappings;
+  //   //     // console.log("calculating variant with expLimit:", expLimit);
+  //   //     // ignore = [
+  //   //     //   "expLimit",
+  //   //     //   "Exp",
+  //   //     //   "Spot",
+  //   //     //   "Price",
+  //   //     //   "Amnt",
+  //   //     //   "A0",
+  //   //     //   "tmpMinBuying",
+  //   //     // ]; // NOTE most of those are not irrelevant
+  //   //     // swappings_ = this.swappingsFor(
+  //   //     //   adhereMaxInteger,
+  //   //     //   user,
+  //   //     //   paramUtxo,
+  //   //     //   optimizeAmnts,
+  //   //     //   minBuying,
+  //   //     //   minSelling_,
+  //   //     //   availableSelling_,
+  //   //     //   buyableAssets,
+  //   //     //   availableBuying,
+  //   //     //   // expLimit <- only difference
+  //   //     // );
+  //   //   }
+  //   //   console.log("expLimit:", expLimit);
+  //   //   assert(
+  //   //     swappings_.length === swappings.length,
+  //   //     `length mismatch:\nvariant:\n${
+  //   //       swappings_.map((s) => s.show()).join("\n")
+  //   //     }\nactual:\n${swappings.map((s) => s.show()).join("\n")}`,
+  //   //   );
+  //   //   const notFound: Swapping[] = [];
+  //   //   swappings.forEach((swapping) => {
+  //   //     const i = swappings_.findIndex((s) => s.equals(swapping, true, ignore));
+  //   //     if (i === -1) notFound.push(swapping);
+  //   //     else swappings_.splice(i, 1);
+  //   //   });
+  //   //   // if (expLimit !== undefined) {
+  //   //   //   // NOTE this is not correct
+  //   //   //   swappings_ = swappings_.filter((s) => !s.maxIntImpacted);
+  //   //   // }
+  //   //   assert(
+  //   //     notFound.length === 0 && swappings_.length === 0,
+  //   //     `swappings mismatch:\nvariant:\n${
+  //   //       swappings_.map((s) => s.show()).join("\n")
+  //   //     }\nactual:\n${notFound.map((s) => s.show()).join("\n")}`,
+  //   //   );
+  //   // }
+
+  //   return swappings;
+  // };
 
   // private oldSwappingsFor = (
   //   adhereMaxInteger: boolean,

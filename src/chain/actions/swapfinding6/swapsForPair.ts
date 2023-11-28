@@ -11,6 +11,7 @@ import { maxInteger, maxIntRoot } from "../../../utils/constants.ts";
 import { PPositive } from "../../../types/general/derived/bounded/positive.ts";
 import { maxSmallInteger } from "../../../types/euclid/smallValue.ts";
 import { Param } from "../../../types/euclid/param.ts";
+import { f, t } from "../../../types/general/fundamental/type.ts";
 
 export const genWildAssetParams = () => {
   const jumpSize = genPositive(maxSmallInteger);
@@ -40,52 +41,103 @@ export const genTightAssetParams = () => {
 };
 
 export class AssetOption {
-  readonly l: bigint;
-  readonly wl: bigint;
-  readonly jspp: bigint;
-  readonly logJM: number;
-  readonly logAW: number;
-  exp: bigint;
-  jse: bigint;
-  jsppe: bigint;
-  constructor(
+  private constructor(
     readonly type: "buying" | "selling",
     readonly v: bigint,
-    readonly available: bigint,
     readonly b: bigint,
     readonly w: bigint,
     readonly a: bigint,
     readonly js: bigint,
     readonly minDelta: bigint,
     readonly maxDelta: bigint | "oo",
-  ) {
-    if (type === "buying") {
-      assert(maxDelta === available);
-    }
-    assert(maxDelta === "oo" || minDelta <= maxDelta);
-    assert(minDelta > 0n);
-    this.l = v + b;
-    this.wl = this.l * w;
-    this.jspp = js + 1n;
-    this.logJM = log(this.jspp) - log(this.js);
-    this.logAW = log(this.a) - log(this.w);
+    readonly l: bigint,
+    readonly wl: bigint,
+    readonly jspp: bigint,
+    readonly logJM: number,
+    readonly logAW: number,
+    readonly exp: bigint,
+    readonly jse: bigint,
+    readonly jsppe: bigint,
+  ) {}
 
-    this.exp = this.minExpForDelta(this.minDelta);
-    this.jse = js ** this.exp;
-    this.jsppe = this.jspp ** this.exp;
+  static initial(
+    type: "buying" | "selling",
+    v: bigint,
+    b: bigint,
+    w: bigint,
+    a: bigint,
+    js: bigint,
+    minDelta: bigint,
+    maxDelta: bigint | "oo",
+  ): AssetOption {
+    assert(
+      maxDelta === "oo" || minDelta <= maxDelta,
+      `${type}: ${minDelta} > ${maxDelta}`,
+    );
+    assert(minDelta > 0n);
+    const l = v + b;
+    const wl = l * w;
+    const jspp = js + 1n;
+    const logJM = log(jspp) - log(js);
+    const logAW = log(a) - log(w);
+
+    const option = new AssetOption(
+      type,
+      v,
+      b,
+      w,
+      a,
+      js,
+      minDelta,
+      maxDelta,
+      l,
+      wl,
+      jspp,
+      logJM,
+      logAW,
+      0n,
+      1n,
+      1n,
+    );
+
+    const exp = option.minExpForDelta(minDelta);
+    return option.withExp(exp);
   }
 
-  public setExp = (to: bigint): void => {
-    assert(to >= 0n);
-    const by = to - this.exp;
-    this.exp = to;
+  public withExp = (exp: bigint): AssetOption => {
+    assert(exp >= 0n);
+    const by = exp - this.exp;
+
+    let jse = this.jse;
+    let jsppe = this.jsppe;
     if (by > 0n) {
-      this.jse *= this.js ** by;
-      this.jsppe *= this.jspp ** by;
+      jse *= this.js ** by;
+      jsppe *= this.jspp ** by;
     } else if (by < 0n) {
-      this.jse /= this.js ** -by;
-      this.jsppe /= this.jspp ** -by;
+      jse /= this.js ** -by;
+      jsppe /= this.jspp ** -by;
     }
+    // assert(jse === this.js ** exp);
+    // assert(jsppe === this.jspp ** exp);
+
+    return new AssetOption(
+      this.type,
+      this.v,
+      this.b,
+      this.w,
+      this.a,
+      this.js,
+      this.minDelta,
+      this.maxDelta,
+      this.l,
+      this.wl,
+      this.jspp,
+      this.logJM,
+      this.logAW,
+      exp,
+      jse,
+      jsppe,
+    );
   };
 
   public minExpForDelta = (delta: bigint): bigint => {
@@ -98,20 +150,49 @@ export class AssetOption {
     return exp;
   };
 
-  public maxDeltaForExp = (): bigint => {
+  public maxDeltaForExp = (): bigint | null => {
     const maxDelta = this.type === "buying"
       ? (this.wl * this.jsppe - this.a * this.jse) / (this.jsppe * this.w)
       : (this.a * this.jsppe - this.wl * this.jse) / (this.jse * this.w);
-    if (maxDelta <= 0n) return 1n; // apparently rounding errors? TODO check
+    if (maxDelta < this.minDelta) return null; // apparently rounding errors? TODO check
     if (this.maxDelta === "oo") {
       return maxDelta;
     } else {
       return min(maxDelta, this.maxDelta);
     }
   };
+
+  public get newAnchor(): bigint {
+    return this.type === "buying"
+      ? (this.a * this.jse) / this.jsppe
+      : (this.a * this.jsppe) / this.jse;
+  }
+
+  public show = (tabs = ""): string => {
+    const tt = tabs + t;
+    const ttf = tt + f;
+    return `AssetOption (
+${ttf}type: ${this.type}
+${ttf}v: ${this.v}
+${ttf}b: ${this.b}
+${ttf}w: ${this.w}
+${ttf}a: ${this.a}
+${ttf}js: ${this.js}
+${ttf}minDelta: ${this.minDelta}
+${ttf}maxDelta: ${this.maxDelta}
+${ttf}l: ${this.l}
+${ttf}wl: ${this.wl}
+${ttf}jspp: ${this.jspp}
+${ttf}logJM: ${this.logJM}
+${ttf}logAW: ${this.logAW}
+${ttf}exp: ${this.exp}
+${ttf}jse: ${this.jse}
+${ttf}jsppe: ${this.jsppe}
+${tt})`;
+  };
 }
 
-class PairOption {
+export class PairOption {
   constructor(
     readonly b: AssetOption,
     readonly s: AssetOption,
@@ -126,7 +207,7 @@ class PairOption {
     assert(s.type === "selling");
     assert(deltaBuying >= b.minDelta, `${deltaBuying} < ${b.minDelta}`);
     assert(deltaSelling >= s.minDelta, `${deltaSelling} < ${s.minDelta}`);
-    assert(b.maxDelta === b.available);
+    assert(b.maxDelta !== "oo");
     assert(deltaBuying <= b.maxDelta, `${deltaBuying} > ${b.maxDelta}`);
     assert(
       s.maxDelta === "oo" || deltaSelling <= s.maxDelta,
@@ -136,10 +217,50 @@ class PairOption {
       this.effectivePrice ===
         Number(this.deltaSelling) / Number(this.deltaBuying),
     );
+    if (perfect) {
+      assert(
+        deltaBuying * s.a * s.jsppe * b.jsppe ===
+          deltaSelling * b.a * b.jse * s.jse,
+      ), `value equation: ${this.show()}`;
+    } else {
+      assert(
+        deltaBuying * s.a * s.jsppe * b.jsppe <
+          deltaSelling * b.a * b.jse * s.jse,
+      ), `value equation: ${this.show()}`;
+    }
+    assert(
+      b.a * b.jse <= (b.l - deltaBuying) * b.jsppe * b.w,
+      `price fit buying: ${this.show()}
+      ${b.a * b.jse} - ${(b.l - deltaBuying) * b.jsppe * b.w} = ${
+        b.a * b.jse - (b.l - deltaBuying) * b.jsppe * b.w
+      }`,
+    );
+    assert(
+      (s.l + deltaSelling) * s.jse * s.w <= s.a * s.jsppe,
+      `price fit selling: ${this.show()}
+      ${(s.l + deltaSelling) * s.jse * s.w} - ${s.a * s.jsppe} = ${
+        (s.l + deltaSelling) * s.jse * s.w - s.a * s.jsppe
+      }`,
+    );
   }
+
+  public show = (tabs = ""): string => {
+    const tt = tabs + t;
+    const ttf = tt + f;
+    return `PairOption (
+${ttf}b: ${this.b.show(ttf)}
+${ttf}s: ${this.s.show(ttf)}
+${ttf}deltaBuying: ${this.deltaBuying}
+${ttf}deltaSelling: ${this.deltaSelling}
+${ttf}expBuying: ${this.expBuying}
+${ttf}expSelling: ${this.expSelling}
+${ttf}effectivePrice: ${this.effectivePrice}
+${ttf}perfect: ${this.perfect}
+${tt})`;
+  };
 }
 
-const log = (x: bigint): number => Math.log(Number(x));
+export const log = (x: bigint): number => Math.log(Number(x));
 
 const gcd = (a: bigint, b: bigint): bigint => {
   while (b !== 0n) {
@@ -184,11 +305,10 @@ export class PairOptions {
     b: AssetOption,
     s: AssetOption,
     expLimit: number,
-    perfectionism = 1000000n,
+    perfectionism = 1000n,
   ) {
     assert(b.type === "buying");
     assert(s.type === "selling");
-    assert(b.maxDelta === b.available);
 
     const minExpSelling = s.minExpForDelta(s.minDelta);
     const minExpBuying = b.minExpForDelta(b.minDelta);
@@ -321,10 +441,10 @@ export class PairOptions {
         }
         continue;
       }
-      s.setExp(expSelling);
-      b.setExp(expBuying);
-      const exceedsMaxInteger = (((b.a * b.jse) / b.jsppe) > maxInteger) ||
-        (((s.a * s.jsppe) / s.jse) > maxInteger);
+      s = s.withExp(expSelling);
+      b = b.withExp(expBuying);
+      const exceedsMaxInteger = (b.newAnchor > maxInteger) ||
+        (s.newAnchor > maxInteger);
 
       const checkNewOption_ = checkNewOption(
         expBuying,
@@ -333,9 +453,25 @@ export class PairOptions {
       );
 
       const maxDeltaForExpSelling = s.maxDeltaForExp();
-      assert(maxDeltaForExpSelling >= s.minDelta);
+      if (maxDeltaForExpSelling === null) {
+        // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
+        queue.push({ expBuying, expSelling: expSelling + 1n });
+        continue;
+      }
+      assert(
+        maxDeltaForExpSelling >= s.minDelta,
+        `${maxDeltaForExpSelling} < ${s.minDelta}`,
+      );
       const maxDeltaForExpBuying = b.maxDeltaForExp();
-      assert(maxDeltaForExpBuying >= b.minDelta);
+      if (maxDeltaForExpBuying === null) {
+        // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
+        queue.push({ expBuying: expBuying + 1n, expSelling });
+        continue;
+      }
+      assert(
+        maxDeltaForExpBuying >= b.minDelta,
+        `${maxDeltaForExpBuying} < ${b.minDelta}`,
+      );
 
       const buyingDeltaMultiplierRaw = s.a * s.jsppe * b.jsppe;
       const sellingDeltaMultiplierRaw = b.a * b.jse * s.jse;
@@ -492,6 +628,7 @@ export class PairOptions {
         // }
       }
 
+      assert(b.maxDelta !== "oo");
       if (maxDeltaForExpBuying < b.maxDelta) {
         queue.push({ expBuying: expBuying + 1n, expSelling });
       }

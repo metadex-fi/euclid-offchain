@@ -8,3 +8,5 @@ export * from "./swapfinding/mod.ts";
 export * from "./swapfinding2/mod.ts";
 export * from "./swapfinding3/mod.ts";
 export * from "./swapfinding4/mod.ts";
+export * from "./swapfinding5/mod.ts";
+export * from "./swapfinding6/mod.ts";

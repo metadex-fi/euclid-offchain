@@ -1,4 +1,4 @@
-// import { PBoughtSold } from "../src/types/euclid/boughtSold.ts";
+// // import { PBoughtSold } from "../src/types/euclid/boughtSold.ts";
 // import { PDirac, PPreDirac } from "../src/types/euclid/dirac.ts";
 // import { PEuclidAction } from "../src/types/euclid/euclidAction.ts";
 // import {
@@ -90,7 +90,7 @@
 // ];
 
 // const euclidPrimitiveGenerators = [
-//   PBoughtSold.genPType,
+//   // PBoughtSold.genPType,
 //   PSwap.genPType,
 //   PEuclidValue.genPType,
 //   PSmallValue.genPType,
