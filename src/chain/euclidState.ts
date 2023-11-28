@@ -85,7 +85,7 @@ export class EuclidState {
           throw new Error(`unknown preEuclidDatum`);
         }
       } catch (e) {
-        if(handleInvalidPools) console.error(e);
+        if (handleInvalidPools) console.error(e);
         else throw e;
         // const is = this.invalidUtxos.get(e.message) ?? [];
         // is.push(utxo);

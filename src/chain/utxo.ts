@@ -124,7 +124,7 @@ export class PreDiracUtxo {
     param: Param,
   ): DiracUtxo | undefined => {
     try {
-    return DiracUtxo.parse(this, param);
+      return DiracUtxo.parse(this, param);
     } catch (e) { // TODO log this somewhere
       if (handleInvalidPools) return undefined;
       else throw e;

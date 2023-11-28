@@ -41,6 +41,9 @@ export const genTightAssetParams = () => {
 };
 
 export class AssetOption {
+  private newAnchorCache: bigint | null = null;
+  private multsCache: number | null = null;
+
   private constructor(
     readonly type: "buying" | "selling",
     readonly v: bigint,
@@ -163,9 +166,19 @@ export class AssetOption {
   };
 
   public get newAnchor(): bigint {
-    return this.type === "buying"
-      ? (this.a * this.jse) / this.jsppe
-      : (this.a * this.jsppe) / this.jse;
+    if (this.newAnchorCache === null) {
+      this.newAnchorCache = this.type === "buying"
+        ? (this.a * this.jse) / this.jsppe
+        : (this.a * this.jsppe) / this.jse;
+    }
+    return this.newAnchorCache;
+  }
+
+  public get mults(): number {
+    if (this.multsCache === null) {
+      this.multsCache = countMults(this.exp);
+    }
+    return this.multsCache;
   }
 
   public show = (tabs = ""): string => {
@@ -188,6 +201,8 @@ ${ttf}logAW: ${this.logAW}
 ${ttf}exp: ${this.exp}
 ${ttf}jse: ${this.jse}
 ${ttf}jsppe: ${this.jsppe}
+${ttf}newAnchor: ${this.newAnchor}
+${ttf}mults: ${this.mults}
 ${tt})`;
   };
 }
@@ -200,6 +215,8 @@ export class PairOption {
     readonly deltaSelling: bigint,
     readonly effectivePrice: number,
     readonly perfect: boolean,
+    readonly adhereMaxInteger: boolean,
+    readonly expLimit: number,
   ) {
     assert(b.type === "buying");
     assert(s.type === "selling");
@@ -224,6 +241,8 @@ export class PairOption {
     deltaSelling: bigint,
     effectivePrice: number,
     perfect: boolean,
+    adhereMaxInteger: boolean,
+    expLimit: number,
   ): PairOption => {
     const option = new PairOption(
       b,
@@ -232,6 +251,8 @@ export class PairOption {
       deltaSelling,
       effectivePrice,
       perfect,
+      adhereMaxInteger,
+      expLimit,
     );
     assert(
       option.validates(),
@@ -276,6 +297,23 @@ export class PairOption {
       console.error(`price fit selling: ${this.show()}`);
     }
 
+    if (this.adhereMaxInteger) {
+      if (this.b.newAnchor > maxInteger) {
+        passes = false;
+        console.error(`maxInteger buying: ${this.show()}`);
+      }
+
+      if (this.s.newAnchor > maxInteger) {
+        passes = false;
+        console.error(`maxInteger selling: ${this.show()}`);
+      }
+    }
+
+    if (this.b.mults + this.s.mults > this.expLimit) {
+      passes = false;
+      console.error(`expLimit: ${this.show()}`);
+    }
+
     return passes;
   };
 
@@ -292,11 +330,21 @@ export class PairOption {
       deltaSelling,
       Number(deltaSelling) / Number(deltaBuying),
       this.perfect,
+      this.adhereMaxInteger,
+      this.expLimit,
     );
     assert(
       !option.validates(),
-      `corrupted option should fail offchain validation: ${option.show()}`,
+      `corrupted option should fail offchain validation: ${this.show()}\n~~~>\n${option.show()}`,
     );
+    // TODO FIXME
+    // if (
+    //   !option.validates()
+    // ) {
+    //   console.error(
+    //     `corrupted option should fail offchain validation: ${this.show()}\n~~~>\n${option.show()}`,
+    //   );
+    // }
     return option;
   };
 
@@ -310,6 +358,7 @@ ${ttf}deltaBuying: ${this.deltaBuying}
 ${ttf}deltaSelling: ${this.deltaSelling}
 ${ttf}effectivePrice: ${this.effectivePrice}
 ${ttf}perfect: ${this.perfect}
+${ttf}adhereMaxInteger: ${this.adhereMaxInteger}
 ${tt})`;
   };
 }
@@ -417,6 +466,8 @@ export class PairOptions {
           deltaSelling,
           effectivePrice,
           perfect,
+          !exceedsMaxInteger,
+          expLimit,
         );
         if (exceedsMaxInteger) {
           bestExceedingOption = bestPriceOption;
@@ -461,7 +512,7 @@ export class PairOptions {
           //   (100 * Number(potential)) / Number(perfectionism),
           //   "%",
           // );
-          if (potential === 0n) return false; // good enough
+          if (potential === 0n) return false; // good enough // TODO revert
         }
       }
       // }
@@ -476,7 +527,22 @@ export class PairOptions {
     const checked: { expBuying: bigint; expSelling: bigint }[] = [];
 
     while (queue.length) {
+      // queue.sort((a, b) => {
+      //   const aMin = min(a.expBuying, a.expSelling);
+      //   const bMin = min(b.expBuying, b.expSelling);
+      //   return Number(aMin - bMin);
+      // });
       const { expBuying, expSelling } = queue.shift()!;
+      // let minExpBuying = queue[0].expBuying;
+      // let minExpSelling = queue[0].expSelling;
+      // queue.forEach(({ expBuying, expSelling }) => {
+      //   minExpBuying = min(minExpBuying, expBuying);
+      //   minExpSelling = min(minExpSelling, expSelling);
+      // });
+      // const best = queue.findIndex(({ expBuying, expSelling }) =>
+      //   expBuying === minExpBuying || expSelling === minExpSelling
+      // );
+      // const { expBuying, expSelling } = queue.splice(best, 1)[0];
       if (
         checked.find((e) =>
           e.expBuying === expBuying &&

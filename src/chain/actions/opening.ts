@@ -313,12 +313,19 @@ export class Opening {
     if (balance.size < 1) return null;
     const maxAssets = gMaxLength;
     const deposit = balance.boundedSubValue(1n, maxAssets, minAdaBalance);
+    const allowAda = deposit.has(Asset.ADA);
 
     const allAssets = deposit.assets;
     let addVirtualAssets = max(genNonNegative(maxAssets), 2n) - allAssets.size;
     while (addVirtualAssets > 0n) {
       const asset = Asset.generate();
       if (allAssets.has(asset)) continue;
+      if ((!allowAda) && asset.equals(Asset.ADA)) continue;
+      // we require for now either no ADA in the pool, or at least minAdaBalance, to fix swapfinding
+      // note that there is always a minimum amount of ADA in the pool, so if that's lower than
+      // minAdaBalance, we can't allow ADA to be one of the pool-assets, or our swapfinding is imperfect
+      // TODO this is actually a bit bullshit in prod - why impose extra costs on LPs just so
+      // our swapfinding can claim to be perfect? There might be reasons though
       allAssets.insert(asset);
       addVirtualAssets--;
     }

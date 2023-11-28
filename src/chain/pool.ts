@@ -67,7 +67,7 @@ export class PrePool {
       );
       if (parsedDiracUtxo) parsedDiracUtxos.push(parsedDiracUtxo);
       else if (handleInvalidPools) invalidDiracUtxos.push(preDiracUtxo);
-      else throw new Error(`invalid dirac utxo: ${preDiracUtxo.show()}`); 
+      else throw new Error(`invalid dirac utxo: ${preDiracUtxo.show()}`);
     }
     if (!parsedDiracUtxos.length) return undefined;
     return [
