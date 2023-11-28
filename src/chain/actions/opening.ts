@@ -10,7 +10,7 @@ import { PositiveValue } from "../../types/general/derived/value/positiveValue.t
 import { genNonNegative, max, min } from "../../utils/generators.ts";
 import { Pool } from "../pool.ts";
 import { User } from "../user.ts";
-import { DiracUtxo, ParamUtxo } from "../utxo.ts";
+import { DiracUtxo, minAdaBalance, ParamUtxo } from "../utxo.ts";
 import { gMaxLength, maxInteger } from "../../utils/constants.ts";
 import { log } from "./swapfinding6/swapsForPair.ts";
 // complete settings for opening a pool
@@ -191,7 +191,7 @@ export class Opening {
     const virtual = this.param.virtual.unsigned;
     const weights = this.param.weights.unsigned;
     const jumpSizes = this.param.jumpSizes.unsigned;
-    const paramNFT = this.user.nextParamNFT.next(); // TODO remove next()
+    const paramNFT = this.user.nextParamNFT.next(); // TODO remove next() - why is it there and why is it wrong?
     const paramUtxo = ParamUtxo.open(this.param, paramNFT);
 
     const numDiracs = this.numTicks.unsigned.mulAmounts();
@@ -267,7 +267,7 @@ export class Opening {
           }
 
           anchorPrices.setAmountOf(asset, finalAnchor);
-          console.log(`updated anchors: ${anchorPrices.concise()}`);
+          // console.log(`updated anchors: ${anchorPrices.concise()}`);
           threadNFT = threadNFT.next();
           diracs_.push(
             new Dirac(
@@ -299,11 +299,21 @@ export class Opening {
 
   // splitting it up this way to later use the same class to process actual user input
   static genOfUser = (user: User): Opening | null => {
+    console.log(
+      `Opening.genOfUser(): generating opening for user ${user.paymentKeyHash?.show()}`,
+    );
     // console.log(`attempting to open`);
     const balance = user.availableBalance;
-    if (!balance || balance.size < 1) return null;
+    if (!balance) return null;
+
+    if (balance.has(Asset.ADA) && balance.amountOf(Asset.ADA) < minAdaBalance) {
+      balance.drop(Asset.ADA);
+    }
+
+    if (balance.size < 1) return null;
     const maxAssets = gMaxLength;
-    const deposit = balance.boundedSubValue(1n, maxAssets);
+    const deposit = balance.boundedSubValue(1n, maxAssets, minAdaBalance);
+
     const allAssets = deposit.assets;
     let addVirtualAssets = max(genNonNegative(maxAssets), 2n) - allAssets.size;
     while (addVirtualAssets > 0n) {
@@ -316,7 +326,12 @@ export class Opening {
     const param = Param.genOf(user.paymentKeyHash, allAssets);
 
     // const gMaxDiracs = 26n; // because tx size
-    const maxDiracs = deposit.smallestAmount; // because minimum deposit
+    let maxDiracs = deposit.smallestAmount; // because minimum deposit
+    if (deposit.has(Asset.ADA)) {
+      maxDiracs = min(maxDiracs, deposit.amountOf(Asset.ADA) / minAdaBalance);
+    }
+    console.log("maxDiracs:", maxDiracs);
+
     let maxTicks = maxDiracs; //min(gMaxDiracs, maxDiracs);
     const numTicks = new PositiveValue();
     allAssets.forEach((asset) => {

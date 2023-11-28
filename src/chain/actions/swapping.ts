@@ -813,25 +813,25 @@ ${ttf}expLimit: ${this.expLimit}
 
   // try to make it wrong with minimal changes
   public corruptAll = (): Swapping[] => {
-    return []; // TODO update to new version
-    // return [
-    //   // this.corruptBoughtSpot(), // TODO revert
-    //   // this.corruptSoldSpot(),
+    // return []; // TODO update to new version
+    return [
+      // this.corruptBoughtSpot(), // TODO revert
+      // this.corruptSoldSpot(),
 
-    //   this.corruptSoldAmnt(false),
-    //   this.corruptBoughtAmnt(false),
-    //   // TODO revert from time to time
-    //   this.corruptSoldAmnt(true),
-    //   this.corruptBoughtAmnt(true),
-    //   // this.corruptSoldAmnt(true),
-    //   // this.corruptBoughtAmnt(true),
-    //   // this.corruptSoldAmnt(true),
-    //   // this.corruptBoughtAmnt(true),
-    //   // this.corruptSoldAmnt(true),
-    //   // this.corruptBoughtAmnt(true),
-    //   // this.corruptSoldAmnt(true),
-    //   // this.corruptBoughtAmnt(true),
-    // ].filter((s) => s) as Swapping[];
+      this.corruptSoldAmnt(false), // TODO revert
+      this.corruptBoughtAmnt(false),
+      // TODO revert from time to time
+      this.corruptSoldAmnt(true), // TODO revert
+      this.corruptBoughtAmnt(true),
+      // this.corruptSoldAmnt(true),
+      // this.corruptBoughtAmnt(true),
+      // this.corruptSoldAmnt(true),
+      // this.corruptBoughtAmnt(true),
+      // this.corruptSoldAmnt(true),
+      // this.corruptBoughtAmnt(true),
+      // this.corruptSoldAmnt(true),
+      // this.corruptBoughtAmnt(true),
+    ].filter((s) => s) as Swapping[];
   };
 
   // private corrupted = (
@@ -844,73 +844,85 @@ ${ttf}expLimit: ${this.expLimit}
   // ): Swapping => {
   //   console.log(`Swapping.corrupted()`);
   //   return new Swapping(
-  //     this.adhereMaxInteger,
-  //     this.maxIntImpacted,
-  //     this.expLimit,
-  //     // this.expLimitImpacted,
-  //     this.user,
-  //     this.paramUtxo,
-  //     this.diracUtxo,
-  //     this.buyingAsset,
-  //     this.sellingAsset,
-  //     buyingAmnt,
-  //     sellingAmnt,
-  //     buyingSpot,
-  //     sellingSpot,
-  //     buyingExp,
-  //     sellingExp,
-  //     this.availableBuying,
-  //     this.availableSelling,
-  //     this.minBuying_,
-  //     this.minSelling,
-  //     this.tmpMinBuying,
-  //     false,
+  //     // this.adhereMaxInteger,
+  //     // this.maxIntImpacted,
+  //     // this.expLimit,
+  //     // // this.expLimitImpacted,
+  //     // this.user,
+  //     // this.paramUtxo,
+  //     // this.diracUtxo,
+  //     // this.buyingAsset,
+  //     // this.sellingAsset,
+  //     // buyingAmnt,
+  //     // sellingAmnt,
+  //     // buyingSpot,
+  //     // sellingSpot,
+  //     // buyingExp,
+  //     // sellingExp,
+  //     // this.availableBuying,
+  //     // this.availableSelling,
+  //     // this.minBuying_,
+  //     // this.minSelling,
+  //     // this.tmpMinBuying,
+  //     // false,
   //   );
   // };
 
-  // public corruptBoughtAmnt = (random: boolean): Swapping | null => {
-  //   console.log(`trying to corrupt bought amount...`);
-  //   if (this.buyingAmnt === this.availableBuying) return null;
-  //   const amnt = random
-  //     ? genPositive(this.availableBuying - this.buyingAmnt)
-  //     : 1n;
-  //   console.log(`... by ${amnt}`);
-  //   const boughtTooMuch = this.corrupted(
-  //     this.buyingAmnt + amnt,
-  //     this.sellingAmnt,
-  //     this.newAnchorBuying,
-  //     this.newAnchorSelling,
-  //     this.buyingExp,
-  //     this.sellingExp,
-  //   );
-  //   assert(
-  //     !boughtTooMuch.validates(),
-  //     `buying ${amnt} more should fail offchain validation: ${this.show()}\n~~~>\n${boughtTooMuch.show()}`,
-  //   );
-  //   console.log(`returning corruptBoughtAmnt`);
-  //   return boughtTooMuch;
-  // };
+  public corruptBoughtAmnt = (random: boolean): Swapping | null => {
+    console.log(`trying to corrupt bought amount...`);
+    if (this.option.deltaBuying === this.option.b.maxDelta) return null;
+    assert(this.option.b.maxDelta !== "oo");
+    const amnt = random
+      ? genPositive(this.option.b.maxDelta - this.option.deltaBuying)
+      : 1n;
+    console.log(`... by ${amnt}`);
+    const boughtTooMuch = new Swapping(
+      this.user, // webapp needs undefined iirc
+      this.paramUtxo,
+      this.diracUtxo,
+      this.buyingAsset,
+      this.sellingAsset,
+      this.option.corrupted(
+        this.option.deltaBuying + amnt,
+        this.option.deltaSelling,
+        this.option.b.exp,
+        this.option.s.exp,
+      ),
+      this.maxIntImpacted,
+      this.expLimit,
+      false, // corruption-test-swappings don't run tests themselves.
+    );
 
-  // public corruptSoldAmnt = (random: boolean): Swapping | null => {
-  //   console.log(`trying to corrupt sold amount...`);
-  //   if (this.sellingAmnt === this.minSelling) return null;
-  //   const amnt = random ? genPositive(this.sellingAmnt - this.minSelling) : 1n;
-  //   console.log(`... by ${amnt}`);
-  //   const soldTooLittle = this.corrupted(
-  //     this.buyingAmnt,
-  //     this.sellingAmnt - amnt,
-  //     this.newAnchorBuying,
-  //     this.newAnchorSelling,
-  //     this.buyingExp,
-  //     this.sellingExp,
-  //   );
-  //   assert(
-  //     !soldTooLittle.validates(),
-  //     `selling ${amnt} less should fail offchain validation: ${this.show()}\n~~~>\n${soldTooLittle.show()}`,
-  //   );
-  //   console.log(`returning corruptSoldAmnt`);
-  //   return soldTooLittle;
-  // };
+    console.log(`returning corruptBoughtAmnt`);
+    return boughtTooMuch;
+  };
+
+  public corruptSoldAmnt = (random: boolean): Swapping | null => {
+    console.log(`trying to corrupt sold amount...`);
+    if (this.option.deltaSelling === this.option.s.minDelta) return null;
+    const amnt = random
+      ? genPositive(this.option.deltaSelling - this.option.s.minDelta)
+      : 1n;
+    console.log(`... by ${amnt}`);
+    const soldTooLittle = new Swapping(
+      this.user, // webapp needs undefined iirc
+      this.paramUtxo,
+      this.diracUtxo,
+      this.buyingAsset,
+      this.sellingAsset,
+      this.option.corrupted(
+        this.option.deltaBuying,
+        this.option.deltaSelling - amnt,
+        this.option.b.exp,
+        this.option.s.exp,
+      ),
+      this.maxIntImpacted,
+      this.expLimit,
+      false, // corruption-test-swappings don't run tests themselves.
+    );
+    console.log(`returning corruptSoldAmnt`);
+    return soldTooLittle;
+  };
 
   // private calcSpot = (buySell: "buying" | "selling"): (s: bigint) => bigint => {
   //   const param = this.paramUtxo.param;

@@ -159,6 +159,13 @@ export class User {
       // console.log(`not enough ada to pay fees etc.`);
       return [];
     }
+
+    console.log(
+      "user.generateActions() - found lastIdNFT:",
+      this.lastIdNFT?.show(),
+      "for",
+      this.paymentKeyHash.show(),
+    );
     const action = new UserAction(this).generate();
     if (action) return [action];
     else return [];
@@ -183,6 +190,13 @@ export class User {
     // // console.log(`balance: ${this.balance.concise()}`);
     this.lastIdNFT = this.contract.state!.pools.get(this.paymentKeyHash)?.last
       ?.lastIdNFT;
+
+    console.log(
+      "user.update() - updated lastIdNFT:",
+      this.lastIdNFT?.show(),
+      "for",
+      this.paymentKeyHash.show(),
+    );
 
     return this.lucid.currentSlot();
   };

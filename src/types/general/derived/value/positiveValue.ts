@@ -1,6 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
-import { genPositive } from "../../../../utils/generators.ts";
+import { genNonNegative, genPositive } from "../../../../utils/generators.ts";
 import { AssocMap } from "../../fundamental/container/map.ts";
 import { PWrapped } from "../../fundamental/container/wrapped.ts";
 import { Asset } from "../asset/asset.ts";
@@ -103,12 +103,22 @@ export class PositiveValue {
   public boundedSubValue = (
     minSize?: bigint,
     maxSize?: bigint,
+    minAdaBalance?: bigint,
   ): PositiveValue => {
     const assets = this.assets.boundedSubset(minSize, maxSize);
     const value = new PositiveValue();
     assets.forEach((asset) => {
-      const amount = this.amountOf(asset);
-      value.initAmountOf(asset, genPositive(amount));
+      let amount = this.amountOf(asset);
+      if (minAdaBalance && asset.equals(Asset.ADA)) {
+        assert(
+          amount >= minAdaBalance,
+          `minAdaBalance: ${minAdaBalance} too low`,
+        );
+        amount = minAdaBalance + genNonNegative(amount - minAdaBalance);
+      } else {
+        amount = genPositive(amount);
+      }
+      value.initAmountOf(asset, amount);
     });
     return value;
   };

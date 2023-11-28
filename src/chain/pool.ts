@@ -13,6 +13,7 @@ import { ParamDatum, PPreEuclidDatum } from "../types/euclid/euclidDatum.ts";
 import { Value } from "../types/general/derived/value/value.ts";
 import { Asset } from "../types/general/derived/asset/asset.ts";
 import { Assets } from "../types/general/derived/asset/assets.ts";
+import { handleInvalidPools } from "../utils/constants.ts";
 
 export class PrePool {
   public paramUtxo?: ParamUtxo;
@@ -65,7 +66,8 @@ export class PrePool {
         this.paramUtxo.param,
       );
       if (parsedDiracUtxo) parsedDiracUtxos.push(parsedDiracUtxo);
-      else invalidDiracUtxos.push(preDiracUtxo);
+      else if (handleInvalidPools) invalidDiracUtxos.push(preDiracUtxo);
+      else throw new Error(`invalid dirac utxo: ${preDiracUtxo.show()}`); 
     }
     if (!parsedDiracUtxos.length) return undefined;
     return [
@@ -203,6 +205,7 @@ export class Pool {
         this.paramContainingSplit ? 1 : 0
       } param utxos`,
     );
+    this.diracUtxos.forEach((diracUtxo) => console.log(diracUtxo.show()));
     let tx_ = this.paramUtxo.openingTx(tx, contract, this.paramContainingSplit);
     // let remaining = this.diracUtxos.slice(0, 100); TODO this is for splitting larger txes
     this.diracUtxos.forEach((diracUtxo) =>

@@ -15,6 +15,7 @@ import { Pool, PrePool } from "./pool.ts";
 import { User } from "./user.ts";
 import { ParamUtxo, PreDiracUtxo } from "./utxo.ts";
 import { Asset } from "../types/general/derived/asset/asset.ts";
+import { handleInvalidPools } from "../utils/constants.ts";
 
 type ErrorMessage = string;
 
@@ -84,8 +85,8 @@ export class EuclidState {
           throw new Error(`unknown preEuclidDatum`);
         }
       } catch (e) {
-        console.error(e);
-        // throw e; // TODO revert in prod
+        if(handleInvalidPools) console.error(e);
+        else throw e;
         // const is = this.invalidUtxos.get(e.message) ?? [];
         // is.push(utxo);
         // this.invalidUtxos.set(e.message, is);
@@ -116,8 +117,8 @@ export class EuclidState {
             paramNFT = lastIdNFT;
             hits--;
           } else {
-            // throw new Error(`invalid prePool: ${prePool.show()}`); // TODO revert in prod
-            invalidOwnerPools.set(paramNFT, prePool);
+            if (handleInvalidPools) invalidOwnerPools.set(paramNFT, prePool);
+            else throw new Error(`invalid prePool: ${prePool.show()}`);
           }
         } else {
           misses--;
@@ -126,6 +127,19 @@ export class EuclidState {
       }
       this.pools.set(owner, parsedOwnerPools);
       this.invalidPools.set(owner, invalidOwnerPools);
+
+      console.log(
+        "found valid pools for owner:",
+        owner.show(),
+        parsedOwnerPools.size,
+        parsedOwnerPools.last?.paramUtxo.paramNFT.show(),
+      );
+      console.log(
+        "found invalid pools for owner:",
+        owner.show(),
+        invalidOwnerPools.size,
+        invalidOwnerPools.last?.paramUtxo?.paramNFT.show(),
+      );
     });
   }
 

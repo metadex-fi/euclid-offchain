@@ -20,6 +20,7 @@ import { User } from "./user.ts";
 import { ceilDiv, max, min } from "../utils/generators.ts";
 import {
   compareVariants,
+  handleInvalidPools,
   maxInteger,
   // webappExpLimit,
 } from "../utils/constants.ts";
@@ -70,6 +71,8 @@ export class ParamUtxo {
       const peuclidDatum = PPreEuclidDatum.genPType(); //only need this for ParamDatum, so this is fine
       const paramDatum = peuclidDatum.pconstant(new ParamDatum(this.param));
       const paramNFT = this.paramNFT.toLucidNFT;
+      console.log("paramNFT:", paramNFT);
+      console.log("owner:", this.param.owner.toString());
 
       return tx
         .attachMintingPolicy(contract.mintingPolicy)
@@ -121,9 +124,10 @@ export class PreDiracUtxo {
     param: Param,
   ): DiracUtxo | undefined => {
     try {
-      return DiracUtxo.parse(this, param);
-    } catch (_e) { // TODO log this somewhere
-      return undefined;
+    return DiracUtxo.parse(this, param);
+    } catch (e) { // TODO log this somewhere
+      if (handleInvalidPools) return undefined;
+      else throw e;
     }
   };
 
@@ -273,7 +277,12 @@ export class DiracUtxo {
       const virtualSelling = param.virtual.amountOf(sellingAsset);
       const weightSelling = param.weights.amountOf(sellingAsset);
       const jumpSizeSelling = param.jumpSizes.amountOf(sellingAsset);
+      // console.log("selling:", sellingAsset.concise());
+      // console.log("anchorPrices:", dirac.anchorPrices.concise());
+      // console.log("param:", param.concise());
+      // console.log("dirac:", dirac.concise());
       const anchorSelling = dirac.anchorPrices.amountOf(sellingAsset);
+      // console.log("passed");
       const balanceSelling = this.funds.amountOf(sellingAsset, 0n);
       const availableSelling_ = availableSelling?.amountOf(sellingAsset, 0n) ??
         -1n;
@@ -285,10 +294,16 @@ export class DiracUtxo {
         const virtualBuying = param.virtual.amountOf(buyingAsset);
         const weightBuying = param.weights.amountOf(buyingAsset);
         const jumpSizeBuying = param.jumpSizes.amountOf(buyingAsset);
+        // console.log("buying:", buyingAsset.show());
+        // console.log("anchorPrices:", dirac.anchorPrices.concise());
         const anchorBuying = dirac.anchorPrices.amountOf(buyingAsset);
+        // console.log("passed");
         const balanceBuying = this.funds.amountOf(buyingAsset, 0n);
-        const availableBuying_ = availableBuying ??
-          this.available.amountOf(buyingAsset, 0n);
+        let availableBuying_ = this.available.amountOf(buyingAsset, 0n);
+        if (availableBuying !== undefined) {
+          assert(availableBuying <= availableBuying_);
+          availableBuying_ = availableBuying;
+        }
         if (minBuying > availableBuying_) return;
 
         const sellingOption = AssetOption.initial( // TODO don't need to repeat this in the inner loop (probably needs some fixing first)

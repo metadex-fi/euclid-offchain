@@ -66,75 +66,75 @@ Deno.test("emulator", async () => {
       //   }),
       // );
       // console.log(`users: ${users.length}`);
-      try {
-        // for (const user of users) {
-        const hashes = await user
-          .generateActions()
-          .then(async (actions) => {
-            const hashes_: string[] = [];
-            for (const action of actions) {
-              const type = action.type;
+      // try {
+      // for (const user of users) {
+      const hashes = await user
+        .generateActions()
+        .then(async (actions) => {
+          const hashes_: string[] = [];
+          for (const action of actions) {
+            const type = action.type;
 
-              // corruption-tests
-              if (type === "Swapping") {
-                const swapping = action as Swapping;
-                const corrupted = swapping.corruptAll();
-                console.log(`attempting ${corrupted.length} corruptions...`);
-                for (const [t, c] of corrupted.entries()) {
-                  console.log(`attempting corruption ${t}...`);
-                  try {
-                    const hash = await user.execute(c);
-                    console.log(
-                      `successfully executed type ${t} corruption: ${hash}`,
-                    );
-                  } catch (e) {
-                    console.log(
-                      `type ${t} corruption failed successfully: ${e}`,
-                    );
-                    continue;
-                  }
-
-                  // TODO FIXME
-                  // if (c.soldAsset.equals(Asset.ADA)) {
-                  //   console.error(
-                  //     `type ${t} corruption succeeded, but skipping due to ADA sold: ${swapping.show()}\n~~~>\n${c.show()}`,
-                  //   );
-                  //   break;
-                  // }
-
-                  // console.log(`type ${t} corruption succeeded: ${swapping.show()}\n~~~>\n${c.show()}`)
-                  throw new Error(
-                    `type ${t} corruption succeeded: ${swapping.show()}\n~~~>\n${c.show()}`,
+            // corruption-tests
+            if (type === "Swapping") {
+              const swapping = action as Swapping;
+              const corrupted = swapping.corruptAll();
+              console.log(`attempting ${corrupted.length} corruptions...`);
+              for (const [t, c] of corrupted.entries()) {
+                console.log(`attempting corruption ${t}...`);
+                try {
+                  const hash = await user.execute(c);
+                  console.log(
+                    `successfully executed type ${t} corruption: ${hash}`,
                   );
+                } catch (e) {
+                  console.log(
+                    `type ${t} corruption failed successfully: ${e}`,
+                  );
+                  continue;
                 }
+
+                // TODO FIXME
+                // if (c.soldAsset.equals(Asset.ADA)) {
+                //   console.error(
+                //     `type ${t} corruption succeeded, but skipping due to ADA sold: ${swapping.show()}\n~~~>\n${c.show()}`,
+                //   );
+                //   break;
+                // }
+
+                // console.log(`type ${t} corruption succeeded: ${swapping.show()}\n~~~>\n${c.show()}`)
+                throw new Error(
+                  `type ${t} corruption succeeded: ${swapping.show()}\n~~~>\n${c.show()}`,
+                );
               }
-              console.log(`attempting ${type}...`);
-              actionCounts.set(type, (actionCounts.get(type) ?? 0) + 1);
-              const results = await user.execute(action);
-              hashes_.push(...results.txHashes);
             }
-            while (user.wantsToRetry) {
-              console.warn(`wantsToRetry`);
-              emulator.awaitBlock(1); // TODO this does not take into account the possibility that others do or attempt stuff in the meantime
-              const results = await user.newBlock();
-              results.forEach((r) => hashes_.push(...r.txHashes)); // TODO do this automatically in user.update() - requires checking blocks, however
-            }
-            return hashes_;
-          });
-        // console.log(hashes);
-        traces.push(...hashes.flat());
-        // }
-      } catch (e) {
-        // if (
-        //   e.toString().includes("Not enough ADA leftover to cover minADA") ||
-        //   e.toString().includes("InputsExhaustedError")
-        // ) {
-        //   console.error("caught:", e);
-        // } else {
-        console.error(e);
-        throw e;
-        // }
-      }
+            console.log(`attempting ${type}...`);
+            actionCounts.set(type, (actionCounts.get(type) ?? 0) + 1);
+            const results = await user.execute(action);
+            hashes_.push(...results.txHashes);
+          }
+          while (user.wantsToRetry) {
+            console.warn(`wantsToRetry`);
+            emulator.awaitBlock(1); // TODO this does not take into account the possibility that others do or attempt stuff in the meantime
+            const results = await user.newBlock();
+            results.forEach((r) => hashes_.push(...r.txHashes)); // TODO do this automatically in user.update() - requires checking blocks, however
+          }
+          return hashes_;
+        });
+      // console.log(hashes);
+      traces.push(...hashes.flat());
+      // }
+      // } catch (e) {
+      //   // if (
+      //   //   e.toString().includes("Not enough ADA leftover to cover minADA") ||
+      //   //   e.toString().includes("InputsExhaustedError")
+      //   // ) {
+      //   //   console.error("caught:", e);
+      //   // } else {
+      //   // console.error(e);
+      //   throw e;
+      //   // }
+      // }
       emulator.awaitBlock(Number(genPositive(1000n))); // NOTE/TODO this arbitrary limit is a hotfix for block height overflow issue
       assert(!user.wantsToRetry, `user wants to retry still`);
       const actionResults = await user.newBlock();

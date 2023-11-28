@@ -193,13 +193,11 @@ ${tt})`;
 }
 
 export class PairOption {
-  constructor(
+  private constructor(
     readonly b: AssetOption,
     readonly s: AssetOption,
     readonly deltaBuying: bigint,
     readonly deltaSelling: bigint,
-    readonly expBuying: bigint,
-    readonly expSelling: bigint,
     readonly effectivePrice: number,
     readonly perfect: boolean,
   ) {
@@ -217,32 +215,90 @@ export class PairOption {
       this.effectivePrice ===
         Number(this.deltaSelling) / Number(this.deltaBuying),
     );
-    if (perfect) {
-      assert(
-        deltaBuying * s.a * s.jsppe * b.jsppe ===
-          deltaSelling * b.a * b.jse * s.jse,
-      ), `value equation: ${this.show()}`;
-    } else {
-      assert(
-        deltaBuying * s.a * s.jsppe * b.jsppe <
-          deltaSelling * b.a * b.jse * s.jse,
-      ), `value equation: ${this.show()}`;
-    }
-    assert(
-      b.a * b.jse <= (b.l - deltaBuying) * b.jsppe * b.w,
-      `price fit buying: ${this.show()}
-      ${b.a * b.jse} - ${(b.l - deltaBuying) * b.jsppe * b.w} = ${
-        b.a * b.jse - (b.l - deltaBuying) * b.jsppe * b.w
-      }`,
-    );
-    assert(
-      (s.l + deltaSelling) * s.jse * s.w <= s.a * s.jsppe,
-      `price fit selling: ${this.show()}
-      ${(s.l + deltaSelling) * s.jse * s.w} - ${s.a * s.jsppe} = ${
-        (s.l + deltaSelling) * s.jse * s.w - s.a * s.jsppe
-      }`,
-    );
   }
+
+  static new = (
+    b: AssetOption,
+    s: AssetOption,
+    deltaBuying: bigint,
+    deltaSelling: bigint,
+    effectivePrice: number,
+    perfect: boolean,
+  ): PairOption => {
+    const option = new PairOption(
+      b,
+      s,
+      deltaBuying,
+      deltaSelling,
+      effectivePrice,
+      perfect,
+    );
+    assert(
+      option.validates(),
+      `new option should pass offchain validation: ${option.show()}`,
+    );
+    return option;
+  };
+
+  private validates = (): boolean => {
+    let passes = true;
+
+    if (this.perfect) {
+      if (
+        this.deltaBuying * this.s.a * this.s.jsppe * this.b.jsppe !==
+          this.deltaSelling * this.b.a * this.b.jse * this.s.jse
+      ) {
+        passes = false;
+        console.error(`value equation: ${this.show()}`);
+      }
+    } else {
+      if (
+        this.deltaBuying * this.s.a * this.s.jsppe * this.b.jsppe >=
+          this.deltaSelling * this.b.a * this.b.jse * this.s.jse
+      ) {
+        passes = false;
+        console.error(`value equation: ${this.show()}`);
+      }
+    }
+    if (
+      this.b.a * this.b.jse >
+        (this.b.l - this.deltaBuying) * this.b.jsppe * this.b.w
+    ) {
+      passes = false;
+      console.error(`price fit buying: ${this.show()}`);
+    }
+
+    if (
+      (this.s.l + this.deltaSelling) * this.s.jse * this.s.w >
+        this.s.a * this.s.jsppe
+    ) {
+      passes = false;
+      console.error(`price fit selling: ${this.show()}`);
+    }
+
+    return passes;
+  };
+
+  public corrupted = (
+    deltaBuying: bigint,
+    deltaSelling: bigint,
+    expBuying: bigint,
+    expSelling: bigint,
+  ): PairOption => {
+    const option = new PairOption(
+      this.b.withExp(expBuying),
+      this.s.withExp(expSelling),
+      deltaBuying,
+      deltaSelling,
+      Number(deltaSelling) / Number(deltaBuying),
+      this.perfect,
+    );
+    assert(
+      !option.validates(),
+      `corrupted option should fail offchain validation: ${option.show()}`,
+    );
+    return option;
+  };
 
   public show = (tabs = ""): string => {
     const tt = tabs + t;
@@ -252,8 +308,6 @@ ${ttf}b: ${this.b.show(ttf)}
 ${ttf}s: ${this.s.show(ttf)}
 ${ttf}deltaBuying: ${this.deltaBuying}
 ${ttf}deltaSelling: ${this.deltaSelling}
-${ttf}expBuying: ${this.expBuying}
-${ttf}expSelling: ${this.expSelling}
 ${ttf}effectivePrice: ${this.effectivePrice}
 ${ttf}perfect: ${this.perfect}
 ${tt})`;
@@ -356,13 +410,11 @@ export class PairOptions {
         in the end, we compare the best of each to see if we have maxIntegerImpacted or not.
         */
 
-        bestPriceOption = new PairOption(
-          b,
-          s,
+        bestPriceOption = PairOption.new(
+          b.withExp(expBuying),
+          s.withExp(expSelling),
           deltaBuying,
           deltaSelling,
-          expBuying,
-          expSelling,
           effectivePrice,
           perfect,
         );
