@@ -193,17 +193,30 @@ ${ttf}a: ${this.a}
 ${ttf}js: ${this.js}
 ${ttf}minDelta: ${this.minDelta}
 ${ttf}maxDelta: ${this.maxDelta}
-${ttf}l: ${this.l}
-${ttf}wl: ${this.wl}
-${ttf}jspp: ${this.jspp}
-${ttf}logJM: ${this.logJM}
-${ttf}logAW: ${this.logAW}
 ${ttf}exp: ${this.exp}
-${ttf}jse: ${this.jse}
-${ttf}jsppe: ${this.jsppe}
 ${ttf}newAnchor: ${this.newAnchor}
 ${ttf}mults: ${this.mults}
 ${tt})`;
+    //     return `AssetOption (
+    // ${ttf}type: ${this.type}
+    // ${ttf}v: ${this.v}
+    // ${ttf}b: ${this.b}
+    // ${ttf}w: ${this.w}
+    // ${ttf}a: ${this.a}
+    // ${ttf}js: ${this.js}
+    // ${ttf}minDelta: ${this.minDelta}
+    // ${ttf}maxDelta: ${this.maxDelta}
+    // ${ttf}l: ${this.l}
+    // ${ttf}wl: ${this.wl}
+    // ${ttf}jspp: ${this.jspp}
+    // ${ttf}logJM: ${this.logJM}
+    // ${ttf}logAW: ${this.logAW}
+    // ${ttf}exp: ${this.exp}
+    // ${ttf}jse: ${this.jse}
+    // ${ttf}jsppe: ${this.jsppe}
+    // ${ttf}newAnchor: ${this.newAnchor}
+    // ${ttf}mults: ${this.mults}
+    // ${tt})`;
   };
 }
 
@@ -297,17 +310,18 @@ export class PairOption {
       console.error(`price fit selling: ${this.show()}`);
     }
 
-    if (this.adhereMaxInteger) {
-      if (this.b.newAnchor > maxInteger) {
-        passes = false;
-        console.error(`maxInteger buying: ${this.show()}`);
-      }
+    // TODO REVERT
+    // if (this.adhereMaxInteger) {
+    //   if (this.b.newAnchor > maxInteger) {
+    //     passes = false;
+    //     console.error(`maxInteger buying: ${this.show()}`);
+    //   }
 
-      if (this.s.newAnchor > maxInteger) {
-        passes = false;
-        console.error(`maxInteger selling: ${this.show()}`);
-      }
-    }
+    //   if (this.s.newAnchor > maxInteger) {
+    //     passes = false;
+    //     console.error(`maxInteger selling: ${this.show()}`);
+    //   }
+    // }
 
     if (this.b.mults + this.s.mults > this.expLimit) {
       passes = false;
@@ -417,7 +431,7 @@ export class PairOptions {
     b: AssetOption,
     s: AssetOption,
     expLimit: number,
-    perfectionism = 1000n,
+    // perfectionism = 1000n,
   ) {
     assert(b.type === "buying");
     assert(s.type === "selling");
@@ -572,8 +586,9 @@ export class PairOptions {
       }
       s = s.withExp(expSelling);
       b = b.withExp(expBuying);
-      const exceedsMaxInteger = (b.newAnchor > maxInteger) ||
-        (s.newAnchor > maxInteger);
+      // const exceedsMaxInteger = (b.newAnchor > maxInteger) ||
+      //   (s.newAnchor > maxInteger); // TODO REVERT
+      const exceedsMaxInteger = false;
 
       const checkNewOption_ = checkNewOption(
         expBuying,
@@ -606,6 +621,8 @@ export class PairOptions {
         s.a * s.jsppe * b.jsppe,
         b.a * b.jse * s.jse,
       );
+      console.log("buying-multiplier", buyingMultiplier);
+      console.log("selling-multiplier", sellingMultiplier);
       const improvementFeasible_ = improvementFeasible(
         buyingMultiplier,
         sellingMultiplier,
@@ -665,10 +682,9 @@ export class PairOptions {
           let deltaSelling = minSelling;
           let bestFoundImprovement: PairOption | null = null;
           while (
-            deltaSelling <= maxSelling && improvementFeasible_()
+            deltaSelling <= maxSelling // && improvementFeasible_() // TODO what
           ) {
-            const maxBuyingForSelling = (deltaSelling * sellingMultiplier) /
-              buyingMultiplier;
+            const maxBuyingForSelling = buyingForSelling(deltaSelling);
             if (prevDeltaBuying !== null) {
               assert(
                 maxBuyingForSelling > prevDeltaBuying,
@@ -703,9 +719,8 @@ export class PairOptions {
               break;
             }
 
-            const minDeltaSellingForNextBuying = ceilDiv(
-              (maxBuyingForSelling + 1n) * buyingMultiplier,
-              sellingMultiplier,
+            const minDeltaSellingForNextBuying = sellingForBuying(
+              maxBuyingForSelling + 1n,
             );
             assert(minDeltaSellingForNextBuying > deltaSelling);
             deltaSelling = minDeltaSellingForNextBuying;
@@ -783,10 +798,14 @@ export class PairOptions {
             // if this constitutes a valid range, we pick the first point of the smallest slope of that range
             const deltaSelling = minSlopeFirst +
               (minSmallestSlopeSteps * interSlopeStep);
+            console.log("found solution within slope", deltaSelling);
+            console.log("interSlopeStep", interSlopeStep);
+            console.log("minSlopeFirst", minSlopeFirst);
             foundImperfectSolution(deltaSelling);
           } else {
             // otherwise we assume the best solution is within the range below, and use exhaustive search to find it (TODO guess)
             assert(minSmallestSlopeSteps - 1n === maxSmallestSlopeSteps);
+            console.log("resorting to exhaustive search");
             const minSelling_ = max(
               minSelling,
               maxSmallestSlopeSteps * interSlopeStep,
@@ -851,10 +870,13 @@ export class PairOptions {
           maxSellingForExp,
         );
         if (maybeBetter) {
-          assert(bestImperfectOption !== null);
+          assert(bestImperfectOption !== null, maybeBetter.show());
           assert(
-            bestImperfectOption.effectivePrice === maybeBetter.effectivePrice,
-            `${bestImperfectOption.effectivePrice} !== ${maybeBetter.effectivePrice}`,
+            bestImperfectOption.effectivePrice <= maybeBetter.effectivePrice,
+            `${bestImperfectOption.effectivePrice} > ${maybeBetter.effectivePrice}
+diff: ${bestImperfectOption.effectivePrice - maybeBetter.effectivePrice}
+best imperfect: ${bestImperfectOption.show()} 
+exhaustive: ${maybeBetter.show()}}`,
           );
         }
       }
