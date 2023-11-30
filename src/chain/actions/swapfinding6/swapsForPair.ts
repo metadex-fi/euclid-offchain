@@ -384,6 +384,15 @@ const reduce = (a: bigint, b: bigint): [bigint, bigint] => {
   return [a_, b_];
 };
 
+const smallestPrimeFactor = (n: bigint): bigint => {
+  for (let i = 2n; i <= Math.sqrt(Number(n)); i++) {
+    if (n % i === 0n) {
+      return i; // Found the smallest prime factor
+    }
+  }
+  return n; // The number itself is prime if no factor is found
+};
+
 // each power of 2 is a multiplication.
 export const countMults = (exp: bigint): number => {
   const exp_ = Math.abs(Number(exp));
@@ -429,7 +438,7 @@ export class PairOptions {
       deltaBuying: bigint,
       deltaSelling: bigint,
       perfect: boolean,
-    ) => {
+    ): PairOption | null => {
       const effectivePrice = Number(deltaSelling) / Number(deltaBuying);
       let bestPriceOption = exceedsMaxInteger
         ? bestExceedingOption
@@ -474,11 +483,13 @@ export class PairOptions {
         } else {
           bestAdheringOption = bestPriceOption;
         }
+        return bestPriceOption;
       } else if (bestPriceOption) {
         assert(!perfect);
         // if we already found a solution, and this one is not better, we assert it isn't perfect
         // -> perfect solutions are always optimal (fails if we do perfect first)
       }
+      return null;
     };
 
     const improvementFeasible = (
@@ -504,16 +515,16 @@ export class PairOptions {
         const mDeltaBuying = best.deltaBuying * buyingDeltaMultiplier;
         const mDeltaSelling = best.deltaSelling * sellingDeltaMultiplier;
         if (mDeltaBuying > mDeltaSelling) return false; // spot price is the best we can get, so if that's worse than what we got already, we can skip this
-        else {
-          const potential = (perfectionism * (mDeltaSelling - mDeltaBuying)) /
-            mDeltaSelling;
-          // console.log(
-          //   "maximum possible improvement:",
-          //   (100 * Number(potential)) / Number(perfectionism),
-          //   "%",
-          // );
-          if (potential === 0n) return false; // good enough // TODO revert
-        }
+        // else {
+        //   const potential = (perfectionism * (mDeltaSelling - mDeltaBuying)) /
+        //     mDeltaSelling;
+        //   // console.log(
+        //   //   "maximum possible improvement:",
+        //   //   (100 * Number(potential)) / Number(perfectionism),
+        //   //   "%",
+        //   // );
+        //   // if (potential === 0n) return false; // good enough // TODO revert
+        // }
       }
       // }
       return true;
@@ -570,36 +581,34 @@ export class PairOptions {
         exceedsMaxInteger,
       );
 
-      const maxDeltaForExpSelling = s.maxDeltaForExp();
-      if (maxDeltaForExpSelling === null) {
+      const maxSellingForExp = s.maxDeltaForExp();
+      if (maxSellingForExp === null) {
         // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
         queue.push({ expBuying, expSelling: expSelling + 1n });
         continue;
       }
       assert(
-        maxDeltaForExpSelling >= s.minDelta,
-        `${maxDeltaForExpSelling} < ${s.minDelta}`,
+        maxSellingForExp >= s.minDelta,
+        `${maxSellingForExp} < ${s.minDelta}`,
       );
-      const maxDeltaForExpBuying = b.maxDeltaForExp();
-      if (maxDeltaForExpBuying === null) {
+      const maxBuyingForExp = b.maxDeltaForExp();
+      if (maxBuyingForExp === null) {
         // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
         queue.push({ expBuying: expBuying + 1n, expSelling });
         continue;
       }
       assert(
-        maxDeltaForExpBuying >= b.minDelta,
-        `${maxDeltaForExpBuying} < ${b.minDelta}`,
+        maxBuyingForExp >= b.minDelta,
+        `${maxBuyingForExp} < ${b.minDelta}`,
       );
 
-      const buyingDeltaMultiplierRaw = s.a * s.jsppe * b.jsppe;
-      const sellingDeltaMultiplierRaw = b.a * b.jse * s.jse;
-      const [buyingDeltaMultiplier, sellingDeltaMultiplier] = reduce(
-        buyingDeltaMultiplierRaw,
-        sellingDeltaMultiplierRaw,
+      const [buyingMultiplier, sellingMultiplier] = reduce(
+        s.a * s.jsppe * b.jsppe,
+        b.a * b.jse * s.jse,
       );
       const improvementFeasible_ = improvementFeasible(
-        buyingDeltaMultiplier,
-        sellingDeltaMultiplier,
+        buyingMultiplier,
+        sellingMultiplier,
         exceedsMaxInteger,
       );
 
@@ -616,23 +625,23 @@ export class PairOptions {
 
       const minBuyingMultiplier = ceilDiv(
         b.minDelta,
-        sellingDeltaMultiplier,
+        sellingMultiplier,
       );
       const minSellingMultiplier = ceilDiv(
         s.minDelta,
-        buyingDeltaMultiplier,
+        buyingMultiplier,
       );
       const minMultiplier = max(minBuyingMultiplier, minSellingMultiplier);
 
-      const maxBuyingMultiplier = maxDeltaForExpBuying /
-        sellingDeltaMultiplier;
-      const maxSellingMultiplier = maxDeltaForExpSelling /
-        buyingDeltaMultiplier;
+      const maxBuyingMultiplier = maxBuyingForExp /
+        sellingMultiplier;
+      const maxSellingMultiplier = maxSellingForExp /
+        buyingMultiplier;
       const maxMultiplier = min(maxBuyingMultiplier, maxSellingMultiplier);
 
       if (minMultiplier <= maxMultiplier) {
-        const deltaBuying = maxMultiplier * sellingDeltaMultiplier;
-        const deltaSelling = maxMultiplier * buyingDeltaMultiplier;
+        const deltaBuying = maxMultiplier * sellingMultiplier;
+        const deltaSelling = maxMultiplier * buyingMultiplier;
         checkNewOption_(
           deltaBuying,
           deltaSelling,
@@ -648,109 +657,213 @@ export class PairOptions {
         //   expSelling,
         // );
 
-        const minSellingForMinBuying = ceilDiv(
-          b.minDelta * buyingDeltaMultiplier,
-          sellingDeltaMultiplier,
-        );
-        const minDeltaSelling = max(minSellingForMinBuying, s.minDelta);
-        // let direction: "worse" | "better" | "start" = "start";
-        // let bestPrice: number | null = null;
-        // let pivot = false;
-        let prevDeltaBuying: bigint | null = null;
-        // let prevDeltaSelling: bigint | null = null;
-        // let bestDeltaSelling: bigint | null = null;
-        let deltaSelling = minDeltaSelling;
-        while (
-          deltaSelling <= maxDeltaForExpSelling && improvementFeasible_()
-        ) {
-          const maxBuyingForSelling = (deltaSelling * sellingDeltaMultiplier) /
-            buyingDeltaMultiplier;
-          // if (prevDeltaBuying === maxBuyingForSelling) {
-          //   // console.log("same");
-          //   continue;
-          // }
-          if (prevDeltaBuying !== null) {
-            assert(
-              maxBuyingForSelling > prevDeltaBuying,
-              `${maxBuyingForSelling} <= ${prevDeltaBuying}`,
-            );
-            const maxBuyingForSelling_ =
-              ((deltaSelling - 1n) * sellingDeltaMultiplier) /
-              buyingDeltaMultiplier;
-            assert(maxBuyingForSelling_ === prevDeltaBuying);
-          }
-          prevDeltaBuying = maxBuyingForSelling;
-          // if (prevDeltaSelling !== null) {
-          //   console.log("diff deltaSelling:", deltaSelling - prevDeltaSelling);
-          // }
-          // prevDeltaSelling = deltaSelling;
-          assert(maxBuyingForSelling >= b.minDelta);
-          // const effectivePrice = Number(deltaSelling) /
-          //   Number(maxBuyingForSelling);
-          // console.log(
-          //   deltaSelling,
-          //   maxBuyingForSelling,
-          //   effectivePrice,
-          //   bestPriceOption
-          //     ? (bestPriceOption as PairOption).effectivePrice - effectivePrice
-          //     : null,
-          // );
+        const findImperfectExhaustively = (
+          minSelling: bigint,
+          maxSelling: bigint,
+        ): PairOption | null => {
+          let prevDeltaBuying: bigint | null = null;
+          let deltaSelling = minSelling;
+          let bestFoundImprovement: PairOption | null = null;
+          while (
+            deltaSelling <= maxSelling && improvementFeasible_()
+          ) {
+            const maxBuyingForSelling = (deltaSelling * sellingMultiplier) /
+              buyingMultiplier;
+            if (prevDeltaBuying !== null) {
+              assert(
+                maxBuyingForSelling > prevDeltaBuying,
+                `${maxBuyingForSelling} <= ${prevDeltaBuying}`,
+              );
+              const maxBuyingForSelling_ =
+                ((deltaSelling - 1n) * sellingMultiplier) /
+                buyingMultiplier;
+              assert(maxBuyingForSelling_ === prevDeltaBuying);
+            }
+            prevDeltaBuying = maxBuyingForSelling;
+            assert(maxBuyingForSelling >= b.minDelta);
 
-          if (maxBuyingForSelling < maxDeltaForExpBuying) {
-            checkNewOption_(
-              maxBuyingForSelling,
-              deltaSelling,
-              false,
-            );
+            if (maxBuyingForSelling < maxBuyingForExp) {
+              const maybeBetter = checkNewOption_(
+                maxBuyingForSelling,
+                deltaSelling,
+                false,
+              );
+              if (maybeBetter) {
+                bestFoundImprovement = maybeBetter;
+              }
+            } else {
+              const maybeBetter = checkNewOption_(
+                maxBuyingForExp,
+                deltaSelling,
+                false,
+              );
+              if (maybeBetter) {
+                bestFoundImprovement = maybeBetter;
+              }
+              break;
+            }
 
-            // const effectivePrice = Number(deltaSelling) /
-            //   Number(maxBuyingForSelling);
-            // if (bestPrice === null || effectivePrice < bestPrice) {
-            //   bestPrice = effectivePrice;
-            //   bestDeltaSelling = deltaSelling;
-            // }
-          } else {
-            checkNewOption_(
-              maxDeltaForExpBuying,
-              deltaSelling,
-              false,
+            const minDeltaSellingForNextBuying = ceilDiv(
+              (maxBuyingForSelling + 1n) * buyingMultiplier,
+              sellingMultiplier,
             );
-            break;
+            assert(minDeltaSellingForNextBuying > deltaSelling);
+            deltaSelling = minDeltaSellingForNextBuying;
           }
 
-          const minDeltaSellingForNextBuying = ceilDiv(
-            (maxBuyingForSelling + 1n) * buyingDeltaMultiplier,
-            sellingDeltaMultiplier,
+          return bestFoundImprovement;
+        };
+
+        // see math/swapfinding/rounding.ipynb for reasoning behind the algorithm below
+
+        const buyingForSelling = (selling: bigint): bigint =>
+          (selling * sellingMultiplier) / buyingMultiplier;
+        const sellingForBuying = (buying: bigint): bigint =>
+          ceilDiv(buying * buyingMultiplier, sellingMultiplier);
+
+        const minSelling = max(s.minDelta, sellingForBuying(b.minDelta));
+        const maxSelling = maxSellingForExp;
+        // const maxSelling = min( // TODO we could always give up more though...
+        //   maxSellingForExp,
+        //   sellingForBuying(maxBuyingForExp),
+        // );
+
+        let bestImperfectOption: PairOption | null = null;
+        const foundImperfectSolution = (deltaSelling: bigint) => {
+          const deltaBuying = buyingForSelling(deltaSelling);
+          const maybeBetter = checkNewOption_(
+            deltaBuying,
+            deltaSelling,
+            false,
           );
-          assert(minDeltaSellingForNextBuying > deltaSelling);
-          deltaSelling = minDeltaSellingForNextBuying;
+          if (maybeBetter) {
+            bestImperfectOption = maybeBetter;
+          }
+        };
+        if (minSelling === maxSelling) {
+          console.log(`${minSelling} === ${maxSelling}`);
+          foundImperfectSolution(minSelling);
+        } else if (minSelling < maxSelling) {
+          console.log(`${minSelling} < ${maxSelling}`);
+          // the first point of the smallest slope
+          const minSlopeFirst = (minSelling / buyingMultiplier) *
+            buyingMultiplier;
+          const smallestSellingPrime = smallestPrimeFactor(sellingMultiplier);
+          const smallestBuyingPrime = smallestPrimeFactor(buyingMultiplier);
+          // const intraSlopeStep = smallestSellingPrime;
+          // const intraSlopeStep = min(smallestBuyingPrime, smallestSellingPrime); // extreme guess - doesn't work either
+          const interSlopeStep = (smallestSellingPrime * smallestBuyingPrime) -
+            1n;
+          // const smallerMultiplier = min(sellingMultiplier, buyingMultiplier);
+          // const intraSlopeStep =
+          //   ceilDiv(smallerMultiplier, interSlopeStep) * interSlopeStep -
+          //   smallerMultiplier;
+
+          // assert(intraSlopeStep === smallestSellingPrime); // fails
+          // assert(
+          //   intraSlopeStep === min(smallestBuyingPrime, smallestSellingPrime),
+          // ); // fails
+
+          // we can first try to simply find the smallest conforming slope.
+          // if we find one, the first point of that slope is the solution.
+
+          // how many interSlopeSteps the slope containing minSelling is above the smallest slope
+          const minSmallestSlopeSteps = ceilDiv(
+            minSelling - minSlopeFirst,
+            interSlopeStep,
+          );
+          assert(minSmallestSlopeSteps > 0n, `${minSmallestSlopeSteps}`);
+
+          // how many interSlopeSteps the slope containing maxSelling is above the the smallest slope
+          const maxSmallestSlopeSteps = (maxSelling - minSlopeFirst) /
+            interSlopeStep;
+          assert(maxSmallestSlopeSteps >= 0n, `${maxSmallestSlopeSteps}`);
+
+          if (minSmallestSlopeSteps <= maxSmallestSlopeSteps) {
+            // if this constitutes a valid range, we pick the first point of the smallest slope of that range
+            const deltaSelling = minSlopeFirst +
+              (minSmallestSlopeSteps * interSlopeStep);
+            foundImperfectSolution(deltaSelling);
+          } else {
+            // otherwise we assume the best solution is within the range below, and use exhaustive search to find it (TODO guess)
+            assert(minSmallestSlopeSteps - 1n === maxSmallestSlopeSteps);
+            const minSelling_ = max(
+              minSelling,
+              maxSmallestSlopeSteps * interSlopeStep,
+            );
+            const maxSelling_ = min(maxSelling, minSelling + interSlopeStep);
+            const maybeBetter = findImperfectExhaustively(
+              minSelling_,
+              maxSelling_,
+            );
+            if (maybeBetter) {
+              bestImperfectOption = maybeBetter;
+            }
+
+            // // below doesn't work
+            // // if we can't find one, we look for the optimal solution within the slope just
+            // // below our allowed range.
+            // // if that doesn't work either, we try one slope below, until we find a solution.
+
+            // // the first point of the slope just below our allowed range
+            // let currentSlopeFirst = (minSmallestSlopeSteps - 1n) *
+            //   interSlopeStep;
+            // while (true) {
+            //   // how many intraSlopeSteps minSelling is within the currently examined slope
+            //   const minCurrentSlopeSteps = ceilDiv(
+            //     minSelling - currentSlopeFirst,
+            //     intraSlopeStep,
+            //   );
+            //   assert(minCurrentSlopeSteps > 0n, `${minCurrentSlopeSteps}`);
+
+            //   // how many intraSlopeSteps maxSelling is within the currently examined slope
+            //   const maxCurrentSlopeSteps = (maxSelling - currentSlopeFirst) /
+            //     intraSlopeStep;
+            //   assert(maxCurrentSlopeSteps >= 0n, `${maxCurrentSlopeSteps}`);
+
+            //   console.log(
+            //     "within slope",
+            //     minCurrentSlopeSteps,
+            //     maxCurrentSlopeSteps,
+            //     maxCurrentSlopeSteps - minCurrentSlopeSteps,
+            //   );
+            //   if (minCurrentSlopeSteps <= maxCurrentSlopeSteps) {
+            //     // if this constitutes a valid range, we pick the smallest point of that range
+            //     const deltaSelling = currentSlopeFirst +
+            //       (minCurrentSlopeSteps * intraSlopeStep);
+            //     foundImperfectSolution(deltaSelling);
+            //     break;
+            //   } else {
+            //     // otherwise we try again with one slope below
+            //     currentSlopeFirst -= interSlopeStep;
+            //   }
+            // }
+          }
+        } // otherwise no solution possible
+        else {
+          console.log(`${minSelling} > ${maxSelling}`);
         }
-        // if (bestDeltaSelling !== null) {
-        //   {
-        //     console.log(
-        //       "bestDeltaSelling after:",
-        //       (100 * Number(bestDeltaSelling - minDeltaSelling)) /
-        //         Number(maxDeltaForExpSelling - minDeltaSelling),
-        //       "%",
-        //     );
-        //   }
-        //   // console.log(
-        //   //   "bestDeltaSelling:",
-        //   //   bestDeltaSelling,
-        //   //   "of",
-        //   //   minDeltaSelling,
-        //   //   "-",
-        //   //   maxDeltaForExpSelling,
-        //   // );
-        //   // assert(bestDeltaSelling === maxDeltaForExpSelling); // fails
-        // }
+
+        // here: assert that we can't find a better solution
+        console.log("asserting");
+        const maybeBetter = findImperfectExhaustively(
+          minSelling,
+          maxSellingForExp,
+        );
+        if (maybeBetter) {
+          assert(bestImperfectOption !== null);
+          assert(
+            bestImperfectOption.effectivePrice === maybeBetter.effectivePrice,
+            `${bestImperfectOption.effectivePrice} !== ${maybeBetter.effectivePrice}`,
+          );
+        }
       }
 
       assert(b.maxDelta !== "oo");
-      if (maxDeltaForExpBuying < b.maxDelta) {
+      if (maxBuyingForExp < b.maxDelta) {
         queue.push({ expBuying: expBuying + 1n, expSelling });
       }
-      if (s.maxDelta === "oo" || maxDeltaForExpSelling < s.maxDelta) {
+      if (s.maxDelta === "oo" || maxSellingForExp < s.maxDelta) {
         queue.push({ expBuying, expSelling: expSelling + 1n });
       }
     }

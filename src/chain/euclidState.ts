@@ -128,18 +128,18 @@ export class EuclidState {
       this.pools.set(owner, parsedOwnerPools);
       this.invalidPools.set(owner, invalidOwnerPools);
 
-      console.log(
-        "found valid pools for owner:",
-        owner.show(),
-        parsedOwnerPools.size,
-        parsedOwnerPools.last?.paramUtxo.paramNFT.show(),
-      );
-      console.log(
-        "found invalid pools for owner:",
-        owner.show(),
-        invalidOwnerPools.size,
-        invalidOwnerPools.last?.paramUtxo?.paramNFT.show(),
-      );
+      // console.log(
+      //   "found valid pools for owner:",
+      //   owner.show(),
+      //   parsedOwnerPools.size,
+      //   parsedOwnerPools.last?.paramUtxo.paramNFT.show(),
+      // );
+      // console.log(
+      //   "found invalid pools for owner:",
+      //   owner.show(),
+      //   invalidOwnerPools.size,
+      //   invalidOwnerPools.last?.paramUtxo?.paramNFT.show(),
+      // );
     });
   }
 
