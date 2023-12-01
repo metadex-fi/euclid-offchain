@@ -800,31 +800,37 @@ export class PairOptions {
               // } else {
               // }
               const effectivePrice = Number(deltaSelling) / Number(deltaBuying);
-              console.log(
-                deltaSelling,
-                deltaBuying,
-                effectivePrice,
-                "stepSize",
-                intraSlopeStep,
-                "improvedBefore",
-                improvedBefore,
-                "mode",
-                mode,
-              );
+              // console.log(
+              //   deltaSelling,
+              //   deltaBuying,
+              //   effectivePrice,
+              //   "stepSize",
+              //   intraSlopeStep,
+              //   "improvedBefore",
+              //   improvedBefore,
+              //   "mode",
+              //   mode,
+              // );
               if (bestPrice === null) {
                 bestPrice = effectivePrice;
                 bestSelling = deltaSelling;
+                console.log(
+                  `(${deltaBuying}, ${deltaSelling}, ${effectivePrice}),`,
+                );
               } else if (effectivePrice <= bestPrice) {
                 if (improvedBefore) {
                   // the first time price improves, we do nothing.
                   // the second time, we use it to determine the stepSize within a slope.
                   intraSlopeStep = bestSelling! - deltaSelling;
-                  console.log("computing intraSlopeStep", intraSlopeStep);
+                  // console.log("computing intraSlopeStep", intraSlopeStep);
                 }
                 mode = "within";
                 bestPrice = effectivePrice;
                 bestSelling = deltaSelling;
                 improvedBefore++;
+                console.log(
+                  `(${deltaBuying}, ${deltaSelling}, ${effectivePrice}),`,
+                );
               } // price worsening
               else if (improvedBefore > 1) {
                 // exiting the slope on the left side
@@ -880,10 +886,12 @@ export class PairOptions {
           We use this to look through the remaining slopes, only evaluating their best/leftmost
           points.
           */
-          console.log("buyingMultiplier", buyingMultiplier);
-          console.log("sellingMultiplier", sellingMultiplier);
-          console.log("maxBuying", maxBuyingForExp);
-          console.log("maxSelling", maxSellingForExp);
+          console.log("m_b =", buyingMultiplier.toString());
+          console.log("m_s =", sellingMultiplier.toString());
+          console.log("min_delta_b =", b.minDelta.toString());
+          console.log("min_delta_s =", s.minDelta.toString());
+          console.log("max_delta_b =", maxBuyingForExp.toString());
+          console.log("max_delta_s =", maxSellingForExp.toString());
 
           console.log("searching first slope");
           const firstSlope = searchWithinSlope(maxSelling, 1n);
@@ -893,26 +901,22 @@ export class PairOptions {
           } else {
             console.log("searching second slope");
             const secondSlope = searchWithinSlope(
-              firstSlope.bestSelling,
+              firstSlope.bestSelling - 1n,
               1n, //firstSlope.intraSlopeStep, // TODO FIXME
             );
-            if (secondSlope.done) {
-              foundImperfectSolution(
-                min(firstSlope.bestSelling, secondSlope.bestSelling),
-              );
+            const interSlopeStep = firstSlope.bestSelling -
+              secondSlope.bestSelling;
+            console.log("interSlopeStep", interSlopeStep);
+            let bestPrice: number;
+            let bestSelling: bigint;
+            if (firstSlope.bestPrice <= secondSlope.bestPrice) {
+              bestPrice = firstSlope.bestPrice;
+              bestSelling = firstSlope.bestSelling;
             } else {
-              const interSlopeStep = firstSlope.bestSelling -
-                secondSlope.bestSelling;
-              console.log("interSlopeStep", interSlopeStep);
-              let bestPrice: number;
-              let bestSelling: bigint;
-              if (firstSlope.bestPrice <= secondSlope.bestPrice) {
-                bestPrice = firstSlope.bestPrice;
-                bestSelling = firstSlope.bestSelling;
-              } else {
-                bestPrice = secondSlope.bestPrice;
-                bestSelling = secondSlope.bestSelling;
-              }
+              bestPrice = secondSlope.bestPrice;
+              bestSelling = secondSlope.bestSelling;
+            }
+            if (!secondSlope.done) {
               let deltaSelling = secondSlope.bestSelling - interSlopeStep;
               while (deltaSelling >= minSelling) {
                 const deltaBuying = buyingForSelling(deltaSelling);
@@ -924,7 +928,8 @@ export class PairOptions {
                   deltaBuying,
                   effectivePrice,
                 );
-                if (effectivePrice < bestPrice) {
+                if (effectivePrice <= bestPrice) {
+                  if (effectivePrice < bestPrice) {
                   console.log(
                     "found better:",
                     deltaSelling,
@@ -933,11 +938,14 @@ export class PairOptions {
                   );
                   bestPrice = effectivePrice;
                   bestSelling = deltaSelling;
+                  }
+                } else {
+                  // tertiary slope - at this point some sort of recursion might be warranted
                 }
                 deltaSelling -= interSlopeStep;
               }
-              foundImperfectSolution(bestSelling);
             }
+            foundImperfectSolution(bestSelling);
           }
         } // we're here because maxSelling < minSelling
         else if (minSelling <= maxSellingForExp) {
