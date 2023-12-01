@@ -398,14 +398,14 @@ const reduce = (a: bigint, b: bigint): [bigint, bigint] => {
   return [a_, b_];
 };
 
-const smallestPrimeFactor = (n: bigint): bigint => {
-  for (let i = 2n; i <= Math.sqrt(Number(n)); i++) {
-    if (n % i === 0n) {
-      return i; // Found the smallest prime factor
-    }
-  }
-  return n; // The number itself is prime if no factor is found
-};
+// const smallestPrimeFactor = (n: bigint): bigint => {
+//   for (let i = 2n; i <= Math.sqrt(Number(n)); i++) {
+//     if (n % i === 0n) {
+//       return i; // Found the smallest prime factor
+//     }
+//   }
+//   return n; // The number itself is prime if no factor is found
+// };
 
 // each power of 2 is a multiplication.
 export const countMults = (exp: bigint): number => {
@@ -621,8 +621,8 @@ export class PairOptions {
         s.a * s.jsppe * b.jsppe,
         b.a * b.jse * s.jse,
       );
-      console.log("buying-multiplier", buyingMultiplier);
-      console.log("selling-multiplier", sellingMultiplier);
+      // console.log("buying-multiplier", buyingMultiplier);
+      // console.log("selling-multiplier", sellingMultiplier);
       const improvementFeasible_ = improvementFeasible(
         buyingMultiplier,
         sellingMultiplier,
@@ -737,10 +737,17 @@ export class PairOptions {
           ceilDiv(buying * buyingMultiplier, sellingMultiplier);
 
         const minSelling = max(s.minDelta, sellingForBuying(b.minDelta));
-        const maxSelling = maxSellingForExp;
-        // const maxSelling = min( // TODO we could always give up more though...
-        //   maxSellingForExp,
-        //   sellingForBuying(maxBuyingForExp),
+        assert(buyingForSelling(minSelling) >= b.minDelta);
+        // const maxSelling = maxSellingForExp;
+        const maxSelling = min(
+          maxSellingForExp,
+          sellingForBuying(maxBuyingForExp),
+        );
+        // assert(
+        //   buyingForSelling(maxSelling) <= maxBuyingForExp,
+        //   `${maxSelling} * ${sellingMultiplier} / ${buyingMultiplier} = ${
+        //     buyingForSelling(maxSelling)
+        //   } > ${maxBuyingForExp}`,
         // );
 
         let bestImperfectOption: PairOption | null = null;
@@ -755,127 +762,210 @@ export class PairOptions {
             bestImperfectOption = maybeBetter;
           }
         };
+        let runAsserts = true;
         if (minSelling === maxSelling) {
           console.log(`${minSelling} === ${maxSelling}`);
           foundImperfectSolution(minSelling);
         } else if (minSelling < maxSelling) {
           console.log(`${minSelling} < ${maxSelling}`);
-          // the first point of the smallest slope
-          const minSlopeFirst = (minSelling / buyingMultiplier) *
-            buyingMultiplier;
-          const smallestSellingPrime = smallestPrimeFactor(sellingMultiplier);
-          const smallestBuyingPrime = smallestPrimeFactor(buyingMultiplier);
-          // const intraSlopeStep = smallestSellingPrime;
-          // const intraSlopeStep = min(smallestBuyingPrime, smallestSellingPrime); // extreme guess - doesn't work either
-          const interSlopeStep = (smallestSellingPrime * smallestBuyingPrime) -
-            1n;
-          // const smallerMultiplier = min(sellingMultiplier, buyingMultiplier);
-          // const intraSlopeStep =
-          //   ceilDiv(smallerMultiplier, interSlopeStep) * interSlopeStep -
-          //   smallerMultiplier;
+          /*
+          Starting with the largest delta, we decrease it one by one, recording the best price found.
+          If that improves a second time, we assume we have found the distance between points in a "slope".
+          We continue decreasing delta by that amount, until the price gets worse again, at which
+          point we start over, this time trying to ascertain the distance between slopes.
+          This happens automatically, as we keep bestPrice around, which now is the best of the previous slope.
+          */
 
-          // assert(intraSlopeStep === smallestSellingPrime); // fails
-          // assert(
-          //   intraSlopeStep === min(smallestBuyingPrime, smallestSellingPrime),
-          // ); // fails
+          const searchWithinSlope = (
+            rightmost: bigint,
+            intraSlopeStep: bigint,
+          ): {
+            bestPrice: number;
+            bestSelling: bigint;
+            intraSlopeStep: bigint;
+            done: boolean;
+          } => {
+            // leftmost point of slope
+            let bestPrice: number | null = null;
+            let bestSelling: bigint | null = null;
 
-          // we can first try to simply find the smallest conforming slope.
-          // if we find one, the first point of that slope is the solution.
-
-          // how many interSlopeSteps the slope containing minSelling is above the smallest slope
-          const minSmallestSlopeSteps = ceilDiv(
-            minSelling - minSlopeFirst,
-            interSlopeStep,
-          );
-          assert(minSmallestSlopeSteps > 0n, `${minSmallestSlopeSteps}`);
-
-          // how many interSlopeSteps the slope containing maxSelling is above the the smallest slope
-          const maxSmallestSlopeSteps = (maxSelling - minSlopeFirst) /
-            interSlopeStep;
-          assert(maxSmallestSlopeSteps >= 0n, `${maxSmallestSlopeSteps}`);
-
-          if (minSmallestSlopeSteps <= maxSmallestSlopeSteps) {
-            // if this constitutes a valid range, we pick the first point of the smallest slope of that range
-            const deltaSelling = minSlopeFirst +
-              (minSmallestSlopeSteps * interSlopeStep);
-            console.log("found solution within slope", deltaSelling);
-            console.log("interSlopeStep", interSlopeStep);
-            console.log("minSlopeFirst", minSlopeFirst);
-            foundImperfectSolution(deltaSelling);
-          } else {
-            // otherwise we assume the best solution is within the range below, and use exhaustive search to find it (TODO guess)
-            assert(minSmallestSlopeSteps - 1n === maxSmallestSlopeSteps);
-            console.log("resorting to exhaustive search");
-            const minSelling_ = max(
-              minSelling,
-              maxSmallestSlopeSteps * interSlopeStep,
-            );
-            const maxSelling_ = min(maxSelling, minSelling + interSlopeStep);
-            const maybeBetter = findImperfectExhaustively(
-              minSelling_,
-              maxSelling_,
-            );
-            if (maybeBetter) {
-              bestImperfectOption = maybeBetter;
+            let improvedBefore = 0;
+            let deltaSelling = rightmost;
+            let mode: "within" | "before" = "before";
+            // let prevDeltaBuying: bigint | null = null;
+            while (deltaSelling >= minSelling) {
+              const deltaBuying = buyingForSelling(deltaSelling);
+              // if (prevDeltaBuying === null) {
+              //   prevDeltaBuying = deltaBuying;
+              // } else {
+              // }
+              const effectivePrice = Number(deltaSelling) / Number(deltaBuying);
+              console.log(
+                deltaSelling,
+                deltaBuying,
+                effectivePrice,
+                "stepSize",
+                intraSlopeStep,
+                "improvedBefore",
+                improvedBefore,
+                "mode",
+                mode,
+              );
+              if (bestPrice === null) {
+                bestPrice = effectivePrice;
+                bestSelling = deltaSelling;
+              } else if (effectivePrice <= bestPrice) {
+                if (improvedBefore) {
+                  // the first time price improves, we do nothing.
+                  // the second time, we use it to determine the stepSize within a slope.
+                  intraSlopeStep = bestSelling! - deltaSelling;
+                  console.log("computing intraSlopeStep", intraSlopeStep);
+                }
+                mode = "within";
+                bestPrice = effectivePrice;
+                bestSelling = deltaSelling;
+                improvedBefore++;
+              } // price worsening
+              else if (improvedBefore > 1) {
+                // exiting the slope on the left side
+                console.log("exiting slope");
+                assert(bestSelling !== null);
+                return {
+                  bestPrice,
+                  bestSelling,
+                  intraSlopeStep,
+                  done: false,
+                };
+              }
+              if (mode === "before") {
+                deltaSelling -= 1n;
+              } else {
+                deltaSelling -= intraSlopeStep;
+              }
+              while (
+                buyingForSelling(deltaSelling) === deltaBuying &&
+                deltaSelling >= minSelling
+              ) {
+                deltaSelling -= 1n;
+              }
+              const nextBuying = buyingForSelling(deltaSelling);
+              while (
+                buyingForSelling(deltaSelling - 1n) === nextBuying &&
+                deltaSelling - 1n >= minSelling
+              ) {
+                deltaSelling -= 1n;
+              }
             }
+            // reached the leftmost end of delta-interval
+            console.log("reached leftmost end of delta-interval");
+            assert(bestPrice !== null);
+            assert(bestSelling !== null);
+            return {
+              bestPrice,
+              bestSelling,
+              intraSlopeStep,
+              done: true,
+            };
+          };
+          /*
+          We first traverse the rightmost slope, beginning on the right side.
+          This might give us a solution already (done = true).
+          If not, it gives us the intraSlopeStep and the delta of its leftmost point.
+          We then traverse the second slope from the right.
+          This might give us a solution too (done = true).
+          If so, we take the better one of the two slopes' optima.
+          If not, it gives us the delta of its leftmost point, which we can use
+          together with the delta of the leftmost point of the first slope to determine the
+          interSlopeStep.
+          We use this to look through the remaining slopes, only evaluating their best/leftmost
+          points.
+          */
+          console.log("buyingMultiplier", buyingMultiplier);
+          console.log("sellingMultiplier", sellingMultiplier);
+          console.log("maxBuying", maxBuyingForExp);
+          console.log("maxSelling", maxSellingForExp);
 
-            // // below doesn't work
-            // // if we can't find one, we look for the optimal solution within the slope just
-            // // below our allowed range.
-            // // if that doesn't work either, we try one slope below, until we find a solution.
-
-            // // the first point of the slope just below our allowed range
-            // let currentSlopeFirst = (minSmallestSlopeSteps - 1n) *
-            //   interSlopeStep;
-            // while (true) {
-            //   // how many intraSlopeSteps minSelling is within the currently examined slope
-            //   const minCurrentSlopeSteps = ceilDiv(
-            //     minSelling - currentSlopeFirst,
-            //     intraSlopeStep,
-            //   );
-            //   assert(minCurrentSlopeSteps > 0n, `${minCurrentSlopeSteps}`);
-
-            //   // how many intraSlopeSteps maxSelling is within the currently examined slope
-            //   const maxCurrentSlopeSteps = (maxSelling - currentSlopeFirst) /
-            //     intraSlopeStep;
-            //   assert(maxCurrentSlopeSteps >= 0n, `${maxCurrentSlopeSteps}`);
-
-            //   console.log(
-            //     "within slope",
-            //     minCurrentSlopeSteps,
-            //     maxCurrentSlopeSteps,
-            //     maxCurrentSlopeSteps - minCurrentSlopeSteps,
-            //   );
-            //   if (minCurrentSlopeSteps <= maxCurrentSlopeSteps) {
-            //     // if this constitutes a valid range, we pick the smallest point of that range
-            //     const deltaSelling = currentSlopeFirst +
-            //       (minCurrentSlopeSteps * intraSlopeStep);
-            //     foundImperfectSolution(deltaSelling);
-            //     break;
-            //   } else {
-            //     // otherwise we try again with one slope below
-            //     currentSlopeFirst -= interSlopeStep;
-            //   }
-            // }
+          console.log("searching first slope");
+          const firstSlope = searchWithinSlope(maxSelling, 1n);
+          console.log("intraSlopeStep", firstSlope.intraSlopeStep);
+          if (firstSlope.done) {
+            foundImperfectSolution(firstSlope.bestSelling);
+          } else {
+            console.log("searching second slope");
+            const secondSlope = searchWithinSlope(
+              firstSlope.bestSelling,
+              1n, //firstSlope.intraSlopeStep, // TODO FIXME
+            );
+            if (secondSlope.done) {
+              foundImperfectSolution(
+                min(firstSlope.bestSelling, secondSlope.bestSelling),
+              );
+            } else {
+              const interSlopeStep = firstSlope.bestSelling -
+                secondSlope.bestSelling;
+              console.log("interSlopeStep", interSlopeStep);
+              let bestPrice: number;
+              let bestSelling: bigint;
+              if (firstSlope.bestPrice <= secondSlope.bestPrice) {
+                bestPrice = firstSlope.bestPrice;
+                bestSelling = firstSlope.bestSelling;
+              } else {
+                bestPrice = secondSlope.bestPrice;
+                bestSelling = secondSlope.bestSelling;
+              }
+              let deltaSelling = secondSlope.bestSelling - interSlopeStep;
+              while (deltaSelling >= minSelling) {
+                const deltaBuying = buyingForSelling(deltaSelling);
+                const effectivePrice = Number(deltaSelling) /
+                  Number(deltaBuying);
+                console.log(
+                  "searching remaining slopes",
+                  deltaSelling,
+                  deltaBuying,
+                  effectivePrice,
+                );
+                if (effectivePrice < bestPrice) {
+                  console.log(
+                    "found better:",
+                    deltaSelling,
+                    deltaBuying,
+                    effectivePrice,
+                  );
+                  bestPrice = effectivePrice;
+                  bestSelling = deltaSelling;
+                }
+                deltaSelling -= interSlopeStep;
+              }
+              foundImperfectSolution(bestSelling);
+            }
+          }
+        } // we're here because maxSelling < minSelling
+        else if (minSelling <= maxSellingForExp) {
+          console.log(`${minSelling} <= ${maxSellingForExp}`);
+          const maybeBetter = findImperfectExhaustively(
+            minSelling,
+            maxSellingForExp,
+          );
+          if (maybeBetter) {
+            bestImperfectOption = maybeBetter;
           }
         } // otherwise no solution possible
-        else {
-          console.log(`${minSelling} > ${maxSelling}`);
-        }
 
         // here: assert that we can't find a better solution
-        console.log("asserting");
+        // console.log("exhaustive search");
         const maybeBetter = findImperfectExhaustively(
           minSelling,
           maxSellingForExp,
         );
-        if (maybeBetter) {
+        if (maybeBetter && runAsserts) {
+          console.log("asserting");
           assert(bestImperfectOption !== null, maybeBetter.show());
+          const best = bestImperfectOption as PairOption;
           assert(
-            bestImperfectOption.effectivePrice <= maybeBetter.effectivePrice,
-            `${bestImperfectOption.effectivePrice} > ${maybeBetter.effectivePrice}
-diff: ${bestImperfectOption.effectivePrice - maybeBetter.effectivePrice}
-best imperfect: ${bestImperfectOption.show()} 
+            best.effectivePrice <= maybeBetter.effectivePrice,
+            `${best.effectivePrice} > ${maybeBetter.effectivePrice}
+diff: ${best.effectivePrice - maybeBetter.effectivePrice}
+best imperfect: ${best.show()} 
 exhaustive: ${maybeBetter.show()}}`,
           );
         }
