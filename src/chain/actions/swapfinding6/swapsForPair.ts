@@ -950,6 +950,18 @@ export class PairOptions {
                   - whether the global leftmost end of the x-axis was met ("done")
           */
 
+          /*
+          next version:
+          - record stepsizes upwards as well
+          - if going "downwards" actually makes the price worse (aka we overstepped the slope),
+            we take another step with "upwards" stepsize, expecting to hit the next slope again
+          -
+
+
+
+
+          */
+
           const stepSizeN: Map<number, bigint> = new Map();
           stepSizeN.set(0, 1n);
 
@@ -993,7 +1005,6 @@ export class PairOptions {
           };
 
           const minimizeSelling = (point: Point, stepSize: bigint): Point => {
-            return point;
             let lessBuying = pointForSelling(
               point.deltaSelling - stepSize,
             );
@@ -1057,6 +1068,25 @@ export class PairOptions {
                     withinSlope = true;
                   }
                   bestPoint = nextPoint;
+                } else if (withinSlope && nextPoint.price > rightmost.price) {
+                  // alternative win condition for some edge-cases:
+                  // if we're walking upwards, after finding our first
+                  // improvement, and reaching the point where
+                  // we're getting worse than the initial point, we can
+                  // determine stepsize by going one step back and comparing
+                  // that point with the initial one.
+
+                  // found stepSize(1)
+                  const nextStepSize = rightmost.deltaSelling -
+                    currentPoint.deltaSelling;
+                  stepSizeN.set(1, nextStepSize);
+                  printPoints(
+                    n,
+                    points,
+                    "calculating stepSize(1) (alternative)",
+                    bestPoint,
+                  );
+                  return bestPoint;
                 }
 
                 currentPoint = nextPoint;
@@ -1123,24 +1153,33 @@ export class PairOptions {
                   // stepsize(n), until walking downwards once with stepsize(n-1)
                   // gives us an improvement over where we started.
                   // we're starting walking once with stepsize(n-1) first.
-                  // remember to update the stepsize(n) with whatever we find.
+                  // remember to update the stepsize(n) with whatever we find
+                  // --> no, because the number of steps vary
 
-                  nextPoint = pointForSelling(
-                    nextPoint.deltaSelling - stepSizeN.get(n - 1)!,
-                  );
-                  points.push(nextPoint);
-                  const maybeDone = checkIfDone(nextPoint);
-                  if (maybeDone) return maybeDone;
+                  // -> update: some kind of zigzag-motion, until we find an improvement,
+                  // using stepsize(n) and stepsize(n-1)
+
+                  let smallerStepSize = stepSize;
+                  let smallerN = n - 1;
+                  while (smallerStepSize === stepSize) {
+                    smallerStepSize = stepSizeN.get(smallerN--)!; // TODO hack
+                  }
                   while (nextPoint.price > currentPoint.price) {
-                    nextPoint = pointForSelling(
+                    const nextPointBigStep = pointForSelling(
                       nextPoint.deltaSelling - stepSize,
                     );
+                    const nextPointSmallStep = pointForSelling(
+                      nextPoint.deltaSelling - smallerStepSize,
+                    );
+                    if (nextPointBigStep.price < nextPointSmallStep.price) {
+                      nextPoint = nextPointBigStep;
+                    } else {
+                      nextPoint = nextPointSmallStep;
+                    }
                     points.push(nextPoint);
                     const maybeDone = checkIfDone(nextPoint);
                     if (maybeDone) return maybeDone;
                   }
-                  stepSize = currentPoint.deltaSelling - nextPoint.deltaSelling;
-                  stepSizeN.set(n, stepSize);
                 }
                 currentPoint = nextPoint;
               }
