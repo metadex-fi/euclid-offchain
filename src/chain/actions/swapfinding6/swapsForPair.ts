@@ -753,6 +753,7 @@ export class PairOptions {
         let bestImperfectOption: PairOption | null = null;
         const foundImperfectSolution = (deltaSelling: bigint) => {
           const deltaBuying = buyingForSelling(deltaSelling);
+          console.log("found imperfect solution", deltaBuying, deltaSelling);
           const maybeBetter = checkNewOption_(
             deltaBuying,
             deltaSelling,
@@ -775,104 +776,6 @@ export class PairOptions {
           point we start over, this time trying to ascertain the distance between slopes.
           This happens automatically, as we keep bestPrice around, which now is the best of the previous slope.
           */
-
-          // const searchWithinSlope = (
-          //   rightmost: bigint,
-          //   intraSlopeStep: bigint,
-          // ): {
-          //   bestPrice: number;
-          //   bestSelling: bigint;
-          //   intraSlopeStep: bigint;
-          //   done: boolean;
-          // } => {
-          //   // leftmost point of slope
-          //   let bestPrice: number | null = null;
-          //   let bestSelling: bigint | null = null;
-
-          //   let improvedBefore = 0;
-          //   let deltaSelling = rightmost;
-          //   let mode: "within" | "before" = "before";
-          //   // let prevDeltaBuying: bigint | null = null;
-          //   while (deltaSelling >= minSelling) {
-          //     const deltaBuying = buyingForSelling(deltaSelling);
-          //     // if (prevDeltaBuying === null) {
-          //     //   prevDeltaBuying = deltaBuying;
-          //     // } else {
-          //     // }
-          //     const effectivePrice = Number(deltaSelling) / Number(deltaBuying);
-          //     // console.log(
-          //     //   deltaSelling,
-          //     //   deltaBuying,
-          //     //   effectivePrice,
-          //     //   "stepSize",
-          //     //   intraSlopeStep,
-          //     //   "improvedBefore",
-          //     //   improvedBefore,
-          //     //   "mode",
-          //     //   mode,
-          //     // );
-          //     if (bestPrice === null) {
-          //       bestPrice = effectivePrice;
-          //       bestSelling = deltaSelling;
-          //       console.log(
-          //         `(${deltaBuying}, ${deltaSelling}, ${effectivePrice}),`,
-          //       );
-          //     } else if (effectivePrice <= bestPrice) {
-          //       if (improvedBefore) {
-          //         // the first time price improves, we do nothing.
-          //         // the second time, we use it to determine the stepSize within a slope.
-          //         intraSlopeStep = bestSelling! - deltaSelling;
-          //         // console.log("computing intraSlopeStep", intraSlopeStep);
-          //       }
-          //       mode = "within";
-          //       bestPrice = effectivePrice;
-          //       bestSelling = deltaSelling;
-          //       improvedBefore++;
-          //       console.log(
-          //         `(${deltaBuying}, ${deltaSelling}, ${effectivePrice}),`,
-          //       );
-          //     } // price worsening
-          //     else if (improvedBefore > 1) {
-          //       // exiting the slope on the left side
-          //       console.log("exiting slope");
-          //       assert(bestSelling !== null);
-          //       return {
-          //         bestPrice,
-          //         bestSelling,
-          //         intraSlopeStep,
-          //         done: false,
-          //       };
-          //     }
-          //     if (mode === "before") {
-          //       deltaSelling -= 1n;
-          //     } else {
-          //       deltaSelling -= intraSlopeStep;
-          //     }
-          //     while (
-          //       buyingForSelling(deltaSelling) === deltaBuying &&
-          //       deltaSelling >= minSelling
-          //     ) {
-          //       deltaSelling -= 1n;
-          //     }
-          //     const nextBuying = buyingForSelling(deltaSelling);
-          //     while (
-          //       buyingForSelling(deltaSelling - 1n) === nextBuying &&
-          //       deltaSelling - 1n >= minSelling
-          //     ) {
-          //       deltaSelling -= 1n;
-          //     }
-          //   }
-          //   // reached the leftmost end of delta-interval
-          //   console.log("reached leftmost end of delta-interval");
-          //   assert(bestPrice !== null);
-          //   assert(bestSelling !== null);
-          //   return {
-          //     bestPrice,
-          //     bestSelling,
-          //     intraSlopeStep,
-          //     done: true,
-          //   };
-          // };
 
           console.log("m_b =", buyingMultiplier.toString());
           console.log("m_s =", sellingMultiplier.toString());
@@ -962,8 +865,10 @@ export class PairOptions {
 
           */
 
-          const stepSizeN: Map<number, bigint> = new Map();
-          stepSizeN.set(0, 1n);
+          const stepSizeDownN: Map<number, bigint> = new Map();
+          stepSizeDownN.set(0, 1n);
+
+          // const stepSizeUpN: Map<number, bigint> = new Map();
 
           type Point = {
             price: number;
@@ -989,7 +894,7 @@ export class PairOptions {
             msg: string,
             returned: Point,
           ) => {
-            // if (points.length <= 0) return;
+            if (points.length <= 1) return;
             console.log("[ # n =", n, msg);
             points.forEach((point) => {
               console.log(
@@ -1004,7 +909,8 @@ export class PairOptions {
             );
           };
 
-          const minimizeSelling = (point: Point, stepSize: bigint): Point => {
+          const minimizeSelling = (point: Point): Point => {
+            const stepSize = 1n;
             let lessBuying = pointForSelling(
               point.deltaSelling - stepSize,
             );
@@ -1022,72 +928,100 @@ export class PairOptions {
             return point;
           };
 
+          let maybeMissed: Point | null = null;
+
           const iterateSlopeType = (
             n: number,
             rightmost: Point,
           ): Point => {
-            const points: Point[] = [rightmost]; // for debugging
+            const points: Point[] = []; // for debugging
             if (n === 0) {
-              // primary type of iteration: until improvement/finding beginning of slope
+              // primary type of iteration: until improvement/finding beginning of slope,
+              // then until worsening/finding end of slope
               const stepSize = 1n;
-              let currentPoint = minimizeSelling(rightmost, stepSize);
+              let currentPoint = minimizeSelling(rightmost);
               points.push(currentPoint);
               let bestPoint = currentPoint;
               let withinSlope = false;
+              // let lookingForUpwards = true;
+              let initialUpwardsMovement = true; // TODO hack, likely has edgecases
               while (!currentPoint.done) {
                 let nextPoint = pointForSelling(
                   currentPoint.deltaSelling - stepSize,
                 );
-                nextPoint = minimizeSelling(nextPoint, stepSize);
+                nextPoint = minimizeSelling(nextPoint);
                 points.push(nextPoint);
                 if (nextPoint.price <= bestPoint.price) {
+                  initialUpwardsMovement = false;
                   // price getting better -> beginning of slope
-                  if (stepSizeN.has(1)) {
+                  if (stepSizeDownN.has(1)) {
                     // don't need to find stepSize(1) again
-                    printPoints(
-                      n,
-                      points,
-                      "found stepSize(1) before",
-                      nextPoint,
-                    );
-                    return nextPoint;
+                    // printPoints(
+                    //   n,
+                    //   points,
+                    //   "found stepSize(1) before",
+                    //   nextPoint,
+                    // );
+                    // return nextPoint;
                   } else if (withinSlope) {
                     // found stepSize(1)
                     const nextStepSize = bestPoint.deltaSelling -
                       nextPoint.deltaSelling;
-                    stepSizeN.set(1, nextStepSize);
-                    printPoints(
-                      n,
-                      points,
-                      "calculating stepSize(1)",
-                      nextPoint,
-                    );
-                    return nextPoint;
+                    stepSizeDownN.set(1, nextStepSize);
+                    // printPoints(
+                    //   n,
+                    //   points,
+                    //   "calculating stepSize(1)",
+                    //   nextPoint,
+                    // );
+                    // return nextPoint;
                   } else {
                     // looking for stepSize(1) from now on
                     withinSlope = true;
                   }
                   bestPoint = nextPoint;
-                } else if (withinSlope && nextPoint.price > rightmost.price) {
-                  // alternative win condition for some edge-cases:
-                  // if we're walking upwards, after finding our first
-                  // improvement, and reaching the point where
-                  // we're getting worse than the initial point, we can
-                  // determine stepsize by going one step back and comparing
-                  // that point with the initial one.
-
-                  // found stepSize(1)
-                  const nextStepSize = rightmost.deltaSelling -
-                    currentPoint.deltaSelling;
-                  stepSizeN.set(1, nextStepSize);
+                } else if (initialUpwardsMovement) {
+                  if ((!maybeMissed) || maybeMissed.price > nextPoint.price) {
+                    maybeMissed = bestPoint;
+                  }
+                  bestPoint = nextPoint; // TODO technically wrong, part of said hack
+                } else {
                   printPoints(
                     n,
                     points,
-                    "calculating stepSize(1) (alternative)",
-                    bestPoint,
+                    "found currentPoint",
+                    currentPoint,
                   );
-                  return bestPoint;
+                  return currentPoint;
                 }
+                // else if (lookingForUpwards) {
+                //   // stepSizeUpN.set(
+                //   //   1,
+                //   //   bestPoint.deltaSelling - nextPoint.deltaSelling,
+                //   // );
+                //   // lookingForUpwards = false;
+                // }
+
+                // if (withinSlope && nextPoint.price > rightmost.price) {
+                //   // alternative win condition for some edge-cases:
+                //   // if we're walking upwards, after finding our first
+                //   // improvement, and reaching the point where
+                //   // we're getting worse than the initial point, we can
+                //   // determine stepsize by going one step back and comparing
+                //   // that point with the initial one.
+
+                //   // found stepSize(1)
+                //   const nextStepSize = rightmost.deltaSelling -
+                //     currentPoint.deltaSelling;
+                //   stepSizeDownN.set(1, nextStepSize);
+                //   printPoints(
+                //     n,
+                //     points,
+                //     "calculating stepSize(1) (alternative)",
+                //     bestPoint,
+                //   );
+                //   return bestPoint;
+                // }
 
                 currentPoint = nextPoint;
               }
@@ -1099,7 +1033,16 @@ export class PairOptions {
               };
             } else {
               // secondary+ type of iteration: until worsening/finding end of slope
-              let currentPoint = iterateSlopeType(n - 1, rightmost);
+              // let stepSizeUp = stepSizeUpN.get(n);
+              let currentPoint: Point;
+              // if (stepSizeUp) {
+              //   currentPoint = pointForSelling(
+              //     rightmost.deltaSelling - stepSizeUp + 1n,
+              //   );
+              // } else {
+              currentPoint = iterateSlopeType(n - 1, rightmost);
+              // }
+
               points.push(currentPoint);
 
               const checkIfDone = (nextPoint: Point): Point | null => {
@@ -1137,17 +1080,27 @@ export class PairOptions {
                 );
                 return currentPoint;
               }
-              let stepSize = stepSizeN.get(n);
-              if (stepSize === undefined) {
-                let nextPoint = iterateSlopeType(
+              let stepSizeDown = stepSizeDownN.get(n);
+              if (stepSizeDown === undefined) {
+                let nextPoint: Point;
+                // stepSizeUp = stepSizeUpN.get(n);
+                // if (stepSizeUp) {
+                //   nextPoint = pointForSelling(
+                //     currentPoint.deltaSelling - stepSizeUp,
+                //   );
+                // } else {
+                nextPoint = iterateSlopeType(
                   n - 1,
                   pointForSelling(currentPoint.deltaSelling - 1n),
                 );
+                // }
+
                 points.push(nextPoint);
                 const maybeDone = checkIfDone(nextPoint);
                 if (maybeDone) return maybeDone;
-                stepSize = currentPoint.deltaSelling - nextPoint.deltaSelling;
-                stepSizeN.set(n, stepSize);
+                stepSizeDown = currentPoint.deltaSelling -
+                  nextPoint.deltaSelling;
+                stepSizeDownN.set(n, stepSizeDown);
                 if (nextPoint.price > currentPoint.price) { // TODO not too sure about this
                   // weird situation where we're continuing upwards with
                   // stepsize(n), until walking downwards once with stepsize(n-1)
@@ -1159,22 +1112,38 @@ export class PairOptions {
                   // -> update: some kind of zigzag-motion, until we find an improvement,
                   // using stepsize(n) and stepsize(n-1)
 
-                  let smallerStepSize = stepSize;
+                  // -> update: since it's some sort of square sometimes, also look at
+                  // the 3rd point if it exists
+
+                  let smallerStepSize = stepSizeDown;
                   let smallerN = n - 1;
-                  while (smallerStepSize === stepSize) {
-                    smallerStepSize = stepSizeN.get(smallerN--)!; // TODO hack
+                  while (smallerStepSize === stepSizeDown) {
+                    smallerStepSize = stepSizeDownN.get(smallerN--)!; // TODO hack
                   }
                   while (nextPoint.price > currentPoint.price) {
                     const nextPointBigStep = pointForSelling(
-                      nextPoint.deltaSelling - stepSize,
+                      nextPoint.deltaSelling - stepSizeDown,
                     );
-                    const nextPointSmallStep = pointForSelling(
+                    const nextPointSmallStep = minimizeSelling(pointForSelling(
                       nextPoint.deltaSelling - smallerStepSize,
-                    );
+                    ));
                     if (nextPointBigStep.price < nextPointSmallStep.price) {
-                      nextPoint = nextPointBigStep;
+                      const backStep = nextPointSmallStep.deltaSelling -
+                        nextPoint.deltaSelling;
+                      const nextPointMediumStep = pointForSelling(
+                        nextPoint.deltaSelling - stepSizeDown + backStep,
+                      );
+                      if (nextPointBigStep.price < nextPointMediumStep.price) {
+                        nextPoint = nextPointBigStep;
+                        points.push(nextPointMediumStep);
+                      } else {
+                        nextPoint = nextPointMediumStep;
+                        points.push(nextPointBigStep);
+                      }
+                      points.push(nextPointSmallStep);
                     } else {
                       nextPoint = nextPointSmallStep;
+                      points.push(nextPointBigStep);
                     }
                     points.push(nextPoint);
                     const maybeDone = checkIfDone(nextPoint);
@@ -1185,7 +1154,7 @@ export class PairOptions {
               }
               while (true) {
                 const nextPoint = pointForSelling(
-                  currentPoint.deltaSelling - stepSize,
+                  currentPoint.deltaSelling - stepSizeDown,
                 );
                 points.push(nextPoint);
                 const maybeDone = checkIfDone(nextPoint);
@@ -1212,67 +1181,25 @@ export class PairOptions {
           //   );
           // }
           const bestOfSlope = iterateSlopeType(
-            5,
+            100, // TODO probably ugly - first of all what to do with the excess, second of all might need to repeat if we don't hit leftmost end
             pointForSelling(maxSelling),
           );
           console.log("]");
-          stepSizeN.forEach((stepSize, n) => {
-            console.log(`stepSize(${n}) = ${stepSize}`);
+          stepSizeDownN.forEach((stepSize, n) => {
+            console.log(`stepSizeDown(${n}) = ${stepSize}`);
           });
-          foundImperfectSolution(bestOfSlope.deltaSelling);
-
-          // console.log("searching first slope");
-          // const firstSlope = searchWithinSlope(maxSelling, 1n);
-          // console.log("intraSlopeStep", firstSlope.intraSlopeStep);
-          // if (firstSlope.done) {
-          //   foundImperfectSolution(firstSlope.bestSelling);
-          // } else {
-          //   console.log("searching second slope");
-          //   const secondSlope = searchWithinSlope(
-          //     firstSlope.bestSelling - 1n,
-          //     1n, //firstSlope.intraSlopeStep, // TODO FIXME
-          //   );
-          //   const interSlopeStep = firstSlope.bestSelling -
-          //     secondSlope.bestSelling;
-          //   console.log("interSlopeStep", interSlopeStep);
-          //   let bestPrice: number;
-          //   let bestSelling: bigint;
-          //   if (firstSlope.bestPrice <= secondSlope.bestPrice) {
-          //     bestPrice = firstSlope.bestPrice;
-          //     bestSelling = firstSlope.bestSelling;
-          //   } else {
-          //     bestPrice = secondSlope.bestPrice;
-          //     bestSelling = secondSlope.bestSelling;
-          //   }
-          //   if (!secondSlope.done) {
-          //     let deltaSelling = secondSlope.bestSelling - interSlopeStep;
-          //     while (deltaSelling >= minSelling) {
-          //       const deltaBuying = buyingForSelling(deltaSelling);
-          //       const effectivePrice = Number(deltaSelling) /
-          //         Number(deltaBuying);
-          //       console.log(
-          //         "searching remaining slopes",
-          //         deltaSelling,
-          //         deltaBuying,
-          //         effectivePrice,
-          //       );
-          //       if (effectivePrice < bestPrice) {
-          //         console.log(
-          //           "found better:",
-          //           deltaSelling,
-          //           deltaBuying,
-          //           effectivePrice,
-          //         );
-          //         bestPrice = effectivePrice;
-          //         bestSelling = deltaSelling;
-          //       } else if (effectivePrice > bestPrice) {
-          //         // tertiary slope - at this point some sort of recursion might be warranted
-          //       }
-          //       deltaSelling -= interSlopeStep;
-          //     }
-          //   }
-          //   foundImperfectSolution(bestSelling);
-          // }
+          // stepSizeUpN.forEach((stepSize, n) => {
+          //   console.log(`stepSizeUp(${n}) = ${stepSize}`);
+          // });
+          console.log("bestOfSlope:", bestOfSlope);
+          console.log("maybeMissed:", maybeMissed);
+          if (
+            maybeMissed && (maybeMissed as Point).price <= bestOfSlope.price
+          ) {
+            foundImperfectSolution((maybeMissed as Point).deltaSelling);
+          } else {
+            foundImperfectSolution(bestOfSlope.deltaSelling);
+          }
         } // we're here because maxSelling < minSelling
         else if (minSelling <= maxSellingForExp) {
           console.log(`${minSelling} <= ${maxSellingForExp}`);
