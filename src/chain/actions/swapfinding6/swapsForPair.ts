@@ -853,6 +853,17 @@ export class PairOptions {
             return { price, deltaSelling, deltaBuying, done };
           };
 
+          const pointForBuying = (deltaBuying: bigint): Point => {
+            let deltaSelling = sellingForBuying(deltaBuying);
+            let done = false;
+            if (deltaSelling < minSelling) {
+              deltaSelling = minSelling;
+              done = true;
+            }
+            const price = Number(deltaSelling) / Number(deltaBuying);
+            return { price, deltaSelling, deltaBuying, done };
+          };
+
           const minimizeSelling = (point: Point): Point => {
             const stepSize = 1n;
             let lessBuying = pointForSelling(
@@ -860,6 +871,13 @@ export class PairOptions {
             );
             if (point.deltaBuying === lessBuying.deltaBuying) {
               while (point.deltaBuying === lessBuying.deltaBuying) {
+                console.log(
+                  "minimzing_ selling",
+                  lessBuying.deltaBuying,
+                  lessBuying.deltaSelling,
+                  lessBuying.price,
+                  lessBuying.done,
+                );
                 lessBuying = pointForSelling(
                   lessBuying.deltaSelling - stepSize,
                 );
@@ -871,6 +889,41 @@ export class PairOptions {
             }
             return point;
           };
+
+          // const minimizeSelling = (point: Point): Point => {
+          //   console.log("minimizing:", point);
+          //   // const point_ = minimizeSelling_(point);
+          //   const stepSize = 1n;
+          //   let lessBuying = pointForSelling(
+          //     point.deltaSelling - stepSize,
+          //   );
+          //   if (point.deltaBuying === lessBuying.deltaBuying) {
+          //     lessBuying = pointForBuying(point.deltaBuying - stepSize);
+          //     while (lessBuying.deltaBuying < point.deltaBuying) {
+          //       console.log(
+          //         "minimzing selling",
+          //         lessBuying.deltaBuying,
+          //         lessBuying.deltaSelling,
+          //         lessBuying.price,
+          //         lessBuying.done,
+          //       );
+          //       lessBuying = pointForSelling(
+          //         lessBuying.deltaSelling + stepSize,
+          //       );
+          //       // if (lessBuying.done) break;
+          //     }
+          //     point = lessBuying.done ? lessBuying : pointForSelling(
+          //       lessBuying.deltaSelling + stepSize,
+          //     );
+          //   }
+          //   return minimizeSelling_(point);
+          //   // console.log(point);
+          //   // console.log(point_);
+          //   // assert(point.deltaBuying === point_.deltaBuying);
+          //   // assert(point.deltaSelling === point_.deltaSelling);
+          //   // assert(point.price === point_.price);
+          //   // return point;
+          // };
 
           const stepPoint = (point: Point, stepSize = 1n): Point => {
             const nextPoint = pointForSelling(point.deltaSelling - stepSize);
@@ -887,13 +940,25 @@ export class PairOptions {
           let stepSizeDown: bigint | null = null;
           let stepSizeUp: bigint | null = null;
 
+          const print = true;
+
           // finding stepSizes
-          console.log("slopes = [[");
-          console.log(
-            `\t(${currentPoint.deltaBuying}, ${currentPoint.deltaSelling}, ${currentPoint.price}),`,
-          );
+          if (print) console.log("slopes = [[");
+          if (print) {
+            console.log(
+              `\t(${currentPoint.deltaBuying}, ${currentPoint.deltaSelling}, ${currentPoint.price}),`,
+            );
+          }
+          const seenPrices: Map<number, number> = new Map(); // for infinite loop detection
+          let infiniteLoop = false;
           while (((!stepSizeDown) || (!stepSizeUp)) && (!currentPoint.done)) {
             const nextPoint = stepPoint(currentPoint);
+            const seen = seenPrices.get(nextPoint.price) ?? 0;
+            seenPrices.set(nextPoint.price, seen + 1);
+            if (seen > 10) {
+              infiniteLoop = true;
+              break;
+            }
             // console.log(nextPoint);
             if (nextPoint.price < bestPoint.price) {
               if (bestBettered) {
@@ -905,67 +970,81 @@ export class PairOptions {
                 }
               } else bestBettered = true;
               bestPoint = nextPoint;
-            } else if ((!secondBest) || nextPoint.price < secondBest.price) {
+            } else if ((!secondBest) || nextPoint.price <= secondBest.price) {
               secondBest = nextPoint;
             }
             currentPoint = nextPoint;
-            console.log(
-              `\t(${currentPoint.deltaBuying}, ${currentPoint.deltaSelling}, ${currentPoint.price}),`,
-            );
-          }
-
-          // console.log("stepSizeDown", stepSizeDown);
-          // console.log("stepSizeUp", stepSizeUp);
-
-          const stepSizesDown = [{ stepSize: stepSizeDown, repeats: 1n }];
-          let bestRepeatsGlobal = 1n;
-
-          // traversing boundary of feasible region using stepSizes
-          console.log("],[");
-          if (!currentPoint.done) {
-            assert(stepSizeDown, `${stepSizeDown}`);
-            assert(stepSizeUp, `${stepSizeUp}`);
-            assert(stepSizeDown > 0, `${stepSizeDown}`);
-            assert(stepSizeUp > 0, `${stepSizeUp}`);
-            currentPoint = bestPoint;
-            console.log(
-              `\t(${currentPoint.deltaBuying}, ${currentPoint.deltaSelling}, ${currentPoint.price}),`,
-            );
-            let repeatedDown = 0n;
-            while (!currentPoint.done) {
-              let bestStep = stepPoint(currentPoint, stepSizeUp);
-              let bestRepeats = -1n;
-              for (const down of stepSizesDown) {
-                assert(down.stepSize);
-                const step = stepPoint(currentPoint, down.stepSize);
-                if (step.price < bestStep.price) {
-                  bestRepeats = down.repeats;
-                  bestStep = step;
-                }
-              }
-              if (bestRepeats === -1n) {
-                if (repeatedDown > bestRepeatsGlobal) {
-                  bestRepeatsGlobal = repeatedDown;
-                  stepSizesDown.push({
-                    stepSize: stepSizeDown * repeatedDown,
-                    repeats: repeatedDown,
-                  });
-                }
-                repeatedDown = 0n;
-              } else {
-                repeatedDown += bestRepeats;
-              }
-              assert(bestStep);
-              currentPoint = bestStep;
-              if (currentPoint.price < bestPoint.price) {
-                bestPoint = currentPoint;
-              }
+            if (print) {
               console.log(
                 `\t(${currentPoint.deltaBuying}, ${currentPoint.deltaSelling}, ${currentPoint.price}),`,
               );
             }
           }
-          console.log("]]");
+          if (!infiniteLoop) {
+            if (!print) console.log("stepSizeDown", stepSizeDown);
+            if (!print) console.log("stepSizeUp", stepSizeUp);
+
+            const stepSizesDown = [{ stepSize: stepSizeDown, repeats: 1n }];
+            let bestRepeatsGlobal = 1n;
+
+            // traversing boundary of feasible region using stepSizes
+            if (print) console.log("],[");
+            if (!currentPoint.done) {
+              assert(stepSizeDown, `${stepSizeDown}`);
+              assert(stepSizeUp, `${stepSizeUp}`);
+              assert(stepSizeDown > 0, `${stepSizeDown}`);
+              assert(stepSizeUp > 0, `${stepSizeUp}`);
+              currentPoint = bestPoint;
+              if (print) {
+                console.log(
+                  `\t(${currentPoint.deltaBuying}, ${currentPoint.deltaSelling}, ${currentPoint.price}),`,
+                );
+              }
+              let repeatedDown = 0n;
+              seenPrices.clear();
+              while (!currentPoint.done) {
+                let bestStep = stepPoint(currentPoint, stepSizeUp);
+                let bestRepeats = -1n;
+                for (const down of stepSizesDown) {
+                  assert(down.stepSize);
+                  const step = stepPoint(currentPoint, down.stepSize);
+                  if (step.price < bestStep.price) {
+                    bestRepeats = down.repeats;
+                    bestStep = step;
+                  }
+                }
+                if (bestRepeats === -1n) {
+                  if (repeatedDown > bestRepeatsGlobal) {
+                    bestRepeatsGlobal = repeatedDown;
+                    stepSizesDown.push({
+                      stepSize: stepSizeDown * repeatedDown,
+                      repeats: repeatedDown,
+                    });
+                  }
+                  repeatedDown = 0n;
+                } else {
+                  repeatedDown += bestRepeats;
+                }
+                assert(bestStep);
+                currentPoint = bestStep;
+                const seen = seenPrices.get(currentPoint.price) ?? 0;
+                seenPrices.set(currentPoint.price, seen + 1);
+                if (seen > 10) {
+                  infiniteLoop = true;
+                  break;
+                }
+                if (currentPoint.price < bestPoint.price) {
+                  bestPoint = currentPoint;
+                }
+                if (print) {
+                  console.log(
+                    `\t(${currentPoint.deltaBuying}, ${currentPoint.deltaSelling}, ${currentPoint.price}),`,
+                  );
+                }
+              }
+            }
+            if (print) console.log("]]");
+          }
           console.log("stepSizeDown", stepSizeDown);
           console.log("stepSizeUp", stepSizeUp);
           // if (skipped1.price < bestPoint.price) {
