@@ -945,6 +945,7 @@ export class PairOptions {
               }
               if (bestRepeats === -1n) {
                 if (repeatedDown > bestRepeatsGlobal) {
+                  bestRepeatsGlobal = repeatedDown;
                   stepSizesDown.push({
                     stepSize: stepSizeDown * repeatedDown,
                     repeats: repeatedDown,
