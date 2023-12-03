@@ -860,15 +860,66 @@ export class PairOptions {
             we take another step with "upwards" stepsize, expecting to hit the next slope again
           -
 
+          */
+
+          /*
+          unsorted ideas for other versions:
+
+          - mind the upwards-slopes as well
+          - keep a record of all encountered distances, then
+              - for all downwards-distances, see if we can find an improvement, recording the best in any case
+              - if we can't find an improvement, take the best from the previous and all upwards-distances
+
+          - utilize the fact that we got those parallelograms everywhere
+          - same for triangles
+
+          - record for each stepsize also the y-change; then, in each step, try them in order of 
+            decreasing y-decrease, until one sticks
+            - that info -whether it sticks - can probably be made use of as well
+            - we can try to lego them together - i.e. if up+down hits, add that to the repertoire
+            - we can also record how often we're repeating any move until another one is better,
+              and add that to the repertoire
+            - question now: how far do we want to go with this pattern-recognition-approach?
+              - repetition of the same move should be a no-brainer
+              - improvement of global optimum feels dangerous
+              - merging direction-change feels like a requirement for serious recursive compression
+              - we could also look at the diff between certain events and add those as new moves
+                - i.e. direction-changes feel like good candidates
+                - or misses of the previous pattern?
+                - consider all four combinations of pre/post event
+              - we could also in each step:
+                - for any sequence-length >= 2 up to a sensible limit:
+                  - see if we just encountered a repeating pattern
+                  - if we did, add it to the repertoire
+                  - consider wiping the history then and/or replacing the pattern in it
+                  - also ensure the repertoire doesn't get spammed with a million copies of the same
+              - keep in mind that an increasing repertoire will increase the runtime per step
+              - we could use the knowledge of the theoretical optimum to skip certain patterns
+                - we could in each step use binary search to find the best applicable pattern,
+                  try it, and if it fails try the next worse one stepwise
+                - we could initialize said binary search with the previous step
 
 
 
+
+          outline of one approach:
+          - record best and worst encountered points (initialized with initial)
+          - start from the right
+          - go left with stepsize 1, minimizing deltaSelling
+          - if worst price gets worse a second time, we found an upwards-distance
+          - if best price gets better a second time, we found a downwards-distance
+          - if we find or already have both, we look at the best price in that loop
+          - we repeatedly try 
+              - first the downwards-distance
+              - if that doesn't improve the price, we also look at upwards-distance,
+                and pick the better one
+              - if our best price improves again, we add that distance to our repertoire
           */
 
           const stepSizeDownN: Map<number, bigint> = new Map();
           stepSizeDownN.set(0, 1n);
 
-          // const stepSizeUpN: Map<number, bigint> = new Map();
+          const stepSizeUpN: Map<number, bigint> = new Map();
 
           type Point = {
             price: number;
@@ -943,7 +994,7 @@ export class PairOptions {
               points.push(currentPoint);
               let bestPoint = currentPoint;
               let withinSlope = false;
-              // let lookingForUpwards = true;
+              let lookingForUpwards = true;
               let initialUpwardsMovement = true; // TODO hack, likely has edgecases
               while (!currentPoint.done) {
                 let nextPoint = pointForSelling(
@@ -956,25 +1007,25 @@ export class PairOptions {
                   // price getting better -> beginning of slope
                   if (stepSizeDownN.has(1)) {
                     // don't need to find stepSize(1) again
-                    // printPoints(
-                    //   n,
-                    //   points,
-                    //   "found stepSize(1) before",
-                    //   nextPoint,
-                    // );
-                    // return nextPoint;
+                    printPoints(
+                      n,
+                      points,
+                      "found stepSize(1) before",
+                      nextPoint,
+                    );
+                    return nextPoint;
                   } else if (withinSlope) {
                     // found stepSize(1)
                     const nextStepSize = bestPoint.deltaSelling -
                       nextPoint.deltaSelling;
                     stepSizeDownN.set(1, nextStepSize);
-                    // printPoints(
-                    //   n,
-                    //   points,
-                    //   "calculating stepSize(1)",
-                    //   nextPoint,
-                    // );
-                    // return nextPoint;
+                    printPoints(
+                      n,
+                      points,
+                      "calculating stepSize(1)",
+                      nextPoint,
+                    );
+                    return nextPoint;
                   } else {
                     // looking for stepSize(1) from now on
                     withinSlope = true;
@@ -985,22 +1036,22 @@ export class PairOptions {
                     maybeMissed = bestPoint;
                   }
                   bestPoint = nextPoint; // TODO technically wrong, part of said hack
-                } else {
-                  printPoints(
-                    n,
-                    points,
-                    "found currentPoint",
-                    currentPoint,
-                  );
-                  return currentPoint;
-                }
-                // else if (lookingForUpwards) {
-                //   // stepSizeUpN.set(
-                //   //   1,
-                //   //   bestPoint.deltaSelling - nextPoint.deltaSelling,
+                } // else {
+                //   // printPoints(
+                //   //   n,
+                //   //   points,
+                //   //   "found currentPoint",
+                //   //   currentPoint,
                 //   // );
-                //   // lookingForUpwards = false;
+                //   // return currentPoint;
                 // }
+                else if (lookingForUpwards) {
+                  stepSizeUpN.set(
+                    1,
+                    bestPoint.deltaSelling - nextPoint.deltaSelling,
+                  );
+                  lookingForUpwards = false;
+                }
 
                 // if (withinSlope && nextPoint.price > rightmost.price) {
                 //   // alternative win condition for some edge-cases:
@@ -1033,15 +1084,15 @@ export class PairOptions {
               };
             } else {
               // secondary+ type of iteration: until worsening/finding end of slope
-              // let stepSizeUp = stepSizeUpN.get(n);
+              let stepSizeUp = stepSizeUpN.get(n);
               let currentPoint: Point;
-              // if (stepSizeUp) {
-              //   currentPoint = pointForSelling(
-              //     rightmost.deltaSelling - stepSizeUp + 1n,
-              //   );
-              // } else {
-              currentPoint = iterateSlopeType(n - 1, rightmost);
-              // }
+              if (stepSizeUp) {
+                currentPoint = pointForSelling(
+                  rightmost.deltaSelling - stepSizeUp + 1n,
+                );
+              } else {
+                currentPoint = iterateSlopeType(n - 1, rightmost);
+              }
 
               points.push(currentPoint);
 
@@ -1083,17 +1134,17 @@ export class PairOptions {
               let stepSizeDown = stepSizeDownN.get(n);
               if (stepSizeDown === undefined) {
                 let nextPoint: Point;
-                // stepSizeUp = stepSizeUpN.get(n);
-                // if (stepSizeUp) {
-                //   nextPoint = pointForSelling(
-                //     currentPoint.deltaSelling - stepSizeUp,
-                //   );
-                // } else {
-                nextPoint = iterateSlopeType(
-                  n - 1,
-                  pointForSelling(currentPoint.deltaSelling - 1n),
-                );
-                // }
+                stepSizeUp = stepSizeUpN.get(n);
+                if (stepSizeUp) {
+                  nextPoint = pointForSelling(
+                    currentPoint.deltaSelling - stepSizeUp,
+                  );
+                } else {
+                  nextPoint = iterateSlopeType(
+                    n - 1,
+                    pointForSelling(currentPoint.deltaSelling - 1n),
+                  );
+                }
 
                 points.push(nextPoint);
                 const maybeDone = checkIfDone(nextPoint);
@@ -1188,9 +1239,9 @@ export class PairOptions {
           stepSizeDownN.forEach((stepSize, n) => {
             console.log(`stepSizeDown(${n}) = ${stepSize}`);
           });
-          // stepSizeUpN.forEach((stepSize, n) => {
-          //   console.log(`stepSizeUp(${n}) = ${stepSize}`);
-          // });
+          stepSizeUpN.forEach((stepSize, n) => {
+            console.log(`stepSizeUp(${n}) = ${stepSize}`);
+          });
           console.log("bestOfSlope:", bestOfSlope);
           console.log("maybeMissed:", maybeMissed);
           if (
