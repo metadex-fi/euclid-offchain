@@ -871,13 +871,13 @@ export class PairOptions {
             );
             if (point.deltaBuying === lessBuying.deltaBuying) {
               while (point.deltaBuying === lessBuying.deltaBuying) {
-                console.log(
-                  "minimzing_ selling",
-                  lessBuying.deltaBuying,
-                  lessBuying.deltaSelling,
-                  lessBuying.price,
-                  lessBuying.done,
-                );
+                // console.log(
+                //   "minimzing_ selling",
+                //   lessBuying.deltaBuying,
+                //   lessBuying.deltaSelling,
+                //   lessBuying.price,
+                //   lessBuying.done,
+                // );
                 lessBuying = pointForSelling(
                   lessBuying.deltaSelling - stepSize,
                 );
@@ -949,16 +949,21 @@ export class PairOptions {
               `\t(${currentPoint.deltaBuying}, ${currentPoint.deltaSelling}, ${currentPoint.price}),`,
             );
           }
-          const seenPrices: Map<number, number> = new Map(); // for infinite loop detection
+          // for infinite loop detection
+          // const seenPrices: Map<number, number> = new Map();
+          let previousPoints = [currentPoint];
+          let groundhogs = 0;
+          const groundhogLimit = 100;
+          const memsize = 3;
           let infiniteLoop = false;
           while (((!stepSizeDown) || (!stepSizeUp)) && (!currentPoint.done)) {
             const nextPoint = stepPoint(currentPoint);
-            const seen = seenPrices.get(nextPoint.price) ?? 0;
-            seenPrices.set(nextPoint.price, seen + 1);
-            if (seen > 10) {
-              infiniteLoop = true;
-              break;
-            }
+            // const seen = seenPrices.get(nextPoint.price) ?? 0;
+            // seenPrices.set(nextPoint.price, seen + 1);
+            // if (seen > 10) {
+            //   infiniteLoop = true;
+            //   break;
+            // }
             // console.log(nextPoint);
             if (nextPoint.price < bestPoint.price) {
               if (bestBettered) {
@@ -972,6 +977,23 @@ export class PairOptions {
               bestPoint = nextPoint;
             } else if ((!secondBest) || nextPoint.price <= secondBest.price) {
               secondBest = nextPoint;
+            }
+            if (
+              previousPoints.some((previousPoint) =>
+                previousPoint.price === nextPoint.price
+              )
+            ) {
+              if (++groundhogs > groundhogLimit) {
+                infiniteLoop = true;
+                console.log("infinite loop");
+                break;
+              }
+            } else {
+              groundhogs = 0;
+              previousPoints = [nextPoint, ...previousPoints].slice(
+                0,
+                memsize,
+              );
             }
             currentPoint = nextPoint;
             if (print) {
@@ -1001,16 +1023,16 @@ export class PairOptions {
                 );
               }
               let repeatedDown = 0n;
-              seenPrices.clear();
+              // seenPrices.clear();
               while (!currentPoint.done) {
-                let bestStep = stepPoint(currentPoint, stepSizeUp);
+                let nextPoint = stepPoint(currentPoint, stepSizeUp);
                 let bestRepeats = -1n;
                 for (const down of stepSizesDown) {
                   assert(down.stepSize);
                   const step = stepPoint(currentPoint, down.stepSize);
-                  if (step.price < bestStep.price) {
+                  if (step.price < nextPoint.price) {
                     bestRepeats = down.repeats;
-                    bestStep = step;
+                    nextPoint = step;
                   }
                 }
                 if (bestRepeats === -1n) {
@@ -1025,14 +1047,31 @@ export class PairOptions {
                 } else {
                   repeatedDown += bestRepeats;
                 }
-                assert(bestStep);
-                currentPoint = bestStep;
-                const seen = seenPrices.get(currentPoint.price) ?? 0;
-                seenPrices.set(currentPoint.price, seen + 1);
-                if (seen > 10) {
-                  infiniteLoop = true;
-                  break;
+                assert(nextPoint);
+                if (
+                  previousPoints.some((previousPoint) =>
+                    previousPoint.price === nextPoint.price
+                  )
+                ) {
+                  if (++groundhogs > groundhogLimit) {
+                    infiniteLoop = true;
+                    console.log("infinite loop");
+                    break;
+                  }
+                } else {
+                  groundhogs = 0;
+                  previousPoints = [nextPoint, ...previousPoints].slice(
+                    0,
+                    memsize,
+                  );
                 }
+                currentPoint = nextPoint;
+                // const seen = seenPrices.get(currentPoint.price) ?? 0;
+                // seenPrices.set(currentPoint.price, seen + 1);
+                // if (seen > 10) {
+                //   infiniteLoop = true;
+                //   break;
+                // }
                 if (currentPoint.price < bestPoint.price) {
                   bestPoint = currentPoint;
                 }
@@ -1044,6 +1083,8 @@ export class PairOptions {
               }
             }
             if (print) console.log("]]");
+          } else {
+            runAsserts = false; // TODO FIXME
           }
           console.log("stepSizeDown", stepSizeDown);
           console.log("stepSizeUp", stepSizeUp);
