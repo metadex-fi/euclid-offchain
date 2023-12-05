@@ -736,27 +736,112 @@ export class PairOptions {
         const sellingForBuying = (buying: bigint): bigint =>
           ceilDiv(buying * buyingMultiplier, sellingMultiplier);
 
-        const minSelling = max(s.minDelta, sellingForBuying(b.minDelta));
-        assert(buyingForSelling(minSelling) >= b.minDelta);
-        // const maxSelling = maxSellingForExp;
-        const maxSelling = min(
-          maxSellingForExp,
-          sellingForBuying(maxBuyingForExp),
-        );
-        // assert(
-        //   buyingForSelling(maxSelling) <= maxBuyingForExp,
-        //   `${maxSelling} * ${sellingMultiplier} / ${buyingMultiplier} = ${
-        //     buyingForSelling(maxSelling)
-        //   } > ${maxBuyingForExp}`,
-        // );
+        type Rational = {
+          numerator: bigint;
+          denominator: bigint;
+        };
+        type Point = {
+          delta: bigint;
+          loss: Rational;
+        };
+
+        // 1 means a is larger, -1 means b is larger
+        const compare = (a: Rational, b: Rational): number => {
+          const aLoss = a.numerator * b.denominator;
+          const bLoss = b.numerator * a.denominator;
+          if (aLoss === bLoss) return 0;
+          if (aLoss > bLoss) return 1;
+          return -1;
+        };
+
+        const negate = (a: Rational): Rational => {
+          return { numerator: -a.numerator, denominator: a.denominator };
+        };
+
+        const avg = (a: Rational, b: Rational): Rational => {
+          const numerator = a.numerator * b.denominator +
+            b.numerator * a.denominator;
+          const denominator = a.denominator * b.denominator * 2n;
+          return { numerator, denominator };
+        };
+
+        const printPoint = (p: Point) => {
+          let numerator = p.loss.numerator;
+          let denominator = p.loss.denominator;
+          let denominator_ = Number(denominator);
+          while (!isFinite(denominator_)) {
+            numerator /= 10n;
+            denominator /= 10n;
+            denominator_ = Number(denominator);
+          }
+          const otherDelta = otherAssetEquivalent(p.delta);
+          const [buying, selling] = xAxis === "buying"
+            ? [p.delta, otherDelta]
+            : [otherDelta, p.delta];
+          console.log(`\t(${buying}, ${selling}),`);
+        };
+
+        const pointForDelta_ = (
+          numerator: bigint,
+          denominator: bigint,
+        ) =>
+        (delta: bigint): Point => {
+          let remainder = (numerator * delta) % denominator;
+          if (numerator < 0n) remainder += denominator;
+          const loss = {
+            numerator: remainder,
+            denominator,
+          };
+          return { delta, loss };
+        };
+
+        let maxDelta: bigint;
+        let minDelta: bigint;
+        let xAxis: "buying" | "selling";
+        let otherAssetEquivalent: (delta: bigint) => bigint;
+        let tighten: (delta: bigint) => bigint;
+        let pointForDelta: (delta: bigint) => Point;
+        const minimizeSelling = (selling: bigint): bigint =>
+          sellingForBuying(buyingForSelling(selling));
+        const maximizeBuying = (buying: bigint): bigint =>
+          buyingForSelling(sellingForBuying(buying));
+
+        if (buyingMultiplier < sellingMultiplier) {
+          xAxis = "selling";
+          tighten = minimizeSelling;
+          pointForDelta = pointForDelta_(sellingMultiplier, buyingMultiplier);
+          otherAssetEquivalent = buyingForSelling;
+          const maxForOtherMax = sellingForBuying(maxBuyingForExp);
+          const minForOtherMin = sellingForBuying(b.minDelta);
+          maxDelta = min(maxForOtherMax, maxSellingForExp);
+          minDelta = max(minForOtherMin, s.minDelta);
+        } else {
+          xAxis = "buying";
+          tighten = (delta) => delta;
+          pointForDelta = pointForDelta_(-buyingMultiplier, sellingMultiplier);
+          otherAssetEquivalent = sellingForBuying;
+          const maxForOtherMax = buyingForSelling(
+            minimizeSelling(maxSellingForExp),
+          );
+          const minForOtherMin = maximizeBuying(buyingForSelling(s.minDelta));
+          maxDelta = min(maxForOtherMax, maxBuyingForExp);
+          minDelta = max(minForOtherMin, b.minDelta);
+          if (sellingForBuying(minDelta) < s.minDelta) minDelta++;
+        }
+        console.log("minDelta", minDelta);
+        console.log("maxDelta", maxDelta);
+        console.log("stepping", xAxis);
 
         let bestImperfectOption: PairOption | null = null;
-        const foundImperfectSolution = (deltaSelling: bigint) => {
-          const deltaBuying = buyingForSelling(deltaSelling);
-          console.log("found imperfect solution", deltaBuying, deltaSelling);
+        const foundImperfectSolution = (delta: bigint) => {
+          const otherDelta = otherAssetEquivalent(delta);
+          const [buying, selling] = xAxis === "buying"
+            ? [delta, otherDelta]
+            : [otherDelta, delta];
+          console.log("found imperfect solution", buying, selling);
           const maybeBetter = checkNewOption_(
-            deltaBuying,
-            deltaSelling,
+            buying,
+            selling,
             false,
           );
           if (maybeBetter) {
@@ -764,11 +849,11 @@ export class PairOptions {
           }
         };
         let runAsserts = true;
-        if (minSelling === maxSelling) {
-          console.log(`${minSelling} === ${maxSelling}`);
-          foundImperfectSolution(minSelling);
-        } else if (minSelling < maxSelling) {
-          console.log(`${minSelling} < ${maxSelling}`);
+        if (minDelta === maxDelta) {
+          console.log(`${minDelta} === ${maxDelta}`);
+          foundImperfectSolution(maxDelta);
+        } else if (minDelta < maxDelta) {
+          console.log(`${minDelta} < ${maxDelta}`);
 
           console.log("m_b =", buyingMultiplier.toString());
           console.log("m_s =", sellingMultiplier.toString());
@@ -776,341 +861,120 @@ export class PairOptions {
           console.log("min_delta_s =", s.minDelta.toString());
           console.log("max_delta_b =", maxBuyingForExp.toString());
           console.log("max_delta_s =", maxSellingForExp.toString());
+          console.log(`stepping = "${xAxis}"`);
 
-          /*
-          unsorted ideas for other versions:
-
-          - mind the upwards-slopes as well
-          - keep a record of all encountered distances, then
-              - for all downwards-distances, see if we can find an improvement, recording the best in any case
-              - if we can't find an improvement, take the best from the previous and all upwards-distances
-
-          - utilize the fact that we got those parallelograms everywhere
-          - same for triangles
-
-          - record for each stepsize also the y-change; then, in each step, try them in order of
-            decreasing y-decrease, until one sticks
-            - that info -whether it sticks - can probably be made use of as well
-            - we can try to lego them together - i.e. if up+down hits, add that to the repertoire
-            - we can also record how often we're repeating any move until another one is better,
-              and add that to the repertoire
-            - question now: how far do we want to go with this pattern-recognition-approach?
-              - repetition of the same move should be a no-brainer
-              - improvement of global optimum feels dangerous
-              - merging direction-change feels like a requirement for serious recursive compression
-              - we could also look at the diff between certain events and add those as new moves
-                - i.e. direction-changes feel like good candidates
-                - or misses of the previous pattern?
-                - consider all four combinations of pre/post event
-              - we could also in each step:
-                - for any sequence-length >= 2 up to a sensible limit:
-                  - see if we just encountered a repeating pattern
-                  - if we did, add it to the repertoire
-                  - consider wiping the history then and/or replacing the pattern in it
-                  - also ensure the repertoire doesn't get spammed with a million copies of the same
-              - keep in mind that an increasing repertoire will increase the runtime per step
-              - we could use the knowledge of the theoretical optimum to skip certain patterns
-                - we could in each step use binary search to find the best applicable pattern,
-                  try it, and if it fails try the next worse one stepwise
-                - we could initialize said binary search with the previous step
-
-
-
-
-          outline of one approach:
-          - record best and worst encountered points (initialized with initial)
-          - start from the right
-          - go left with stepsize 1, minimizing deltaSelling
-          - if worst price gets worse a second time, we found an upwards-distance
-          - if best price gets better a second time, we found a downwards-distance
-          - if we find or already have both, we look at the best price in that loop
-          - we repeatedly try
-              - first the downwards-distance
-              - if that doesn't improve the price, we also look at upwards-distance,
-                and pick the better one
-              - if our best price improves again, we add that distance to our repertoire
-
-
-
-            for starters: simply try to find the up/down distances and use those to traverse the data
-          */
-
-          type Point = {
-            price: number;
-            deltaSelling: bigint;
-            deltaBuying: bigint;
-            done: boolean;
-          };
-
-          const pointForSelling = (deltaSelling: bigint): Point => {
-            let done = false;
-            if (deltaSelling < minSelling) {
-              deltaSelling = minSelling;
-              done = true;
-            }
-            const deltaBuying = buyingForSelling(deltaSelling);
-            const price = Number(deltaSelling) / Number(deltaBuying);
-            return { price, deltaSelling, deltaBuying, done };
-          };
-
-          const pointForBuying = (deltaBuying: bigint): Point => {
-            let deltaSelling = sellingForBuying(deltaBuying);
-            let done = false;
-            if (deltaSelling < minSelling) {
-              deltaSelling = minSelling;
-              done = true;
-            }
-            const price = Number(deltaSelling) / Number(deltaBuying);
-            return { price, deltaSelling, deltaBuying, done };
-          };
-
-          const minimizeSelling = (point: Point): Point => {
-            const stepSize = 1n;
-            let lessBuying = pointForSelling(
-              point.deltaSelling - stepSize,
-            );
-            if (point.deltaBuying === lessBuying.deltaBuying) {
-              while (point.deltaBuying === lessBuying.deltaBuying) {
-                // console.log(
-                //   "minimzing_ selling",
-                //   lessBuying.deltaBuying,
-                //   lessBuying.deltaSelling,
-                //   lessBuying.price,
-                //   lessBuying.done,
-                // );
-                lessBuying = pointForSelling(
-                  lessBuying.deltaSelling - stepSize,
-                );
-                if (lessBuying.done) break;
-              }
-              point = lessBuying.done ? lessBuying : pointForSelling(
-                lessBuying.deltaSelling + stepSize,
-              );
-            }
-            return point;
-          };
-
-          // const minimizeSelling = (point: Point): Point => {
-          //   console.log("minimizing:", point);
-          //   // const point_ = minimizeSelling_(point);
-          //   const stepSize = 1n;
-          //   let lessBuying = pointForSelling(
-          //     point.deltaSelling - stepSize,
-          //   );
-          //   if (point.deltaBuying === lessBuying.deltaBuying) {
-          //     lessBuying = pointForBuying(point.deltaBuying - stepSize);
-          //     while (lessBuying.deltaBuying < point.deltaBuying) {
-          //       console.log(
-          //         "minimzing selling",
-          //         lessBuying.deltaBuying,
-          //         lessBuying.deltaSelling,
-          //         lessBuying.price,
-          //         lessBuying.done,
-          //       );
-          //       lessBuying = pointForSelling(
-          //         lessBuying.deltaSelling + stepSize,
-          //       );
-          //       // if (lessBuying.done) break;
-          //     }
-          //     point = lessBuying.done ? lessBuying : pointForSelling(
-          //       lessBuying.deltaSelling + stepSize,
-          //     );
-          //   }
-          //   return minimizeSelling_(point);
-          //   // console.log(point);
-          //   // console.log(point_);
-          //   // assert(point.deltaBuying === point_.deltaBuying);
-          //   // assert(point.deltaSelling === point_.deltaSelling);
-          //   // assert(point.price === point_.price);
-          //   // return point;
-          // };
-
-          const stepPoint = (point: Point, stepSize = 1n): Point => {
-            const nextPoint = pointForSelling(point.deltaSelling - stepSize);
-            return minimizeSelling(nextPoint);
-          };
-
-          // const skipped1 = pointForSelling(maxSelling);
-          // const skipped2 = stepPoint(skipped1);
-          let currentPoint = minimizeSelling(pointForSelling(maxSelling));
-          // let currentPoint = stepPoint(skipped2); // TODO hack
-          let bestPoint = currentPoint;
-          let secondBest: Point | null = null;
-          let bestBettered = false;
-          let stepSizeDown: bigint | null = null;
-          let stepSizeUp: bigint | null = null;
-
-          const print = true;
-
-          // finding stepSizes
-          if (print) console.log("slopes = [[");
-          if (print) {
-            console.log(
-              `\t(${currentPoint.deltaBuying}, ${currentPoint.deltaSelling}, ${currentPoint.price}),`,
-            );
-          }
-          // for infinite loop detection
-          // const seenPrices: Map<number, number> = new Map();
-          let previousPoints = [currentPoint];
-          let groundhogs = 0;
-          const groundhogLimit = 100;
-          const memsize = 3;
-          let infiniteLoop = false;
-          while (((!stepSizeDown) || (!stepSizeUp)) && (!currentPoint.done)) {
-            const nextPoint = stepPoint(currentPoint);
-            // const seen = seenPrices.get(nextPoint.price) ?? 0;
-            // seenPrices.set(nextPoint.price, seen + 1);
-            // if (seen > 10) {
-            //   infiniteLoop = true;
-            //   break;
-            // }
-            // console.log(nextPoint);
-            if (nextPoint.price < bestPoint.price) {
-              if (bestBettered) {
-                stepSizeDown = bestPoint.deltaSelling - nextPoint.deltaSelling;
-                if (
-                  secondBest && bestPoint.deltaSelling > secondBest.deltaSelling
-                ) {
-                  stepSizeUp = bestPoint.deltaSelling - secondBest.deltaSelling;
-                }
-              } else bestBettered = true;
-              bestPoint = nextPoint;
-            } else if ((!secondBest) || nextPoint.price <= secondBest.price) {
-              secondBest = nextPoint;
-            }
-            if (
-              previousPoints.some((previousPoint) =>
-                previousPoint.price === nextPoint.price
-              )
-            ) {
-              if (++groundhogs > groundhogLimit) {
-                infiniteLoop = true;
-                console.log("infinite loop");
+          const search = (reverse = false): Point => {
+            const stepsizes = [0n, reverse ? -1n : 1n];
+            let delta = tighten(reverse ? maxDelta : minDelta);
+            // let delta = reverse ? maxDelta : minDelta;
+            let current = pointForDelta(delta);
+            let optimum = current;
+            // let prevWorsening: Point | null = null;
+            // let upStep: bigint | null = null;
+            printPoint(current);
+            // let checkedReversal = reverse;
+            while (true) {
+              const stepsize = stepsizes.at(-1)!;
+              delta = tighten(delta + stepsize);
+              // delta += stepsize;
+              // console.log("delta", delta);
+              if (reverse ? delta < minDelta : delta > maxDelta) {
+                printPoint(pointForDelta(delta));
                 break;
               }
-            } else {
-              groundhogs = 0;
-              previousPoints = [nextPoint, ...previousPoints].slice(
-                0,
-                memsize,
-              );
-            }
-            currentPoint = nextPoint;
-            if (print) {
-              console.log(
-                `\t(${currentPoint.deltaBuying}, ${currentPoint.deltaSelling}, ${currentPoint.price}),`,
-              );
-            }
-          }
-          if (!infiniteLoop) {
-            if (!print) console.log("stepSizeDown", stepSizeDown);
-            if (!print) console.log("stepSizeUp", stepSizeUp);
+              let next = pointForDelta(delta);
+              printPoint(next);
+              const gotWorse = compare(next.loss, current.loss) > 0;
+              if (gotWorse) {
+                delta -= stepsizes.at(-2)!;
+                let corrected = pointForDelta(delta);
+                // printPoint(corrected);
+                const middle = avg(corrected.loss, negate(next.loss));
+                if (compare(middle, current.loss) < 0) {
+                  if (stepsizes.length > 2) {
+                    delta = current.delta + stepsizes.at(-2)! -
+                      stepsizes.at(-3)!;
+                    delta = tighten(delta);
+                    corrected = pointForDelta(delta);
+                  }
 
-            const stepSizesDown = [{ stepSize: stepSizeDown, repeats: 1n }];
-            let bestRepeatsGlobal = 1n;
-
-            // traversing boundary of feasible region using stepSizes
-            if (print) console.log("],[");
-            if (!currentPoint.done) {
-              assert(stepSizeDown, `${stepSizeDown}`);
-              assert(stepSizeUp, `${stepSizeUp}`);
-              assert(stepSizeDown > 0, `${stepSizeDown}`);
-              assert(stepSizeUp > 0, `${stepSizeUp}`);
-              currentPoint = bestPoint;
-              if (print) {
-                console.log(
-                  `\t(${currentPoint.deltaBuying}, ${currentPoint.deltaSelling}, ${currentPoint.price}),`,
-                );
+                  // if (prevWorsening === null) {
+                  //   prevWorsening = current;
+                  // } else {
+                  //   if (upStep !== null) {
+                  //     // corrected = pointForDelta(current.delta + upStep);
+                  //     // printPoint(corrected);
+                  //   }
+                  //   upStep = next.delta - prevWorsening.delta;
+                  // }
+                  // if (!checkedReversal) {
+                  //   checkedReversal = true;
+                  //   const middle = avg(corrected.loss, negate(next.loss));
+                  //   if (compare(middle, current.loss) < 0) {
+                  //     console.log("], # reversing\n[");
+                  //     return search(true);
+                  //   }
+                }
+                printPoint(corrected);
+                next = corrected;
               }
-              let repeatedDown = 0n;
-              // seenPrices.clear();
-              while (!currentPoint.done) {
-                let nextPoint = stepPoint(currentPoint, stepSizeUp);
-                let bestRepeats = -1n;
-                for (const down of stepSizesDown) {
-                  assert(down.stepSize);
-                  const step = stepPoint(currentPoint, down.stepSize);
-                  if (step.price < nextPoint.price) {
-                    bestRepeats = down.repeats;
-                    nextPoint = step;
-                  }
+              if (compare(next.loss, optimum.loss) <= 0) {
+                // met or improved optimum
+                const distance = delta - optimum.delta;
+                // assert(distance >= stepsize);
+                if (distance !== stepsize) {
+                  stepsizes.push(distance);
                 }
-                if (bestRepeats === -1n) {
-                  if (repeatedDown > bestRepeatsGlobal) {
-                    bestRepeatsGlobal = repeatedDown;
-                    stepSizesDown.push({
-                      stepSize: stepSizeDown * repeatedDown,
-                      repeats: repeatedDown,
-                    });
-                  }
-                  repeatedDown = 0n;
-                } else {
-                  repeatedDown += bestRepeats;
-                }
-                assert(nextPoint);
-                if (
-                  previousPoints.some((previousPoint) =>
-                    previousPoint.price === nextPoint.price
-                  )
-                ) {
-                  if (++groundhogs > groundhogLimit) {
-                    infiniteLoop = true;
-                    console.log("infinite loop");
-                    break;
-                  }
-                } else {
-                  groundhogs = 0;
-                  previousPoints = [nextPoint, ...previousPoints].slice(
-                    0,
-                    memsize,
-                  );
-                }
-                currentPoint = nextPoint;
-                // const seen = seenPrices.get(currentPoint.price) ?? 0;
-                // seenPrices.set(currentPoint.price, seen + 1);
-                // if (seen > 10) {
-                //   infiniteLoop = true;
-                //   break;
-                // }
-                if (currentPoint.price < bestPoint.price) {
-                  bestPoint = currentPoint;
-                }
-                if (print) {
-                  console.log(
-                    `\t(${currentPoint.deltaBuying}, ${currentPoint.deltaSelling}, ${currentPoint.price}),`,
-                  );
-                }
+                optimum = next;
               }
+              current = next;
             }
-            if (print) console.log("]]");
-          } else {
-            runAsserts = false; // TODO FIXME
-          }
-          console.log("stepSizeDown", stepSizeDown);
-          console.log("stepSizeUp", stepSizeUp);
-          // if (skipped1.price < bestPoint.price) {
-          //   bestPoint = skipped1;
+            console.log("]]");
+            console.log("stepsizes:", stepsizes);
+            // console.log("upStep:", upStep);
+            return optimum;
+          };
+          console.log("slopes = [[");
+          const optimumForward = search();
+          // console.log("], # reversing\n[");
+          // const optimumReverse = search(true);
+          let optimum: Point;
+          // const comparison = compare(optimumForward.loss, optimumReverse.loss);
+          // if (comparison < 0) {
+          //   optimum = optimumReverse;
+          // } else if (comparison > 0) {
+          //   optimum = optimumReverse;
+          // } else {
+          //   if (optimumForward.delta < optimumReverse.delta) {
+          //     optimum = optimumReverse;
+          //   } else {
+          //     optimum = optimumForward;
+          //   }
           // }
-          // if (skipped2.price < bestPoint.price) {
-          //   bestPoint = skipped2;
-          // }
-          foundImperfectSolution(bestPoint.deltaSelling);
-        } // we're here because maxSelling < minSelling
-        else if (minSelling <= maxSellingForExp) {
-          console.log(`${minSelling} <= ${maxSellingForExp}`);
-          const maybeBetter = findImperfectExhaustively(
-            minSelling,
-            maxSellingForExp,
-          );
-          if (maybeBetter) {
-            bestImperfectOption = maybeBetter;
-          }
-        } // otherwise no solution possible
+          // console.log("]]");
+          optimum = optimumForward;
+
+          foundImperfectSolution(optimum.delta);
+        } else {
+          runAsserts = false; // TODO FIXME
+        }
+
+        // we're here because maxSelling < minSelling
+        // else if (minSelling <= maxSellingForExp) {
+        //   console.log(`${minSelling} <= ${maxSellingForExp}`);
+        //   const maybeBetter = findImperfectExhaustively(
+        //     minSelling,
+        //     maxSellingForExp,
+        //   );
+        //   if (maybeBetter) {
+        //     bestImperfectOption = maybeBetter;
+        //   }
+        // } // otherwise no solution possible
 
         // here: assert that we can't find a better solution
         // console.log("exhaustive search");
         const maybeBetter = findImperfectExhaustively(
-          minSelling,
+          max(s.minDelta, sellingForBuying(b.minDelta)),
           maxSellingForExp,
         );
         if (maybeBetter && runAsserts) {
