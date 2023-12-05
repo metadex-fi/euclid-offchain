@@ -865,9 +865,6 @@ export class PairOptions {
 
           const search = (minDelta: bigint): Point => {
             const stepsizes = [0n, 1n];
-            if (xAxis === "buying") {
-              stepsizes.push((buyingMultiplier * 10n) / sellingMultiplier);
-            }
             let delta = tighten(minDelta);
             // let delta = reverse ? maxDelta : minDelta;
             let current = pointForDelta(delta);
@@ -876,6 +873,7 @@ export class PairOptions {
             printPoint(current);
             // let checkedReversal = reverse;
             // let upStep: bigint | null = null;
+            // let preflight = true;
             while (true) {
               const stepsize = stepsizes.at(-1)!;
               delta = tighten(delta + stepsize);
@@ -892,43 +890,52 @@ export class PairOptions {
                 delta -= stepsizes.at(-2)!;
                 let corrected = pointForDelta(delta);
                 printPoint(corrected);
+
+                // if (preflight) {
+                //   if (xAxis === "buying") {
+                //     stepsizes.push(
+                //       (buyingMultiplier * 10n) / sellingMultiplier,
+                //     );
+                //   }
+                //   preflight = false;
+                // }
                 // if (upStep !== null) {
-                // const middle = avg(corrected.loss, negate(next.loss));
-                // if (compare(middle, current.loss) < 0) {
-                //   // runAsserts = false; // TODO FIXME
-                //   // delta = current.delta + upStep;
-                //   // corrected = pointForDelta(delta);
-                //   // printPoint(corrected);
+                const middle = avg(corrected.loss, negate(next.loss));
+                if (compare(middle, current.loss) < 0) {
+                  runAsserts = false; // TODO FIXME
+                  // delta = current.delta + upStep;
+                  // corrected = pointForDelta(delta);
+                  // printPoint(corrected);
 
-                //   // delta = current.delta + 1n;
-                //   // while (true) {
-                //   //   next = pointForDelta(delta++);
-                //   //   if (delta > maxDelta) break;
-                //   //   if (compare(next.loss, corrected.loss) < 0) {
-                //   //     printPoint(next);
-                //   //     corrected = next;
-                //   //     break;
-                //   //   }
-                //   // }
+                  // delta = current.delta + 1n;
+                  // while (true) {
+                  //   next = pointForDelta(delta++);
+                  //   if (delta > maxDelta) break;
+                  //   if (compare(next.loss, corrected.loss) < 0) {
+                  //     printPoint(next);
+                  //     corrected = next;
+                  //     break;
+                  //   }
+                  // }
 
-                //   // const rhsOptimum = search(next.delta);
-                //   // const comparison = compare(
-                //   //   optimum.loss,
-                //   //   rhsOptimum.loss,
-                //   // );
-                //   // if (comparison < 0) {
-                //   //   return optimum;
-                //   // } else if (comparison > 0) {
-                //   //   return rhsOptimum;
-                //   // } else {
-                //   //   if (optimum.delta < rhsOptimum.delta) {
-                //   //     return rhsOptimum;
-                //   //   } else {
-                //   //     return optimum;
-                //   //   }
-                //   // }
-                // }
-                // }
+                  // const rhsOptimum = search(next.delta);
+                  // const comparison = compare(
+                  //   optimum.loss,
+                  //   rhsOptimum.loss,
+                  // );
+                  // if (comparison < 0) {
+                  //   return optimum;
+                  // } else if (comparison > 0) {
+                  //   return rhsOptimum;
+                  // } else {
+                  //   if (optimum.delta < rhsOptimum.delta) {
+                  //     return rhsOptimum;
+                  //   } else {
+                  //     return optimum;
+                  //   }
+                  // }
+                  // }
+                }
 
                 // printPoint(corrected);
                 next = corrected;
@@ -980,22 +987,22 @@ export class PairOptions {
 
         // here: assert that we can't find a better solution
         // console.log("exhaustive search");
-        // const maybeBetter = findImperfectExhaustively(
-        //   max(s.minDelta, sellingForBuying(b.minDelta)),
-        //   maxSellingForExp,
-        // );
-        // if (maybeBetter && runAsserts) {
-        //   console.log("asserting");
-        //   assert(bestImperfectOption !== null, maybeBetter.show());
-        //   const best = bestImperfectOption as PairOption;
-        //   assert(
-        //     best.effectivePrice <= maybeBetter.effectivePrice,
-        //     `${best.effectivePrice} > ${maybeBetter.effectivePrice}
-        // diff: ${best.effectivePrice - maybeBetter.effectivePrice}
-        // best imperfect: ${best.show()}
-        // exhaustive: ${maybeBetter.show()}}`,
-        //   );
-        // }
+        const maybeBetter = findImperfectExhaustively(
+          max(s.minDelta, sellingForBuying(b.minDelta)),
+          maxSellingForExp,
+        );
+        if (maybeBetter && runAsserts) {
+          console.log("asserting");
+          assert(bestImperfectOption !== null, maybeBetter.show());
+          const best = bestImperfectOption as PairOption;
+          assert(
+            best.effectivePrice <= maybeBetter.effectivePrice,
+            `${best.effectivePrice} > ${maybeBetter.effectivePrice}
+        diff: ${best.effectivePrice - maybeBetter.effectivePrice}
+        best imperfect: ${best.show()}
+        exhaustive: ${maybeBetter.show()}}`,
+          );
+        }
       }
 
       assert(b.maxDelta !== "oo");
