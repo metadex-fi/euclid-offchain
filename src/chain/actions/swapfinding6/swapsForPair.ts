@@ -863,14 +863,12 @@ export class PairOptions {
           console.log("max_delta_s =", maxSellingForExp.toString());
           console.log(`stepping = "${xAxis}"`);
 
-          const search = (reverse = false): Point => {
-            const stepsizes = [0n, reverse ? -1n : 1n];
-            let delta = tighten(reverse ? maxDelta : minDelta);
+          const search = (minDelta: bigint): Point => {
+            const stepsizes = [0n, 1n];
+            let delta = tighten(minDelta);
             // let delta = reverse ? maxDelta : minDelta;
             let current = pointForDelta(delta);
             let optimum = current;
-            // let prevWorsening: Point | null = null;
-            // let upStep: bigint | null = null;
             printPoint(current);
             // let checkedReversal = reverse;
             while (true) {
@@ -878,7 +876,7 @@ export class PairOptions {
               delta = tighten(delta + stepsize);
               // delta += stepsize;
               // console.log("delta", delta);
-              if (reverse ? delta < minDelta : delta > maxDelta) {
+              if (delta > maxDelta) {
                 printPoint(pointForDelta(delta));
                 break;
               }
@@ -887,36 +885,32 @@ export class PairOptions {
               const gotWorse = compare(next.loss, current.loss) > 0;
               if (gotWorse) {
                 delta -= stepsizes.at(-2)!;
-                let corrected = pointForDelta(delta);
+                const corrected = pointForDelta(delta);
                 // printPoint(corrected);
-                const middle = avg(corrected.loss, negate(next.loss));
-                if (compare(middle, current.loss) < 0) {
-                  if (stepsizes.length > 2) {
-                    delta = current.delta + stepsizes.at(-2)! -
-                      stepsizes.at(-3)!;
-                    delta = tighten(delta);
-                    corrected = pointForDelta(delta);
+                if (stepsizes.length > 2) {
+                  const middle = avg(corrected.loss, negate(next.loss));
+                  if (compare(middle, current.loss) < 0) {
+                    const rhsOptimum = search(next.delta);
+                    const comparison = compare(
+                      optimum.loss,
+                      rhsOptimum.loss,
+                    );
+                    if (comparison < 0) {
+                      return optimum;
+                    } else if (comparison > 0) {
+                      return rhsOptimum;
+                    } else {
+                      if (optimum.delta < rhsOptimum.delta) {
+                        return rhsOptimum;
+                      } else {
+                        return optimum;
+                      }
+                    }
                   }
-
-                  // if (prevWorsening === null) {
-                  //   prevWorsening = current;
-                  // } else {
-                  //   if (upStep !== null) {
-                  //     // corrected = pointForDelta(current.delta + upStep);
-                  //     // printPoint(corrected);
-                  //   }
-                  //   upStep = next.delta - prevWorsening.delta;
-                  // }
-                  // if (!checkedReversal) {
-                  //   checkedReversal = true;
-                  //   const middle = avg(corrected.loss, negate(next.loss));
-                  //   if (compare(middle, current.loss) < 0) {
-                  //     console.log("], # reversing\n[");
-                  //     return search(true);
-                  //   }
                 }
-                printPoint(corrected);
+
                 next = corrected;
+                printPoint(next);
               }
               if (compare(next.loss, optimum.loss) <= 0) {
                 // met or improved optimum
@@ -929,31 +923,14 @@ export class PairOptions {
               }
               current = next;
             }
-            console.log("]]");
-            console.log("stepsizes:", stepsizes);
+            // console.log("]]");
+            // console.log("stepsizes:", stepsizes);
             // console.log("upStep:", upStep);
             return optimum;
           };
           console.log("slopes = [[");
-          const optimumForward = search();
-          // console.log("], # reversing\n[");
-          // const optimumReverse = search(true);
-          let optimum: Point;
-          // const comparison = compare(optimumForward.loss, optimumReverse.loss);
-          // if (comparison < 0) {
-          //   optimum = optimumReverse;
-          // } else if (comparison > 0) {
-          //   optimum = optimumReverse;
-          // } else {
-          //   if (optimumForward.delta < optimumReverse.delta) {
-          //     optimum = optimumReverse;
-          //   } else {
-          //     optimum = optimumForward;
-          //   }
-          // }
-          // console.log("]]");
-          optimum = optimumForward;
-
+          const optimum = search(minDelta);
+          console.log("]]");
           foundImperfectSolution(optimum.delta);
         } else {
           runAsserts = false; // TODO FIXME
