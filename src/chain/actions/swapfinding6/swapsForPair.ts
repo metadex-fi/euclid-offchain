@@ -784,23 +784,26 @@ export class PairOptions {
         const pointForDelta_ = (
           numerator: bigint,
           denominator: bigint,
+          tighten = (delta: bigint) => delta,
         ) =>
-        (delta: bigint): Point => {
+        (delta: bigint, print = true): Point => {
+          delta = tighten(delta);
           let remainder = (numerator * delta) % denominator;
           if (numerator < 0n) remainder += denominator;
           const loss = {
             numerator: remainder,
             denominator,
           };
-          return { delta, loss };
+          const point = { delta, loss };
+          if (print) printPoint(point);
+          return point;
         };
 
         let maxDelta: bigint;
         let minDelta: bigint;
         let xAxis: "buying" | "selling";
         let otherAssetEquivalent: (delta: bigint) => bigint;
-        let tighten: (delta: bigint) => bigint;
-        let pointForDelta: (delta: bigint) => Point;
+        let pointForDelta: (delta: bigint, print?: boolean) => Point;
         const minimizeSelling = (selling: bigint): bigint =>
           sellingForBuying(buyingForSelling(selling));
         const maximizeBuying = (buying: bigint): bigint =>
@@ -808,16 +811,21 @@ export class PairOptions {
 
         if (buyingMultiplier < sellingMultiplier) {
           xAxis = "selling";
-          tighten = minimizeSelling;
-          pointForDelta = pointForDelta_(sellingMultiplier, buyingMultiplier);
+          pointForDelta = pointForDelta_(
+            sellingMultiplier,
+            buyingMultiplier,
+            minimizeSelling,
+          );
           otherAssetEquivalent = buyingForSelling;
-          const maxForOtherMax = sellingForBuying(maxBuyingForExp);
+          const maxForOtherMax = minimizeSelling(
+            sellingForBuying(maxBuyingForExp),
+          );
           const minForOtherMin = sellingForBuying(b.minDelta);
           maxDelta = min(maxForOtherMax, maxSellingForExp);
           minDelta = max(minForOtherMin, s.minDelta);
+          if (buyingForSelling(maxDelta) > maxBuyingForExp) maxDelta--;
         } else {
           xAxis = "buying";
-          tighten = (delta) => delta;
           pointForDelta = pointForDelta_(-buyingMultiplier, sellingMultiplier);
           otherAssetEquivalent = sellingForBuying;
           const maxForOtherMax = buyingForSelling(
@@ -864,99 +872,81 @@ export class PairOptions {
           console.log(`stepping = "${xAxis}"`);
 
           const search = (minDelta: bigint): Point => {
-            const stepsizes = [0n, 1n];
-            let delta = tighten(minDelta);
-            // let delta = reverse ? maxDelta : minDelta;
-            let current = pointForDelta(delta);
+            const stepsizes = [1n];
+            let current = pointForDelta(minDelta);
             let optimum = current;
-            // let secondBest: Point | null = null;
-            printPoint(current);
-            // let checkedReversal = reverse;
-            // let upStep: bigint | null = null;
-            // let preflight = true;
+            let prevWorsening = current;
             while (true) {
-              const stepsize = stepsizes.at(-1)!;
-              delta = tighten(delta + stepsize);
-              // delta += stepsize;
-              // console.log("delta", delta);
-              if (delta > maxDelta) {
-                printPoint(pointForDelta(delta));
-                break;
+              let stepsize = 1n;
+              if (current.delta >= maxDelta) break;
+              let next: Point | null = null;
+              for (let i = 0; i < stepsizes.length; i++) {
+                const stepsize_ = stepsizes[i];
+                const delta_ = current.delta + stepsize_;
+                if (delta_ > maxDelta) continue;
+                const next_ = pointForDelta(delta_, false);
+                if (next === null || compare(next_.loss, next.loss) <= 0) {
+                  printPoint(next_);
+                  next = next_;
+                  stepsize = stepsize_;
+                }
               }
-              let next = pointForDelta(delta);
-              printPoint(next);
+              next ??= pointForDelta(current.delta + 1n);
               const gotWorse = compare(next.loss, current.loss) > 0;
               if (gotWorse) {
-                delta -= stepsizes.at(-2)!;
-                let corrected = pointForDelta(delta);
-                printPoint(corrected);
-
-                // if (preflight) {
-                //   if (xAxis === "buying") {
-                //     stepsizes.push(
-                //       (buyingMultiplier * 10n) / sellingMultiplier,
-                //     );
-                //   }
-                //   preflight = false;
-                // }
-                // if (upStep !== null) {
-                const middle = avg(corrected.loss, negate(next.loss));
-                if (compare(middle, current.loss) < 0) {
-                  runAsserts = false; // TODO FIXME
-                  // delta = current.delta + upStep;
-                  // corrected = pointForDelta(delta);
-                  // printPoint(corrected);
-
-                  // delta = current.delta + 1n;
-                  // while (true) {
-                  //   next = pointForDelta(delta++);
-                  //   if (delta > maxDelta) break;
-                  //   if (compare(next.loss, corrected.loss) < 0) {
-                  //     printPoint(next);
-                  //     corrected = next;
-                  //     break;
-                  //   }
-                  // }
-
-                  // const rhsOptimum = search(next.delta);
-                  // const comparison = compare(
-                  //   optimum.loss,
-                  //   rhsOptimum.loss,
-                  // );
-                  // if (comparison < 0) {
-                  //   return optimum;
-                  // } else if (comparison > 0) {
-                  //   return rhsOptimum;
-                  // } else {
-                  //   if (optimum.delta < rhsOptimum.delta) {
-                  //     return rhsOptimum;
-                  //   } else {
-                  //     return optimum;
-                  //   }
-                  // }
-                  // }
+                for (const vs of [prevWorsening, optimum]) {
+                  const distance = current.delta - vs.delta;
+                  console.log(
+                    "# worsened; distance:",
+                    distance,
+                    "stepsize:",
+                    stepsize,
+                  );
+                  if (distance !== 0n) {
+                    if (!stepsizes.includes(distance)) {
+                      console.log("# new stepsize:", distance);
+                      stepsizes.push(distance);
+                    }
+                  }
                 }
-
-                // printPoint(corrected);
-                next = corrected;
+                let backStepSize = 0n;
+                for (let i = 0; i < stepsizes.length; i++) {
+                  const stepsize_ = stepsizes[i];
+                  if (stepsize_ >= stepsize) continue;
+                  const delta_ = next.delta - stepsize_;
+                  const next_ = pointForDelta(delta_, false);
+                  if (compare(next_.loss, next.loss) < 0) {
+                    printPoint(next_);
+                    next = next_;
+                    backStepSize = stepsize_;
+                  }
+                }
+                if (backStepSize > 0n) {
+                  while (true) {
+                    const delta_ = next.delta - backStepSize;
+                    const next_ = pointForDelta(delta_, false);
+                    if (compare(next_.loss, next.loss) < 0) {
+                      printPoint(next_);
+                      next = next_;
+                    } else break;
+                  }
+                }
+                prevWorsening = current;
               }
               if (compare(next.loss, optimum.loss) <= 0) {
-                // met or improved optimum
-                const distance = delta - optimum.delta;
-                // assert(distance >= stepsize);
-                if (distance !== stepsize) {
+                const distance = next.delta - optimum.delta;
+                console.log(
+                  "# new optimum; distance:",
+                  distance,
+                  "stepsize:",
+                  stepsize,
+                );
+                if (distance !== 0n && !stepsizes.includes(distance)) {
+                  console.log("# new stepsize:", distance);
                   stepsizes.push(distance);
                 }
                 optimum = next;
-              } else {
-                // if (secondBest === null) {
-                //   secondBest = next;
-                // } else if (
-                //   compare(next.loss, secondBest.loss) < 0
-                // ) {
-                //   secondBest = next;
-                //   upStep = delta - optimum.delta;
-                // }
+                prevWorsening = next;
               }
               current = next;
             }
