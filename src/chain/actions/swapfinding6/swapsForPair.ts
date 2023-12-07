@@ -945,6 +945,26 @@ export class PairOptions {
                   console.log("# new stepsize:", distance);
                   stepsizes.push(distance);
                 }
+
+                const n1 = optimum.loss.numerator;
+                const d1 = optimum.loss.denominator;
+                const n2 = next.loss.numerator;
+                const d2 = next.loss.denominator;
+                const x1 = optimum.delta;
+                const x2 = next.delta;
+
+                const a1 = d1 * n2;
+                const a2 = d2 * n1;
+                const stepsize_ = x2 - x1;
+                let root = (a1 * x1 - a2 * x2) / (a1 - a2);
+                root = x2 + (((root - x2) / stepsize_) * stepsize_);
+                if (root > next.delta && root <= maxDelta) {
+                  printPoint(optimum);
+                  printPoint(next);
+                  next = pointForDelta(root);
+                  assert(compare(next.loss, optimum.loss) <= 0);
+                }
+
                 optimum = next;
                 prevWorsening = next;
               }
@@ -977,21 +997,24 @@ export class PairOptions {
 
         // here: assert that we can't find a better solution
         // console.log("exhaustive search");
-        const maybeBetter = findImperfectExhaustively(
-          max(s.minDelta, sellingForBuying(b.minDelta)),
-          maxSellingForExp,
-        );
-        if (maybeBetter && runAsserts) {
-          console.log("asserting");
-          assert(bestImperfectOption !== null, maybeBetter.show());
-          const best = bestImperfectOption as PairOption;
-          assert(
-            best.effectivePrice <= maybeBetter.effectivePrice,
-            `${best.effectivePrice} > ${maybeBetter.effectivePrice}
+        // runAsserts = false;
+        if (runAsserts) {
+          const maybeBetter = findImperfectExhaustively(
+            max(s.minDelta, sellingForBuying(b.minDelta)),
+            maxSellingForExp,
+          );
+          if (maybeBetter) {
+            console.log("asserting");
+            assert(bestImperfectOption !== null, maybeBetter.show());
+            const best = bestImperfectOption as PairOption;
+            assert(
+              best.effectivePrice <= maybeBetter.effectivePrice,
+              `${best.effectivePrice} > ${maybeBetter.effectivePrice}
         diff: ${best.effectivePrice - maybeBetter.effectivePrice}
         best imperfect: ${best.show()}
         exhaustive: ${maybeBetter.show()}}`,
-          );
+            );
+          }
         }
       }
 

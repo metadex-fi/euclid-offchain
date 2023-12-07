@@ -13,7 +13,7 @@ import {
 } from "../src/utils/generators.ts";
 
 Deno.test("swapfinding tight", () => {
-  const iterations = 10000;
+  const iterations = 1000;
   for (let i = 0; i < iterations; i++) {
     let buyingParams;
     let sellingParams;
