@@ -765,6 +765,98 @@ export class PairOptions {
           return { numerator, denominator };
         };
 
+        const bestStep = (
+          stepsizes: bigint[],
+          current: Point,
+        ) => {
+          let next: Point | null = null;
+          let stepsize_: bigint | null = null;
+          for (let i = 0; i < stepsizes.length; i++) {
+            const stepsize = stepsizes[i];
+            const delta_ = current.delta + stepsize;
+            if (delta_ > maxDelta) continue;
+            const next_ = pointForDelta(delta_, false);
+            if (next === null || compare(next_.loss, next.loss) < 0) {
+              printPoint(next_);
+              next = next_;
+              stepsize_ = stepsize;
+            }
+          }
+          return { next, stepsize_ };
+        };
+
+        let runAsserts = false;
+        let runAssertsFrom: bigint | null = null;
+        // p2 is the point with the larger delta aka x-value
+        const extrapolate = (
+          p1: Point,
+          p2: Point,
+          // backwards = false,
+        ): Point => {
+          const x1 = p1.delta;
+          const x2 = p2.delta;
+          assert(x1 !== x2);
+          if (x1 === x2) return p2;
+          const n1 = p1.loss.numerator;
+          const d1 = p1.loss.denominator;
+          const n2 = p2.loss.numerator;
+          const d2 = p2.loss.denominator;
+
+          const a1 = d1 * n2;
+          const a2 = d2 * n1;
+          const stepsize = x2 - x1;
+          let root = (a1 * x1 - a2 * x2) / (a1 - a2);
+          const upwards = root < x1;
+          if (upwards) {
+            throw new Error("wip");
+            // if (backwards) {
+            //   root = x1 - ((x1 - root) / stepsize) * stepsize;
+            //   if (root < x1 && root >= minDelta) {
+            //     const p3 = pointForDelta(root);
+            //     // assert(compare(p3.loss, p1.loss) <= 0);
+            //     if (compare(p3.loss, p1.loss) < 0) return p3;
+            //   }
+            //   return p1;
+            // } else {
+            //   root = x2 + ((x1 - root) / stepsize) * stepsize;
+            //   if (root > x2 && root <= maxDelta) {
+            //     console.log("# extrapolated:");
+            //     const p3 = pointForDelta(root);
+            //     // assert(compare(p3.loss, p2.loss) <= 0);
+            //     return p3;
+            //   }
+            //   return p2;
+            // }
+          } else {
+            root = x2 + ((root - x2) / stepsize) * stepsize;
+            if (root > x2) {
+              if (root > maxDelta) {
+                root = maxDelta;
+                console.log("# trying to extrapolate to end:");
+                const p3 = pointForDelta(root);
+                if (compare(p3.loss, p2.loss) <= 0) {
+                  runAsserts = true;
+                  if (runAssertsFrom === null) runAssertsFrom = x2;
+                  return p3;
+                }
+                return p2;
+              }
+              console.log("# extrapolated:");
+              const p3 = pointForDelta(root);
+              assert(compare(p3.loss, p2.loss) <= 0);
+              return p3;
+            } else {
+              // console.log(`
+              // root: ${root}
+              // x1: ${x1}
+              // x2: ${x2}
+              // stepsize: ${stepsize}
+              // `);
+            }
+            return p2;
+          }
+        };
+
         const printPoint = (p: Point) => {
           let numerator = p.loss.numerator;
           let denominator = p.loss.denominator;
@@ -778,7 +870,8 @@ export class PairOptions {
           const [buying, selling] = xAxis === "buying"
             ? [p.delta, otherDelta]
             : [otherDelta, p.delta];
-          console.log(`\t(${buying}, ${selling}),`);
+          const loss = Number(numerator) / denominator_;
+          console.log(`\t(${buying}, ${selling}, ${loss}),`);
         };
 
         const pointForDelta_ = (
@@ -856,7 +949,7 @@ export class PairOptions {
             bestImperfectOption = maybeBetter;
           }
         };
-        let runAsserts = true;
+
         if (minDelta === maxDelta) {
           console.log(`${minDelta} === ${maxDelta}`);
           foundImperfectSolution(maxDelta);
@@ -879,19 +972,9 @@ export class PairOptions {
             while (true) {
               let stepsize = 1n;
               if (current.delta >= maxDelta) break;
-              let next: Point | null = null;
-              for (let i = 0; i < stepsizes.length; i++) {
-                const stepsize_ = stepsizes[i];
-                const delta_ = current.delta + stepsize_;
-                if (delta_ > maxDelta) continue;
-                const next_ = pointForDelta(delta_, false);
-                if (next === null || compare(next_.loss, next.loss) <= 0) {
-                  printPoint(next_);
-                  next = next_;
-                  stepsize = stepsize_;
-                }
-              }
+              let { next, stepsize_ } = bestStep(stepsizes, current);
               next ??= pointForDelta(current.delta + 1n);
+              stepsize = stepsize_ ?? 1n;
               const gotWorse = compare(next.loss, current.loss) > 0;
               if (gotWorse) {
                 for (const vs of [prevWorsening, optimum]) {
@@ -907,9 +990,22 @@ export class PairOptions {
                       console.log("# new stepsize:", distance);
                       stepsizes.push(distance);
                     }
+                    // else if (distance === stepsize) {
+                    //   let next_: Point | null = extrapolate(current, next);
+                    //   next_ = bestStep(stepsizes, next_).next;
+                    //   if (next_) {
+                    //     const nextBak = next_;
+                    //     next_ = bestStep(stepsizes, next_).next;
+                    //     if (next_) {
+                    //       next = extrapolate(nextBak, next_, true);
+                    //     }
+                    //   }
+                    // }
                   }
                 }
                 let backStepSize = 0n;
+                // let backstepped = false;
+                // const nextBak = next;
                 for (let i = 0; i < stepsizes.length; i++) {
                   const stepsize_ = stepsizes[i];
                   if (stepsize_ >= stepsize) continue;
@@ -918,9 +1014,13 @@ export class PairOptions {
                   if (compare(next_.loss, next.loss) < 0) {
                     printPoint(next_);
                     next = next_;
+                    // backstepped = true;
                     backStepSize = stepsize_;
                   }
                 }
+                // if (backstepped) {
+                //   next = extrapolate(nextBak, next);
+                // }
                 if (backStepSize > 0n) {
                   while (true) {
                     const delta_ = next.delta - backStepSize;
@@ -932,8 +1032,10 @@ export class PairOptions {
                   }
                 }
                 prevWorsening = current;
+              } else {
+                next = extrapolate(current, next);
               }
-              if (compare(next.loss, optimum.loss) <= 0) {
+              if (compare(next.loss, optimum.loss) < 0) {
                 const distance = next.delta - optimum.delta;
                 console.log(
                   "# new optimum; distance:",
@@ -946,24 +1048,7 @@ export class PairOptions {
                   stepsizes.push(distance);
                 }
 
-                const n1 = optimum.loss.numerator;
-                const d1 = optimum.loss.denominator;
-                const n2 = next.loss.numerator;
-                const d2 = next.loss.denominator;
-                const x1 = optimum.delta;
-                const x2 = next.delta;
-
-                const a1 = d1 * n2;
-                const a2 = d2 * n1;
-                const stepsize_ = x2 - x1;
-                let root = (a1 * x1 - a2 * x2) / (a1 - a2);
-                root = x2 + (((root - x2) / stepsize_) * stepsize_);
-                if (root > next.delta && root <= maxDelta) {
-                  printPoint(optimum);
-                  printPoint(next);
-                  next = pointForDelta(root);
-                  assert(compare(next.loss, optimum.loss) <= 0);
-                }
+                next = extrapolate(optimum, next);
 
                 optimum = next;
                 prevWorsening = next;
@@ -980,7 +1065,7 @@ export class PairOptions {
           // console.log("]]");
           foundImperfectSolution(optimum.delta);
         } else {
-          runAsserts = false; // TODO FIXME
+          // runAsserts = false; // TODO FIXME
         }
 
         // we're here because maxSelling < minSelling
@@ -999,8 +1084,16 @@ export class PairOptions {
         // console.log("exhaustive search");
         // runAsserts = false;
         if (runAsserts) {
+          let from = runAssertsFrom as bigint | null;
+          let from_ = max(s.minDelta, sellingForBuying(b.minDelta));
+          if (from) {
+            if (xAxis === "buying") {
+              from = minimizeSelling(sellingForBuying(from));
+            }
+            from_ = max(from, from_);
+          }
           const maybeBetter = findImperfectExhaustively(
-            max(s.minDelta, sellingForBuying(b.minDelta)),
+            from_,
             maxSellingForExp,
           );
           if (maybeBetter) {
