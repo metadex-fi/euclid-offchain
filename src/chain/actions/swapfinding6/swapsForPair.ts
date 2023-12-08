@@ -233,10 +233,19 @@ export class PairOption {
   ) {
     assert(b.type === "buying");
     assert(s.type === "selling");
-    assert(deltaBuying >= b.minDelta, `deltaBuying < b.minDelta: ${deltaBuying} < ${b.minDelta}`);
-    assert(deltaSelling >= s.minDelta, `deltaSelling < s.minDelta: ${deltaSelling} < ${s.minDelta}`);
+    assert(
+      deltaBuying >= b.minDelta,
+      `deltaBuying < b.minDelta: ${deltaBuying} < ${b.minDelta}`,
+    );
+    assert(
+      deltaSelling >= s.minDelta,
+      `deltaSelling < s.minDelta: ${deltaSelling} < ${s.minDelta}`,
+    );
     assert(b.maxDelta !== "oo");
-    assert(deltaBuying <= b.maxDelta, `deltaBuying > b.maxDelta: ${deltaBuying} > ${b.maxDelta}`);
+    assert(
+      deltaBuying <= b.maxDelta,
+      `deltaBuying > b.maxDelta: ${deltaBuying} > ${b.maxDelta}`,
+    );
     assert(
       s.maxDelta === "oo" || deltaSelling <= s.maxDelta,
       `deltaSelling > s.maxDelta: ${deltaSelling} > ${s.maxDelta}`,
@@ -586,9 +595,20 @@ export class PairOptions {
       }
       s = s.withExp(expSelling);
       b = b.withExp(expBuying);
-      // const exceedsMaxInteger = (b.newAnchor > maxInteger) ||
-      //   (s.newAnchor > maxInteger); // TODO REVERT
-      const exceedsMaxInteger = false;
+      // TODO below wasn't part of performance-comparison - or consideration -
+      // for the expensive imperfect swapfinding. Remedy that
+      const exceedsMaxInteger = (b.newAnchor > maxInteger) ||
+        (s.newAnchor > maxInteger);
+      // const exceedsMaxInteger = false;
+
+      /* NOTE - below:
+
+      - reduces average runtime from ~1.5s to ~6ms
+      - seems to be allowed for some reason, see the assertion at the very bottom
+        ( assert(!(this.maxIntegerImpacted && adhering)); )
+      
+      */
+      if (exceedsMaxInteger) continue; 
 
       const checkNewOption_ = checkNewOption(
         expBuying,
@@ -667,6 +687,7 @@ export class PairOptions {
         continue; // if we found a perfect solution, we know that increasing exps will only make it worse
         // }
       } else {
+        // if (exceedsMaxInteger) continue; // not needed here, we do it above =
         // try to find imperfect solution if we can't find a perfect one (TODO this eats the bulk of the expected runtime)
         // console.log(
         //   "trying to find imperfect solution for ",
@@ -805,6 +826,7 @@ export class PairOptions {
           const a1 = d1 * n2;
           const a2 = d2 * n1;
           const stepsize = x2 - x1;
+          if (a1 === a2) return p2; // TODO extrapolate to end here? (unimportant, almost never happens)
           let root = (a1 * x1 - a2 * x2) / (a1 - a2);
           const upwards = root < x1;
           if (upwards) {
@@ -913,7 +935,7 @@ export class PairOptions {
           );
           otherAssetEquivalent = buyingForSelling;
           const maxForOtherMax = minimizeSelling(
-            sellingForBuying(maxBuyingForExp)
+            sellingForBuying(maxBuyingForExp),
           );
           const minForOtherMin = sellingForBuying(b.minDelta);
           console.log("maxForOtherMax", maxForOtherMax);
@@ -922,22 +944,29 @@ export class PairOptions {
           minDeltaCombined = max(minForOtherMin, s.minDelta);
           minDeltaAlone = s.minDelta;
           maxDeltaAlone = maxSellingForExp;
-          if (buyingForSelling(maxDeltaCombined) > maxBuyingForExp) maxDeltaCombined--;
+          if (buyingForSelling(maxDeltaCombined) > maxBuyingForExp) {
+            maxDeltaCombined--;
+          }
         } else {
           xAxis = "buying";
-          pointForDelta = pointForDelta_(-buyingMultiplier, sellingMultiplier);
+          pointForDelta = pointForDelta_(
+            -buyingMultiplier,
+            sellingMultiplier,
+          );
           otherAssetEquivalent = sellingForBuying;
           const maxForOtherMax = buyingForSelling(
             minimizeSelling(maxSellingForExp),
           );
           const minForOtherMin = //maximizeBuying(
-            buyingForSelling(s.minDelta)
-           //  );
+            buyingForSelling(s.minDelta);
+          //  );
           console.log("minForOtherMin", minForOtherMin);
           console.log("b.minDelta", b.minDelta);
           maxDeltaCombined = min(maxForOtherMax, maxBuyingForExp);
           minDeltaCombined = max(minForOtherMin, b.minDelta);
-          if (sellingForBuying(minDeltaCombined) < s.minDelta) minDeltaCombined++;
+          if (sellingForBuying(minDeltaCombined) < s.minDelta) {
+            minDeltaCombined++;
+          }
           minDeltaAlone = b.minDelta;
           maxDeltaAlone = maxBuyingForExp;
         }
@@ -946,7 +975,7 @@ export class PairOptions {
         console.log("minDeltaCombined", minDeltaCombined);
         console.log("maxDeltaCombined", maxDeltaCombined);
         console.log("stepping", xAxis);
-        
+
         // minDeltaCombined = minDeltaAlone;
 
         let bestImperfectOption: PairOption | null = null;
@@ -1082,14 +1111,22 @@ export class PairOptions {
           const optimum = search(minDeltaCombined);
           foundImperfectSolution(optimum.delta);
         } else if (minDeltaAlone < minDeltaCombined) {
-          console.log("minDeltaAlone < minDeltaCombined", minDeltaAlone, minDeltaCombined);
+          console.log(
+            "minDeltaAlone < minDeltaCombined",
+            minDeltaAlone,
+            minDeltaCombined,
+          );
           if (xAxis === "buying") {
             const selling = s.minDelta;
             const buying = min(buyingForSelling(selling), maxBuyingForExp);
             foundImperfectSolution_(buying, selling);
           }
         } else if (maxDeltaCombined < maxDeltaAlone) {
-          console.log("maxDeltaCombined < maxDeltaAlone", maxDeltaCombined, maxDeltaAlone);
+          console.log(
+            "maxDeltaCombined < maxDeltaAlone",
+            maxDeltaCombined,
+            maxDeltaAlone,
+          );
           if (xAxis === "selling") {
             const buying = maxBuyingForExp;
             const selling = max(sellingForBuying(buying), s.minDelta);
@@ -1111,10 +1148,10 @@ export class PairOptions {
 
         // here: assert that we can't find a better solution
         // console.log("exhaustive search");
-        runAsserts = false
+        runAsserts = false;
         // runAsserts = true
         if (runAsserts) {
-          let from = null//runAssertsFrom as bigint | null;
+          let from = null; //runAssertsFrom as bigint | null;
           let from_ = max(s.minDelta, sellingForBuying(b.minDelta));
           if (from) {
             if (xAxis === "buying") {

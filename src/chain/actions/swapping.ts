@@ -306,6 +306,14 @@ ${ttf}expLimit: ${this.expLimit}
     const oldDirac = this.diracUtxo.dirac;
 
     const newAnchorPrices = oldDirac.anchorPrices.clone; // TODO cloning neccessary?
+    assert(
+      this.option.b.newAnchor <= maxInteger,
+      `b.newAnchor too high: ${this.option.b.newAnchor}`,
+    );
+    assert(
+      this.option.s.newAnchor <= maxInteger,
+      `s.newAnchor too high: ${this.option.s.newAnchor}`,
+    );
     newAnchorPrices.setAmountOf(this.buyingAsset, this.option.b.newAnchor);
     newAnchorPrices.setAmountOf(this.sellingAsset, this.option.s.newAnchor);
 
