@@ -17,10 +17,10 @@ update_counts() {
         fi
 
         # Extract the number of passed tests from all files and sum them up
-        total_passed=$(grep -hoE '([0-9]+) passed' test_logs/*.txt 2>/dev/null | awk '{ sum += $1 } END { print sum }')
+        # total_passed=$(grep -hoE '([0-9]+) passed' test_logs/*.txt 2>/dev/null | awk '{ sum += $1 } END { print sum }')
 
         # Print out the results
-        echo "Running: $total_running, Passed: $total_passed"
+        # echo "Running: $total_running, Passed: $total_passed"
 
         sleep 1
     done
@@ -40,12 +40,5 @@ wait
 # Clean up the named pipe
 rm -f $pipe
 
-# Print the summary of failed tests
-failed_indices=$(grep -lE '([1-9][0-9]*) failed' test_logs/*.txt 2>/dev/null | sed -n 's/test_logs\/logs_\([0-9]*\).txt/\1/p' | tr '\n' ',' | sed 's/,$//')
-
-# If any tests failed, print their indices
-if [ ! -z "$failed_indices" ]; then
-    echo "Failed test indices: $failed_indices"
-fi
-
-grep "does not validate" test_logs/*.txt
+# Print the summary of passed and failed tests
+./scan_tests.sh

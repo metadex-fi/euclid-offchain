@@ -7,33 +7,38 @@ import {
   min,
   randomChoice,
 } from "../../../utils/generators.ts";
-import { maxInteger, maxIntRoot } from "../../../utils/constants.ts";
+// import { maxInteger, maxIntRoot } from "../../../utils/constants.ts";
 import { PPositive } from "../../../types/general/derived/bounded/positive.ts";
 import { maxSmallInteger } from "../../../types/euclid/smallValue.ts";
 import { Param } from "../../../types/euclid/param.ts";
 import { f, t } from "../../../types/general/fundamental/type.ts";
 
-export const genWildAssetParams = () => {
+const logging = true;
+
+export const genWildAssetParams = (maxInteger: bigint) => {
   const jumpSize = genPositive(maxSmallInteger);
   const virtual = genPositive(maxInteger);
   const balance = genNonNegative(maxInteger - virtual);
   const locked = genNonNegative(balance);
   const available = balance - locked;
+  const maxIntRoot = BigInt(Math.floor(Number(maxInteger) ** 0.5));
   const weight = genPositive(randomChoice([maxInteger, maxIntRoot]));
   const anchor = genPositive(maxInteger);
   const minDelta = genPositive(maxInteger);
   return { virtual, balance, available, weight, anchor, jumpSize, minDelta };
 };
 
-export const genTightAssetParams = () => {
+export const genTightAssetParams = (maxInteger: bigint) => {
   const jumpSize = genPositive(maxSmallInteger);
   const virtual = new PPositive(
-    ceilDiv(jumpSize + 1n, maxSmallInteger),
+    ceilDiv(jumpSize + 1n, maxSmallInteger), 
+    maxInteger
   ).genData();
   const balance = genNonNegative(maxInteger - virtual);
   const locked = genNonNegative(balance);
   const available = balance - locked;
-  const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual);
+  const maxIntRoot = BigInt(Math.floor(Number(maxInteger) ** 0.5));
+  const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual, maxIntRoot);
   const weight = new PPositive(minWeight, maxWeight).genData();
   const anchor = genPositive(maxInteger);
   const minDelta = genPositive(maxInteger);
@@ -221,12 +226,13 @@ ${tt})`;
 }
 
 export class PairOption {
+  readonly effectivePrice: number;
   private constructor(
     readonly b: AssetOption,
     readonly s: AssetOption,
     readonly deltaBuying: bigint,
     readonly deltaSelling: bigint,
-    readonly effectivePrice: number,
+    // readonly effectivePrice: number,
     readonly perfect: boolean,
     readonly adhereMaxInteger: boolean,
     readonly expLimit: number,
@@ -250,10 +256,9 @@ export class PairOption {
       s.maxDelta === "oo" || deltaSelling <= s.maxDelta,
       `deltaSelling > s.maxDelta: ${deltaSelling} > ${s.maxDelta}`,
     );
-    assert(
-      this.effectivePrice ===
-        Number(this.deltaSelling) / Number(this.deltaBuying),
-    );
+    // assert(
+    this.effectivePrice = Number(this.deltaSelling) / Number(this.deltaBuying);
+    // );
   }
 
   static new = (
@@ -261,29 +266,30 @@ export class PairOption {
     s: AssetOption,
     deltaBuying: bigint,
     deltaSelling: bigint,
-    effectivePrice: number,
+    // effectivePrice: number,
     perfect: boolean,
     adhereMaxInteger: boolean,
     expLimit: number,
+    maxInteger: bigint,
   ): PairOption => {
     const option = new PairOption(
       b,
       s,
       deltaBuying,
       deltaSelling,
-      effectivePrice,
+      // effectivePrice,
       perfect,
       adhereMaxInteger,
       expLimit,
     );
     assert(
-      option.validates(),
+      option.validates(maxInteger),
       `new option should pass offchain validation: ${option.show()}`,
     );
     return option;
   };
 
-  private validates = (): boolean => {
+  private validates = (maxInteger: bigint): boolean => {
     let passes = true;
 
     if (this.perfect) {
@@ -319,18 +325,17 @@ export class PairOption {
       console.error(`price fit selling: ${this.show()}`);
     }
 
-    // TODO REVERT
-    // if (this.adhereMaxInteger) {
-    //   if (this.b.newAnchor > maxInteger) {
-    //     passes = false;
-    //     console.error(`maxInteger buying: ${this.show()}`);
-    //   }
+    if (this.adhereMaxInteger) {
+      if (this.b.newAnchor > maxInteger) {
+        passes = false;
+        console.error(`maxInteger buying: ${this.show()}`);
+      }
 
-    //   if (this.s.newAnchor > maxInteger) {
-    //     passes = false;
-    //     console.error(`maxInteger selling: ${this.show()}`);
-    //   }
-    // }
+      if (this.s.newAnchor > maxInteger) {
+        passes = false;
+        console.error(`maxInteger selling: ${this.show()}`);
+      }
+    }
 
     if (this.b.mults + this.s.mults > this.expLimit) {
       passes = false;
@@ -345,29 +350,29 @@ export class PairOption {
     deltaSelling: bigint,
     expBuying: bigint,
     expSelling: bigint,
+    maxInteger: bigint,
   ): PairOption => {
     const option = new PairOption(
       this.b.withExp(expBuying),
       this.s.withExp(expSelling),
       deltaBuying,
       deltaSelling,
-      Number(deltaSelling) / Number(deltaBuying),
+      // Number(deltaSelling) / Number(deltaBuying),
       this.perfect,
       this.adhereMaxInteger,
       this.expLimit,
     );
     assert(
-      !option.validates(),
+      !option.validates(maxInteger),
       `corrupted option should fail offchain validation: ${this.show()}\n~~~>\n${option.show()}`,
     );
-    // TODO FIXME
-    if (
-      !option.validates()
-    ) {
-      console.error(
-        `corrupted option should fail offchain validation: ${this.show()}\n~~~>\n${option.show()}`,
-      );
-    }
+    // if (
+    //   !option.validates()
+    // ) {
+    //   console.error(
+    //     `corrupted option should fail offchain validation: ${this.show()}\n~~~>\n${option.show()}`,
+    //   );
+    // }
     return option;
   };
 
@@ -440,6 +445,8 @@ export class PairOptions {
     b: AssetOption,
     s: AssetOption,
     expLimit: number,
+    maxInteger: bigint,
+    runAsserts: boolean,
     // perfectionism = 1000n,
   ) {
     assert(b.type === "buying");
@@ -462,20 +469,22 @@ export class PairOptions {
       deltaSelling: bigint,
       perfect: boolean,
     ): PairOption | null => {
-      const effectivePrice = Number(deltaSelling) / Number(deltaBuying);
+      // const effectivePrice = Number(deltaSelling) / Number(deltaBuying);
       let bestPriceOption = exceedsMaxInteger
         ? bestExceedingOption
         : bestAdheringOption;
+      const effNew = deltaSelling * (bestPriceOption?.deltaBuying ?? 0n);
+      const effOld = deltaBuying * (bestPriceOption?.deltaSelling ?? 0n);
       if (
         (!bestPriceOption) ||
-        effectivePrice <= bestPriceOption.effectivePrice ||
-        (effectivePrice === bestPriceOption.effectivePrice &&
-          (deltaBuying > bestPriceOption.deltaBuying ||
-            deltaSelling > bestPriceOption.deltaSelling))
+        effNew <= effOld //|| // TODO revert to < and reactive rest of condition
+        // (effNew === effOld &&
+        //   (deltaBuying > bestPriceOption.deltaBuying ||
+        //     deltaSelling > bestPriceOption.deltaSelling))
       ) {
         // const duration = performance.now() - now;
         // now = performance.now();
-        // console.log(
+        // if (logging) console.log(
         //   duration / 1000,
         //   "s, found better price option",
         //   perfect,
@@ -496,10 +505,11 @@ export class PairOptions {
           s.withExp(expSelling),
           deltaBuying,
           deltaSelling,
-          effectivePrice,
+          // effectivePrice,
           perfect,
           !exceedsMaxInteger,
           expLimit,
+          maxInteger,
         );
         if (exceedsMaxInteger) {
           bestExceedingOption = bestPriceOption;
@@ -541,12 +551,12 @@ export class PairOptions {
         // else {
         //   const potential = (perfectionism * (mDeltaSelling - mDeltaBuying)) /
         //     mDeltaSelling;
-        //   // console.log(
+        //   // if (logging) console.log(
         //   //   "maximum possible improvement:",
         //   //   (100 * Number(potential)) / Number(perfectionism),
         //   //   "%",
         //   // );
-        //   // if (potential === 0n) return false; // good enough // TODO revert
+        //   // if (potential === 0n) return false; // good enough
         // }
       }
       // }
@@ -560,10 +570,12 @@ export class PairOptions {
     }];
     const checked: { expBuying: bigint; expSelling: bigint }[] = [];
 
+    let stepBuyingFirst = true;
     while (queue.length) {
+      stepBuyingFirst = randomChoice([true, false])//!stepBuyingFirst; // TODO consider making this deterministic again
       // queue.sort((a, b) => {
       //   const aMin = min(a.expBuying, a.expSelling);
-      //   const bMin = min(b.expBuying, b.expSelling);
+      //   const bMin = min(b.expBuying, b.expSelling);r
       //   return Number(aMin - bMin);
       // });
       const { expBuying, expSelling } = queue.shift()!;
@@ -588,15 +600,20 @@ export class PairOptions {
         if (
           bestMultsAhead(expBuying) + bestMultsAhead(expSelling) <= expLimit
         ) {
-          queue.push({ expBuying: expBuying + 1n, expSelling });
-          queue.push({ expBuying, expSelling: expSelling + 1n });
+          if (stepBuyingFirst) {
+            queue.push({ expBuying: expBuying + 1n, expSelling });
+            queue.push({ expBuying, expSelling: expSelling + 1n });
+          } else {
+            queue.push({ expBuying, expSelling: expSelling + 1n });
+            queue.push({ expBuying: expBuying + 1n, expSelling });
+          }
         }
         continue;
       }
       s = s.withExp(expSelling);
       b = b.withExp(expBuying);
-      // TODO below wasn't part of performance-comparison - or consideration -
-      // for the expensive imperfect swapfinding. Remedy that
+      // NOTE below wasn't part of performance-comparison - or consideration -
+      // for the expensive imperfect swapfinding. Remedy that. And see note below
       const exceedsMaxInteger = (b.newAnchor > maxInteger) ||
         (s.newAnchor > maxInteger);
       // const exceedsMaxInteger = false;
@@ -606,9 +623,9 @@ export class PairOptions {
       - reduces average runtime from ~1.5s to ~6ms
       - seems to be allowed for some reason, see the assertion at the very bottom
         ( assert(!(this.maxIntegerImpacted && adhering)); )
-      
+
       */
-      if (exceedsMaxInteger) continue; 
+      if (exceedsMaxInteger) continue;
 
       const checkNewOption_ = checkNewOption(
         expBuying,
@@ -616,22 +633,39 @@ export class PairOptions {
         exceedsMaxInteger,
       );
 
-      const maxSellingForExp = s.maxDeltaForExp();
-      if (maxSellingForExp === null) {
-        // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
-        queue.push({ expBuying, expSelling: expSelling + 1n });
-        continue;
+      let maxSellingForExp: bigint | null;
+      let maxBuyingForExp: bigint | null;
+      if (stepBuyingFirst) {
+        maxBuyingForExp = b.maxDeltaForExp();
+        if (maxBuyingForExp === null) {
+          // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
+          queue.push({ expBuying: expBuying + 1n, expSelling });
+          continue;
+        }
+        maxSellingForExp = s.maxDeltaForExp();
+        if (maxSellingForExp === null) {
+          // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
+          queue.push({ expBuying, expSelling: expSelling + 1n });
+          continue;
+        }
+      } else {
+        maxSellingForExp = s.maxDeltaForExp();
+        if (maxSellingForExp === null) {
+          // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
+          queue.push({ expBuying, expSelling: expSelling + 1n });
+          continue;
+        }
+        maxBuyingForExp = b.maxDeltaForExp();
+        if (maxBuyingForExp === null) {
+          // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
+          queue.push({ expBuying: expBuying + 1n, expSelling });
+          continue;
+        }
       }
       assert(
         maxSellingForExp >= s.minDelta,
         `${maxSellingForExp} < ${s.minDelta}`,
       );
-      const maxBuyingForExp = b.maxDeltaForExp();
-      if (maxBuyingForExp === null) {
-        // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
-        queue.push({ expBuying: expBuying + 1n, expSelling });
-        continue;
-      }
       assert(
         maxBuyingForExp >= b.minDelta,
         `${maxBuyingForExp} < ${b.minDelta}`,
@@ -641,8 +675,8 @@ export class PairOptions {
         s.a * s.jsppe * b.jsppe,
         b.a * b.jse * s.jse,
       );
-      // console.log("buying-multiplier", buyingMultiplier);
-      // console.log("selling-multiplier", sellingMultiplier);
+      // if (logging) console.log("buying-multiplier", buyingMultiplier);
+      // if (logging) console.log("selling-multiplier", sellingMultiplier);
       const improvementFeasible_ = improvementFeasible(
         buyingMultiplier,
         sellingMultiplier,
@@ -654,7 +688,7 @@ export class PairOptions {
 
       // if (mode === "perfect") {
       // trying to find perfect solution, meaning without rounding-error and with tight value equation
-      // console.log(
+      // if (logging) console.log(
       //   "trying to find perfect solution for ",
       //   expBuying,
       //   expSelling,
@@ -689,7 +723,7 @@ export class PairOptions {
       } else {
         // if (exceedsMaxInteger) continue; // not needed here, we do it above =
         // try to find imperfect solution if we can't find a perfect one (TODO this eats the bulk of the expected runtime)
-        // console.log(
+        // if (logging) console.log(
         //   "trying to find imperfect solution for ",
         //   expBuying,
         //   expSelling,
@@ -703,7 +737,7 @@ export class PairOptions {
           let deltaSelling = minSelling;
           let bestFoundImprovement: PairOption | null = null;
           while (
-            deltaSelling <= maxSelling // && improvementFeasible_() // TODO what
+            deltaSelling <= maxSelling // && improvementFeasible_() // TODO what (not using this function anyways)
           ) {
             const maxBuyingForSelling = buyingForSelling(deltaSelling);
             if (prevDeltaBuying !== null) {
@@ -719,7 +753,7 @@ export class PairOptions {
             prevDeltaBuying = maxBuyingForSelling;
             assert(maxBuyingForSelling >= b.minDelta);
 
-            if (maxBuyingForSelling < maxBuyingForExp) {
+            if (maxBuyingForSelling < maxBuyingForExp!) {
               const maybeBetter = checkNewOption_(
                 maxBuyingForSelling,
                 deltaSelling,
@@ -730,7 +764,7 @@ export class PairOptions {
               }
             } else {
               const maybeBetter = checkNewOption_(
-                maxBuyingForExp,
+                maxBuyingForExp!,
                 deltaSelling,
                 false,
               );
@@ -806,8 +840,8 @@ export class PairOptions {
           return { next, stepsize_ };
         };
 
-        let runAsserts = true;
-        let runAssertsFrom: bigint | null = null;
+        // let runAsserts = true;
+        // let runAssertsFrom: bigint | null = null;
         // p2 is the point with the larger delta aka x-value
         const extrapolate = (
           p1: Point,
@@ -842,7 +876,7 @@ export class PairOptions {
             // } else {
             //   root = x2 + ((x1 - root) / stepsize) * stepsize;
             //   if (root > x2 && root <= maxDelta) {
-            //     console.log("# extrapolated:");
+            //     if (logging) console.log("# extrapolated:");
             //     const p3 = pointForDelta(root);
             //     // assert(compare(p3.loss, p2.loss) <= 0);
             //     return p3;
@@ -854,21 +888,21 @@ export class PairOptions {
             if (root > x2) {
               if (root > maxDeltaCombined) {
                 root = maxDeltaCombined;
-                console.log("# trying to extrapolate to end:");
+                if (logging) console.log("# trying to extrapolate to end:");
                 const p3 = pointForDelta(root);
                 if (compare(p3.loss, p2.loss) <= 0) {
-                  runAsserts = true;
-                  if (runAssertsFrom === null) runAssertsFrom = x2;
+                  // runAsserts = true;
+                  // if (runAssertsFrom === null) runAssertsFrom = x2;
                   return p3;
                 }
                 return p2;
               }
-              console.log("# extrapolated:");
+              if (logging) console.log("# extrapolated:");
               const p3 = pointForDelta(root);
               assert(compare(p3.loss, p2.loss) <= 0);
               return p3;
             } else {
-              // console.log(`
+              // if (logging) console.log(`
               // root: ${root}
               // x1: ${x1}
               // x2: ${x2}
@@ -893,7 +927,7 @@ export class PairOptions {
             ? [p.delta, otherDelta]
             : [otherDelta, p.delta];
           const loss = Number(numerator) / denominator_;
-          console.log(`\t(${buying}, ${selling}, ${loss}),`);
+          if (logging) console.log(`\t(${buying}, ${selling}, ${loss}),`);
         };
 
         const pointForDelta_ = (
@@ -921,8 +955,11 @@ export class PairOptions {
         let xAxis: "buying" | "selling";
         let otherAssetEquivalent: (delta: bigint) => bigint;
         let pointForDelta: (delta: bigint, print?: boolean) => Point;
-        const minimizeSelling = (selling: bigint): bigint =>
-          sellingForBuying(buyingForSelling(selling));
+        // const minimizeSelling = (selling: bigint): bigint => {
+        //   const minimized = sellingForBuying(buyingForSelling(selling));
+        //   assert(minimized === selling, `${minimized} !== ${selling}`); // TODO remove usage of this function
+        //   return minimized;
+        // }
         // const maximizeBuying = (buying: bigint): bigint =>
         //   buyingForSelling(sellingForBuying(buying));
 
@@ -931,15 +968,15 @@ export class PairOptions {
           pointForDelta = pointForDelta_(
             sellingMultiplier,
             buyingMultiplier,
-            minimizeSelling,
+            // minimizeSelling,
           );
-          otherAssetEquivalent = buyingForSelling;
-          const maxForOtherMax = minimizeSelling(
-            sellingForBuying(maxBuyingForExp),
-          );
+           // TODO minimize/maximize?
+          // otherAssetEquivalent = buyingForSelling;
+          otherAssetEquivalent = buyingForSelling//(delta:bigint) => buyingForSelling(minimizeSelling(delta));
+          const maxForOtherMax = sellingForBuying(maxBuyingForExp)
           const minForOtherMin = sellingForBuying(b.minDelta);
-          console.log("maxForOtherMax", maxForOtherMax);
-          console.log("maxSellingForExp", maxSellingForExp);
+          if (logging) console.log("maxForOtherMax", maxForOtherMax);
+          if (logging) console.log("maxSellingForExp", maxSellingForExp);
           maxDeltaCombined = min(maxForOtherMax, maxSellingForExp);
           minDeltaCombined = max(minForOtherMin, s.minDelta);
           minDeltaAlone = s.minDelta;
@@ -953,15 +990,16 @@ export class PairOptions {
             -buyingMultiplier,
             sellingMultiplier,
           );
-          otherAssetEquivalent = sellingForBuying;
-          const maxForOtherMax = buyingForSelling(
-            minimizeSelling(maxSellingForExp),
-          );
+           // TODO minimize/maximize?
+          otherAssetEquivalent = sellingForBuying//(delta:bigint) => minimizeSelling(sellingForBuying(delta));
+          const maxForOtherMax = buyingForSelling(maxSellingForExp)
+            // minimizeSelling(maxSellingForExp)
+          //);
           const minForOtherMin = //maximizeBuying(
             buyingForSelling(s.minDelta);
           //  );
-          console.log("minForOtherMin", minForOtherMin);
-          console.log("b.minDelta", b.minDelta);
+          if (logging) console.log("minForOtherMin", minForOtherMin);
+          if (logging) console.log("b.minDelta", b.minDelta);
           maxDeltaCombined = min(maxForOtherMax, maxBuyingForExp);
           minDeltaCombined = max(minForOtherMin, b.minDelta);
           if (sellingForBuying(minDeltaCombined) < s.minDelta) {
@@ -970,17 +1008,17 @@ export class PairOptions {
           minDeltaAlone = b.minDelta;
           maxDeltaAlone = maxBuyingForExp;
         }
-        console.log("minDeltaAlone", minDeltaAlone);
-        console.log("maxDeltaAlone", maxDeltaAlone);
-        console.log("minDeltaCombined", minDeltaCombined);
-        console.log("maxDeltaCombined", maxDeltaCombined);
-        console.log("stepping", xAxis);
+        if (logging) console.log("minDeltaAlone", minDeltaAlone);
+        if (logging) console.log("maxDeltaAlone", maxDeltaAlone);
+        if (logging) console.log("minDeltaCombined", minDeltaCombined);
+        if (logging) console.log("maxDeltaCombined", maxDeltaCombined);
+        if (logging) console.log("stepping", xAxis);
 
         // minDeltaCombined = minDeltaAlone;
 
         let bestImperfectOption: PairOption | null = null;
         const foundImperfectSolution_ = (buying: bigint, selling: bigint) => {
-          console.log("found imperfect solution", buying, selling);
+          if (logging) console.log("found imperfect solution", buying, selling);
           const maybeBetter = checkNewOption_(
             buying,
             selling,
@@ -999,21 +1037,25 @@ export class PairOptions {
         };
 
         if (minDeltaCombined === maxDeltaCombined) {
-          console.log(`${minDeltaCombined} === ${maxDeltaCombined}`);
+          if (logging) {
+            console.log(`${minDeltaCombined} === ${maxDeltaCombined}`);
+          }
           foundImperfectSolution(maxDeltaCombined);
         } else if (minDeltaCombined < maxDeltaCombined) {
-          console.log(`${minDeltaCombined} < ${maxDeltaCombined}`);
+          if (logging) console.log(`${minDeltaCombined} < ${maxDeltaCombined}`);
 
-          console.log("m_b =", buyingMultiplier.toString());
-          console.log("m_s =", sellingMultiplier.toString());
-          console.log("min_delta_b =", b.minDelta.toString());
-          console.log("min_delta_s =", s.minDelta.toString());
-          console.log("max_delta_b =", maxBuyingForExp.toString());
-          console.log("max_delta_s =", maxSellingForExp.toString());
-          console.log(`stepping = "${xAxis}"`);
+          if (logging) console.log("m_b =", buyingMultiplier.toString());
+          if (logging) console.log("m_s =", sellingMultiplier.toString());
+          if (logging) console.log("min_delta_b =", b.minDelta.toString());
+          if (logging) console.log("min_delta_s =", s.minDelta.toString());
+          if (logging) console.log("max_delta_b =", maxBuyingForExp.toString());
+          if (logging) {
+            console.log("max_delta_s =", maxSellingForExp.toString());
+          }
+          if (logging) console.log(`stepping = "${xAxis}"`);
 
           const search = (minDelta: bigint): Point => {
-            console.log("slopes = [[");
+            if (logging) console.log("slopes = [[");
             const stepsizes = [1n];
             let current = pointForDelta(minDelta);
             let optimum = current;
@@ -1028,15 +1070,17 @@ export class PairOptions {
               if (gotWorse) {
                 for (const vs of [prevWorsening, optimum]) {
                   const distance = current.delta - vs.delta;
-                  console.log(
-                    "# worsened; distance:",
-                    distance,
-                    "stepsize:",
-                    stepsize,
-                  );
+                  if (logging) {
+                    console.log(
+                      "# worsened; distance:",
+                      distance,
+                      "stepsize:",
+                      stepsize,
+                    );
+                  }
                   if (distance !== 0n) {
                     if (!stepsizes.includes(distance)) {
-                      console.log("# new stepsize:", distance);
+                      if (logging) console.log("# new stepsize:", distance);
                       stepsizes.push(distance);
                     }
                     // else if (distance === stepsize) {
@@ -1086,14 +1130,16 @@ export class PairOptions {
               }
               if (compare(next.loss, optimum.loss) < 0) {
                 const distance = next.delta - optimum.delta;
-                console.log(
-                  "# new optimum; distance:",
-                  distance,
-                  "stepsize:",
-                  stepsize,
-                );
+                if (logging) {
+                  console.log(
+                    "# new optimum; distance:",
+                    distance,
+                    "stepsize:",
+                    stepsize,
+                  );
+                }
                 if (distance !== 0n && !stepsizes.includes(distance)) {
-                  console.log("# new stepsize:", distance);
+                  if (logging) console.log("# new stepsize:", distance);
                   stepsizes.push(distance);
                 }
 
@@ -1104,29 +1150,37 @@ export class PairOptions {
               }
               current = next;
             }
-            console.log("]]");
-            console.log("stepsizes:", stepsizes);
+            if (logging) console.log("]]");
+            if (logging) console.log("stepsizes:", stepsizes);
             return optimum;
           };
           const optimum = search(minDeltaCombined);
           foundImperfectSolution(optimum.delta);
         } else if (minDeltaAlone < minDeltaCombined) {
-          console.log(
-            "minDeltaAlone < minDeltaCombined",
-            minDeltaAlone,
-            minDeltaCombined,
-          );
+          if (logging) {
+            console.log(
+              "minDeltaAlone < minDeltaCombined",
+              minDeltaAlone,
+              minDeltaCombined,
+            );
+          }
           if (xAxis === "buying") {
             const selling = s.minDelta;
             const buying = min(buyingForSelling(selling), maxBuyingForExp);
             foundImperfectSolution_(buying, selling);
+          } else {
+            const buying = b.minDelta;
+            const selling = sellingForBuying(buying);
+            if (selling <= maxSellingForExp) foundImperfectSolution_(buying, selling);
           }
         } else if (maxDeltaCombined < maxDeltaAlone) {
-          console.log(
-            "maxDeltaCombined < maxDeltaAlone",
-            maxDeltaCombined,
-            maxDeltaAlone,
-          );
+          if (logging) {
+            console.log(
+              "maxDeltaCombined < maxDeltaAlone",
+              maxDeltaCombined,
+              maxDeltaAlone,
+            );
+          }
           if (xAxis === "selling") {
             const buying = maxBuyingForExp;
             const selling = max(sellingForBuying(buying), s.minDelta);
@@ -1136,7 +1190,7 @@ export class PairOptions {
 
         // we're here because maxSelling < minSelling
         // else if (minSelling <= maxSellingForExp) {
-        //   console.log(`${minSelling} <= ${maxSellingForExp}`);
+        //   if (logging) console.log(`${minSelling} <= ${maxSellingForExp}`);
         //   const maybeBetter = findImperfectExhaustively(
         //     minSelling,
         //     maxSellingForExp,
@@ -1147,24 +1201,26 @@ export class PairOptions {
         // } // otherwise no solution possible
 
         // here: assert that we can't find a better solution
-        // console.log("exhaustive search");
-        runAsserts = false;
-        // runAsserts = true
+        // if (logging) console.log("exhaustive search");
+        // runAsserts = false;
+        // runAsserts = true // TODO revert
         if (runAsserts) {
-          let from = null; //runAssertsFrom as bigint | null;
           let from_ = max(s.minDelta, sellingForBuying(b.minDelta));
-          if (from) {
-            if (xAxis === "buying") {
-              from = minimizeSelling(sellingForBuying(from));
-            }
-            from_ = max(from, from_);
-          }
+          // let from = runAssertsFrom as bigint | null;
+          // if (from) {
+          //   if (xAxis === "buying") {
+          //     const tmp = sellingForBuying(from)
+          //     from = minimizeSelling(tmp);
+          //     assert(from === tmp, `${from} !== ${tmp}`); // means we don't need minimizeSelling
+          //   }
+          //   from_ = max(from, from_);
+          // }
           const maybeBetter = findImperfectExhaustively(
             from_,
             maxSellingForExp,
           );
           if (maybeBetter) {
-            console.log("asserting");
+            if (logging) console.log("asserting");
             assert(bestImperfectOption !== null, maybeBetter.show());
             const best = bestImperfectOption as PairOption;
             assert(
@@ -1179,11 +1235,20 @@ export class PairOptions {
       }
 
       assert(b.maxDelta !== "oo");
-      if (maxBuyingForExp < b.maxDelta) {
-        queue.push({ expBuying: expBuying + 1n, expSelling });
-      }
-      if (s.maxDelta === "oo" || maxSellingForExp < s.maxDelta) {
-        queue.push({ expBuying, expSelling: expSelling + 1n });
+      if (stepBuyingFirst) {
+        if (maxBuyingForExp < b.maxDelta) {
+          queue.push({ expBuying: expBuying + 1n, expSelling });
+        }
+        if (s.maxDelta === "oo" || maxSellingForExp < s.maxDelta) {
+          queue.push({ expBuying, expSelling: expSelling + 1n });
+        }
+      } else {
+          if (s.maxDelta === "oo" || maxSellingForExp < s.maxDelta) {
+            queue.push({ expBuying, expSelling: expSelling + 1n });
+          }
+        if (maxBuyingForExp < b.maxDelta) {
+          queue.push({ expBuying: expBuying + 1n, expSelling });
+        }
       }
     }
     //   if (bestAdheringOption) break; // since we know that perfect solutions are also optimal

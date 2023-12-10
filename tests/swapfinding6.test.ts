@@ -4,16 +4,19 @@ import {
   genTightAssetParams,
   PairOptions,
 } from "../src/chain/actions/swapfinding6/swapsForPair.ts";
-import { maxSmallInteger } from "../src/types/euclid/smallValue.ts";
-import { maxInteger } from "../src/utils/constants.ts";
+// import { maxSmallInteger } from "../src/types/euclid/smallValue.ts";
+// import { maxInteger } from "../src/utils/constants.ts";
 import {
   genNonNegative,
   genPositive,
   randomChoice,
 } from "../src/utils/generators.ts";
+import { webappExpLimit } from "../src/mod.ts";
+
+const maxIntegerLocal = 1000000n; // NOTE this
 
 Deno.test("swapfinding tight", () => {
-  const iterations = 1000;
+  const iterations = 100000;
   let duration = 0;
 
   for (let i = 0; i < iterations; i++) {
@@ -24,14 +27,14 @@ Deno.test("swapfinding tight", () => {
 
     while (true) {
       while (true) {
-        buyingParams = genTightAssetParams();
+        buyingParams = genTightAssetParams(maxIntegerLocal);
         if (
           buyingParams.minDelta <= buyingParams.available
         ) {
           break;
         }
       }
-      sellingParams = genTightAssetParams();
+      sellingParams = genTightAssetParams(maxIntegerLocal);
 
       buyingOption = AssetOption.initial(
         "buying",
@@ -55,7 +58,7 @@ Deno.test("swapfinding tight", () => {
         randomChoice([
           "oo",
           sellingParams.minDelta +
-          genNonNegative(maxInteger - sellingParams.minDelta),
+          genNonNegative(maxIntegerLocal - sellingParams.minDelta),
         ]),
       );
 
@@ -67,8 +70,10 @@ Deno.test("swapfinding tight", () => {
     const pairOptions = new PairOptions(
       buyingOption,
       sellingOption,
-      11,
-    );
+      webappExpLimit,// TODO test different ones, and fix infinite loop that sometimes happens. And test the maxIntImpacted thing with it
+      maxIntegerLocal,
+      true,
+      );
     const end = performance.now();
     duration += end - start;
     console.log(

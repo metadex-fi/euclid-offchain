@@ -9,6 +9,7 @@ import { Currency } from "../asset/currency.ts";
 import { Token } from "../asset/token.ts";
 import { PPositive } from "../bounded/positive.ts";
 import { PValue, Value } from "./value.ts";
+import { minAdaBalance } from "../../../../utils/constants.ts";
 
 export class PositiveValue {
   constructor(
@@ -103,9 +104,9 @@ export class PositiveValue {
   public boundedSubValue = (
     minSize?: bigint,
     maxSize?: bigint,
-    minAdaBalance?: bigint,
   ): PositiveValue => {
     const assets = this.assets.boundedSubset(minSize, maxSize);
+    if (!assets.has(Asset.ADA)) assets.insert(Asset.ADA);
     const value = new PositiveValue();
     assets.forEach((asset) => {
       let amount = this.amountOf(asset);

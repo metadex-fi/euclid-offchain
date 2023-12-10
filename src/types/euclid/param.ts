@@ -11,7 +11,11 @@ import { PInteger } from "../general/fundamental/primitive/integer.ts";
 import { ceilDiv, min } from "../../utils/generators.ts";
 import { Value } from "../general/derived/value/value.ts";
 import { maxSmallInteger, PSmallValue, SmallValue } from "./smallValue.ts";
-import { maxInteger, maxIntRoot } from "../../utils/constants.ts";
+import {
+  maxInteger,
+  maxIntRoot,
+  minAdaBalance,
+} from "../../utils/constants.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
 
@@ -25,6 +29,7 @@ export class Param {
     public readonly weights: EuclidValue, //SmallValue // NOTE those are actually inverted
     public readonly jumpSizes: SmallValue,
     public readonly active: bigint,
+    public readonly minAda: bigint,
   ) {
     Param.asserts(this);
   }
@@ -54,6 +59,7 @@ export class Param {
       this.weights,
       this.jumpSizes,
       this.active ? 0n : 1n,
+      minAdaBalance,
     );
   }
 
@@ -82,6 +88,11 @@ ${tt})`;
       param.virtual.assets.subsetOf(assets),
       `assets of virtual must be a subset of assets of jumpSizes and weights, but ${param.virtual.assets.show()}\nis not a subset of ${assets.show()}`,
     );
+    assert(
+      param.minAda === minAdaBalance,
+      `minAda: ${param.minAda} !== ${minAdaBalance}`,
+    );
+
     // const minAnchorPrices = param.maxAnchorPrices;
     // const maxAnchorPrices = minAnchorPrices.plus(param.jumpSizes);
 
@@ -157,6 +168,7 @@ ${tt})`;
       new EuclidValue(weights), //new SmallValue(new EuclidValue(weights)),
       new SmallValue(new EuclidValue(jumpSizes)),
       1n, // TODO include active-status in testing
+      minAdaBalance,
     );
   }
 
@@ -236,6 +248,7 @@ export class PParam extends PObject<Param> {
         weights: PEuclidValue.ptype, //PSmallValue.ptype,
         jumpSizes: PSmallValue.ptype,
         active: PInteger.ptype,
+        minAda: PInteger.ptype,
       }),
       Param,
     );

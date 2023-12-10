@@ -29,7 +29,7 @@
 //   // console.log(parameters);
 
 //   // return;
-//   let trials = 100;
+//   let trials = 5;
 //   const actionCounts_ = new Map<string, number>();
 //   // const errors = [];
 //   while (trials > 0) {
@@ -126,8 +126,10 @@
 //         // }
 //       } catch (e) {
 //         if (
-//           e.toString().includes("Not enough ADA leftover to cover minADA") ||
-//           e.toString().includes("InputsExhaustedError") // TODO FIXME
+//           false
+//           //e.toString().includes("Not enough ADA leftover to cover minADA") //||
+//           // e.toString().includes("Insufficient collateral balance") //||
+//           // e.toString().includes("InputsExhaustedError")
 //         ) {
 //           console.error("caught:", e);
 //         } else {

@@ -4,17 +4,18 @@ import { IdNFT } from "../types/euclid/idnft.ts";
 import { Asset } from "../types/general/derived/asset/asset.ts";
 import { Assets } from "../types/general/derived/asset/assets.ts";
 import { KeyHash, PKeyHash } from "../types/general/derived/hash/keyHash.ts";
-import { feesEtcLovelace } from "../utils/constants.ts";
+import { feesEtcLovelace, minAdaBalance } from "../utils/constants.ts";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { Action, UserAction } from "./actions/action.ts";
 
 import { Contract } from "./contract.ts";
 import { utxosToCore } from "../utils/conversion.ts";
 import { WalletApi } from "https://deno.land/x/lucid@0.10.7/mod.ts";
+import { genPositive } from "../utils/generators.ts";
 
 const forFeesEtc = PositiveValue.singleton(
   Asset.ADA,
-  10n * feesEtcLovelace,
+  feesEtcLovelace,
 ); // costs in lovelace for fees etc. TODO excessive
 // const feesEtc = PositiveValue.singleton(Asset.ADA, feesEtcLovelace);
 
@@ -393,7 +394,11 @@ export class User {
     const user = new User(lucid, privateKey, address);
     user.balance = PositiveValue.genOfAssets(
       allAssets.boundedSubset(1n),
-    ).normedPlus(forFeesEtc);
+    ).normedPlus(forFeesEtc)
+      .normedPlus(PositiveValue.singleton(
+        Asset.ADA,
+        genPositive(100n * minAdaBalance), // for opening pools
+      ));
     return user;
   }
 

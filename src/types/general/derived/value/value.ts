@@ -16,6 +16,9 @@ export const ccysTknsAmnts = new AssocMap<Currency, AssocMap<Token, bigint>>(
 );
 export const tknsAmnts = new AssocMap<Token, bigint>((tkn) => tkn.show());
 
+const showAmnt = (amnt: bigint): string =>
+  amnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
 export class Value {
   constructor(
     private value = ccysTknsAmnts.anew,
@@ -37,7 +40,7 @@ export class Value {
         t.push(
           `${ttff}${
             token.name === "" ? symbol === "" ? "lovelace" : "_" : token.name
-          }: ${amount}`,
+          }: ${showAmnt(amount)}`,
         );
       }
       ccys.push(t.join(",\n"));
@@ -51,7 +54,7 @@ export class Value {
     for (const [ccy, tokenMap] of this.value) {
       for (const [tkn, amount] of tokenMap) {
         amounts.push(
-          `${tf}${ccy.toString()}_${tkn.name}: ${amount.toString()}`,
+          `${tf}${ccy.toString()}_${tkn.name}: ${showAmnt(amount)}`,
         );
       }
     }

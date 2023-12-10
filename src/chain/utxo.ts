@@ -22,15 +22,13 @@ import {
   compareVariants,
   handleInvalidPools,
   maxInteger,
+  minAdaBalance,
   // webappExpLimit,
 } from "../utils/constants.ts";
 import {
   AssetOption,
   PairOptions,
 } from "./actions/swapfinding6/swapsForPair.ts";
-
-// export const getMinBalance = (asset: Asset): bigint =>
-//   asset.equals(Asset.ADA) ? 10000000n : 0n; // TODO arbitary aka both excessive and edge-casing
 
 export class ParamUtxo {
   private constructor(
@@ -141,8 +139,6 @@ ${ttf}preDirac: ${this.preDirac.concise(ttf)}
 ${tt})`;
   };
 }
-
-export const minAdaBalance = 10000000n; // TODO arbitary aka both excessive and edge-casing
 
 export class DiracUtxo {
   public readonly available: PositiveValue;
@@ -330,6 +326,8 @@ export class DiracUtxo {
           buyingOption,
           sellingOption,
           expLimit_,
+          maxInteger,
+          false,
         );
 
         const option = pairOptions.bestAdheringOption;

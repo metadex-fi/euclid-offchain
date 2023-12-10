@@ -70,7 +70,8 @@ export class Swapping {
     public readonly option: PairOption,
     public readonly maxIntImpacted: boolean,
     public readonly expLimit: number,
-    runTests: boolean, // corruption-test-swappings don't run tests themselves.
+    public readonly corruptions: string[],
+    // runTests: boolean, // corruption-test-swappings don't run tests themselves.
     // public readonly adhereMaxInteger: boolean,
     // public readonly maxIntImpacted: boolean,
     // public readonly expLimit: number | null,
@@ -153,13 +154,13 @@ export class Swapping {
     //   );
     // }
 
-    if (runTests) {
-      // assert(
-      //   this.spotPrice <= this.effectivePrice,
-      //   `spotPrice > effectivePrice: ${this.show()}`,
-      // );
-      assert(this.validates(), `Swapping does not validate: ${this.show()}`);
-    }
+    // if (runTests) {
+    //   // assert(
+    //   //   this.spotPrice <= this.effectivePrice,
+    //   //   `spotPrice > effectivePrice: ${this.show()}`,
+    //   // );
+    //   assert(this.validates(), `Swapping does not validate: ${this.show()}`);
+    // }
   }
 
   // private get minBuying(): bigint {
@@ -190,7 +191,8 @@ export class Swapping {
       option,
       maxIntImpacted,
       expLimit,
-      true, // corruption-test-swappings don't run tests themselves.
+      [],
+      // true, // corruption-test-swappings don't run tests themselves.
       // adhereMaxInteger,
       // maxIntImpacted,
       // expLimit,
@@ -255,48 +257,49 @@ ${ttf}sellingAsset: ${this.sellingAsset.show()}
 ${ttf}option: ${this.option.show(ttf)}
 ${ttf}maxIntImpacted: ${this.maxIntImpacted}
 ${ttf}expLimit: ${this.expLimit}
+${ttf}corruptions: ${this.corruptions.toString()}
   )`;
   };
 
-  public equals = (
-    other: Swapping,
-    compareMinSoft: boolean,
-    ignore: string[],
-  ): boolean => {
-    const as = this.show().split("\n");
-    const bs = other.show().split("\n");
-    let matches = true;
+  // public equals = (
+  //   other: Swapping,
+  //   compareMinSoft: boolean,
+  //   ignore: string[],
+  // ): boolean => {
+  //   const as = this.show().split("\n");
+  //   const bs = other.show().split("\n");
+  //   let matches = true;
 
-    if (as.length !== bs.length) {
-      console.log(`mismatch in length: ${as.length} !== ${bs.length}`);
-      matches = false;
-    }
-    for (let i = 0; i < as.length; i++) {
-      const a = as[i];
-      const b = bs[i];
-      if ((!compareMinSoft) && a.includes("s.minDelta")) continue;
+  //   if (as.length !== bs.length) {
+  //     console.log(`mismatch in length: ${as.length} !== ${bs.length}`);
+  //     matches = false;
+  //   }
+  //   for (let i = 0; i < as.length; i++) {
+  //     const a = as[i];
+  //     const b = bs[i];
+  //     if ((!compareMinSoft) && a.includes("s.minDelta")) continue;
 
-      let skip = false;
-      for (const ign of ignore) {
-        if (a.includes(ign)) {
-          skip = true;
-          break;
-        }
-      }
-      if (skip) continue;
-      if (a !== b) {
-        console.log(`mismatch: ${a} !== ${b}`);
-        matches = false;
-      }
-    }
-    if (compareMinSoft && this.option.b.minDelta !== other.option.b.minDelta) {
-      console.log(
-        `mismatch in minBuying: ${this.option.b.minDelta} !== ${other.option.b.minDelta}`,
-      );
-      matches = false;
-    }
-    return matches;
-  };
+  //     let skip = false;
+  //     for (const ign of ignore) {
+  //       if (a.includes(ign)) {
+  //         skip = true;
+  //         break;
+  //       }
+  //     }
+  //     if (skip) continue;
+  //     if (a !== b) {
+  //       console.log(`mismatch: ${a} !== ${b}`);
+  //       matches = false;
+  //     }
+  //   }
+  //   if (compareMinSoft && this.option.b.minDelta !== other.option.b.minDelta) {
+  //     console.log(
+  //       `mismatch in minBuying: ${this.option.b.minDelta} !== ${other.option.b.minDelta}`,
+  //     );
+  //     matches = false;
+  //   }
+  //   return matches;
+  // };
 
   public split = (): Swapping[] => {
     throw new Error("Swapping-split not implemented");
@@ -750,86 +753,86 @@ ${ttf}expLimit: ${this.expLimit}
   //   return true;
   // }
 
-  public validates(): boolean {
-    return true; // TODO not updated to new version
-    // public readonly user: User | undefined, // TODO why can this be undefined again?
-    // public readonly paramUtxo: ParamUtxo,
-    // public readonly diracUtxo: DiracUtxo,
-    // public readonly buyingAsset: Asset,
-    // public readonly sellingAsset: Asset,
-    // public readonly buyingAmnt: bigint,
-    // public readonly sellingAmnt: bigint,
-    // public readonly buyingSpot: bigint, // inverted
-    // public readonly sellingSpot: bigint, // inverted
-    // public readonly buyingExp: bigint,
-    // public readonly sellingExp: bigint,
+  // public validates(): boolean {
+  //   return true; // TODO not updated to new version (it's in swapfinding6 now tho)
+  //   // public readonly user: User | undefined, // TODO why can this be undefined again?
+  //   // public readonly paramUtxo: ParamUtxo,
+  //   // public readonly diracUtxo: DiracUtxo,
+  //   // public readonly buyingAsset: Asset,
+  //   // public readonly sellingAsset: Asset,
+  //   // public readonly buyingAmnt: bigint,
+  //   // public readonly sellingAmnt: bigint,
+  //   // public readonly buyingSpot: bigint, // inverted
+  //   // public readonly sellingSpot: bigint, // inverted
+  //   // public readonly buyingExp: bigint,
+  //   // public readonly sellingExp: bigint,
 
-    // const param = this.paramUtxo.param;
-    // const buyingWeight = param.weights.amountOf(this.buyingAsset);
-    // const sellingWeight = param.weights.amountOf(this.sellingAsset);
-    // const jsBuying = param.jumpSizes.amountOf(this.buyingAsset);
-    // const jsSelling = param.jumpSizes.amountOf(this.sellingAsset);
-    // const virtualBuying = param.virtual.amountOf(this.buyingAsset);
-    // const virtualSelling = param.virtual.amountOf(this.sellingAsset);
+  //   // const param = this.paramUtxo.param;
+  //   // const buyingWeight = param.weights.amountOf(this.buyingAsset);
+  //   // const sellingWeight = param.weights.amountOf(this.sellingAsset);
+  //   // const jsBuying = param.jumpSizes.amountOf(this.buyingAsset);
+  //   // const jsSelling = param.jumpSizes.amountOf(this.sellingAsset);
+  //   // const virtualBuying = param.virtual.amountOf(this.buyingAsset);
+  //   // const virtualSelling = param.virtual.amountOf(this.sellingAsset);
 
-    // const dirac = this.diracUtxo.dirac;
-    // const anchorBuying = dirac.anchorPrices.amountOf(this.buyingAsset);
-    // const anchorSelling = dirac.anchorPrices.amountOf(this.sellingAsset);
-    // const balanceBuying = this.diracUtxo.funds.amountOf(this.buyingAsset, 0n);
-    // const balanceSelling = this.diracUtxo.funds.amountOf(this.sellingAsset, 0n);
+  //   // const dirac = this.diracUtxo.dirac;
+  //   // const anchorBuying = dirac.anchorPrices.amountOf(this.buyingAsset);
+  //   // const anchorSelling = dirac.anchorPrices.amountOf(this.sellingAsset);
+  //   // const balanceBuying = this.diracUtxo.funds.amountOf(this.buyingAsset, 0n);
+  //   // const balanceSelling = this.diracUtxo.funds.amountOf(this.sellingAsset, 0n);
 
-    // const buyingLiquidity = balanceBuying + virtualBuying;
-    // const sellingLiquidity = balanceSelling + virtualSelling;
+  //   // const buyingLiquidity = balanceBuying + virtualBuying;
+  //   // const sellingLiquidity = balanceSelling + virtualSelling;
 
-    // // const oldBuyingAmm = buyingWeight * buyingLiquidity;
-    // // const oldSellingAmm = sellingWeight * sellingLiquidity;
+  //   // // const oldBuyingAmm = buyingWeight * buyingLiquidity;
+  //   // // const oldSellingAmm = sellingWeight * sellingLiquidity;
 
-    // const newBuyingAmm = buyingWeight * (buyingLiquidity - this.buyingAmnt);
-    // const newSellingAmm = sellingWeight * (sellingLiquidity + this.sellingAmnt);
+  //   // const newBuyingAmm = buyingWeight * (buyingLiquidity - this.buyingAmnt);
+  //   // const newSellingAmm = sellingWeight * (sellingLiquidity + this.sellingAmnt);
 
-    // return true &&
-    //   // Swapping.pricesFitDirac(
-    //   //   spotBuying,
-    //   //   spotSelling,
-    //   //   buyingLowest,x
-    //   //   sellingLowest,
-    //   //   buyingJumpSize,
-    //   //   sellingJumpSize,
-    //   // ) &&
-    //   Swapping.exponentsYieldPrice(
-    //     anchorBuying,
-    //     jsBuying,
-    //     this.buyingExp,
-    //     this.newAnchorBuying,
-    //     "buying",
-    //   ) &&
-    //   Swapping.exponentsYieldPrice(
-    //     anchorSelling,
-    //     jsSelling,
-    //     this.sellingExp,
-    //     this.newAnchorSelling,
-    //     "selling",
-    //   ) &&
-    //   Swapping.pricesFitAmm(
-    //     this.buyingSpot,
-    //     this.sellingSpot,
-    //     newBuyingAmm,
-    //     newSellingAmm,
-    //   ) &&
-    //   Swapping.valueEquation(
-    //     this.buyingSpot,
-    //     this.sellingSpot,
-    //     this.buyingAmnt,
-    //     this.sellingAmnt,
-    //   );
-    // // TODO othersUnchanged - con: this is implicit
-  }
+  //   // return true &&
+  //   //   // Swapping.pricesFitDirac(
+  //   //   //   spotBuying,
+  //   //   //   spotSelling,
+  //   //   //   buyingLowest,x
+  //   //   //   sellingLowest,
+  //   //   //   buyingJumpSize,
+  //   //   //   sellingJumpSize,
+  //   //   // ) &&
+  //   //   Swapping.exponentsYieldPrice(
+  //   //     anchorBuying,
+  //   //     jsBuying,
+  //   //     this.buyingExp,
+  //   //     this.newAnchorBuying,
+  //   //     "buying",
+  //   //   ) &&
+  //   //   Swapping.exponentsYieldPrice(
+  //   //     anchorSelling,
+  //   //     jsSelling,
+  //   //     this.sellingExp,
+  //   //     this.newAnchorSelling,
+  //   //     "selling",
+  //   //   ) &&
+  //   //   Swapping.pricesFitAmm(
+  //   //     this.buyingSpot,
+  //   //     this.sellingSpot,
+  //   //     newBuyingAmm,
+  //   //     newSellingAmm,
+  //   //   ) &&
+  //   //   Swapping.valueEquation(
+  //   //     this.buyingSpot,
+  //   //     this.sellingSpot,
+  //   //     this.buyingAmnt,
+  //   //     this.sellingAmnt,
+  //   //   );
+  //   // // TODO othersUnchanged - con: this is implicit
+  // }
 
   // try to make it wrong with minimal changes
   public corruptAll = (): Swapping[] => {
-    // return []; // TODO update to new version
-
-    const corrupted_ = [];
+    // if (this.sellingAsset.equals(Asset.ADA)) return []; // TODO FIXME
+    // if (this.buyingAsset.equals(Asset.ADA)) return []; // TODO FIXME
+    const corrupted_: (Swapping | null)[] = [];
     for (const random of [false, true]) {
       let corrupted = [
         this.corruptSoldAmnt(random),
@@ -840,6 +843,7 @@ ${ttf}expLimit: ${this.expLimit}
         corrupted = corrupted.flatMap((s) =>
           s
             ? [
+              s,
               s.corruptSoldAmnt(random),
               s.corruptBoughtAmnt(random),
               s.corruptSoldExp(random),
@@ -894,7 +898,7 @@ ${ttf}expLimit: ${this.expLimit}
   };
 
   public corruptBoughtAmnt = (random: boolean): Swapping | null => {
-    console.log(`trying to corrupt bought amount...`);
+    console.log(`trying to corrupt bought amount...\nof ${this.show()}`);
     if (this.option.deltaBuying === this.option.b.maxDelta) return null;
     assert(this.option.b.maxDelta !== "oo");
     const amnt = random
@@ -912,10 +916,12 @@ ${ttf}expLimit: ${this.expLimit}
         this.option.deltaSelling,
         this.option.b.exp,
         this.option.s.exp,
+        maxInteger,
       ),
       this.maxIntImpacted,
       this.expLimit,
-      false, // corruption-test-swappings don't run tests themselves.
+      [...this.corruptions, `boughtAmnt ${amnt}`],
+      // false, // corruption-test-swappings don't run tests themselves.
     );
 
     console.log(`returning corruptBoughtAmnt`);
@@ -923,7 +929,7 @@ ${ttf}expLimit: ${this.expLimit}
   };
 
   public corruptSoldAmnt = (random: boolean): Swapping | null => {
-    console.log(`trying to corrupt sold amount...`);
+    console.log(`trying to corrupt sold amount...\nof ${this.show()}`);
     if (this.option.deltaSelling === this.option.s.minDelta) return null;
     const amnt = random
       ? genPositive(this.option.deltaSelling - this.option.s.minDelta)
@@ -940,17 +946,19 @@ ${ttf}expLimit: ${this.expLimit}
         this.option.deltaSelling - amnt,
         this.option.b.exp,
         this.option.s.exp,
+        maxInteger,
       ),
       this.maxIntImpacted,
       this.expLimit,
-      false, // corruption-test-swappings don't run tests themselves.
+      [...this.corruptions, `soldAmnt ${amnt}`],
+      // false, // corruption-test-swappings don't run tests themselves.
     );
     console.log(`returning corruptSoldAmnt`);
     return soldTooLittle;
   };
 
   public corruptBoughtExp = (random: boolean): Swapping | null => {
-    console.log(`trying to corrupt bought exp...`);
+    console.log(`trying to corrupt bought exp...\nof ${this.show()}`);
     if (this.option.b.exp === 0n) return null;
     const amnt = random ? genPositive(this.option.b.exp) : 1n;
     console.log(`... by ${amnt}`);
@@ -973,10 +981,12 @@ ${ttf}expLimit: ${this.expLimit}
         this.option.deltaSelling,
         exp,
         this.option.s.exp,
+        maxInteger,
       ),
       this.maxIntImpacted,
       this.expLimit,
-      false, // corruption-test-swappings don't run tests themselves.
+      [...this.corruptions, `boughtExp ${amnt}`],
+      // false, // corruption-test-swappings don't run tests themselves.
     );
 
     console.log(`returning corruptBoughtExp`);
@@ -984,7 +994,7 @@ ${ttf}expLimit: ${this.expLimit}
   };
 
   public corruptSoldExp = (random: boolean): Swapping | null => {
-    console.log(`trying to corrupt sold exp...`);
+    console.log(`trying to corrupt sold exp...\nof ${this.show()}`);
     if (this.option.s.exp === 0n) return null;
     const amnt = random ? genPositive(this.option.s.exp) : 1n;
     console.log(`... by ${amnt}`);
@@ -1007,10 +1017,12 @@ ${ttf}expLimit: ${this.expLimit}
         this.option.deltaSelling,
         this.option.b.exp,
         exp,
+        maxInteger,
       ),
       this.maxIntImpacted,
       this.expLimit,
-      false, // corruption-test-swappings don't run tests themselves.
+      [...this.corruptions, `soldExp ${amnt}`],
+      // false, // corruption-test-swappings don't run tests themselves.
     );
 
     console.log(`returning corruptSoldExp`);
