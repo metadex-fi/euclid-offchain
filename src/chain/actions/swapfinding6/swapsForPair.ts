@@ -31,14 +31,18 @@ export const genWildAssetParams = (maxInteger: bigint) => {
 export const genTightAssetParams = (maxInteger: bigint) => {
   const jumpSize = genPositive(maxSmallInteger);
   const virtual = new PPositive(
-    ceilDiv(jumpSize + 1n, maxSmallInteger), 
-    maxInteger
+    ceilDiv(jumpSize + 1n, maxSmallInteger),
+    maxInteger,
   ).genData();
   const balance = genNonNegative(maxInteger - virtual);
   const locked = genNonNegative(balance);
   const available = balance - locked;
   const maxIntRoot = BigInt(Math.floor(Number(maxInteger) ** 0.5));
-  const [minWeight, maxWeight] = Param.weightBounds(jumpSize, virtual, maxIntRoot);
+  const [minWeight, maxWeight] = Param.weightBounds(
+    jumpSize,
+    virtual,
+    maxIntRoot,
+  );
   const weight = new PPositive(minWeight, maxWeight).genData();
   const anchor = genPositive(maxInteger);
   const minDelta = genPositive(maxInteger);
@@ -572,7 +576,7 @@ export class PairOptions {
 
     let stepBuyingFirst = true;
     while (queue.length) {
-      stepBuyingFirst = randomChoice([true, false])//!stepBuyingFirst; // TODO consider making this deterministic again
+      stepBuyingFirst = randomChoice([true, false]); //!stepBuyingFirst; // TODO consider making this deterministic again
       // queue.sort((a, b) => {
       //   const aMin = min(a.expBuying, a.expSelling);
       //   const bMin = min(b.expBuying, b.expSelling);r
@@ -970,10 +974,10 @@ export class PairOptions {
             buyingMultiplier,
             // minimizeSelling,
           );
-           // TODO minimize/maximize?
+          // TODO minimize/maximize?
           // otherAssetEquivalent = buyingForSelling;
-          otherAssetEquivalent = buyingForSelling//(delta:bigint) => buyingForSelling(minimizeSelling(delta));
-          const maxForOtherMax = sellingForBuying(maxBuyingForExp)
+          otherAssetEquivalent = buyingForSelling; //(delta:bigint) => buyingForSelling(minimizeSelling(delta));
+          const maxForOtherMax = sellingForBuying(maxBuyingForExp);
           const minForOtherMin = sellingForBuying(b.minDelta);
           if (logging) console.log("maxForOtherMax", maxForOtherMax);
           if (logging) console.log("maxSellingForExp", maxSellingForExp);
@@ -990,10 +994,10 @@ export class PairOptions {
             -buyingMultiplier,
             sellingMultiplier,
           );
-           // TODO minimize/maximize?
-          otherAssetEquivalent = sellingForBuying//(delta:bigint) => minimizeSelling(sellingForBuying(delta));
-          const maxForOtherMax = buyingForSelling(maxSellingForExp)
-            // minimizeSelling(maxSellingForExp)
+          // TODO minimize/maximize?
+          otherAssetEquivalent = sellingForBuying; //(delta:bigint) => minimizeSelling(sellingForBuying(delta));
+          const maxForOtherMax = buyingForSelling(maxSellingForExp);
+          // minimizeSelling(maxSellingForExp)
           //);
           const minForOtherMin = //maximizeBuying(
             buyingForSelling(s.minDelta);
@@ -1171,7 +1175,9 @@ export class PairOptions {
           } else {
             const buying = b.minDelta;
             const selling = sellingForBuying(buying);
-            if (selling <= maxSellingForExp) foundImperfectSolution_(buying, selling);
+            if (selling <= maxSellingForExp) {
+              foundImperfectSolution_(buying, selling);
+            }
           }
         } else if (maxDeltaCombined < maxDeltaAlone) {
           if (logging) {
@@ -1243,9 +1249,9 @@ export class PairOptions {
           queue.push({ expBuying, expSelling: expSelling + 1n });
         }
       } else {
-          if (s.maxDelta === "oo" || maxSellingForExp < s.maxDelta) {
-            queue.push({ expBuying, expSelling: expSelling + 1n });
-          }
+        if (s.maxDelta === "oo" || maxSellingForExp < s.maxDelta) {
+          queue.push({ expBuying, expSelling: expSelling + 1n });
+        }
         if (maxBuyingForExp < b.maxDelta) {
           queue.push({ expBuying: expBuying + 1n, expSelling });
         }
