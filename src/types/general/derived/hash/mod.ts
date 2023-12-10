@@ -1,2 +1,2 @@
-export * from "./hash.ts";
-export * from "./keyHash.ts";
+export * from './hash.ts';
+export * from './keyHash.ts';
