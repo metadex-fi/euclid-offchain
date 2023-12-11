@@ -10,6 +10,7 @@ import { f, t } from "../general/fundamental/type.ts";
 import { gMaxHashes, IdNFT, PIdNFT } from "./idnft.ts";
 import { Param, PParam } from "./param.ts";
 import { EuclidValue, PEuclidValue } from "./euclidValue.ts";
+import { Assets } from "../general/derived/asset/assets.ts";
 
 export class Dirac {
   constructor(
@@ -18,6 +19,10 @@ export class Dirac {
     public readonly paramNFT: IdNFT,
     public readonly anchorPrices: EuclidValue,
   ) {}
+
+  public get assets(): Assets {
+    return this.anchorPrices.assets;
+  }
 
   public concise = (tabs = ""): string => {
     const tt = tabs + t;

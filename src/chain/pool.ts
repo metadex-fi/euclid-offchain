@@ -14,6 +14,7 @@ import { Value } from "../types/general/derived/value/value.ts";
 import { Asset } from "../types/general/derived/asset/asset.ts";
 import { Assets } from "../types/general/derived/asset/assets.ts";
 import { handleInvalidPools } from "../utils/constants.ts";
+import { SwapfindingVariant } from "./actions/swapfinding6/swapsForPair.ts";
 
 export class PrePool {
   public paramUtxo?: ParamUtxo;
@@ -265,6 +266,7 @@ export class Pool {
 
   public swappingsFor(
     user: User,
+    variant: SwapfindingVariant,
     minBuying?: bigint,
     minSelling?: bigint,
     expLimit?: number,
@@ -280,6 +282,7 @@ export class Pool {
       d.swappingsFor(
         user,
         this.paramUtxo,
+        variant,
         minBuying,
         minSelling,
         sellableBalance.unsigned,

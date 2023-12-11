@@ -28,6 +28,7 @@ import {
 import {
   AssetOption,
   PairOptions,
+  SwapfindingVariant,
 } from "./actions/swapfinding6/swapsForPair.ts";
 
 export class ParamUtxo {
@@ -172,6 +173,7 @@ export class DiracUtxo {
     );
     const diracDatum = peuclidDatum.plift(from.datum);
     assert(diracDatum instanceof DiracDatum, `expected DiracDatum`);
+    assert(param.assets.equals(diracDatum.dirac.assets), `assets mismatch`)
     return new DiracUtxo(
       peuclidDatum,
       diracDatum.dirac,
@@ -256,6 +258,7 @@ export class DiracUtxo {
   public swappingsFor = (
     user: User | null,
     paramUtxo: ParamUtxo,
+    variant: SwapfindingVariant,
     minBuying = 1n,
     minSelling = 1n,
     availableSelling?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
@@ -328,6 +331,7 @@ export class DiracUtxo {
           expLimit_,
           maxInteger,
           false,
+          variant,
         );
 
         const option = pairOptions.bestAdheringOption;

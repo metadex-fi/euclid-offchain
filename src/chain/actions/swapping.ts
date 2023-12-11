@@ -225,15 +225,16 @@ export class Swapping {
     for (let i = maxInteger; i > 1n; i /= 10n) {
       swappings = user.contract!.state!.swappingsFor(
         user,
+        randomChoice(["exact", "perExpMaxDelta", "imperfectMaxDelta"]),
         maybeNdef(genPositive(i)),
         maybeNdef(genPositive(i)),
-        webappExpLimit,
-        // randomChoice([ // TODO test this
-        //   undefined,
-        //   webappExpLimit,
-        //   Number(genPositive(50n)),
-        //   Number(genPositive()),
-        // ]),
+        // webappExpLimit,
+        randomChoice([ // TODO test this
+          undefined,
+          webappExpLimit,
+          Number(genPositive(50n)),
+          Number(genPositive()),
+        ]),
       );
       if (swappings.length > 0) break;
     }
@@ -447,6 +448,7 @@ ${ttf}corruptions: ${this.corruptions.toString()}
       const subsequents = diracUtxo.swappingsFor(
         this.user,
         this.paramUtxo,
+        this.option.variant,
         applyMinAmounts ? this.option.b.minDelta : undefined,
         applyMinAmounts ? this.option.s.minDelta : undefined,
         Value.singleton(this.sellingAsset, sellableAmount),
@@ -497,6 +499,7 @@ ${ttf}corruptions: ${this.corruptions.toString()}
     const swappings = this.diracUtxo.swappingsFor(
       this.user,
       this.paramUtxo,
+      this.option.variant,
       applyMinAmounts ? this.option.b.minDelta ?? undefined : undefined,
       applyMinAmounts ? this.option.s.minDelta ?? undefined : undefined,
       Value.singleton(
@@ -830,8 +833,7 @@ ${ttf}corruptions: ${this.corruptions.toString()}
 
   // try to make it wrong with minimal changes
   public corruptAll = (): Swapping[] => {
-    // if (this.sellingAsset.equals(Asset.ADA)) return []; // TODO FIXME
-    // if (this.buyingAsset.equals(Asset.ADA)) return []; // TODO FIXME
+    if (this.option.variant !== "exact") return [];
     const corrupted_: (Swapping | null)[] = [];
     for (const random of [false, true]) {
       let corrupted = [

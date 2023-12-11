@@ -156,10 +156,11 @@ export class User {
   // TODO consider generating several
   public generateActions = async (): Promise<Action[]> => {
     await this.update();
-    if (this.balance!.amountOf(Asset.ADA) < feesEtcLovelace) {
-      // console.log(`not enough ada to pay fees etc.`);
-      return [];
-    }
+    // doing this in the individual actions - note that closing is supposed to be cheaper, which is why that is better
+    // if (this.balance!.amountOf(Asset.ADA) < feesEtcLovelace) { 
+    //   // console.log(`not enough ada to pay fees etc.`);
+    //   return [];
+    // }
 
     console.log(
       "user.generateActions() - found lastIdNFT:",

@@ -16,6 +16,7 @@ import { User } from "./user.ts";
 import { ParamUtxo, PreDiracUtxo } from "./utxo.ts";
 import { Asset } from "../types/general/derived/asset/asset.ts";
 import { handleInvalidPools } from "../utils/constants.ts";
+import { SwapfindingVariant } from "./actions/swapfinding6/swapsForPair.ts";
 
 type ErrorMessage = string;
 
@@ -164,6 +165,7 @@ export class EuclidState {
 
   public swappingsFor(
     user: User,
+    variant: SwapfindingVariant,
     minBuying?: bigint,
     minSelling?: bigint,
     expLimit?: number,
@@ -175,7 +177,7 @@ export class EuclidState {
     //   console.log(`\t\tpools: ${pools.length}`);
     // }
     return pools.flatMap((pool) =>
-      pool.swappingsFor(user, minBuying, minSelling, expLimit)
+      pool.swappingsFor(user, variant, minBuying, minSelling, expLimit)
     );
   }
 }

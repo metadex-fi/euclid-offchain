@@ -1,4 +1,6 @@
 import { Lucid } from "../../../lucid.mod.ts";
+import { Asset } from "../../types/general/derived/asset/asset.ts";
+import { closingFees } from "../../utils/constants.ts";
 import { randomChoice } from "../../utils/generators.ts";
 import { Pool } from "../pool.ts";
 import { User } from "../user.ts";
@@ -27,8 +29,8 @@ export class Closing {
 
   static genOfUser = (user: User): Closing | null => {
     // console.log(`attempting to close`);
-    const enoughForFees = user.availableBalance;
-    if (!enoughForFees) return null;
+    const balance = user.balance!;
+    if (balance.amountOf(Asset.ADA, 0n) < closingFees) return null;
     const pools = user.contract.state?.pools.get(user.paymentKeyHash);
     if (!pools) return null;
     if (!pools.size) return null;

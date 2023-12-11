@@ -157,7 +157,7 @@ export class AssetOption {
       ? this.logAW - log(this.l - delta)
       : log(this.l + delta) - this.logAW;
 
-    const exp = BigInt(Math.ceil(numerator / this.logJM));
+    const exp = BigInt(Math.ceil(numerator / this.logJM)) - 1n; // -1n to start below limit, for good measure/rounding errors
     if (exp < 0n) return 0n;
     return exp;
   };
@@ -166,7 +166,8 @@ export class AssetOption {
     const maxDelta = this.type === "buying"
       ? (this.wl * this.jsppe - this.a * this.jse) / (this.jsppe * this.w)
       : (this.a * this.jsppe - this.wl * this.jse) / (this.jse * this.w);
-    if (maxDelta < this.minDelta) return null; // apparently rounding errors? TODO check
+
+    if (maxDelta < this.minDelta) return null; // apparently rounding errors? Also we purposefully do this, see above TODO check
     if (this.maxDelta === "oo") {
       return maxDelta;
     } else {
@@ -229,8 +230,14 @@ ${tt})`;
   };
 }
 
+export type SwapfindingVariant =
+  | "exact"
+  | "perExpMaxDelta"
+  | "imperfectMaxDelta";
+
 export class PairOption {
   readonly effectivePrice: number;
+  private spotPriceCache: number | null = null;
   private constructor(
     readonly b: AssetOption,
     readonly s: AssetOption,
@@ -240,6 +247,7 @@ export class PairOption {
     readonly perfect: boolean,
     readonly adhereMaxInteger: boolean,
     readonly expLimit: number,
+    readonly variant: SwapfindingVariant,
   ) {
     assert(b.type === "buying");
     assert(s.type === "selling");
@@ -275,6 +283,7 @@ export class PairOption {
     adhereMaxInteger: boolean,
     expLimit: number,
     maxInteger: bigint,
+    variant: SwapfindingVariant,
   ): PairOption => {
     const option = new PairOption(
       b,
@@ -285,6 +294,7 @@ export class PairOption {
       perfect,
       adhereMaxInteger,
       expLimit,
+      variant,
     );
     assert(
       option.validates(maxInteger),
@@ -296,7 +306,15 @@ export class PairOption {
   private validates = (maxInteger: bigint): boolean => {
     let passes = true;
 
-    if (this.perfect) {
+    if (this.variant === "perExpMaxDelta") {
+      if (
+        this.deltaBuying * this.s.a * this.s.jsppe * this.b.jsppe >
+          this.deltaSelling * this.b.a * this.b.jse * this.s.jse
+      ) {
+        passes = false;
+        console.error(`value equation: ${this.show()}`);
+      }
+    } else if (this.perfect) {
       if (
         this.deltaBuying * this.s.a * this.s.jsppe * this.b.jsppe !==
           this.deltaSelling * this.b.a * this.b.jse * this.s.jse
@@ -365,6 +383,7 @@ export class PairOption {
       this.perfect,
       this.adhereMaxInteger,
       this.expLimit,
+      this.variant,
     );
     assert(
       !option.validates(maxInteger),
@@ -391,8 +410,29 @@ ${ttf}deltaSelling: ${this.deltaSelling}
 ${ttf}effectivePrice: ${this.effectivePrice}
 ${ttf}perfect: ${this.perfect}
 ${ttf}adhereMaxInteger: ${this.adhereMaxInteger}
+${ttf}expLimit: ${this.expLimit}
+${ttf}variant: ${this.variant}
 ${tt})`;
   };
+
+  public get spotPrice(): number {
+    if (this.spotPriceCache === null) {
+      // if (this.perfect) this.spotPriceCache = this.effectivePrice; TODO wip
+      let [buyingMultiplier, sellingMultiplier] = calcMultipliers(
+        this.b,
+        this.s,
+        false, // TODO consider true, for more exactness
+      );
+      let sellingMultiplier_ = Number(sellingMultiplier);
+      while (!isFinite(sellingMultiplier_)) {
+        buyingMultiplier /= 10n;
+        sellingMultiplier /= 10n;
+        sellingMultiplier_ = Number(sellingMultiplier);
+      }
+      this.spotPriceCache = Number(buyingMultiplier) / sellingMultiplier_;
+    }
+    return this.spotPriceCache;
+  }
 }
 
 export const log = (x: bigint): number => Math.log(Number(x));
@@ -440,9 +480,21 @@ export const countMults = (exp: bigint): number => {
 export const bestMultsAhead = (exp: bigint): number =>
   Math.abs(Number(exp) - 1).toString(2).length;
 
+const calcMultipliers = (
+  b: AssetOption,
+  s: AssetOption,
+  reduce_: boolean,
+): [bigint, bigint] => {
+  const buyingMultiplier = s.a * s.jsppe * b.jsppe;
+  const sellingMultiplier = b.a * b.jse * s.jse;
+  if (reduce_) return reduce(buyingMultiplier, sellingMultiplier);
+  return [buyingMultiplier, sellingMultiplier];
+};
+
 export class PairOptions {
   readonly bestAdheringOption: PairOption | null;
-  readonly bestOverallOption: PairOption | null;
+  // readonly bestOverallOption: PairOption | null;
+  // readonly maxDeltaOption: PairOption | null; // TODO wip
   readonly maxIntegerImpacted: boolean;
 
   constructor(
@@ -451,10 +503,20 @@ export class PairOptions {
     expLimit: number,
     maxInteger: bigint,
     runAsserts: boolean,
-    // perfectionism = 1000n,
+    variant: SwapfindingVariant,
+    rounding?: bigint,
   ) {
     assert(b.type === "buying");
     assert(s.type === "selling");
+
+    // calculating maximum volume option
+    // assert(b.maxDelta !== "oo");
+    // {
+    //   const expBuying = b.minExpForDelta(b.maxDelta);
+
+    // }
+
+    // calculating effective-price-optimized option
 
     const minExpSelling = s.minExpForDelta(s.minDelta);
     const minExpBuying = b.minExpForDelta(b.minDelta);
@@ -514,6 +576,7 @@ export class PairOptions {
           !exceedsMaxInteger,
           expLimit,
           maxInteger,
+          variant,
         );
         if (exceedsMaxInteger) {
           bestExceedingOption = bestPriceOption;
@@ -535,10 +598,6 @@ export class PairOptions {
       exceedsMaxInteger: boolean,
     ) =>
     (): boolean => {
-      // const bestPriceOptions = exceedsMaxInteger
-      //   ? [bestExceedingOption, bestAdheringOption]
-      //   : [bestAdheringOption];
-      // for (const bestPriceOption of bestPriceOptions) {
       const bestPriceOption = exceedsMaxInteger
         ? bestExceedingOption
         : bestAdheringOption;
@@ -551,723 +610,866 @@ export class PairOptions {
         const best = bestPriceOption as PairOption;
         const mDeltaBuying = best.deltaBuying * buyingDeltaMultiplier;
         const mDeltaSelling = best.deltaSelling * sellingDeltaMultiplier;
-        if (mDeltaBuying > mDeltaSelling) return false; // spot price is the best we can get, so if that's worse than what we got already, we can skip this
-        // else {
-        //   const potential = (perfectionism * (mDeltaSelling - mDeltaBuying)) /
-        //     mDeltaSelling;
-        //   // if (logging) console.log(
-        //   //   "maximum possible improvement:",
-        //   //   (100 * Number(potential)) / Number(perfectionism),
-        //   //   "%",
-        //   // );
-        //   // if (potential === 0n) return false; // good enough
-        // }
+        // TODO consider reverting to >
+        if (mDeltaBuying >= mDeltaSelling) {
+          if (logging) {
+            console.log("improvement not feasible over", bestPriceOption);
+          }
+          return false;
+        } // spot price is the best we can get, so if that's worse than what we got already, we can skip this
+        else if (rounding !== undefined) {
+          const potential = (rounding * (mDeltaSelling - mDeltaBuying)) /
+            mDeltaSelling;
+          if (logging) {
+            console.log(
+              "maximum possible improvement:",
+              (100 * Number(potential)) / Number(rounding),
+              "%",
+            );
+          }
+          if (potential === 0n) { // good enough
+            if (logging) {
+              console.log("improvement not feasible over", bestPriceOption);
+            }
+            return false;
+          }
+        }
       }
-      // }
+      if (logging) console.log("improvement feasible over", bestPriceOption);
       return true;
     };
 
     // for (const mode of ["perfect", "imperfect"]) {
-    const queue: { expBuying: bigint; expSelling: bigint }[] = [{
+    let queue: { expBuying: bigint; expSelling: bigint }[] = [{
       expBuying: minExpBuying,
       expSelling: minExpSelling,
     }];
-    const checked: { expBuying: bigint; expSelling: bigint }[] = [];
-
-    let stepBuyingFirst = true;
-    while (queue.length) {
-      stepBuyingFirst = randomChoice([true, false]); //!stepBuyingFirst; // TODO consider making this deterministic again
-      // queue.sort((a, b) => {
-      //   const aMin = min(a.expBuying, a.expSelling);
-      //   const bMin = min(b.expBuying, b.expSelling);r
-      //   return Number(aMin - bMin);
-      // });
-      const { expBuying, expSelling } = queue.shift()!;
-      // let minExpBuying = queue[0].expBuying;
-      // let minExpSelling = queue[0].expSelling;
-      // queue.forEach(({ expBuying, expSelling }) => {
-      //   minExpBuying = min(minExpBuying, expBuying);
-      //   minExpSelling = min(minExpSelling, expSelling);
-      // });
-      // const best = queue.findIndex(({ expBuying, expSelling }) =>
-      //   expBuying === minExpBuying || expSelling === minExpSelling
-      // );
-      // const { expBuying, expSelling } = queue.splice(best, 1)[0];
-      if (
-        checked.find((e) =>
-          e.expBuying === expBuying &&
-          e.expSelling === expSelling
-        )
-      ) continue;
-      checked.push({ expBuying, expSelling });
-      if (countMults(expBuying) + countMults(expSelling) > expLimit) {
-        if (
-          bestMultsAhead(expBuying) + bestMultsAhead(expSelling) <= expLimit
-        ) {
-          if (stepBuyingFirst) {
-            queue.push({ expBuying: expBuying + 1n, expSelling });
-            queue.push({ expBuying, expSelling: expSelling + 1n });
-          } else {
-            queue.push({ expBuying, expSelling: expSelling + 1n });
-            queue.push({ expBuying: expBuying + 1n, expSelling });
-          }
-        }
-        continue;
+    let checked: { expBuying: bigint; expSelling: bigint }[] = [];
+    const exceedingQueue: { expBuying: bigint; expSelling: bigint }[] = [];
+    // for (const mode of ["adhering", "exceeding"]) {
+    for (const mode of ["adhering"]) { // NOTE not doing the exceedsMaxInteger thing for now (in frontend instead by other means)
+      let stepBuyingFirst: boolean;
+      if (mode === "exceeding") {
+        queue = exceedingQueue;
+        checked = [];
+        variant = "perExpMaxDelta"; // using the fastest, since we only need to know if an exceeding option exists
       }
-      s = s.withExp(expSelling);
-      b = b.withExp(expBuying);
-      // NOTE below wasn't part of performance-comparison - or consideration -
-      // for the expensive imperfect swapfinding. Remedy that. And see note below
-      const exceedsMaxInteger = (b.newAnchor > maxInteger) ||
-        (s.newAnchor > maxInteger);
-      // const exceedsMaxInteger = false;
+      if (logging) console.log("mode:", mode);
+      if (logging) console.log("queue:", queue);
+      while (queue.length) {
+        stepBuyingFirst = randomChoice([true, false]); //!stepBuyingFirst; // TODO consider making this deterministic again
+        // queue.sort((a, b) => {
+        //   const aMin = min(a.expBuying, a.expSelling);
+        //   const bMin = min(b.expBuying, b.expSelling);r
+        //   return Number(aMin - bMin);
+        // });
+        const { expBuying, expSelling } = queue.shift()!;
+        // let minExpBuying = queue[0].expBuying;
+        // let minExpSelling = queue[0].expSelling;
+        // queue.forEach(({ expBuying, expSelling }) => {
+        //   minExpBuying = min(minExpBuying, expBuying);
+        //   minExpSelling = min(minExpSelling, expSelling);
+        // });
+        // const best = queue.findIndex(({ expBuying, expSelling }) =>
+        //   expBuying === minExpBuying || expSelling === minExpSelling
+        // );
+        // const { expBuying, expSelling } = queue.splice(best, 1)[0];
+        if (
+          checked.find((e) =>
+            e.expBuying === expBuying &&
+            e.expSelling === expSelling
+          )
+        ) continue;
+        checked.push({ expBuying, expSelling });
+        if (countMults(expBuying) + countMults(expSelling) > expLimit) {
+          if (
+            bestMultsAhead(expBuying) + bestMultsAhead(expSelling) <= expLimit
+          ) {
+            if (stepBuyingFirst) {
+              queue.push({ expBuying: expBuying + 1n, expSelling });
+              queue.push({ expBuying, expSelling: expSelling + 1n });
+            } else {
+              queue.push({ expBuying, expSelling: expSelling + 1n });
+              queue.push({ expBuying: expBuying + 1n, expSelling });
+            }
+          }
+          continue;
+        }
+        s = s.withExp(expSelling);
+        b = b.withExp(expBuying);
+        // NOTE below wasn't part of performance-comparison - or consideration -
+        // for the expensive imperfect swapfinding. Remedy that. And see note below
+        const exceedsMaxInteger = (b.newAnchor > maxInteger) ||
+          (s.newAnchor > maxInteger);
+        // const exceedsMaxInteger = false;
 
-      /* NOTE - below:
+        /* NOTE - below:
 
-      - reduces average runtime from ~1.5s to ~6ms
+      - reduces average runtime from ~1.5s to ~6ms (outdated info)
       - seems to be allowed for some reason, see the assertion at the very bottom
         ( assert(!(this.maxIntegerImpacted && adhering)); )
+      - ...which translates to: if we find both an adhering and exceeding option,
+        the exceeding one isn't better
+      - thus, we are are only interested in knowing if any exceeding option exists at all
+        for maxIntImpacted, not how good we can get it
 
       */
-      if (exceedsMaxInteger) continue;
 
-      const checkNewOption_ = checkNewOption(
-        expBuying,
-        expSelling,
-        exceedsMaxInteger,
-      );
-
-      let maxSellingForExp: bigint | null;
-      let maxBuyingForExp: bigint | null;
-      if (stepBuyingFirst) {
-        maxBuyingForExp = b.maxDeltaForExp();
-        if (maxBuyingForExp === null) {
-          // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
-          queue.push({ expBuying: expBuying + 1n, expSelling });
-          continue;
-        }
-        maxSellingForExp = s.maxDeltaForExp();
-        if (maxSellingForExp === null) {
-          // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
-          queue.push({ expBuying, expSelling: expSelling + 1n });
-          continue;
-        }
-      } else {
-        maxSellingForExp = s.maxDeltaForExp();
-        if (maxSellingForExp === null) {
-          // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
-          queue.push({ expBuying, expSelling: expSelling + 1n });
-          continue;
-        }
-        maxBuyingForExp = b.maxDeltaForExp();
-        if (maxBuyingForExp === null) {
-          // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
-          queue.push({ expBuying: expBuying + 1n, expSelling });
-          continue;
-        }
-      }
-      assert(
-        maxSellingForExp >= s.minDelta,
-        `${maxSellingForExp} < ${s.minDelta}`,
-      );
-      assert(
-        maxBuyingForExp >= b.minDelta,
-        `${maxBuyingForExp} < ${b.minDelta}`,
-      );
-
-      const [buyingMultiplier, sellingMultiplier] = reduce(
-        s.a * s.jsppe * b.jsppe,
-        b.a * b.jse * s.jse,
-      );
-      // if (logging) console.log("buying-multiplier", buyingMultiplier);
-      // if (logging) console.log("selling-multiplier", sellingMultiplier);
-      const improvementFeasible_ = improvementFeasible(
-        buyingMultiplier,
-        sellingMultiplier,
-        exceedsMaxInteger,
-      );
-
-      // value-equation: deltaBuying * buyingDeltaMultiplier <= deltaSelling * sellingDeltaMultiplier
-      if (!improvementFeasible_()) continue;
-
-      // if (mode === "perfect") {
-      // trying to find perfect solution, meaning without rounding-error and with tight value equation
-      // if (logging) console.log(
-      //   "trying to find perfect solution for ",
-      //   expBuying,
-      //   expSelling,
-      // );
-
-      const minBuyingMultiplier = ceilDiv(
-        b.minDelta,
-        sellingMultiplier,
-      );
-      const minSellingMultiplier = ceilDiv(
-        s.minDelta,
-        buyingMultiplier,
-      );
-      const minMultiplier = max(minBuyingMultiplier, minSellingMultiplier);
-
-      const maxBuyingMultiplier = maxBuyingForExp /
-        sellingMultiplier;
-      const maxSellingMultiplier = maxSellingForExp /
-        buyingMultiplier;
-      const maxMultiplier = min(maxBuyingMultiplier, maxSellingMultiplier);
-
-      if (minMultiplier <= maxMultiplier) {
-        const deltaBuying = maxMultiplier * sellingMultiplier;
-        const deltaSelling = maxMultiplier * buyingMultiplier;
-        checkNewOption_(
-          deltaBuying,
-          deltaSelling,
-          true,
-        );
-        continue; // if we found a perfect solution, we know that increasing exps will only make it worse
-        // }
-      } else {
-        // if (exceedsMaxInteger) continue; // not needed here, we do it above =
-        // try to find imperfect solution if we can't find a perfect one (TODO this eats the bulk of the expected runtime)
-        // if (logging) console.log(
-        //   "trying to find imperfect solution for ",
-        //   expBuying,
-        //   expSelling,
-        // );
-
-        const findImperfectExhaustively = (
-          minSelling: bigint,
-          maxSelling: bigint,
-        ): PairOption | null => {
-          let prevDeltaBuying: bigint | null = null;
-          let deltaSelling = minSelling;
-          let bestFoundImprovement: PairOption | null = null;
-          while (
-            deltaSelling <= maxSelling // && improvementFeasible_() // TODO what (not using this function anyways)
-          ) {
-            const maxBuyingForSelling = buyingForSelling(deltaSelling);
-            if (prevDeltaBuying !== null) {
-              assert(
-                maxBuyingForSelling > prevDeltaBuying,
-                `${maxBuyingForSelling} <= ${prevDeltaBuying}`,
-              );
-              const maxBuyingForSelling_ =
-                ((deltaSelling - 1n) * sellingMultiplier) /
-                buyingMultiplier;
-              assert(maxBuyingForSelling_ === prevDeltaBuying);
-            }
-            prevDeltaBuying = maxBuyingForSelling;
-            assert(maxBuyingForSelling >= b.minDelta);
-
-            if (maxBuyingForSelling < maxBuyingForExp!) {
-              const maybeBetter = checkNewOption_(
-                maxBuyingForSelling,
-                deltaSelling,
-                false,
-              );
-              if (maybeBetter) {
-                bestFoundImprovement = maybeBetter;
-              }
-            } else {
-              const maybeBetter = checkNewOption_(
-                maxBuyingForExp!,
-                deltaSelling,
-                false,
-              );
-              if (maybeBetter) {
-                bestFoundImprovement = maybeBetter;
-              }
-              break;
-            }
-
-            const minDeltaSellingForNextBuying = sellingForBuying(
-              maxBuyingForSelling + 1n,
-            );
-            assert(minDeltaSellingForNextBuying > deltaSelling);
-            deltaSelling = minDeltaSellingForNextBuying;
-          }
-
-          return bestFoundImprovement;
-        };
-
-        // see math/swapfinding/rounding copy 6.ipynb for reasoning behind the algorithm below
-
-        const buyingForSelling = (selling: bigint): bigint =>
-          (selling * sellingMultiplier) / buyingMultiplier;
-        const sellingForBuying = (buying: bigint): bigint =>
-          ceilDiv(buying * buyingMultiplier, sellingMultiplier);
-
-        type Rational = {
-          numerator: bigint;
-          denominator: bigint;
-        };
-        type Point = {
-          delta: bigint;
-          loss: Rational;
-        };
-
-        // 1 means a is larger, -1 means b is larger
-        const compare = (a: Rational, b: Rational): number => {
-          const aLoss = a.numerator * b.denominator;
-          const bLoss = b.numerator * a.denominator;
-          if (aLoss === bLoss) return 0;
-          if (aLoss > bLoss) return 1;
-          return -1;
-        };
-
-        // const negate = (a: Rational): Rational => {
-        //   return { numerator: -a.numerator, denominator: a.denominator };
-        // };
-
-        // const avg = (a: Rational, b: Rational): Rational => {
-        //   const numerator = a.numerator * b.denominator +
-        //     b.numerator * a.denominator;
-        //   const denominator = a.denominator * b.denominator * 2n;
-        //   return { numerator, denominator };
-        // };
-
-        const bestStep = (
-          stepsizes: bigint[],
-          current: Point,
-        ) => {
-          let next: Point | null = null;
-          let stepsize_: bigint | null = null;
-          for (let i = 0; i < stepsizes.length; i++) {
-            const stepsize = stepsizes[i];
-            const delta_ = current.delta + stepsize;
-            if (delta_ > maxDeltaCombined) continue;
-            const next_ = pointForDelta(delta_, false);
-            if (next === null || compare(next_.loss, next.loss) < 0) {
-              printPoint(next_);
-              next = next_;
-              stepsize_ = stepsize;
-            }
-          }
-          return { next, stepsize_ };
-        };
-
-        // let runAsserts = true;
-        // let runAssertsFrom: bigint | null = null;
-        // p2 is the point with the larger delta aka x-value
-        const extrapolate = (
-          p1: Point,
-          p2: Point,
-          // backwards = false,
-        ): Point => {
-          const x1 = p1.delta;
-          const x2 = p2.delta;
-          assert(x1 !== x2);
-          if (x1 === x2) return p2;
-          const n1 = p1.loss.numerator;
-          const d1 = p1.loss.denominator;
-          const n2 = p2.loss.numerator;
-          const d2 = p2.loss.denominator;
-
-          const a1 = d1 * n2;
-          const a2 = d2 * n1;
-          const stepsize = x2 - x1;
-          if (a1 === a2) return p2; // TODO extrapolate to end here? (unimportant, almost never happens)
-          let root = (a1 * x1 - a2 * x2) / (a1 - a2);
-          const upwards = root < x1;
-          if (upwards) {
-            throw new Error("wip");
-            // if (backwards) {
-            //   root = x1 - ((x1 - root) / stepsize) * stepsize;
-            //   if (root < x1 && root >= minDelta) {
-            //     const p3 = pointForDelta(root);
-            //     // assert(compare(p3.loss, p1.loss) <= 0);
-            //     if (compare(p3.loss, p1.loss) < 0) return p3;
-            //   }
-            //   return p1;
-            // } else {
-            //   root = x2 + ((x1 - root) / stepsize) * stepsize;
-            //   if (root > x2 && root <= maxDelta) {
-            //     if (logging) console.log("# extrapolated:");
-            //     const p3 = pointForDelta(root);
-            //     // assert(compare(p3.loss, p2.loss) <= 0);
-            //     return p3;
-            //   }
-            //   return p2;
-            // }
-          } else {
-            root = x2 + ((root - x2) / stepsize) * stepsize;
-            if (root > x2) {
-              if (root > maxDeltaCombined) {
-                root = maxDeltaCombined;
-                if (logging) console.log("# trying to extrapolate to end:");
-                const p3 = pointForDelta(root);
-                if (compare(p3.loss, p2.loss) <= 0) {
-                  // runAsserts = true;
-                  // if (runAssertsFrom === null) runAssertsFrom = x2;
-                  return p3;
-                }
-                return p2;
-              }
-              if (logging) console.log("# extrapolated:");
-              const p3 = pointForDelta(root);
-              assert(compare(p3.loss, p2.loss) <= 0);
-              return p3;
-            } else {
-              // if (logging) console.log(`
-              // root: ${root}
-              // x1: ${x1}
-              // x2: ${x2}
-              // stepsize: ${stepsize}
-              // `);
-            }
-            return p2;
-          }
-        };
-
-        const printPoint = (p: Point) => {
-          let numerator = p.loss.numerator;
-          let denominator = p.loss.denominator;
-          let denominator_ = Number(denominator);
-          while (!isFinite(denominator_)) {
-            numerator /= 10n;
-            denominator /= 10n;
-            denominator_ = Number(denominator);
-          }
-          const otherDelta = otherAssetEquivalent(p.delta);
-          const [buying, selling] = xAxis === "buying"
-            ? [p.delta, otherDelta]
-            : [otherDelta, p.delta];
-          const loss = Number(numerator) / denominator_;
-          if (logging) console.log(`\t(${buying}, ${selling}, ${loss}),`);
-        };
-
-        const pointForDelta_ = (
-          numerator: bigint,
-          denominator: bigint,
-          tighten = (delta: bigint) => delta,
-        ) =>
-        (delta: bigint, print = true): Point => {
-          delta = tighten(delta);
-          let remainder = (numerator * delta) % denominator;
-          if (numerator < 0n) remainder += denominator;
-          const loss = {
-            numerator: remainder,
-            denominator,
-          };
-          const point = { delta, loss };
-          if (print) printPoint(point);
-          return point;
-        };
-
-        let maxDeltaCombined: bigint;
-        let minDeltaCombined: bigint;
-        let minDeltaAlone: bigint;
-        let maxDeltaAlone: bigint;
-        let xAxis: "buying" | "selling";
-        let otherAssetEquivalent: (delta: bigint) => bigint;
-        let pointForDelta: (delta: bigint, print?: boolean) => Point;
-        // const minimizeSelling = (selling: bigint): bigint => {
-        //   const minimized = sellingForBuying(buyingForSelling(selling));
-        //   assert(minimized === selling, `${minimized} !== ${selling}`); // TODO remove usage of this function
-        //   return minimized;
-        // }
-        // const maximizeBuying = (buying: bigint): bigint =>
-        //   buyingForSelling(sellingForBuying(buying));
-
-        if (buyingMultiplier < sellingMultiplier) {
-          xAxis = "selling";
-          pointForDelta = pointForDelta_(
-            sellingMultiplier,
-            buyingMultiplier,
-            // minimizeSelling,
-          );
-          // TODO minimize/maximize?
-          // otherAssetEquivalent = buyingForSelling;
-          otherAssetEquivalent = buyingForSelling; //(delta:bigint) => buyingForSelling(minimizeSelling(delta));
-          const maxForOtherMax = sellingForBuying(maxBuyingForExp);
-          const minForOtherMin = sellingForBuying(b.minDelta);
-          if (logging) console.log("maxForOtherMax", maxForOtherMax);
-          if (logging) console.log("maxSellingForExp", maxSellingForExp);
-          maxDeltaCombined = min(maxForOtherMax, maxSellingForExp);
-          minDeltaCombined = max(minForOtherMin, s.minDelta);
-          minDeltaAlone = s.minDelta;
-          maxDeltaAlone = maxSellingForExp;
-          if (buyingForSelling(maxDeltaCombined) > maxBuyingForExp) {
-            maxDeltaCombined--;
+        // if (bestExceedingOption && exceedsMaxInteger) continue;
+        // if (exceedsMaxInteger) continue; // vastly cheaper but doesn't inform us about maxIntegerImpacted
+        if (mode === "adhering") {
+          assert(!bestExceedingOption);
+          if (exceedsMaxInteger) {
+            exceedingQueue.push({ expBuying, expSelling });
+            continue;
           }
         } else {
-          xAxis = "buying";
-          pointForDelta = pointForDelta_(
-            -buyingMultiplier,
+          assert(exceedsMaxInteger);
+          if (bestExceedingOption) break;
+        }
+
+        const checkNewOption_ = checkNewOption(
+          expBuying,
+          expSelling,
+          exceedsMaxInteger,
+        );
+
+        let maxSellingForExp: bigint | null;
+        let maxBuyingForExp: bigint | null;
+        if (stepBuyingFirst) {
+          maxBuyingForExp = b.maxDeltaForExp();
+          if (maxBuyingForExp === null) {
+            // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
+            queue.push({ expBuying: expBuying + 1n, expSelling });
+            continue;
+          }
+          maxSellingForExp = s.maxDeltaForExp();
+          if (maxSellingForExp === null) {
+            // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
+            queue.push({ expBuying, expSelling: expSelling + 1n });
+            continue;
+          }
+        } else {
+          maxSellingForExp = s.maxDeltaForExp();
+          if (maxSellingForExp === null) {
+            // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
+            queue.push({ expBuying, expSelling: expSelling + 1n });
+            continue;
+          }
+          maxBuyingForExp = b.maxDeltaForExp();
+          if (maxBuyingForExp === null) {
+            // if we can't find a delta for this exp (presumably due to rounding-errors), try one bigger
+            queue.push({ expBuying: expBuying + 1n, expSelling });
+            continue;
+          }
+        }
+        assert(
+          maxSellingForExp >= s.minDelta,
+          `${maxSellingForExp} < ${s.minDelta}`,
+        );
+        assert(
+          maxBuyingForExp >= b.minDelta,
+          `${maxBuyingForExp} < ${b.minDelta}`,
+        );
+
+        let [buyingMultiplier, sellingMultiplier] = calcMultipliers(
+          b,
+          s,
+          false,
+        );
+        // if (logging) console.log("buying-multiplier", buyingMultiplier);
+        // if (logging) console.log("selling-multiplier", sellingMultiplier);
+        const improvementFeasible_ = improvementFeasible(
+          buyingMultiplier,
+          sellingMultiplier,
+          exceedsMaxInteger,
+        );
+
+        // value-equation: deltaBuying * buyingDeltaMultiplier <= deltaSelling * sellingDeltaMultiplier
+        if (!improvementFeasible_()) continue;
+
+        let buyingForSelling = (selling: bigint): bigint =>
+          (selling * sellingMultiplier) / buyingMultiplier;
+        let sellingForBuying = (buying: bigint): bigint =>
+          ceilDiv(buying * buyingMultiplier, sellingMultiplier);
+
+        if (variant === "perExpMaxDelta") {
+          const buyingForMaxSelling = buyingForSelling(maxSellingForExp);
+          // const sellingForMaxBuying = sellingForBuying(maxBuyingForExp);
+          let buying: bigint;
+          let selling: bigint;
+
+          if (buyingForMaxSelling < maxBuyingForExp) {
+            buying = buyingForMaxSelling;
+            selling = maxSellingForExp;
+          } else {
+            buying = maxBuyingForExp;
+            const sellingForMaxBuying = sellingForBuying(maxBuyingForExp);
+            selling = max(sellingForMaxBuying, s.minDelta);
+          }
+
+          // if (sellingForMaxBuying < maxSellingForExp) {
+          //   assert(selling === max(sellingForMaxBuying, s.minDelta));
+          //   assert(buying === maxBuyingForExp);
+          // } else {
+          //   assert(selling === maxSellingForExp);
+          //   assert(buying === buyingForMaxSelling);
+          // }
+
+          if (buying >= b.minDelta) {
+            checkNewOption_(
+              buying,
+              selling,
+              false, // actually unknown, but irrelevant
+            );
+          }
+        } else {
+          // if (mode === "perfect") {
+          // trying to find perfect solution, meaning without rounding-error and with tight value equation
+          // if (logging) console.log(
+          //   "trying to find perfect solution for ",
+          //   expBuying,
+          //   expSelling,
+          // );
+
+          [buyingMultiplier, sellingMultiplier] = reduce(
+            buyingMultiplier,
             sellingMultiplier,
           );
-          // TODO minimize/maximize?
-          otherAssetEquivalent = sellingForBuying; //(delta:bigint) => minimizeSelling(sellingForBuying(delta));
-          const maxForOtherMax = buyingForSelling(maxSellingForExp);
-          // minimizeSelling(maxSellingForExp)
-          //);
-          const minForOtherMin = //maximizeBuying(
-            buyingForSelling(s.minDelta);
-          //  );
-          if (logging) console.log("minForOtherMin", minForOtherMin);
-          if (logging) console.log("b.minDelta", b.minDelta);
-          maxDeltaCombined = min(maxForOtherMax, maxBuyingForExp);
-          minDeltaCombined = max(minForOtherMin, b.minDelta);
-          if (sellingForBuying(minDeltaCombined) < s.minDelta) {
-            minDeltaCombined++;
-          }
-          minDeltaAlone = b.minDelta;
-          maxDeltaAlone = maxBuyingForExp;
-        }
-        if (logging) console.log("minDeltaAlone", minDeltaAlone);
-        if (logging) console.log("maxDeltaAlone", maxDeltaAlone);
-        if (logging) console.log("minDeltaCombined", minDeltaCombined);
-        if (logging) console.log("maxDeltaCombined", maxDeltaCombined);
-        if (logging) console.log("stepping", xAxis);
 
-        // minDeltaCombined = minDeltaAlone;
-
-        let bestImperfectOption: PairOption | null = null;
-        const foundImperfectSolution_ = (buying: bigint, selling: bigint) => {
-          if (logging) console.log("found imperfect solution", buying, selling);
-          const maybeBetter = checkNewOption_(
-            buying,
-            selling,
-            false,
+          const minBuyingMultiplier = ceilDiv(
+            b.minDelta,
+            sellingMultiplier,
           );
-          if (maybeBetter) {
-            bestImperfectOption = maybeBetter;
-          }
-        };
-        const foundImperfectSolution = (delta: bigint) => {
-          const otherDelta = otherAssetEquivalent(delta);
-          const [buying, selling] = xAxis === "buying"
-            ? [delta, otherDelta]
-            : [otherDelta, delta];
-          foundImperfectSolution_(buying, selling);
-        };
+          const minSellingMultiplier = ceilDiv(
+            s.minDelta,
+            buyingMultiplier,
+          );
+          const minMultiplier = max(minBuyingMultiplier, minSellingMultiplier);
 
-        if (minDeltaCombined === maxDeltaCombined) {
-          if (logging) {
-            console.log(`${minDeltaCombined} === ${maxDeltaCombined}`);
-          }
-          foundImperfectSolution(maxDeltaCombined);
-        } else if (minDeltaCombined < maxDeltaCombined) {
-          if (logging) console.log(`${minDeltaCombined} < ${maxDeltaCombined}`);
+          const maxBuyingMultiplier = maxBuyingForExp /
+            sellingMultiplier;
+          const maxSellingMultiplier = maxSellingForExp /
+            buyingMultiplier;
+          const maxMultiplier = min(maxBuyingMultiplier, maxSellingMultiplier);
 
-          if (logging) console.log("m_b =", buyingMultiplier.toString());
-          if (logging) console.log("m_s =", sellingMultiplier.toString());
-          if (logging) console.log("min_delta_b =", b.minDelta.toString());
-          if (logging) console.log("min_delta_s =", s.minDelta.toString());
-          if (logging) console.log("max_delta_b =", maxBuyingForExp.toString());
-          if (logging) {
-            console.log("max_delta_s =", maxSellingForExp.toString());
-          }
-          if (logging) console.log(`stepping = "${xAxis}"`);
+          if (minMultiplier <= maxMultiplier) {
+            const deltaBuying = maxMultiplier * sellingMultiplier;
+            const deltaSelling = maxMultiplier * buyingMultiplier;
+            checkNewOption_(
+              deltaBuying,
+              deltaSelling,
+              true,
+            );
+            continue; // if we found a perfect solution, we know that increasing exps will only make it worse
+            // }
+          } else {
+            // try to find imperfect solution if we can't find a perfect one (TODO this eats the bulk of the expected runtime)
+            // if (logging) console.log(
+            //   "trying to find imperfect solution for ",
+            //   expBuying,
+            //   expSelling,
+            // );
 
-          const search = (minDelta: bigint): Point => {
-            if (logging) console.log("slopes = [[");
-            const stepsizes = [1n];
-            let current = pointForDelta(minDelta);
-            let optimum = current;
-            let prevWorsening = current;
-            while (true) {
-              let stepsize = 1n;
-              if (current.delta >= maxDeltaCombined) break;
-              let { next, stepsize_ } = bestStep(stepsizes, current);
-              next ??= pointForDelta(current.delta + 1n);
-              stepsize = stepsize_ ?? 1n;
-              const gotWorse = compare(next.loss, current.loss) > 0;
-              if (gotWorse) {
-                for (const vs of [prevWorsening, optimum]) {
-                  const distance = current.delta - vs.delta;
-                  if (logging) {
-                    console.log(
-                      "# worsened; distance:",
-                      distance,
-                      "stepsize:",
-                      stepsize,
+            buyingForSelling = (selling: bigint): bigint =>
+              (selling * sellingMultiplier) / buyingMultiplier;
+            sellingForBuying = (buying: bigint): bigint =>
+              ceilDiv(buying * buyingMultiplier, sellingMultiplier);
+
+            if (variant === "imperfectMaxDelta") {
+              const buyingForMaxSelling = buyingForSelling(maxSellingForExp);
+              // const sellingForMaxBuying = sellingForBuying(maxBuyingForExp);
+              let buying: bigint;
+              let selling: bigint;
+
+              if (buyingForMaxSelling < maxBuyingForExp) {
+                buying = buyingForMaxSelling;
+                selling = maxSellingForExp;
+              } else {
+                buying = maxBuyingForExp;
+                const sellingForMaxBuying = sellingForBuying(maxBuyingForExp);
+                selling = max(sellingForMaxBuying, s.minDelta);
+              }
+
+              // if (sellingForMaxBuying < maxSellingForExp) {
+              //   assert(selling === max(sellingForMaxBuying, s.minDelta));
+              //   assert(buying === maxBuyingForExp);
+              // } else {
+              //   assert(selling === maxSellingForExp);
+              //   assert(buying === buyingForMaxSelling);
+              // }
+
+              if (buying >= b.minDelta) {
+                checkNewOption_(
+                  buying,
+                  selling,
+                  false,
+                );
+              }
+            } else {
+              const findImperfectExhaustively = (
+                minSelling: bigint,
+                maxSelling: bigint,
+              ): PairOption | null => {
+                let prevDeltaBuying: bigint | null = null;
+                let deltaSelling = minSelling;
+                let bestFoundImprovement: PairOption | null = null;
+                while (
+                  deltaSelling <= maxSelling // && improvementFeasible_() // TODO what (not using this function anyways)
+                ) {
+                  const maxBuyingForSelling = buyingForSelling(deltaSelling);
+                  if (prevDeltaBuying !== null) {
+                    assert(
+                      maxBuyingForSelling > prevDeltaBuying,
+                      `${maxBuyingForSelling} <= ${prevDeltaBuying}`,
                     );
+                    const maxBuyingForSelling_ =
+                      ((deltaSelling - 1n) * sellingMultiplier) /
+                      buyingMultiplier;
+                    assert(maxBuyingForSelling_ === prevDeltaBuying);
                   }
-                  if (distance !== 0n) {
-                    if (!stepsizes.includes(distance)) {
-                      if (logging) console.log("# new stepsize:", distance);
-                      stepsizes.push(distance);
+                  prevDeltaBuying = maxBuyingForSelling;
+                  assert(maxBuyingForSelling >= b.minDelta);
+
+                  if (maxBuyingForSelling < maxBuyingForExp!) {
+                    const maybeBetter = checkNewOption_(
+                      maxBuyingForSelling,
+                      deltaSelling,
+                      false,
+                    );
+                    if (maybeBetter) {
+                      bestFoundImprovement = maybeBetter;
                     }
-                    // else if (distance === stepsize) {
-                    //   let next_: Point | null = extrapolate(current, next);
-                    //   next_ = bestStep(stepsizes, next_).next;
-                    //   if (next_) {
-                    //     const nextBak = next_;
-                    //     next_ = bestStep(stepsizes, next_).next;
-                    //     if (next_) {
-                    //       next = extrapolate(nextBak, next_, true);
-                    //     }
-                    //   }
-                    // }
+                  } else {
+                    const maybeBetter = checkNewOption_(
+                      maxBuyingForExp!,
+                      deltaSelling,
+                      false,
+                    );
+                    if (maybeBetter) {
+                      bestFoundImprovement = maybeBetter;
+                    }
+                    break;
                   }
+
+                  const minDeltaSellingForNextBuying = sellingForBuying(
+                    maxBuyingForSelling + 1n,
+                  );
+                  assert(minDeltaSellingForNextBuying > deltaSelling);
+                  deltaSelling = minDeltaSellingForNextBuying;
                 }
-                let backStepSize = 0n;
-                // let backstepped = false;
-                // const nextBak = next;
+
+                return bestFoundImprovement;
+              };
+
+              // see math/swapfinding/rounding copy 6.ipynb for reasoning behind the algorithm below
+
+              type Rational = {
+                numerator: bigint;
+                denominator: bigint;
+              };
+              type Point = {
+                delta: bigint;
+                loss: Rational;
+              };
+
+              // 1 means a is larger, -1 means b is larger
+              const compare = (a: Rational, b: Rational): number => {
+                const aLoss = a.numerator * b.denominator;
+                const bLoss = b.numerator * a.denominator;
+                if (aLoss === bLoss) return 0;
+                if (aLoss > bLoss) return 1;
+                return -1;
+              };
+
+              const bestStep = (
+                stepsizes: bigint[],
+                current: Point,
+              ) => {
+                let next: Point | null = null;
+                let stepsize_: bigint | null = null;
                 for (let i = 0; i < stepsizes.length; i++) {
-                  const stepsize_ = stepsizes[i];
-                  if (stepsize_ >= stepsize) continue;
-                  const delta_ = next.delta - stepsize_;
+                  const stepsize = stepsizes[i];
+                  const delta_ = current.delta + stepsize;
+                  if (delta_ > maxDeltaCombined) continue;
                   const next_ = pointForDelta(delta_, false);
-                  if (compare(next_.loss, next.loss) < 0) {
+                  if (next === null || compare(next_.loss, next.loss) < 0) {
                     printPoint(next_);
                     next = next_;
-                    // backstepped = true;
-                    backStepSize = stepsize_;
+                    stepsize_ = stepsize;
                   }
                 }
-                // if (backstepped) {
-                //   next = extrapolate(nextBak, next);
+                return { next, stepsize_ };
+              };
+
+              // let runAsserts = true;
+              // let runAssertsFrom: bigint | null = null;
+              // p2 is the point with the larger delta aka x-value
+              const extrapolate = (
+                p1: Point,
+                p2: Point,
+                // backwards = false,
+              ): Point => {
+                const x1 = p1.delta;
+                const x2 = p2.delta;
+                assert(x1 !== x2);
+                if (x1 === x2) return p2;
+                const n1 = p1.loss.numerator;
+                const d1 = p1.loss.denominator;
+                const n2 = p2.loss.numerator;
+                const d2 = p2.loss.denominator;
+
+                const a1 = d1 * n2;
+                const a2 = d2 * n1;
+                const stepsize = x2 - x1;
+                if (a1 === a2) return p2; // TODO extrapolate to end here? (unimportant, almost never happens)
+                let root = (a1 * x1 - a2 * x2) / (a1 - a2);
+                const upwards = root < x1;
+                if (upwards) {
+                  throw new Error("wip");
+                  // if (backwards) {
+                  //   root = x1 - ((x1 - root) / stepsize) * stepsize;
+                  //   if (root < x1 && root >= minDelta) {
+                  //     const p3 = pointForDelta(root);
+                  //     // assert(compare(p3.loss, p1.loss) <= 0);
+                  //     if (compare(p3.loss, p1.loss) < 0) return p3;
+                  //   }
+                  //   return p1;
+                  // } else {
+                  //   root = x2 + ((x1 - root) / stepsize) * stepsize;
+                  //   if (root > x2 && root <= maxDelta) {
+                  //     if (logging) console.log("# extrapolated:");
+                  //     const p3 = pointForDelta(root);
+                  //     // assert(compare(p3.loss, p2.loss) <= 0);
+                  //     return p3;
+                  //   }
+                  //   return p2;
+                  // }
+                } else {
+                  root = x2 + ((root - x2) / stepsize) * stepsize;
+                  if (root > x2) {
+                    if (root > maxDeltaCombined) {
+                      root = maxDeltaCombined;
+                      if (logging) {
+                        console.log("# trying to extrapolate to end:");
+                      }
+                      const p3 = pointForDelta(root);
+                      if (compare(p3.loss, p2.loss) <= 0) {
+                        // runAsserts = true;
+                        // if (runAssertsFrom === null) runAssertsFrom = x2;
+                        return p3;
+                      }
+                      return p2;
+                    }
+                    if (logging) console.log("# extrapolated:");
+                    const p3 = pointForDelta(root);
+                    assert(compare(p3.loss, p2.loss) <= 0);
+                    return p3;
+                  } else {
+                    // if (logging) console.log(`
+                    // root: ${root}
+                    // x1: ${x1}
+                    // x2: ${x2}
+                    // stepsize: ${stepsize}
+                    // `);
+                  }
+                  return p2;
+                }
+              };
+
+              const printPoint = (p: Point) => {
+                if (!logging) return;
+                // let numerator = p.loss.numerator;
+                // let denominator = p.loss.denominator;
+                // let denominator_ = Number(denominator);
+                // while (!isFinite(denominator_)) {
+                //   numerator /= 10n;
+                //   denominator /= 10n;
+                //   denominator_ = Number(denominator);
                 // }
-                if (backStepSize > 0n) {
-                  while (true) {
-                    const delta_ = next.delta - backStepSize;
-                    const next_ = pointForDelta(delta_, false);
-                    if (compare(next_.loss, next.loss) < 0) {
-                      printPoint(next_);
-                      next = next_;
-                    } else break;
-                  }
+                const otherDelta = otherAssetEquivalent(p.delta);
+                const [buying, selling] = xAxis === "buying"
+                  ? [p.delta, otherDelta]
+                  : [otherDelta, p.delta];
+                // const loss = Number(numerator) / denominator_;
+                // console.log(`\t(${buying}, ${selling}, ${loss}),`);
+                console.log(`\t(${buying}, ${selling}`);
+              };
+
+              const pointForDelta_ = (
+                numerator: bigint,
+                denominator: bigint,
+                // tighten = (delta: bigint) => delta,
+              ) =>
+              (delta: bigint, print = true): Point => {
+                // delta = tighten(delta);
+                let remainder = (numerator * delta) % denominator;
+                if (numerator < 0n) remainder += denominator;
+                const loss = {
+                  numerator: remainder,
+                  denominator,
+                };
+                const point = { delta, loss };
+                if (print) printPoint(point);
+                return point;
+              };
+
+              let maxDeltaCombined: bigint;
+              let minDeltaCombined: bigint;
+              let minDeltaAlone: bigint;
+              let maxDeltaAlone: bigint;
+              let xAxis: "buying" | "selling";
+              let otherAssetEquivalent: (delta: bigint) => bigint;
+              let pointForDelta: (delta: bigint, print?: boolean) => Point;
+              // const minimizeSelling = (selling: bigint): bigint => {
+              //   const minimized = sellingForBuying(buyingForSelling(selling));
+              //   assert(minimized === selling, `${minimized} !== ${selling}`); // TODO remove usage of this function
+              //   return minimized;
+              // }
+              // const maximizeBuying = (buying: bigint): bigint =>
+              //   buyingForSelling(sellingForBuying(buying));
+
+              if (buyingMultiplier < sellingMultiplier) {
+                xAxis = "selling";
+                pointForDelta = pointForDelta_(
+                  sellingMultiplier,
+                  buyingMultiplier,
+                  // minimizeSelling,
+                );
+                // TODO minimize/maximize?
+                // otherAssetEquivalent = buyingForSelling;
+                otherAssetEquivalent = buyingForSelling; //(delta:bigint) => buyingForSelling(minimizeSelling(delta));
+                const maxForOtherMax = sellingForBuying(maxBuyingForExp);
+                const minForOtherMin = sellingForBuying(b.minDelta);
+                if (logging) console.log("maxForOtherMax", maxForOtherMax);
+                if (logging) console.log("maxSellingForExp", maxSellingForExp);
+                maxDeltaCombined = min(maxForOtherMax, maxSellingForExp);
+                minDeltaCombined = max(minForOtherMin, s.minDelta);
+                minDeltaAlone = s.minDelta;
+                maxDeltaAlone = maxSellingForExp;
+                if (buyingForSelling(maxDeltaCombined) > maxBuyingForExp) {
+                  maxDeltaCombined--;
                 }
-                prevWorsening = current;
               } else {
-                next = extrapolate(current, next);
+                xAxis = "buying";
+                pointForDelta = pointForDelta_(
+                  -buyingMultiplier,
+                  sellingMultiplier,
+                );
+                // TODO minimize/maximize?
+                otherAssetEquivalent = sellingForBuying; //(delta:bigint) => minimizeSelling(sellingForBuying(delta));
+                const maxForOtherMax = buyingForSelling(maxSellingForExp);
+                // minimizeSelling(maxSellingForExp)
+                //);
+                const minForOtherMin = //maximizeBuying(
+                  buyingForSelling(s.minDelta);
+                //  );
+                if (logging) console.log("minForOtherMin", minForOtherMin);
+                if (logging) console.log("b.minDelta", b.minDelta);
+                maxDeltaCombined = min(maxForOtherMax, maxBuyingForExp);
+                minDeltaCombined = max(minForOtherMin, b.minDelta);
+                if (sellingForBuying(minDeltaCombined) < s.minDelta) {
+                  minDeltaCombined++;
+                }
+                minDeltaAlone = b.minDelta;
+                maxDeltaAlone = maxBuyingForExp;
               }
-              if (compare(next.loss, optimum.loss) < 0) {
-                const distance = next.delta - optimum.delta;
+              if (logging) console.log("minDeltaAlone", minDeltaAlone);
+              if (logging) console.log("maxDeltaAlone", maxDeltaAlone);
+              if (logging) console.log("minDeltaCombined", minDeltaCombined);
+              if (logging) console.log("maxDeltaCombined", maxDeltaCombined);
+              if (logging) console.log("stepping", xAxis);
+
+              // minDeltaCombined = minDeltaAlone;
+
+              let bestImperfectOption: PairOption | null = null;
+              const foundImperfectSolution_ = (
+                buying: bigint,
+                selling: bigint,
+              ) => {
+                if (logging) {
+                  console.log("found imperfect solution", buying, selling);
+                }
+                const maybeBetter = checkNewOption_(
+                  buying,
+                  selling,
+                  false,
+                );
+                if (maybeBetter) {
+                  bestImperfectOption = maybeBetter;
+                }
+              };
+              const foundImperfectSolution = (delta: bigint) => {
+                const otherDelta = otherAssetEquivalent(delta);
+                const [buying, selling] = xAxis === "buying"
+                  ? [delta, otherDelta]
+                  : [otherDelta, delta];
+                foundImperfectSolution_(buying, selling);
+              };
+
+              if (minDeltaCombined === maxDeltaCombined) {
+                if (logging) {
+                  console.log(`${minDeltaCombined} === ${maxDeltaCombined}`);
+                }
+                foundImperfectSolution(maxDeltaCombined);
+              } else if (minDeltaCombined < maxDeltaCombined) {
+                if (logging) {
+                  console.log(`${minDeltaCombined} < ${maxDeltaCombined}`);
+                }
+
+                if (logging) console.log("m_b =", buyingMultiplier.toString());
+                if (logging) console.log("m_s =", sellingMultiplier.toString());
+                if (logging) {
+                  console.log("min_delta_b =", b.minDelta.toString());
+                }
+                if (logging) {
+                  console.log("min_delta_s =", s.minDelta.toString());
+                }
+                if (logging) {
+                  console.log("max_delta_b =", maxBuyingForExp.toString());
+                }
+                if (logging) {
+                  console.log("max_delta_s =", maxSellingForExp.toString());
+                }
+                if (logging) console.log(`stepping = "${xAxis}"`);
+
+                const search = (minDelta: bigint): Point => {
+                  if (logging) console.log("slopes = [[");
+                  const stepsizes = [1n];
+                  let current = pointForDelta(minDelta);
+                  let optimum = current;
+                  let prevWorsening = current;
+                  while (true) {
+                    let stepsize = 1n;
+                    if (current.delta >= maxDeltaCombined) break;
+                    let { next, stepsize_ } = bestStep(stepsizes, current);
+                    next ??= pointForDelta(current.delta + 1n);
+                    stepsize = stepsize_ ?? 1n;
+                    const gotWorse = compare(next.loss, current.loss) > 0;
+                    if (gotWorse) {
+                      for (const vs of [prevWorsening, optimum]) {
+                        const distance = current.delta - vs.delta;
+                        if (logging) {
+                          console.log(
+                            "# worsened; distance:",
+                            distance,
+                            "stepsize:",
+                            stepsize,
+                          );
+                        }
+                        if (distance !== 0n) {
+                          if (!stepsizes.includes(distance)) {
+                            if (logging) {
+                              console.log("# new stepsize:", distance);
+                            }
+                            stepsizes.push(distance);
+                          }
+                          // else if (distance === stepsize) {
+                          //   let next_: Point | null = extrapolate(current, next);
+                          //   next_ = bestStep(stepsizes, next_).next;
+                          //   if (next_) {
+                          //     const nextBak = next_;
+                          //     next_ = bestStep(stepsizes, next_).next;
+                          //     if (next_) {
+                          //       next = extrapolate(nextBak, next_, true);
+                          //     }
+                          //   }
+                          // }
+                        }
+                      }
+                      let backStepSize = 0n;
+                      // let backstepped = false;
+                      // const nextBak = next;
+                      for (let i = 0; i < stepsizes.length; i++) {
+                        const stepsize_ = stepsizes[i];
+                        if (stepsize_ >= stepsize) continue;
+                        const delta_ = next.delta - stepsize_;
+                        const next_ = pointForDelta(delta_, false);
+                        if (compare(next_.loss, next.loss) < 0) {
+                          printPoint(next_);
+                          next = next_;
+                          // backstepped = true;
+                          backStepSize = stepsize_;
+                        }
+                      }
+                      // if (backstepped) {
+                      //   next = extrapolate(nextBak, next);
+                      // }
+                      if (backStepSize > 0n) {
+                        while (true) {
+                          const delta_ = next.delta - backStepSize;
+                          const next_ = pointForDelta(delta_, false);
+                          if (compare(next_.loss, next.loss) < 0) {
+                            printPoint(next_);
+                            next = next_;
+                          } else break;
+                        }
+                      }
+                      prevWorsening = current;
+                    } else {
+                      next = extrapolate(current, next);
+                    }
+                    if (compare(next.loss, optimum.loss) < 0) {
+                      const distance = next.delta - optimum.delta;
+                      if (logging) {
+                        console.log(
+                          "# new optimum; distance:",
+                          distance,
+                          "stepsize:",
+                          stepsize,
+                        );
+                      }
+                      if (distance !== 0n && !stepsizes.includes(distance)) {
+                        if (logging) console.log("# new stepsize:", distance);
+                        stepsizes.push(distance);
+                      }
+
+                      next = extrapolate(optimum, next);
+
+                      optimum = next;
+                      prevWorsening = next;
+                    }
+                    current = next;
+                  }
+                  if (logging) console.log("]]");
+                  if (logging) console.log("stepsizes:", stepsizes);
+                  return optimum;
+                };
+                const optimum = search(minDeltaCombined);
+                foundImperfectSolution(optimum.delta);
+              } else if (minDeltaAlone < minDeltaCombined) {
                 if (logging) {
                   console.log(
-                    "# new optimum; distance:",
-                    distance,
-                    "stepsize:",
-                    stepsize,
+                    "minDeltaAlone < minDeltaCombined",
+                    minDeltaAlone,
+                    minDeltaCombined,
                   );
                 }
-                if (distance !== 0n && !stepsizes.includes(distance)) {
-                  if (logging) console.log("# new stepsize:", distance);
-                  stepsizes.push(distance);
+                if (xAxis === "buying") {
+                  const selling = s.minDelta;
+                  const buying = min(
+                    buyingForSelling(selling),
+                    maxBuyingForExp,
+                  );
+                  foundImperfectSolution_(buying, selling);
+                } else {
+                  const selling = sellingForBuying(b.minDelta);
+                  if (selling <= maxSellingForExp) {
+                    const buying = min(
+                      buyingForSelling(selling),
+                      maxBuyingForExp,
+                    );
+                    foundImperfectSolution_(buying, selling);
+                  }
                 }
-
-                next = extrapolate(optimum, next);
-
-                optimum = next;
-                prevWorsening = next;
+              } else if (maxDeltaCombined < maxDeltaAlone) {
+                if (logging) {
+                  console.log(
+                    "maxDeltaCombined < maxDeltaAlone",
+                    maxDeltaCombined,
+                    maxDeltaAlone,
+                  );
+                }
+                if (xAxis === "selling") {
+                  const buying = maxBuyingForExp;
+                  const selling = max(sellingForBuying(buying), s.minDelta);
+                  foundImperfectSolution_(buying, selling);
+                }
               }
-              current = next;
+
+              // we're here because maxSelling < minSelling
+              // else if (minSelling <= maxSellingForExp) {
+              //   if (logging) console.log(`${minSelling} <= ${maxSellingForExp}`);
+              //   const maybeBetter = findImperfectExhaustively(
+              //     minSelling,
+              //     maxSellingForExp,
+              //   );
+              //   if (maybeBetter) {
+              //     bestImperfectOption = maybeBetter;
+              //   }
+              // } // otherwise no solution possible
+
+              // here: assert that we can't find a better solution
+              // if (logging) console.log("exhaustive search");
+              // runAsserts = false;
+              // runAsserts = true // TODO revert
+              if (runAsserts) {
+                let from_ = max(s.minDelta, sellingForBuying(b.minDelta));
+                // let from = runAssertsFrom as bigint | null;
+                // if (from) {
+                //   if (xAxis === "buying") {
+                //     const tmp = sellingForBuying(from)
+                //     from = minimizeSelling(tmp);
+                //     assert(from === tmp, `${from} !== ${tmp}`); // means we don't need minimizeSelling
+                //   }
+                //   from_ = max(from, from_);
+                // }
+                const maybeBetter = findImperfectExhaustively(
+                  from_,
+                  maxSellingForExp,
+                );
+                if (maybeBetter) {
+                  if (logging) console.log("asserting");
+                  assert(bestImperfectOption !== null, maybeBetter.show());
+                  const best = bestImperfectOption as PairOption;
+                  assert(
+                    best.effectivePrice <= maybeBetter.effectivePrice,
+                    `${best.effectivePrice} > ${maybeBetter.effectivePrice}
+                    diff: ${best.effectivePrice - maybeBetter.effectivePrice}
+                    best imperfect: ${best.show()}
+                    exhaustive: ${maybeBetter.show()}}`,
+                  );
+                }
+              }
             }
-            if (logging) console.log("]]");
-            if (logging) console.log("stepsizes:", stepsizes);
-            return optimum;
-          };
-          const optimum = search(minDeltaCombined);
-          foundImperfectSolution(optimum.delta);
-        } else if (minDeltaAlone < minDeltaCombined) {
-          if (logging) {
-            console.log(
-              "minDeltaAlone < minDeltaCombined",
-              minDeltaAlone,
-              minDeltaCombined,
-            );
-          }
-          if (xAxis === "buying") {
-            const selling = s.minDelta;
-            const buying = min(buyingForSelling(selling), maxBuyingForExp);
-            foundImperfectSolution_(buying, selling);
-          } else {
-            const buying = b.minDelta;
-            const selling = sellingForBuying(buying);
-            if (selling <= maxSellingForExp) {
-              foundImperfectSolution_(buying, selling);
-            }
-          }
-        } else if (maxDeltaCombined < maxDeltaAlone) {
-          if (logging) {
-            console.log(
-              "maxDeltaCombined < maxDeltaAlone",
-              maxDeltaCombined,
-              maxDeltaAlone,
-            );
-          }
-          if (xAxis === "selling") {
-            const buying = maxBuyingForExp;
-            const selling = max(sellingForBuying(buying), s.minDelta);
-            foundImperfectSolution_(buying, selling);
           }
         }
 
-        // we're here because maxSelling < minSelling
-        // else if (minSelling <= maxSellingForExp) {
-        //   if (logging) console.log(`${minSelling} <= ${maxSellingForExp}`);
-        //   const maybeBetter = findImperfectExhaustively(
-        //     minSelling,
-        //     maxSellingForExp,
-        //   );
-        //   if (maybeBetter) {
-        //     bestImperfectOption = maybeBetter;
-        //   }
-        // } // otherwise no solution possible
-
-        // here: assert that we can't find a better solution
-        // if (logging) console.log("exhaustive search");
-        // runAsserts = false;
-        // runAsserts = true // TODO revert
-        if (runAsserts) {
-          let from_ = max(s.minDelta, sellingForBuying(b.minDelta));
-          // let from = runAssertsFrom as bigint | null;
-          // if (from) {
-          //   if (xAxis === "buying") {
-          //     const tmp = sellingForBuying(from)
-          //     from = minimizeSelling(tmp);
-          //     assert(from === tmp, `${from} !== ${tmp}`); // means we don't need minimizeSelling
-          //   }
-          //   from_ = max(from, from_);
-          // }
-          const maybeBetter = findImperfectExhaustively(
-            from_,
-            maxSellingForExp,
-          );
-          if (maybeBetter) {
-            if (logging) console.log("asserting");
-            assert(bestImperfectOption !== null, maybeBetter.show());
-            const best = bestImperfectOption as PairOption;
-            assert(
-              best.effectivePrice <= maybeBetter.effectivePrice,
-              `${best.effectivePrice} > ${maybeBetter.effectivePrice}
-        diff: ${best.effectivePrice - maybeBetter.effectivePrice}
-        best imperfect: ${best.show()}
-        exhaustive: ${maybeBetter.show()}}`,
-            );
+        assert(b.maxDelta !== "oo");
+        if (stepBuyingFirst) {
+          if (maxBuyingForExp < b.maxDelta) {
+            queue.push({ expBuying: expBuying + 1n, expSelling });
+          }
+          if (s.maxDelta === "oo" || maxSellingForExp < s.maxDelta) {
+            queue.push({ expBuying, expSelling: expSelling + 1n });
+          }
+        } else {
+          if (s.maxDelta === "oo" || maxSellingForExp < s.maxDelta) {
+            queue.push({ expBuying, expSelling: expSelling + 1n });
+          }
+          if (maxBuyingForExp < b.maxDelta) {
+            queue.push({ expBuying: expBuying + 1n, expSelling });
           }
         }
       }
-
-      assert(b.maxDelta !== "oo");
-      if (stepBuyingFirst) {
-        if (maxBuyingForExp < b.maxDelta) {
-          queue.push({ expBuying: expBuying + 1n, expSelling });
+      if (bestAdheringOption) {
+        if (logging) {
+          console.log("found adhering solution:", bestAdheringOption);
         }
-        if (s.maxDelta === "oo" || maxSellingForExp < s.maxDelta) {
-          queue.push({ expBuying, expSelling: expSelling + 1n });
-        }
-      } else {
-        if (s.maxDelta === "oo" || maxSellingForExp < s.maxDelta) {
-          queue.push({ expBuying, expSelling: expSelling + 1n });
-        }
-        if (maxBuyingForExp < b.maxDelta) {
-          queue.push({ expBuying: expBuying + 1n, expSelling });
-        }
+        break;
       }
     }
-    //   if (bestAdheringOption) break; // since we know that perfect solutions are also optimal
-    // }
 
     // assert(!bestPriceOption || (bestPriceOption as PairOption).perfect); // fails, which means sometimes the best solution has rounding error
     const exceeding = bestExceedingOption as PairOption | null;
     const adhering = bestAdheringOption as PairOption | null;
-    this.bestAdheringOption = adhering;
-    this.maxIntegerImpacted = exceeding !== null &&
-      (adhering === null || exceeding.effectivePrice < adhering.effectivePrice); // not bothering with comparing deltas at this point
-    this.bestOverallOption = this.maxIntegerImpacted ? exceeding : adhering;
 
-    assert(!(this.maxIntegerImpacted && adhering)); // just verifying a curious obvervation, no reason to insist on this
+    if (logging) console.log("best adhering option:", adhering?.show());
+    if (logging) console.log("best exceeding option:", exceeding?.show());
+
+    this.bestAdheringOption = adhering;
+    this.maxIntegerImpacted = exceeding !== null; // && //adhering === null;
+    // (adhering === null ||
+    //   exceeding.deltaSelling * adhering.deltaBuying <
+    //     adhering.deltaSelling * exceeding.deltaBuying); // not bothering with comparing deltas at this point
+    // this.bestOverallOption = this.maxIntegerImpacted ? exceeding : adhering;
+
+    if (logging) console.log("maxIntegerImpacted:", this.maxIntegerImpacted);
+    // assert(!(this.maxIntegerImpacted && adhering)); // just verifying a curious obvervation, no reason to insist on this
+    // if (!adhering) {
+    //   // assert(!exceeding, `${this.maxIntegerImpacted}\n${exceeding?.show()}`); // fails
+    // } else if (exceeding) {
+    //   assert(exceeding.deltaSelling * adhering.deltaBuying >= adhering.deltaSelling * exceeding.deltaBuying) // different way to put it
+    // }
   }
 }
