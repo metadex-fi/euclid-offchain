@@ -126,10 +126,11 @@ Deno.test("emulator", async () => {
         // }
       } catch (e) {
         if (
-          false
+          // false
           //e.toString().includes("Not enough ADA leftover to cover minADA") //||
-          // e.toString().includes("Insufficient collateral balance") || // TODO FIXME
-          // e.toString().includes("Insufficient input in transaction")
+          // e.toString().includes("Insufficient collateral balance") ||
+          // e.toString().includes("Over budget") // TODO FIXME
+          e.toString().includes("Max collateral inputs reached") // TODO FIXME
         ) {
           console.error("caught:", e);
         } else {

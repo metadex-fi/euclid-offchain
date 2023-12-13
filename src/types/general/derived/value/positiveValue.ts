@@ -1,6 +1,6 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
-import { genNonNegative, genPositive } from "../../../../utils/generators.ts";
+import { genNonNegative, genPositive, max, min } from "../../../../utils/generators.ts";
 import { AssocMap } from "../../fundamental/container/map.ts";
 import { PWrapped } from "../../fundamental/container/wrapped.ts";
 import { Asset } from "../asset/asset.ts";
@@ -9,7 +9,7 @@ import { Currency } from "../asset/currency.ts";
 import { Token } from "../asset/token.ts";
 import { PPositive } from "../bounded/positive.ts";
 import { PValue, Value } from "./value.ts";
-import { minAdaBalance } from "../../../../utils/constants.ts";
+import { feesEtcLovelace, minAdaPerAsset } from "../../../../utils/constants.ts";
 
 export class PositiveValue {
   constructor(
@@ -102,25 +102,34 @@ export class PositiveValue {
   };
 
   public boundedSubValue = (
-    minSize?: bigint,
-    maxSize?: bigint,
-  ): PositiveValue => {
-    const assets = this.assets.boundedSubset(minSize, maxSize);
-    if (!assets.has(Asset.ADA)) assets.insert(Asset.ADA);
+    minSize: bigint,
+    maxSize: bigint,
+  ): PositiveValue | null => {
+    const availableAda = this.amountOf(Asset.ADA) - feesEtcLovelace // removing fees for param
+    const maxAdaDeposit = availableAda - feesEtcLovelace; // removing fees for first dirac
+    const maxAssets = maxAdaDeposit / (minAdaPerAsset * 2n); // likewise
+    console.log(`maxAdaDeposit: ${maxAdaDeposit}, maxAssets: ${maxAssets}`)
+    maxSize = min(maxSize, maxAssets);
+    if (minSize > maxSize) return null;
+    if (minSize > this.assets.size) return null;
+    const assets = this.assets.clone.drop(Asset.ADA).boundedSubset(minSize -1n, maxSize -1n); // TODO clone?
     const value = new PositiveValue();
     assets.forEach((asset) => {
       let amount = this.amountOf(asset);
-      if (minAdaBalance && asset.equals(Asset.ADA)) {
-        assert(
-          amount >= minAdaBalance,
-          `minAdaBalance: ${minAdaBalance} too low`,
-        );
-        amount = minAdaBalance + genNonNegative(amount - minAdaBalance);
-      } else {
+      // if (asset.equals(Asset.ADA)) {
+      //   assert(
+      //     amount >= minAda,
+      //     `minAda: ${minAda} too low`,
+      //   );
+      //   amount = minAda + genNonNegative(amount - minAda);
+      // } else {
         amount = genPositive(amount);
-      }
+      // }
       value.initAmountOf(asset, amount);
     });
+    const minAda = minAdaPerAsset * (assets.size + 1n) + feesEtcLovelace; // ...and adding back the one for the first dirac
+    console.log(`assets: ${assets.size + 1n}, minAda: ${minAda}, availableAda: ${availableAda}`)
+    value.initAmountOf(Asset.ADA, minAda + genNonNegative(availableAda - minAda));
     return value;
   };
 

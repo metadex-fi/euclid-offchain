@@ -4,7 +4,7 @@ import { IdNFT } from "../types/euclid/idnft.ts";
 import { Asset } from "../types/general/derived/asset/asset.ts";
 import { Assets } from "../types/general/derived/asset/assets.ts";
 import { KeyHash, PKeyHash } from "../types/general/derived/hash/keyHash.ts";
-import { feesEtcLovelace, minAdaBalance } from "../utils/constants.ts";
+import { feesEtcLovelace, minAdaPerAsset } from "../utils/constants.ts";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { Action, UserAction } from "./actions/action.ts";
 
@@ -222,6 +222,7 @@ export class User {
     for (const action of retrying_) {
       console.log(`retrying ${action.type}`);
       results.push(await this.execute(action));
+      break;
     }
     return results;
   };
@@ -312,8 +313,9 @@ export class User {
       return { txHash, txCore };
     } catch (e) {
       if (
-        this.usedSplitting &&
+        this.usedSplitting && 
         (e.toString().includes("Insufficient input in transaction") ||
+         e.toString().includes("Insufficient collateral balance") ||
           e.toString().includes("InputsExhaustedError"))
       ) {
         console.warn(
@@ -328,6 +330,7 @@ export class User {
 
   private execute_ = async (action: Action): Promise<TxResult[]> => {
     const tx = action.tx(this.lucid.newTx());
+    console.log("execute_() - balance:", this.balance?.concise());
     try {
       const result = await this.signAndSubmit(tx);
       if (result instanceof Error) this.retrying.push(action); // means mempool-related issue right now
@@ -398,7 +401,7 @@ export class User {
     ).normedPlus(forFeesEtc)
       .normedPlus(PositiveValue.singleton(
         Asset.ADA,
-        genPositive(100n * minAdaBalance), // for opening pools
+        genPositive(100n * minAdaPerAsset), // for opening pools
       ));
     return user;
   }

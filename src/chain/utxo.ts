@@ -22,7 +22,7 @@ import {
   compareVariants,
   handleInvalidPools,
   maxInteger,
-  minAdaBalance,
+  minAdaPerAsset,
   // webappExpLimit,
 } from "../utils/constants.ts";
 import {
@@ -153,10 +153,10 @@ export class DiracUtxo {
     const adaBalance = funds.amountOf(Asset.ADA, 0n);
     this.available = funds.clone;
     if (0n < adaBalance) {
-      if (adaBalance <= minAdaBalance) {
+      if (adaBalance <= minAdaPerAsset) {
         this.available.drop(Asset.ADA);
       } else {
-        this.available.increaseAmountOf(Asset.ADA, -minAdaBalance);
+        this.available.increaseAmountOf(Asset.ADA, -minAdaPerAsset);
       }
     }
   }
@@ -259,18 +259,18 @@ export class DiracUtxo {
     user: User | null,
     paramUtxo: ParamUtxo,
     variant: SwapfindingVariant,
-    minBuying = 1n,
-    minSelling = 1n,
+    minBuying: bigint,
+    minSelling: bigint,
+    minExpMults: number,
+    maxExpMults: number,
     availableSelling?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
     buyableAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
     availableBuying?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
-    expLimit = Infinity,
   ): Swapping[] => {
     console.log("diracUtxo.swappingsFor()");
     const param = paramUtxo.param;
     const dirac = this.dirac;
     const assets = param.assets;
-    const expLimit_ = expLimit ?? Infinity;
     const swappings: Swapping[] = [];
     assets.forEach((sellingAsset, sellingIndex) => {
       const virtualSelling = param.virtual.amountOf(sellingAsset);
@@ -328,7 +328,8 @@ export class DiracUtxo {
         const pairOptions = new PairOptions(
           buyingOption,
           sellingOption,
-          expLimit_,
+          minExpMults,
+          maxExpMults,
           maxInteger,
           false,
           variant,
@@ -345,7 +346,8 @@ export class DiracUtxo {
           sellingAsset,
           option,
           pairOptions.maxIntegerImpacted,
-          expLimit,
+          minExpMults,
+          maxExpMults,
         ));
       });
     });
@@ -362,7 +364,7 @@ export class DiracUtxo {
   //   availableSelling_?: Value, // subset of pool-assets. NOTE: Empty if infinite for any asset, -1 if infinite for a specific asset
   //   buyableAssets?: Assets, // for subsequent swappings we want only a single direction. Assets instead of Asset for simulator in webapp
   //   availableBuying?: bigint, // for the new subSwapA-calculator, in concert with buyingAsset.
-  //   expLimit?: number,
+  //   maxExpMults?: number,
   // ): Swapping[] => {
   //   console.log("diracUtxo.swappingsFor_()");
   //   assert(minBuying > 0n, `minBuying <= 0n: ${minBuying}`);
@@ -378,13 +380,13 @@ export class DiracUtxo {
   //     availableSelling_: availableSelling_ ?? null,
   //     buyableAssets: buyableAssets ?? null,
   //     availableBuying: availableBuying ?? null,
-  //     expLimit: expLimit ?? null,
+  //     maxExpMults: maxExpMults ?? null,
   //   });
 
   //   // if (compareVariants) {
   //   //   let swappings_: Swapping[];
   //   //   const ignore: string[] = [];
-  //   //   if (expLimit === undefined) {
+  //   //   if (maxExpMults === undefined) {
   //   //     // return swappings;
   //   //     console.log("calculating variant with oldSwappingsFor()");
   //   //     swappings_ = this.oldSwappingsFor(
@@ -400,10 +402,10 @@ export class DiracUtxo {
   //   //     );
   //   //   } else {
   //   //     return swappings;
-  //   //     // if (expLimit < webappExpLimit) return swappings;
-  //   //     // console.log("calculating variant with expLimit:", expLimit);
+  //   //     // if (maxExpMults < webappExpLimit) return swappings;
+  //   //     // console.log("calculating variant with maxExpMults:", maxExpMults);
   //   //     // ignore = [
-  //   //     //   "expLimit",
+  //   //     //   "maxExpMults",
   //   //     //   "Exp",
   //   //     //   "Spot",
   //   //     //   "Price",
@@ -421,10 +423,10 @@ export class DiracUtxo {
   //   //     //   availableSelling_,
   //   //     //   buyableAssets,
   //   //     //   availableBuying,
-  //   //     //   // expLimit <- only difference
+  //   //     //   // maxExpMults <- only difference
   //   //     // );
   //   //   }
-  //   //   console.log("expLimit:", expLimit);
+  //   //   console.log("maxExpMults:", maxExpMults);
   //   //   assert(
   //   //     swappings_.length === swappings.length,
   //   //     `length mismatch:\nvariant:\n${
@@ -437,7 +439,7 @@ export class DiracUtxo {
   //   //     if (i === -1) notFound.push(swapping);
   //   //     else swappings_.splice(i, 1);
   //   //   });
-  //   //   // if (expLimit !== undefined) {
+  //   //   // if (maxExpMults !== undefined) {
   //   //   //   // NOTE this is not correct
   //   //   //   swappings_ = swappings_.filter((s) => !s.maxIntImpacted);
   //   //   // }

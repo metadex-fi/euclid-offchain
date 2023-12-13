@@ -12,9 +12,11 @@ import { Pool } from "../pool.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import {
+feesEtcLovelace,
+  gMaxDiracs,
   gMaxLength,
   maxInteger,
-  minAdaBalance,
+  minAdaPerAsset,
 } from "../../utils/constants.ts";
 import { log } from "./swapfinding6/swapsForPair.ts";
 // complete settings for opening a pool
@@ -62,6 +64,7 @@ export class Opening {
   };
 
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
+    console.log("building transaction for Opening:", this.show());
     return this.pool().openingTx(tx, this.user.contract).addSigner(
       this.user.address!,
     );
@@ -234,8 +237,8 @@ export class Opening {
       const tickMultiplier = jumpMultiplier ** (1 / Number(ticks));
       const diracs_ = new Array<Dirac>();
 
+      const balance_ = balance.amountOf(asset, asset.equals(Asset.ADA) ? minAdaPerAsset : 0n);
       const weight = weights.amountOf(asset);
-      const balance_ = balance.amountOf(asset, 0n);
       const virtual_ = virtual.amountOf(asset);
       const jumpSize = jumpSizes.amountOf(asset);
 
@@ -310,50 +313,55 @@ export class Opening {
       (available: ${user.availableBalance?.concise()})`,
     );
     // console.log(`attempting to open`);
-    const balance = user.availableBalance;
+    const balance = user.balance; // feesEtcLovelace accounted for below, as it's per utxo
     if (!balance) return null;
 
-    const adaBalance = balance.amountOf(Asset.ADA, 0n);
-    if (adaBalance < 2n * minAdaBalance) return null; // for one dirac and one param. TODO minAdaBalance is excessive
-    balance.increaseAmountOf(Asset.ADA, -minAdaBalance); // for param-utxo. TODO minAdaBalance is excessive
+    // const adaBalance = balance.amountOf(Asset.ADA, 0n);
+    // const minAdaPerUtxo = minAdaPerAsset + feesEtcLovelace
+    // if (adaBalance < 2n * minAdaPerUtxo) return null; // for one dirac and one param. TODO minAdaBalance is excessive
+    // balance.increaseAmountOf(Asset.ADA, -minAdaPerUtxo); // for param-utxo. TODO minAdaBalance is excessive
 
-    if (balance.size < 1) return null;
+    // if (balance.size < 1) return null;
     const maxAssets = gMaxLength;
-    const deposit = balance.boundedSubValue(1n, maxAssets);
-    const maxDiracsByMinADA = deposit.amountOf(Asset.ADA) / minAdaBalance;
+    const deposit = balance.boundedSubValue(2n, maxAssets); // TODO revert to minimum 1 when virtuals fixed
+    if (!deposit) return null;
+    console.log("deposit:", deposit.concise());
+    const maxDiracsByMinADA = deposit.amountOf(Asset.ADA) / (deposit.size * minAdaPerAsset + feesEtcLovelace);
     // const allowAda = deposit.has(Asset.ADA);
 
     // in case we don't want ADA to be listed in the pool
     let allowAda = true;
-    if (Math.random() < 0.5) {
-      deposit.drop(Asset.ADA);
-      allowAda = false;
-    }
-    if (deposit.size < 1) return null;
+    // if (Math.random() < 0.5) { // TODO FIXME
+    //   deposit.drop(Asset.ADA);
+    //   allowAda = false;
+    //   console.log("dropping ADA")
+    // }
+    // if (deposit.size < 1) return null;
 
     const allAssets = deposit.assets;
-    let addVirtualAssets = max(genNonNegative(maxAssets), 2n) - allAssets.size;
-    while (addVirtualAssets > 0n) {
-      const asset = Asset.generate();
-      if (allAssets.has(asset)) continue;
-      if ((!allowAda) && asset.equals(Asset.ADA)) continue;
-      // we require for now either no ADA in the pool, or at least minAdaBalance, to fix swapfinding
-      // note that there is always a minimum amount of ADA in the pool, so if that's lower than
-      // minAdaBalance, we can't allow ADA to be one of the pool-assets, or our swapfinding is imperfect
-      // TODO this is actually a bit bullshit in prod - why impose extra costs on LPs just so
-      // our swapfinding can claim to be perfect? There might be reasons though
-      allAssets.insert(asset);
-      addVirtualAssets--;
-    }
+    // let addVirtualAssets = max(genNonNegative(maxAssets), 2n) - allAssets.size; // TODO FIXME
+    // while (addVirtualAssets > 0n) {
+    //   const asset = Asset.generate();
+    //   if (allAssets.has(asset)) continue;
+    //   if ((!allowAda) && asset.equals(Asset.ADA)) continue;
+    //   // we require for now either no ADA in the pool, or at least minAdaBalance, to fix swapfinding
+    //   // note that there is always a minimum amount of ADA in the pool, so if that's lower than
+    //   // minAdaBalance, we can't allow ADA to be one of the pool-assets, or our swapfinding is imperfect
+    //   // TODO this is actually a bit bullshit in prod - why impose extra costs on LPs just so
+    //   // our swapfinding can claim to be perfect? There might be reasons though
+    //   allAssets.insert(asset);
+    //   addVirtualAssets--;
+    // }
     // console.log(allAssets.show());
     const param = Param.genOf(user.paymentKeyHash, allAssets);
 
     // const gMaxDiracs = 26n; // because tx size
-    const maxDiracs = min(maxDiracsByMinADA, deposit.smallestAmount); // because minimum deposit
-    console.log("maxDiracs:", maxDiracs);
+    const maxDiracs = min(min(maxDiracsByMinADA, deposit.smallestAmount), gMaxDiracs); // because minimum deposit
+    console.log("maxDiracs:", maxDiracs, "maxDiracsByMinADA:", maxDiracsByMinADA);
 
     let maxTicks = maxDiracs; //min(gMaxDiracs, maxDiracs);
     const numTicks = new PositiveValue();
+    let numDiracs = 1n;
     allAssets.forEach((asset) => {
       const maxTicks_ = Opening.maxTicks(
         param.virtual.amountOf(asset),
@@ -369,7 +377,12 @@ export class Opening {
       ).genData();
       maxTicks /= ticks;
       numTicks.initAmountOf(asset, ticks);
+      numDiracs *= ticks;
     });
+
+    console.log("numDiracs:", numDiracs);
+    if (allowAda) deposit.addAmountOf(Asset.ADA, -numDiracs * feesEtcLovelace);
+    console.log("remaining deposit:", deposit.concise());
 
     // console.log(`numDiracs: ${numTicks.unsigned.mulAmounts()}`);
     // NOTE 27 diracs slightly exceeds the max tx size (17444 vs. 16384)

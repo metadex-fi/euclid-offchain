@@ -206,7 +206,7 @@ export class Pool {
         this.paramContainingSplit ? 1 : 0
       } param utxos`,
     );
-    this.diracUtxos.forEach((diracUtxo) => console.log(diracUtxo.show()));
+    // this.diracUtxos.forEach((diracUtxo) => console.log(diracUtxo.show()));
     let tx_ = this.paramUtxo.openingTx(tx, contract, this.paramContainingSplit);
     // let remaining = this.diracUtxos.slice(0, 100); TODO this is for splitting larger txes
     this.diracUtxos.forEach((diracUtxo) =>
@@ -267,9 +267,10 @@ export class Pool {
   public swappingsFor(
     user: User,
     variant: SwapfindingVariant,
-    minBuying?: bigint,
-    minSelling?: bigint,
-    expLimit?: number,
+    minBuying: bigint,
+    minSelling: bigint,
+    minExpMults: number,
+    maxExpMults: number,
   ): Swapping[] {
     if (this.paramUtxo.param.active === 0n) return [];
     const balance = user.availableBalance;
@@ -285,10 +286,11 @@ export class Pool {
         variant,
         minBuying,
         minSelling,
+        minExpMults,
+        maxExpMults,
         sellableBalance.unsigned,
         undefined,
         undefined,
-        expLimit,
       )
     );
   }

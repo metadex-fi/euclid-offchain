@@ -12,6 +12,7 @@ import {
   ceilDiv,
   genNonNegative,
   genPositive,
+  max,
   maybeNdef,
   min,
   randomChoice,
@@ -31,13 +32,14 @@ import {
   countMults,
   PairOption,
 } from "./swapfinding6/swapsForPair.ts";
+import { minAdaPerAsset } from "../../mod.ts";
 
 // const sellingADAtolerance = 0;
 
 // export interface SwappingArgs {
 //   readonly adhereMaxInteger: boolean,
 //   readonly maxIntImpacted: boolean,
-//   readonly expLimit: number | null,
+//   readonly maxExpMults: number | null,
 //   readonly expLimitImpacted: boolean,
 //   readonly user: User | null, // webapp needs undefined iirc
 //   readonly paramUtxo: ParamUtxo,
@@ -69,12 +71,13 @@ export class Swapping {
     public readonly sellingAsset: Asset,
     public readonly option: PairOption,
     public readonly maxIntImpacted: boolean,
-    public readonly expLimit: number,
+    public readonly minExpMults: number,
+    public readonly maxExpMults: number,
     public readonly corruptions: string[],
     // runTests: boolean, // corruption-test-swappings don't run tests themselves.
     // public readonly adhereMaxInteger: boolean,
     // public readonly maxIntImpacted: boolean,
-    // public readonly expLimit: number | null,
+    // public readonly maxExpMults: number | null,
     // // public readonly expLimitImpacted: boolean,
     // public readonly user: User | null, // webapp needs undefined iirc
     // public readonly paramUtxo: ParamUtxo,
@@ -145,12 +148,12 @@ export class Swapping {
         `availableSelling must be less than or equal to the available balance: ${this.show()}`,
       );
     }
-    // if (expLimit !== null) {
+    // if (maxExpMults !== null) {
     //   const buyingMults = countMults(option.b.exp);
     //   const sellingMults = countMults(option.s.exp);
     //   assert(
-    //     buyingMults + sellingMults <= expLimit,
-    //     `exponents must have ${buyingMults} + ${sellingMults} <= ${expLimit} multiplications: ${this.show()}`,
+    //     buyingMults + sellingMults <= maxExpMults,
+    //     `exponents must have ${buyingMults} + ${sellingMults} <= ${maxExpMults} multiplications: ${this.show()}`,
     //   );
     // }
 
@@ -179,7 +182,8 @@ export class Swapping {
     sellingAsset: Asset,
     option: PairOption,
     maxIntImpacted: boolean,
-    expLimit: number,
+    minExpMults: number,
+    maxExpMults: number,
   ): Swapping {
     console.log(`Swapping.boundary()`);
     return new Swapping(
@@ -190,12 +194,13 @@ export class Swapping {
       sellingAsset,
       option,
       maxIntImpacted,
-      expLimit,
+      minExpMults,
+      maxExpMults,
       [],
       // true, // corruption-test-swappings don't run tests themselves.
       // adhereMaxInteger,
       // maxIntImpacted,
-      // expLimit,
+      // maxExpMults,
       // // expLimitImpacted,
       // user,
       // paramUtxo,
@@ -226,11 +231,11 @@ export class Swapping {
       swappings = user.contract!.state!.swappingsFor(
         user,
         randomChoice(["exact", "perExpMaxDelta", "imperfectMaxDelta"]),
-        maybeNdef(genPositive(i)),
-        maybeNdef(genPositive(i)),
+        genPositive(i),
+        genPositive(i),
+        0,
         // webappExpLimit,
-        randomChoice([ // TODO test this
-          undefined,
+        randomChoice([
           webappExpLimit,
           Number(genPositive(50n)),
           Number(genPositive()),
@@ -257,7 +262,8 @@ ${ttf}buyingAsset: ${this.buyingAsset.show()}
 ${ttf}sellingAsset: ${this.sellingAsset.show()}
 ${ttf}option: ${this.option.show(ttf)}
 ${ttf}maxIntImpacted: ${this.maxIntImpacted}
-${ttf}expLimit: ${this.expLimit}
+${ttf}minExpMults: ${this.minExpMults}
+${ttf}maxExpMults: ${this.maxExpMults}
 ${ttf}corruptions: ${this.corruptions.toString()}
   )`;
   };
@@ -345,6 +351,7 @@ ${ttf}corruptions: ${this.corruptions.toString()}
     // console.log(`funds before: ${funds.show()}`)
     funds.addAmountOf(this.buyingAsset, -this.option.deltaBuying);
     funds.addAmountOf(this.sellingAsset, this.option.deltaSelling);
+    funds.setAmountOf(Asset.ADA, max(funds.amountOf(Asset.ADA), minAdaPerAsset))
     // console.log(`funds after: ${funds.show()}`)
     const retour: Lucid.Assets = funds.toLucid;
     retour[oldDirac.threadNFT.toLucid] = 1n;
@@ -449,12 +456,13 @@ ${ttf}corruptions: ${this.corruptions.toString()}
         this.user,
         this.paramUtxo,
         this.option.variant,
-        applyMinAmounts ? this.option.b.minDelta : undefined,
-        applyMinAmounts ? this.option.s.minDelta : undefined,
+        applyMinAmounts ? this.option.b.minDelta : 1n,
+        applyMinAmounts ? this.option.s.minDelta : 1n,
+        this.minExpMults,
+        this.maxExpMults,
         Value.singleton(this.sellingAsset, sellableAmount),
         Assets.singleton(this.buyingAsset),
         undefined,
-        this.expLimit ?? undefined,
       );
       if (subsequents.length === 0) break;
       assert(
@@ -500,8 +508,10 @@ ${ttf}corruptions: ${this.corruptions.toString()}
       this.user,
       this.paramUtxo,
       this.option.variant,
-      applyMinAmounts ? this.option.b.minDelta ?? undefined : undefined,
-      applyMinAmounts ? this.option.s.minDelta ?? undefined : undefined,
+      applyMinAmounts ? this.option.b.minDelta : 1n,
+      applyMinAmounts ? this.option.s.minDelta : 1n,
+      this.minExpMults,
+      this.maxExpMults,
       Value.singleton(
         this.sellingAsset,
         amntIsSold ? amount : this.option.deltaSelling,
@@ -512,7 +522,6 @@ ${ttf}corruptions: ${this.corruptions.toString()}
       // adding minBalance here because we are removing it again in swappingsFor
       // (amntIsSold ? this.buyingAmnt : amount) +
       //   getMinBalance(this.buyingAsset),
-      this.expLimit ?? undefined,
     );
     assert(
       swappings.length <= 1,
@@ -596,7 +605,7 @@ ${ttf}corruptions: ${this.corruptions.toString()}
   //   const subSwap = new Swapping(
   //     this.adhereMaxInteger,
   //     this.maxIntImpacted,
-  //     this.expLimit,
+  //     this.maxExpMults,
   //     // this.expLimitImpacted,
   //     this.user,
   //     this.paramUtxo,
@@ -921,7 +930,8 @@ ${ttf}corruptions: ${this.corruptions.toString()}
         maxInteger,
       ),
       this.maxIntImpacted,
-      this.expLimit,
+      this.minExpMults,
+      this.maxExpMults,
       [...this.corruptions, `boughtAmnt ${amnt}`],
       // false, // corruption-test-swappings don't run tests themselves.
     );
@@ -951,7 +961,8 @@ ${ttf}corruptions: ${this.corruptions.toString()}
         maxInteger,
       ),
       this.maxIntImpacted,
-      this.expLimit,
+      this.minExpMults,
+      this.maxExpMults,
       [...this.corruptions, `soldAmnt ${amnt}`],
       // false, // corruption-test-swappings don't run tests themselves.
     );
@@ -964,10 +975,10 @@ ${ttf}corruptions: ${this.corruptions.toString()}
     if (this.option.b.exp === 0n) return null;
     const amnt = random ? genPositive(this.option.b.exp) : 1n;
     console.log(`... by ${amnt}`);
-    const expLimit = this.expLimit - this.option.s.mults;
+    const maxExpMults = this.maxExpMults - this.option.s.mults;
     let exp = this.option.b.exp - amnt;
     while (true) {
-      if (countMults(exp) > expLimit) {
+      if (countMults(exp) > maxExpMults) {
         if (exp === 0n) return null;
         else exp--;
       } else break;
@@ -986,7 +997,8 @@ ${ttf}corruptions: ${this.corruptions.toString()}
         maxInteger,
       ),
       this.maxIntImpacted,
-      this.expLimit,
+      this.minExpMults,
+      this.maxExpMults,
       [...this.corruptions, `boughtExp ${amnt}`],
       // false, // corruption-test-swappings don't run tests themselves.
     );
@@ -1000,10 +1012,10 @@ ${ttf}corruptions: ${this.corruptions.toString()}
     if (this.option.s.exp === 0n) return null;
     const amnt = random ? genPositive(this.option.s.exp) : 1n;
     console.log(`... by ${amnt}`);
-    const expLimit = this.expLimit - this.option.b.mults;
+    const maxExpMults = this.maxExpMults - this.option.b.mults;
     let exp = this.option.s.exp - amnt;
     while (true) {
-      if (countMults(exp) > expLimit) {
+      if (countMults(exp) > maxExpMults) {
         if (exp === 0n) return null;
         else exp--;
       } else break;
@@ -1022,7 +1034,8 @@ ${ttf}corruptions: ${this.corruptions.toString()}
         maxInteger,
       ),
       this.maxIntImpacted,
-      this.expLimit,
+      this.minExpMults,
+      this.maxExpMults,
       [...this.corruptions, `soldExp ${amnt}`],
       // false, // corruption-test-swappings don't run tests themselves.
     );
@@ -1053,12 +1066,12 @@ ${ttf}corruptions: ${this.corruptions.toString()}
   //     buyingExp++;
   //     buyingSpot = calcBuyingSpot(buyingExp);
   //   }
-  //   if (this.expLimit !== null) {
+  //   if (this.maxExpMults !== null) {
   //     const calcSellingSpot = this.calcSpot("selling");
   //     while (true) {
   //       const fittedExps = fitExpLimit({
   //         adhereMaxInteger: this.adhereMaxInteger,
-  //         expLimit: this.expLimit,
+  //         maxExpMults: this.maxExpMults,
   //         buyingExp,
   //         sellingExp,
   //         maxBuying: this.availableBuying,
@@ -1142,12 +1155,12 @@ ${ttf}corruptions: ${this.corruptions.toString()}
   //     sellingExp--;
   //     sellingSpot = calcSellingSpot(sellingExp);
   //   }
-  //   if (this.expLimit !== null) {
+  //   if (this.maxExpMults !== null) {
   //     const calcBuyingSpot = this.calcSpot("buying");
   //     while (true) {
   //       const fittedExps = fitExpLimit({
   //         adhereMaxInteger: this.adhereMaxInteger,
-  //         expLimit: this.expLimit,
+  //         maxExpMults: this.maxExpMults,
   //         buyingExp,
   //         sellingExp,
   //         maxBuying: this.availableBuying,

@@ -246,7 +246,8 @@ export class PairOption {
     // readonly effectivePrice: number,
     readonly perfect: boolean,
     readonly adhereMaxInteger: boolean,
-    readonly expLimit: number,
+    readonly minExpMults: number, // for testing
+    readonly maxExpMults: number,
     readonly variant: SwapfindingVariant,
   ) {
     assert(b.type === "buying");
@@ -281,7 +282,8 @@ export class PairOption {
     // effectivePrice: number,
     perfect: boolean,
     adhereMaxInteger: boolean,
-    expLimit: number,
+    minExpMults: number,
+    maxExpMults: number,
     maxInteger: bigint,
     variant: SwapfindingVariant,
   ): PairOption => {
@@ -293,7 +295,8 @@ export class PairOption {
       // effectivePrice,
       perfect,
       adhereMaxInteger,
-      expLimit,
+      minExpMults,
+      maxExpMults,
       variant,
     );
     assert(
@@ -359,9 +362,9 @@ export class PairOption {
       }
     }
 
-    if (this.b.mults + this.s.mults > this.expLimit) {
+    if (this.b.mults + this.s.mults > this.maxExpMults) {
       passes = false;
-      console.error(`expLimit: ${this.show()}`);
+      console.error(`maxExpMults: ${this.show()}`);
     }
 
     return passes;
@@ -382,7 +385,8 @@ export class PairOption {
       // Number(deltaSelling) / Number(deltaBuying),
       this.perfect,
       this.adhereMaxInteger,
-      this.expLimit,
+      this.minExpMults,
+      this.maxExpMults,
       this.variant,
     );
     assert(
@@ -410,7 +414,8 @@ ${ttf}deltaSelling: ${this.deltaSelling}
 ${ttf}effectivePrice: ${this.effectivePrice}
 ${ttf}perfect: ${this.perfect}
 ${ttf}adhereMaxInteger: ${this.adhereMaxInteger}
-${ttf}expLimit: ${this.expLimit}
+${ttf}minExpMults: ${this.minExpMults}
+${ttf}maxExpMults: ${this.maxExpMults}
 ${ttf}variant: ${this.variant}
 ${tt})`;
   };
@@ -500,7 +505,8 @@ export class PairOptions {
   constructor(
     b: AssetOption,
     s: AssetOption,
-    expLimit: number,
+    minExpMults: number,
+    maxExpMults: number,
     maxInteger: bigint,
     runAsserts: boolean,
     variant: SwapfindingVariant,
@@ -574,7 +580,8 @@ export class PairOptions {
           // effectivePrice,
           perfect,
           !exceedsMaxInteger,
-          expLimit,
+          minExpMults,
+          maxExpMults,
           maxInteger,
           variant,
         );
@@ -681,9 +688,22 @@ export class PairOptions {
           )
         ) continue;
         checked.push({ expBuying, expSelling });
-        if (countMults(expBuying) + countMults(expSelling) > expLimit) {
+          const buyingMults = countMults(expBuying);
+          const sellingMults = countMults(expSelling);
+
+        if (buyingMults + sellingMults < minExpMults) {
+          if (stepBuyingFirst) {
+            queue.push({ expBuying: expBuying + 1n, expSelling });
+            queue.push({ expBuying, expSelling: expSelling + 1n });
+          } else {
+            queue.push({ expBuying, expSelling: expSelling + 1n });
+            queue.push({ expBuying: expBuying + 1n, expSelling });
+          }
+          continue;
+        }
+        if (buyingMults + sellingMults > maxExpMults) {
           if (
-            bestMultsAhead(expBuying) + bestMultsAhead(expSelling) <= expLimit
+            bestMultsAhead(expBuying) + bestMultsAhead(expSelling) <= maxExpMults
           ) {
             if (stepBuyingFirst) {
               queue.push({ expBuying: expBuying + 1n, expSelling });

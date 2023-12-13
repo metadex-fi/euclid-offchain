@@ -13,8 +13,8 @@ import { Value } from "../general/derived/value/value.ts";
 import { maxSmallInteger, PSmallValue, SmallValue } from "./smallValue.ts";
 import {
   maxInteger,
-  maxIntRoot,
-  minAdaBalance,
+  defaultMaxWeight,
+  minAdaPerAsset,
 } from "../../utils/constants.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
@@ -59,7 +59,7 @@ export class Param {
       this.weights,
       this.jumpSizes,
       this.active ? 0n : 1n,
-      minAdaBalance,
+      this.minAda,
     );
   }
 
@@ -70,11 +70,12 @@ export class Param {
     const tt = tabs + t;
     const ttf = tt + f;
     return `Param (
-${ttf}owner: ${this.owner.toString()}, 
-${ttf}virtual: ${this.virtual.concise(ttf)}, 
+${ttf}owner: ${this.owner.toString()}
+${ttf}virtual: ${this.virtual.concise(ttf)}
 ${ttf}weights: ${this.weights.concise(ttf)}
-${ttf}jumpSizes: ${this.jumpSizes.concise(ttf)}, 
+${ttf}jumpSizes: ${this.jumpSizes.concise(ttf)}
 ${ttf}active: ${this.active.toString()}
+${ttf}minAda: ${this.minAda.toString()}
 ${tt})`;
   };
 
@@ -88,9 +89,10 @@ ${tt})`;
       param.virtual.assets.subsetOf(assets),
       `assets of virtual must be a subset of assets of jumpSizes and weights, but ${param.virtual.assets.show()}\nis not a subset of ${assets.show()}`,
     );
+    const numAssets = assets.size;
     assert(
-      param.minAda === minAdaBalance,
-      `minAda: ${param.minAda} !== ${minAdaBalance}`,
+      param.minAda === minAdaPerAsset * numAssets,
+      `minAda: ${param.minAda} !== ${minAdaPerAsset * numAssets}`,
     );
 
     // const minAnchorPrices = param.maxAnchorPrices;
@@ -168,7 +170,7 @@ ${tt})`;
       new EuclidValue(weights), //new SmallValue(new EuclidValue(weights)),
       new SmallValue(new EuclidValue(jumpSizes)),
       1n, // TODO include active-status in testing
-      minAdaBalance,
+      allAssets.size * minAdaPerAsset,
     );
   }
 
@@ -181,7 +183,7 @@ ${tt})`;
   static weightBounds(
     jumpSize: bigint,
     virtual: bigint,
-    maxWeight = maxIntRoot,
+    maxWeight = defaultMaxWeight,
   ): [bigint, bigint] {
     // const vjs = virtual * jumpSize;
     const js1 = jumpSize + 1n;

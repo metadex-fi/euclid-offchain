@@ -166,9 +166,10 @@ export class EuclidState {
   public swappingsFor(
     user: User,
     variant: SwapfindingVariant,
-    minBuying?: bigint,
-    minSelling?: bigint,
-    expLimit?: number,
+    minBuying: bigint,
+    minSelling: bigint,
+    minExpMults: number,
+    maxExpMults: number,
   ): Swapping[] {
     // TODO consider removing the user's own pools beforehand
     const pools = [...this.pools.values()].flatMap((p) => [...p.values()]);
@@ -177,7 +178,7 @@ export class EuclidState {
     //   console.log(`\t\tpools: ${pools.length}`);
     // }
     return pools.flatMap((pool) =>
-      pool.swappingsFor(user, variant, minBuying, minSelling, expLimit)
+      pool.swappingsFor(user, variant, minBuying, minSelling, minExpMults, maxExpMults)
     );
   }
 }
