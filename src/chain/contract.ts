@@ -1,7 +1,7 @@
 import euclidValidator from "../../contract/euclidValidator.json" assert {
   type: "json",
 };
-import euclidMinting from "../../contract/mintAlways.json" assert { // TODO change back to euclidMinting
+import euclidMinting from "../../contract/mintAlways.json" assert {  // TODO any reason to constrain minting? If not, we can - maybe have to, to prevent jamming-attacks due to how our pool detection works - clean up the whole ID-NFT mechanism
   type: "json",
 };
 import { EuclidState } from "./euclidState.ts";

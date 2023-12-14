@@ -12,11 +12,11 @@ import { Pool } from "../pool.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import {
-feesEtcLovelace,
+feesLovelace,
   gMaxDiracs,
   gMaxLength,
+  lockedAdaDirac,
   maxInteger,
-  minAdaPerAsset,
 } from "../../utils/constants.ts";
 import { log } from "./swapfinding6/swapsForPair.ts";
 // complete settings for opening a pool
@@ -230,6 +230,9 @@ export class Opening {
     // in that asset's dimension. "spread" means: add all other tick
     // offsets for that asset's lowest price.
     // UPDATE: then, jump enough times to approximate the initial amm-price (TODO)
+
+    const lockedAda = lockedAdaDirac(assets.size)
+
     assets.forEach((asset) => {
       const ticks = this.numTicks.amountOf(asset);
       const jumpMultiplier = 1 +
@@ -237,7 +240,7 @@ export class Opening {
       const tickMultiplier = jumpMultiplier ** (1 / Number(ticks));
       const diracs_ = new Array<Dirac>();
 
-      const balance_ = balance.amountOf(asset, asset.equals(Asset.ADA) ? minAdaPerAsset : 0n);
+      const balance_ = balance.amountOf(asset, asset.equals(Asset.ADA) ? lockedAda : 0n);
       const weight = weights.amountOf(asset);
       const virtual_ = virtual.amountOf(asset);
       const jumpSize = jumpSizes.amountOf(asset);
@@ -309,12 +312,12 @@ export class Opening {
     console.log(
       `Opening.genOfUser(): generating opening 
       for user ${user.paymentKeyHash?.show()} 
-      with balance ${user.balance?.concise()}
-      (available: ${user.availableBalance?.concise()})`,
+      with balance ${user.balance?.concise()}`,
     );
     // console.log(`attempting to open`);
     const balance = user.balance; // feesEtcLovelace accounted for below, as it's per utxo
     if (!balance) return null;
+    if (!balance.has(Asset.ADA)) return null;
 
     // const adaBalance = balance.amountOf(Asset.ADA, 0n);
     // const minAdaPerUtxo = minAdaPerAsset + feesEtcLovelace
@@ -323,10 +326,11 @@ export class Opening {
 
     // if (balance.size < 1) return null;
     const maxAssets = gMaxLength;
-    const deposit = balance.boundedSubValue(2n, maxAssets); // TODO revert to minimum 1 when virtuals fixed
+    const deposit = balance.boundedSubValueForOpening(2n, maxAssets); // this already accounts for lockedAda and fees for param // TODO revert to minimum 1 when virtuals fixed
     if (!deposit) return null;
     console.log("deposit:", deposit.concise());
-    const maxDiracsByMinADA = deposit.amountOf(Asset.ADA) / (deposit.size * minAdaPerAsset + feesEtcLovelace);
+    const lockedAda = lockedAdaDirac(deposit.size);
+    const maxDiracsByMinADA = deposit.amountOf(Asset.ADA) / (lockedAda + feesLovelace);
     // const allowAda = deposit.has(Asset.ADA);
 
     // in case we don't want ADA to be listed in the pool
@@ -380,8 +384,9 @@ export class Opening {
       numDiracs *= ticks;
     });
 
-    console.log("numDiracs:", numDiracs);
-    if (allowAda) deposit.addAmountOf(Asset.ADA, -numDiracs * feesEtcLovelace);
+    console.log("numDiracs:", numDiracs.toString());
+    console.log("numAssets:", allAssets.size.toString());
+    if (allowAda) deposit.addAmountOf(Asset.ADA, -numDiracs * feesLovelace); // otherwise ADA was already removed from the deposit above
     console.log("remaining deposit:", deposit.concise());
 
     // console.log(`numDiracs: ${numTicks.unsigned.mulAmounts()}`);

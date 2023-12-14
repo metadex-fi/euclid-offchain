@@ -4,7 +4,7 @@ import { IdNFT } from "../types/euclid/idnft.ts";
 import { Asset } from "../types/general/derived/asset/asset.ts";
 import { Assets } from "../types/general/derived/asset/assets.ts";
 import { KeyHash, PKeyHash } from "../types/general/derived/hash/keyHash.ts";
-import { feesEtcLovelace, minAdaPerAsset } from "../utils/constants.ts";
+import { feesLovelace, lockedAdaDirac, lockedAdaParam, lovelacePerAda } from "../utils/constants.ts";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { Action, UserAction } from "./actions/action.ts";
 
@@ -12,10 +12,11 @@ import { Contract } from "./contract.ts";
 import { utxosToCore } from "../utils/conversion.ts";
 import { WalletApi } from "https://deno.land/x/lucid@0.10.7/mod.ts";
 import { genPositive } from "../utils/generators.ts";
+import { Opening } from "./actions/opening.ts";
 
 const forFeesEtc = PositiveValue.singleton(
   Asset.ADA,
-  feesEtcLovelace,
+  feesLovelace,
 ); // costs in lovelace for fees etc. TODO excessive
 // const feesEtc = PositiveValue.singleton(Asset.ADA, feesEtcLovelace);
 
@@ -124,13 +125,13 @@ export class User {
   // TODO does this take mempool into account?
   public get availableBalance(): PositiveValue | undefined {
     assert(this.balance, "No balance");
-    if (this.balance.amountOf(Asset.ADA, 0n) <= feesEtcLovelace) {
+    if (this.balance.amountOf(Asset.ADA, 0n) <= feesLovelace) {
       console.warn(`not enough ada to pay fees etc.: ${this.balance.concise()}
-      (current arbitrary & excessive minimum: ${feesEtcLovelace} lovelaces)`);
+      (current arbitrary & excessive minimum: ${feesLovelace} lovelaces)`);
       return undefined;
     }
     const available = this.balance.clone;
-    available.addAmountOf(Asset.ADA, -feesEtcLovelace);
+    available.addAmountOf(Asset.ADA, -feesLovelace);
     // available.drop(Asset.ADA); // TODO don't drop ADA completely
     return available;
   }
@@ -272,39 +273,61 @@ export class User {
 
   private signAndSubmit = async (
     tx: Lucid.Tx,
+    action?: Action,
   ): Promise<TxResult> => {
     try {
       const txCompleted = await tx.complete();
 
-      // // begin logging
-      // const txBody = txCompleted.txComplete.body();
-      // const txHash_ = Lucid.C.hash_transaction(txBody);
-      // const txOuts = txBody.outputs();
-      // for (let i = 0; i < txOuts.len(); i++) {
-      //   const txOut = txOuts.get(i);
-      //   const address = txOut.address().to_bech32(undefined); // NOTE simplified version which does not work in byron (lol)
-      //   if (address !== this.contract.address) {
-      //     continue;
-      //   }
-      //   const txIn = Lucid.C.TransactionInput.new(
-      //     txHash_,
-      //     Lucid.C.BigNum.from_str(i.toString()),
-      //   );
-      //   const utxo = Lucid.C.TransactionUnspentOutput.new(txIn, txOut);
-      //   const bytes = BigInt(utxo.to_bytes().length);
-      //   const coinsPerByte =
-      //     (await this.lucid.provider.getProtocolParameters()).coinsPerUtxoByte;
-      //   const lockedAda = bytes * coinsPerByte;
-      //   console.log(
-      //     "new - coinsPerByte:",
-      //     coinsPerByte,
-      //     "\tbytes:",
-      //     bytes,
-      //     "\tlockedAda:",
-      //     lockedAda,
-      //   );
-      // }
-      // // end logging
+      // begin logging
+      const txBody = txCompleted.txComplete.body();
+      const txHash_ = Lucid.C.hash_transaction(txBody);
+      const txOuts = txBody.outputs();
+
+      // NOTE there's also an assert here
+      let numAssets: bigint | null = null;
+      let minLockedParam: bigint | null = null;
+      let minLockedDirac: bigint | null = null;
+      if(action?.type === "Opening") {
+        numAssets = (action as Opening).deposit.size;
+        minLockedParam = lockedAdaParam(numAssets);
+        minLockedDirac = lockedAdaDirac(numAssets);
+      }
+
+      for (let i = 0; i < txOuts.len(); i++) {
+        const txOut = txOuts.get(i);
+        const address = txOut.address().to_bech32(undefined); // NOTE simplified version which does not work in byron (lol)
+        if (address !== this.contract.address) {
+          continue;
+        }
+        const txIn = Lucid.C.TransactionInput.new(
+          txHash_,
+          Lucid.C.BigNum.from_str(i.toString()),
+        );
+        const utxo = Lucid.C.TransactionUnspentOutput.new(txIn, txOut);
+        const bytes = BigInt(utxo.to_bytes().length);
+        const coinsPerByte =
+          (await this.lucid.provider.getProtocolParameters()).coinsPerUtxoByte;
+        const lockedAda = bytes * coinsPerByte;
+        console.log(
+          "new - coinsPerByte:",
+          coinsPerByte.toString(),
+          "\tbytes:",
+          bytes.toString(),
+          "\tlockedAda:",
+          lockedAda.toString(),
+        );
+
+        if (minLockedParam && i === 0) {
+          // this one just ensures our estimate is correct
+          assert(lockedAda <= minLockedParam, `minLockedParam: ${minLockedParam} < lockedAda: ${lockedAda} (${numAssets} assets)`)
+        } else if (minLockedDirac) {
+          // this one assures that no ADA can be skimmed 
+          // (and swapfinding works anally well all the time)
+          assert(lockedAda <= minLockedDirac, `minLockedDirac: ${minLockedDirac} < lockedAda: ${lockedAda} (${numAssets} assets)`)
+        }
+
+      }
+      // end logging
 
       const txSigned = await txCompleted.sign().complete();
       const txHash = await txSigned.submit();
@@ -332,7 +355,7 @@ export class User {
     const tx = action.tx(this.lucid.newTx());
     console.log("execute_() - balance:", this.balance?.concise());
     try {
-      const result = await this.signAndSubmit(tx);
+      const result = await this.signAndSubmit(tx, action);
       if (result instanceof Error) this.retrying.push(action); // means mempool-related issue right now
       else action.succeeded(result.txCore);
       return [result];
@@ -401,7 +424,7 @@ export class User {
     ).normedPlus(forFeesEtc)
       .normedPlus(PositiveValue.singleton(
         Asset.ADA,
-        genPositive(100n * minAdaPerAsset), // for opening pools
+        genPositive(1000n * lovelacePerAda), // for opening pools, amount doesn't really matter
       ));
     return user;
   }

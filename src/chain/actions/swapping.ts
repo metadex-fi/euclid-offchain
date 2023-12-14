@@ -32,7 +32,6 @@ import {
   countMults,
   PairOption,
 } from "./swapfinding6/swapsForPair.ts";
-import { minAdaPerAsset } from "../../mod.ts";
 
 // const sellingADAtolerance = 0;
 
@@ -351,7 +350,7 @@ ${ttf}corruptions: ${this.corruptions.toString()}
     // console.log(`funds before: ${funds.show()}`)
     funds.addAmountOf(this.buyingAsset, -this.option.deltaBuying);
     funds.addAmountOf(this.sellingAsset, this.option.deltaSelling);
-    funds.setAmountOf(Asset.ADA, max(funds.amountOf(Asset.ADA), minAdaPerAsset))
+    // funds.setAmountOf(Asset.ADA, max(funds.amountOf(Asset.ADA), this.paramUtxo.param.minAda)) // TODO do we need this?
     // console.log(`funds after: ${funds.show()}`)
     const retour: Lucid.Assets = funds.toLucid;
     retour[oldDirac.threadNFT.toLucid] = 1n;

@@ -9,7 +9,7 @@ import { Currency } from "../asset/currency.ts";
 import { Token } from "../asset/token.ts";
 import { PPositive } from "../bounded/positive.ts";
 import { PValue, Value } from "./value.ts";
-import { feesEtcLovelace, minAdaPerAsset } from "../../../../utils/constants.ts";
+import { feesLovelace, lockedAdaDirac, lockedAdaDiracBase, lockedAdaParamBase, lockedAdaPerAssetDirac, lockedAdaPerAssetParam } from "../../../../utils/constants.ts";
 
 export class PositiveValue {
   constructor(
@@ -101,13 +101,13 @@ export class PositiveValue {
     }
   };
 
-  public boundedSubValue = (
+  public boundedSubValueForOpening = (
     minSize: bigint,
     maxSize: bigint,
   ): PositiveValue | null => {
-    const availableAda = this.amountOf(Asset.ADA) - feesEtcLovelace // removing fees for param
-    const maxAdaDeposit = availableAda - feesEtcLovelace; // removing fees for first dirac
-    const maxAssets = maxAdaDeposit / (minAdaPerAsset * 2n); // likewise
+    const availableAda = this.amountOf(Asset.ADA) - (feesLovelace + lockedAdaParamBase) // removing fees and baseLockedAda for param
+    const maxAdaDeposit = availableAda - (feesLovelace + lockedAdaDiracBase); // removing fees and baseLockedAda for first dirac
+    const maxAssets = maxAdaDeposit / (lockedAdaPerAssetDirac + lockedAdaPerAssetParam); // variable locked Ada for param and one dirac
     console.log(`maxAdaDeposit: ${maxAdaDeposit}, maxAssets: ${maxAssets}`)
     maxSize = min(maxSize, maxAssets);
     if (minSize > maxSize) return null;
@@ -127,7 +127,7 @@ export class PositiveValue {
       // }
       value.initAmountOf(asset, amount);
     });
-    const minAda = minAdaPerAsset * (assets.size + 1n) + feesEtcLovelace; // ...and adding back the one for the first dirac
+    const minAda = lockedAdaDirac(assets.size + 1n) + feesLovelace; // ...and adding back the lockedAda and fees for the first dirac (assets.size + 1 to account for ADA)
     console.log(`assets: ${assets.size + 1n}, minAda: ${minAda}, availableAda: ${availableAda}`)
     value.initAmountOf(Asset.ADA, minAda + genNonNegative(availableAda - minAda));
     return value;

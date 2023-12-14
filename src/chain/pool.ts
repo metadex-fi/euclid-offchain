@@ -188,6 +188,15 @@ export class Pool {
     });
   }
 
+  public show = (tabs = "") => {
+    const tt = tabs + t;
+    const ttf = tt + f;
+    return `Pool {
+${ttf}paramUtxo: ${this.paramUtxo?.show(ttf)}
+${ttf}diracUtxos: ${this.diracUtxos.length}
+${tt}}`; // .map((d) => d.show(ttf)).join(",\n" + ttf)}
+};
+
   public split = (): Pool[] => {
     console.log(`splitting pool`);
     assert(this.diracUtxos.length > 1, "Pool is not splittable");
@@ -202,9 +211,9 @@ export class Pool {
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     console.log(
-      `Opening pool with ${this.diracUtxos.length} dirac utxos and ${
+      `Bulding opening-tx pool with ${this.diracUtxos.length} dirac utxos and ${
         this.paramContainingSplit ? 1 : 0
-      } param utxos`,
+      } param utxos for pool: ${this.show()}`,
     );
     // this.diracUtxos.forEach((diracUtxo) => console.log(diracUtxo.show()));
     let tx_ = this.paramUtxo.openingTx(tx, contract, this.paramContainingSplit);
@@ -216,6 +225,7 @@ export class Pool {
   };
 
   public closingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
+    console.log("Building closing-tx for pool:", this.show());
     const adminRedeemer = PEuclidAction.ptype.pconstant(
       new AdminRedeemer(),
     );
@@ -232,7 +242,7 @@ export class Pool {
 
     return tx // TODO read script?
       .attachMintingPolicy(contract.mintingPolicy)
-      .mintAssets(burningNFTs, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+      .mintAssets(burningNFTs, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial // TODO FIXME
       .collectFrom(
         this.utxos,
         Data.to(adminRedeemer),
@@ -240,6 +250,7 @@ export class Pool {
   };
 
   public switchingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
+    console.log("Building switching-tx for pool:", this.show());
     const adminRedeemer = PEuclidAction.ptype.pconstant(
       new AdminRedeemer(),
     );

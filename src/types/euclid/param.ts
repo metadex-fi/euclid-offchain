@@ -14,7 +14,7 @@ import { maxSmallInteger, PSmallValue, SmallValue } from "./smallValue.ts";
 import {
   maxInteger,
   defaultMaxWeight,
-  minAdaPerAsset,
+  lockedAdaDirac,
 } from "../../utils/constants.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)
@@ -90,9 +90,10 @@ ${tt})`;
       `assets of virtual must be a subset of assets of jumpSizes and weights, but ${param.virtual.assets.show()}\nis not a subset of ${assets.show()}`,
     );
     const numAssets = assets.size;
+    const minAda = lockedAdaDirac(numAssets);
     assert(
-      param.minAda === minAdaPerAsset * numAssets,
-      `minAda: ${param.minAda} !== ${minAdaPerAsset * numAssets}`,
+      param.minAda === minAda,
+      `minAda: ${param.minAda} !== ${minAda}`,
     );
 
     // const minAnchorPrices = param.maxAnchorPrices;
@@ -164,13 +165,15 @@ ${tt})`;
       weights.initAmountOf(asset, weight);
     });
 
+    const minAda = lockedAdaDirac(allAssets.size);
+
     return new Param(
       owner,
       new EuclidValue(virtuals),
       new EuclidValue(weights), //new SmallValue(new EuclidValue(weights)),
       new SmallValue(new EuclidValue(jumpSizes)),
       1n, // TODO include active-status in testing
-      allAssets.size * minAdaPerAsset,
+      minAda,
     );
   }
 

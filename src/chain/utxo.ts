@@ -21,8 +21,8 @@ import { ceilDiv, max, min } from "../utils/generators.ts";
 import {
   compareVariants,
   handleInvalidPools,
+  lockedAdaDirac,
   maxInteger,
-  minAdaPerAsset,
   // webappExpLimit,
 } from "../utils/constants.ts";
 import {
@@ -96,8 +96,8 @@ export class ParamUtxo {
     const tt = tabs + t;
     const ttf = tt + f;
     return `ParamUtxo (
-  ${ttf}param: ${this.param.concise(ttf)}
-  ${tt})`;
+${ttf}param: ${this.param.concise(ttf)}
+${tt})`;
   };
 }
 
@@ -153,10 +153,12 @@ export class DiracUtxo {
     const adaBalance = funds.amountOf(Asset.ADA, 0n);
     this.available = funds.clone;
     if (0n < adaBalance) {
-      if (adaBalance <= minAdaPerAsset) {
+      const minAdaBalance = lockedAdaDirac(dirac.assets.size);
+      assert(adaBalance >= minAdaBalance, `minAdaBalance: ${minAdaBalance} > ${adaBalance}`)
+      if (adaBalance <= minAdaBalance) {
         this.available.drop(Asset.ADA);
       } else {
-        this.available.increaseAmountOf(Asset.ADA, -minAdaPerAsset);
+        this.available.increaseAmountOf(Asset.ADA, -minAdaBalance);
       }
     }
   }
@@ -206,10 +208,10 @@ export class DiracUtxo {
     //   utxoToCore(this.utxo).to_bytes().length  // TODO very inefficent print
     // : undefined
     return `DiracUtxo (
-  ${ttf}dirac: ${this.dirac.concise(ttf)},
-  ${ttf}balance: ${this.funds?.concise(ttf) ?? "undefined"},
-  ${ttf}available: ${this.available?.concise(ttf) ?? "undefined"}
-  ${tt})`;
+${ttf}dirac: ${this.dirac.concise(ttf)},
+${ttf}balance: ${this.funds?.concise(ttf) ?? "undefined"},
+${ttf}available: ${this.available?.concise(ttf) ?? "undefined"}
+${tt})`;
     // ${ttf}utxo size: ${size ?? "undefined"}
   };
 
