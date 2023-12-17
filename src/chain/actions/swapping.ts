@@ -31,6 +31,7 @@ import {
   bestMultsAhead,
   countMults,
   PairOption,
+  SwapfindingVariant,
 } from "./swapfinding6/swapsForPair.ts";
 
 // const sellingADAtolerance = 0;
@@ -226,19 +227,23 @@ export class Swapping {
     // console.log(`attempting to swap`);
     let swappings: Swapping[] = [];
     // TODO probably too much
+    const variant: SwapfindingVariant = {
+      accuracy: randomChoice(["exact", "perExpMaxDelta", "imperfectMaxDelta"]),
+      stopOnceNotImproving: randomChoice([true, false]),
+    };
+    const expLimit = randomChoice([
+      webappExpLimit,
+      Number(genPositive(50n)),
+      Number(genPositive()),
+    ]);
     for (let i = maxInteger; i > 1n; i /= 10n) {
       swappings = user.contract!.state!.swappingsFor(
         user,
-        randomChoice(["exact", "perExpMaxDelta", "imperfectMaxDelta"]),
+        variant,
         genPositive(i),
         genPositive(i),
         0,
-        // webappExpLimit,
-        randomChoice([
-          webappExpLimit,
-          Number(genPositive(50n)),
-          Number(genPositive()),
-        ]),
+        expLimit,
       );
       if (swappings.length > 0) break;
     }
@@ -266,6 +271,20 @@ ${ttf}maxExpMults: ${this.maxExpMults}
 ${ttf}corruptions: ${this.corruptions.toString()}
   )`;
   };
+
+  // public toDataRow = (): string[] => {
+  //   return [
+  //     ...this.paramUtxo.toDataRow(),
+  //     ...this.diracUtxo.toDataRow(),
+  //     this.buyingAsset.show(),
+  //     this.sellingAsset.show(),
+  //     ...this.option.toDataRow(),
+  //     this.maxIntImpacted.toString(),
+  //     this.minExpMults.toString(),
+  //     this.maxExpMults.toString(),
+  //     this.corruptions.toString(),
+  //   ]
+  // }
 
   // public equals = (
   //   other: Swapping,
@@ -437,6 +456,7 @@ ${ttf}corruptions: ${this.corruptions.toString()}
   public subsequents = (
     maxSubsequents?: number,
     applyMinAmounts = true, // TODO test false
+    variant?: SwapfindingVariant,
   ): Swapping[] => {
     console.log(`subsequents(${maxSubsequents})`);
     const swappings: Swapping[] = [this];
@@ -454,7 +474,7 @@ ${ttf}corruptions: ${this.corruptions.toString()}
       const subsequents = diracUtxo.swappingsFor(
         this.user,
         this.paramUtxo,
-        this.option.variant,
+        variant ?? this.option.variant,
         applyMinAmounts ? this.option.b.minDelta : 1n,
         applyMinAmounts ? this.option.s.minDelta : 1n,
         this.minExpMults,
@@ -841,7 +861,7 @@ ${ttf}corruptions: ${this.corruptions.toString()}
 
   // try to make it wrong with minimal changes
   public corruptAll = (): Swapping[] => {
-    if (this.option.variant !== "exact") return [];
+    if (this.option.variant.accuracy !== "exact") return [];
     const corrupted_: (Swapping | null)[] = [];
     for (const random of [false, true]) {
       let corrupted = [

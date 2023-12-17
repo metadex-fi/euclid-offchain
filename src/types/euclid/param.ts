@@ -12,9 +12,9 @@ import { ceilDiv, min } from "../../utils/generators.ts";
 import { Value } from "../general/derived/value/value.ts";
 import { maxSmallInteger, PSmallValue, SmallValue } from "./smallValue.ts";
 import {
-  maxInteger,
   defaultMaxWeight,
   lockedAdaDirac,
+  maxInteger,
 } from "../../utils/constants.ts";
 
 // TODO somewhere, take care of sortedness where it applies (not only for PParam)

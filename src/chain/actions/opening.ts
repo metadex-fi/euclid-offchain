@@ -12,7 +12,7 @@ import { Pool } from "../pool.ts";
 import { User } from "../user.ts";
 import { DiracUtxo, ParamUtxo } from "../utxo.ts";
 import {
-feesLovelace,
+  feesLovelace,
   gMaxDiracs,
   gMaxLength,
   lockedAdaDirac,
@@ -29,10 +29,10 @@ export class Opening {
     private poolCache?: Pool,
   ) {
     // console.log(deposit.assets.union(this.param.virtual.assets).show());
-    assert(
-      deposit.assets.union(this.param.virtual.assets).equals(this.param.assets),
-      `deposit and virtual must cover all assets, but got\ndeposit: ${deposit.concise()}\nparam: ${this.param.concise()}`,
-    );
+    // assert( // TODO fix this to account for ADA being in the deposit when it's not a tradeable pool-asset
+    //   deposit.assets.union(this.param.virtual.assets).equals(this.param.assets),
+    //   `deposit and virtual must cover all assets, but got\ndeposit: ${deposit.concise()}\nparam: ${this.param.concise()}`,
+    // );
 
     // TODO assert 2. numDiracs resulting from numTicks <= lowest deposit
   }
@@ -231,7 +231,7 @@ export class Opening {
     // offsets for that asset's lowest price.
     // UPDATE: then, jump enough times to approximate the initial amm-price (TODO)
 
-    const lockedAda = lockedAdaDirac(assets.size)
+    const lockedAda = lockedAdaDirac(assets.size);
 
     assets.forEach((asset) => {
       const ticks = this.numTicks.amountOf(asset);
@@ -240,7 +240,10 @@ export class Opening {
       const tickMultiplier = jumpMultiplier ** (1 / Number(ticks));
       const diracs_ = new Array<Dirac>();
 
-      const balance_ = balance.amountOf(asset, asset.equals(Asset.ADA) ? lockedAda : 0n);
+      const balance_ = balance.amountOf(
+        asset,
+        asset.equals(Asset.ADA) ? lockedAda : 0n,
+      );
       const weight = weights.amountOf(asset);
       const virtual_ = virtual.amountOf(asset);
       const jumpSize = jumpSizes.amountOf(asset);
@@ -315,7 +318,7 @@ export class Opening {
       with balance ${user.balance?.concise()}`,
     );
     // console.log(`attempting to open`);
-    const balance = user.balance; // feesEtcLovelace accounted for below, as it's per utxo
+    const balance = user.availableBalance; // feesEtcLovelace also needs to be removed for base tx fee it seems?
     if (!balance) return null;
     if (!balance.has(Asset.ADA)) return null;
 
@@ -325,43 +328,54 @@ export class Opening {
     // balance.increaseAmountOf(Asset.ADA, -minAdaPerUtxo); // for param-utxo. TODO minAdaBalance is excessive
 
     // if (balance.size < 1) return null;
-    const maxAssets = gMaxLength;
-    const deposit = balance.boundedSubValueForOpening(2n, maxAssets); // this already accounts for lockedAda and fees for param // TODO revert to minimum 1 when virtuals fixed
-    if (!deposit) return null;
+    // const maxAssets = gMaxLength;
+    const subValue = balance.boundedSubValueForOpening(); // this already accounts for lockedAda and fees for param
+    if (!subValue) return null;
+    let [deposit, numVirtuals] = subValue;
     console.log("deposit:", deposit.concise());
-    const lockedAda = lockedAdaDirac(deposit.size);
-    const maxDiracsByMinADA = deposit.amountOf(Asset.ADA) / (lockedAda + feesLovelace);
+    const lockedAdaPerDirac = lockedAdaDirac(deposit.size + numVirtuals);
+    const maxDiracsByMinADA = deposit.amountOf(Asset.ADA) /
+      (lockedAdaPerDirac + feesLovelace);
     // const allowAda = deposit.has(Asset.ADA);
 
     // in case we don't want ADA to be listed in the pool
     let allowAda = true;
-    // if (Math.random() < 0.5) { // TODO FIXME
-    //   deposit.drop(Asset.ADA);
-    //   allowAda = false;
-    //   console.log("dropping ADA")
-    // }
-    // if (deposit.size < 1) return null;
+    if (deposit.size > 1 && Math.random() < 0.5) {
+      deposit.drop(Asset.ADA);
+      allowAda = false;
+      numVirtuals++;
+      console.log("dropping ADA");
+    }
 
     const allAssets = deposit.assets;
-    // let addVirtualAssets = max(genNonNegative(maxAssets), 2n) - allAssets.size; // TODO FIXME
-    // while (addVirtualAssets > 0n) {
-    //   const asset = Asset.generate();
-    //   if (allAssets.has(asset)) continue;
-    //   if ((!allowAda) && asset.equals(Asset.ADA)) continue;
-    //   // we require for now either no ADA in the pool, or at least minAdaBalance, to fix swapfinding
-    //   // note that there is always a minimum amount of ADA in the pool, so if that's lower than
-    //   // minAdaBalance, we can't allow ADA to be one of the pool-assets, or our swapfinding is imperfect
-    //   // TODO this is actually a bit bullshit in prod - why impose extra costs on LPs just so
-    //   // our swapfinding can claim to be perfect? There might be reasons though
-    //   allAssets.insert(asset);
-    //   addVirtualAssets--;
-    // }
-    // console.log(allAssets.show());
+    // let addVirtualAssets = max(genNonNegative(maxAssets), 2n) - allAssets.size;
+    while (numVirtuals > 0n) {
+      console.log(numVirtuals, "virtuals left to generate");
+      const asset = Asset.generate();
+      if (allAssets.has(asset)) continue;
+      if ((!allowAda) && asset.equals(Asset.ADA)) continue;
+      // we require for now either no ADA in the pool, or at least minAdaBalance, to fix swapfinding
+      // note that there is always a minimum amount of ADA in the pool, so if that's lower than
+      // minAdaBalance, we can't allow ADA to be one of the pool-assets, or our swapfinding is imperfect
+      // TODO this is actually a bit bullshit in prod - why impose extra costs on LPs just so
+      // our swapfinding can claim to be perfect? There might be reasons though
+      allAssets.insert(asset);
+      numVirtuals--;
+    }
+    console.log("all assets:", allAssets.show());
     const param = Param.genOf(user.paymentKeyHash, allAssets);
 
     // const gMaxDiracs = 26n; // because tx size
-    const maxDiracs = min(min(maxDiracsByMinADA, deposit.smallestAmount), gMaxDiracs); // because minimum deposit
-    console.log("maxDiracs:", maxDiracs, "maxDiracsByMinADA:", maxDiracsByMinADA);
+    const maxDiracs = min(
+      min(maxDiracsByMinADA, deposit.smallestAmount),
+      gMaxDiracs,
+    ); // because minimum deposit
+    console.log(
+      "maxDiracs:",
+      maxDiracs,
+      "maxDiracsByMinADA:",
+      maxDiracsByMinADA,
+    );
 
     let maxTicks = maxDiracs; //min(gMaxDiracs, maxDiracs);
     const numTicks = new PositiveValue();
@@ -387,6 +401,8 @@ export class Opening {
     console.log("numDiracs:", numDiracs.toString());
     console.log("numAssets:", allAssets.size.toString());
     if (allowAda) deposit.addAmountOf(Asset.ADA, -numDiracs * feesLovelace); // otherwise ADA was already removed from the deposit above
+    // NOTE not adding ADA back in if it's not a pool-asset. Instead this happens in DiraxUtxo.open
+    // else (deposit.addAmountOf(Asset.ADA, numDiracs * lockedAdaPerDirac)); // ...and we need to add the minimum amount back in
     console.log("remaining deposit:", deposit.concise());
 
     // console.log(`numDiracs: ${numTicks.unsigned.mulAmounts()}`);

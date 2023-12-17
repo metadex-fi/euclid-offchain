@@ -194,8 +194,9 @@ export class Pool {
     return `Pool {
 ${ttf}paramUtxo: ${this.paramUtxo?.show(ttf)}
 ${ttf}diracUtxos: ${this.diracUtxos.length}
+${ttf}first diracUtxo: ${this.diracUtxos[0]?.show(ttf)}
 ${tt}}`; // .map((d) => d.show(ttf)).join(",\n" + ttf)}
-};
+  };
 
   public split = (): Pool[] => {
     console.log(`splitting pool`);
@@ -242,7 +243,7 @@ ${tt}}`; // .map((d) => d.show(ttf)).join(",\n" + ttf)}
 
     return tx // TODO read script?
       .attachMintingPolicy(contract.mintingPolicy)
-      .mintAssets(burningNFTs, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial // TODO FIXME
+      .mintAssets(burningNFTs, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
       .collectFrom(
         this.utxos,
         Data.to(adminRedeemer),
@@ -276,7 +277,7 @@ ${tt}}`; // .map((d) => d.show(ttf)).join(",\n" + ttf)}
   };
 
   public swappingsFor(
-    user: User,
+    user: User | null,
     variant: SwapfindingVariant,
     minBuying: bigint,
     minSelling: bigint,
@@ -284,12 +285,12 @@ ${tt}}`; // .map((d) => d.show(ttf)).join(",\n" + ttf)}
     maxExpMults: number,
   ): Swapping[] {
     if (this.paramUtxo.param.active === 0n) return [];
-    const balance = user.availableBalance;
+    const balance = user?.availableBalance;
     console.log("pool.swappingsFor balance", balance?.concise());
-    if (!balance) return [];
-    const sellableBalance = balance.ofAssets(this.paramUtxo.param.assets);
-    console.log("pool.swappingsFor sellableBalance", sellableBalance.concise());
-    if (!sellableBalance.size) return [];
+    if (user && !balance) return [];
+    const sellableBalance = balance?.ofAssets(this.paramUtxo.param.assets).unsigned;
+    console.log("pool.swappingsFor sellableBalance", sellableBalance?.concise());
+    if (user && !sellableBalance!.size) return [];
     return this.diracUtxos.flatMap((d) =>
       d.swappingsFor(
         user,
@@ -299,7 +300,7 @@ ${tt}}`; // .map((d) => d.show(ttf)).join(",\n" + ttf)}
         minSelling,
         minExpMults,
         maxExpMults,
-        sellableBalance.unsigned,
+        sellableBalance,
         undefined,
         undefined,
       )

@@ -150,17 +150,21 @@ export class DiracUtxo {
     public readonly funds: PositiveValue,
     public utxo?: Lucid.UTxO, //exists when reading, not when creating. Not readonly because subesequent-swappings needs to set it. TODO more safety here
   ) {
-    const adaBalance = funds.amountOf(Asset.ADA, 0n);
+    const adaBalance = funds.amountOf(Asset.ADA); //, 0n);
     this.available = funds.clone;
-    if (0n < adaBalance) {
-      const minAdaBalance = lockedAdaDirac(dirac.assets.size);
-      assert(adaBalance >= minAdaBalance, `minAdaBalance: ${minAdaBalance} > ${adaBalance}`)
-      if (adaBalance <= minAdaBalance) {
-        this.available.drop(Asset.ADA);
-      } else {
-        this.available.increaseAmountOf(Asset.ADA, -minAdaBalance);
-      }
+    // if (0n < adaBalance) {
+    const numAssets = dirac.assets.size;
+    const minAdaBalance = lockedAdaDirac(numAssets);
+    assert(
+      adaBalance >= minAdaBalance,
+      `adaBalance: ${adaBalance} < minAdaBalance: ${minAdaBalance} (${numAssets} assets)`,
+    );
+    if (adaBalance <= minAdaBalance) {
+      this.available.drop(Asset.ADA);
+    } else {
+      this.available.increaseAmountOf(Asset.ADA, -minAdaBalance);
     }
+    // }
   }
 
   static parse(
@@ -175,7 +179,7 @@ export class DiracUtxo {
     );
     const diracDatum = peuclidDatum.plift(from.datum);
     assert(diracDatum instanceof DiracDatum, `expected DiracDatum`);
-    assert(param.assets.equals(diracDatum.dirac.assets), `assets mismatch`)
+    assert(param.assets.equals(diracDatum.dirac.assets), `assets mismatch`);
     return new DiracUtxo(
       peuclidDatum,
       diracDatum.dirac,
@@ -194,6 +198,11 @@ export class DiracUtxo {
       dirac.paramNFT,
       dirac.threadNFT,
     );
+    if (!balance.has(Asset.ADA)) {
+      const numAssets = dirac.assets.size;
+      const minAdaBalance = lockedAdaDirac(numAssets);
+      balance.initAmountOf(Asset.ADA, minAdaBalance);
+    }
     return new DiracUtxo(peuclidDatum, dirac, balance);
   }
 

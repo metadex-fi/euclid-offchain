@@ -4,7 +4,12 @@ import { IdNFT } from "../types/euclid/idnft.ts";
 import { Asset } from "../types/general/derived/asset/asset.ts";
 import { Assets } from "../types/general/derived/asset/assets.ts";
 import { KeyHash, PKeyHash } from "../types/general/derived/hash/keyHash.ts";
-import { feesLovelace, lockedAdaDirac, lockedAdaParam, lovelacePerAda } from "../utils/constants.ts";
+import {
+  feesLovelace,
+  lockedAdaDirac,
+  lockedAdaParam,
+  lovelacePerAda,
+} from "../utils/constants.ts";
 import { PositiveValue } from "../types/general/derived/value/positiveValue.ts";
 import { Action, UserAction } from "./actions/action.ts";
 
@@ -36,7 +41,7 @@ export type ActionResults = {
 };
 
 export class User {
-  public readonly contract: Contract;
+  // public readonly contract: Contract;
   public readonly paymentKeyHash: KeyHash;
   public balance?: PositiveValue;
   public usedSplitting = false;
@@ -50,6 +55,7 @@ export class User {
 
   private constructor(
     public readonly lucid: Lucid.Lucid,
+    public readonly contract: Contract, // TODO having this public might lead to oversight-bugs in webapp
     // public readonly protocolParameters: Lucid.ProtocolParameters,
     public readonly privateKey?: string, // for emulation
     public readonly address?: Lucid.Address,
@@ -57,7 +63,7 @@ export class User {
     private readonly api?: WalletApi,
     private readonly userChaining = false, // whether the wallet supports chaining user-utxos
   ) {
-    this.contract = new Contract(lucid);
+    // this.contract = new Contract(lucid);
 
     if (address) {
       const addressDetails = this.lucid.utils.getAddressDetails(address);
@@ -158,7 +164,7 @@ export class User {
   public generateActions = async (): Promise<Action[]> => {
     await this.update();
     // doing this in the individual actions - note that closing is supposed to be cheaper, which is why that is better
-    // if (this.balance!.amountOf(Asset.ADA) < feesEtcLovelace) { 
+    // if (this.balance!.amountOf(Asset.ADA) < feesEtcLovelace) {
     //   // console.log(`not enough ada to pay fees etc.`);
     //   return [];
     // }
@@ -287,8 +293,8 @@ export class User {
       let numAssets: bigint | null = null;
       let minLockedParam: bigint | null = null;
       let minLockedDirac: bigint | null = null;
-      if(action?.type === "Opening") {
-        numAssets = (action as Opening).deposit.size;
+      if (action?.type === "Opening") {
+        numAssets = (action as Opening).param.assets.size;
         minLockedParam = lockedAdaParam(numAssets);
         minLockedDirac = lockedAdaDirac(numAssets);
       }
@@ -319,13 +325,18 @@ export class User {
 
         if (minLockedParam && i === 0) {
           // this one just ensures our estimate is correct
-          assert(lockedAda <= minLockedParam, `minLockedParam: ${minLockedParam} < lockedAda: ${lockedAda} (${numAssets} assets)`)
+          assert(
+            lockedAda <= minLockedParam,
+            `minLockedParam: ${minLockedParam} < lockedAda: ${lockedAda} (${numAssets} assets)`,
+          );
         } else if (minLockedDirac) {
-          // this one assures that no ADA can be skimmed 
+          // this one assures that no ADA can be skimmed
           // (and swapfinding works anally well all the time)
-          assert(lockedAda <= minLockedDirac, `minLockedDirac: ${minLockedDirac} < lockedAda: ${lockedAda} (${numAssets} assets)`)
+          assert(
+            lockedAda <= minLockedDirac,
+            `minLockedDirac: ${minLockedDirac} < lockedAda: ${lockedAda} (${numAssets} assets)`,
+          );
         }
-
       }
       // end logging
 
@@ -336,9 +347,9 @@ export class User {
       return { txHash, txCore };
     } catch (e) {
       if (
-        this.usedSplitting && 
+        this.usedSplitting &&
         (e.toString().includes("Insufficient input in transaction") ||
-         e.toString().includes("Insufficient collateral balance") ||
+          e.toString().includes("Insufficient collateral balance") ||
           e.toString().includes("InputsExhaustedError"))
       ) {
         console.warn(
@@ -394,20 +405,22 @@ export class User {
   static async fromWalletApi(
     lucid: Lucid.Lucid,
     api: Lucid.WalletApi,
+    contract: Contract,
   ): Promise<User> {
     const address = await lucid.selectWallet(api).wallet.address();
     // const protocolParameters = await lucid.provider.getProtocolParameters();
-    return new User(lucid, undefined, address, undefined, api);
+    return new User(lucid, contract, undefined, address, undefined, api);
   }
 
   static async fromPrivateKey(
     lucid: Lucid.Lucid,
     privateKey: string,
+    contract: Contract,
   ): Promise<User> {
     const address = await lucid.selectWalletFromPrivateKey(privateKey).wallet
       .address();
     // const protocolParameters = await lucid.provider.getProtocolParameters();
-    return new User(lucid, privateKey, address);
+    return new User(lucid, contract, privateKey, address);
   }
 
   static async generateWith(
@@ -418,7 +431,8 @@ export class User {
     const address = await lucid.selectWalletFromPrivateKey(privateKey).wallet
       .address();
     // const protocolParameters = await lucid.provider.getProtocolParameters();
-    const user = new User(lucid, privateKey, address);
+    const contract = new Contract(lucid);
+    const user = new User(lucid, contract, privateKey, address);
     user.balance = PositiveValue.genOfAssets(
       allAssets.boundedSubset(1n),
     ).normedPlus(forFeesEtc)
@@ -436,7 +450,8 @@ export class User {
     const privateKey = Lucid.generatePrivateKey();
     const paymentKeyHash = PKeyHash.ptype.genData();
     // const protocolParameters = Lucid.PROTOCOL_PARAMETERS_DEFAULT;
-    const user = new User(lucid, privateKey, undefined, paymentKeyHash);
+    const contract = new Contract(lucid);
+    const user = new User(lucid, contract, privateKey, undefined, paymentKeyHash);
     const assets = Assets.generate(2n);
     user.balance = PositiveValue.genOfAssets(assets);
     return user;

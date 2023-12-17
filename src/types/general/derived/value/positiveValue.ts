@@ -1,6 +1,11 @@
 import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { Lucid } from "../../../../../lucid.mod.ts";
-import { genNonNegative, genPositive, max, min } from "../../../../utils/generators.ts";
+import {
+  genNonNegative,
+  genPositive,
+  max,
+  min,
+} from "../../../../utils/generators.ts";
 import { AssocMap } from "../../fundamental/container/map.ts";
 import { PWrapped } from "../../fundamental/container/wrapped.ts";
 import { Asset } from "../asset/asset.ts";
@@ -9,7 +14,16 @@ import { Currency } from "../asset/currency.ts";
 import { Token } from "../asset/token.ts";
 import { PPositive } from "../bounded/positive.ts";
 import { PValue, Value } from "./value.ts";
-import { feesLovelace, lockedAdaDirac, lockedAdaDiracBase, lockedAdaParamBase, lockedAdaPerAssetDirac, lockedAdaPerAssetParam } from "../../../../utils/constants.ts";
+import {
+  feesLovelace,
+  gMaxLength,
+  lockedAdaDirac,
+  lockedAdaDiracBase,
+  lockedAdaParam,
+  lockedAdaParamBase,
+  lockedAdaPerAssetDirac,
+  lockedAdaPerAssetParam,
+} from "../../../../utils/constants.ts";
 
 export class PositiveValue {
   constructor(
@@ -101,18 +115,21 @@ export class PositiveValue {
     }
   };
 
-  public boundedSubValueForOpening = (
-    minSize: bigint,
-    maxSize: bigint,
-  ): PositiveValue | null => {
-    const availableAda = this.amountOf(Asset.ADA) - (feesLovelace + lockedAdaParamBase) // removing fees and baseLockedAda for param
-    const maxAdaDeposit = availableAda - (feesLovelace + lockedAdaDiracBase); // removing fees and baseLockedAda for first dirac
-    const maxAssets = maxAdaDeposit / (lockedAdaPerAssetDirac + lockedAdaPerAssetParam); // variable locked Ada for param and one dirac
-    console.log(`maxAdaDeposit: ${maxAdaDeposit}, maxAssets: ${maxAssets}`)
-    maxSize = min(maxSize, maxAssets);
-    if (minSize > maxSize) return null;
-    if (minSize > this.assets.size) return null;
-    const assets = this.assets.clone.drop(Asset.ADA).boundedSubset(minSize -1n, maxSize -1n); // TODO clone?
+  public boundedSubValueForOpening = (): [PositiveValue, bigint] | null => {
+    let availableAda = this.amountOf(Asset.ADA);
+    const maxAdaDeposit = availableAda -
+      (2n * feesLovelace + lockedAdaDiracBase + lockedAdaParamBase); // removing fees and baseLockedAda for param and at least one dirac
+    const maxAssets_ = maxAdaDeposit /
+      (lockedAdaPerAssetDirac + lockedAdaPerAssetParam); // variable locked Ada for param and at least one dirac
+    if (maxAssets_ < 2n) return null;
+    console.log(
+      `availableAda: ${availableAda}, maxAdaDeposit: ${maxAdaDeposit}, maxAssets: ${maxAssets_}`,
+    );
+    const maxAssets = min(gMaxLength, maxAssets_);
+    const assets = this.assets.clone.drop(Asset.ADA).boundedSubset(
+      0n,
+      maxAssets - 1n,
+    ); // TODO clone required?
     const value = new PositiveValue();
     assets.forEach((asset) => {
       let amount = this.amountOf(asset);
@@ -123,14 +140,27 @@ export class PositiveValue {
       //   );
       //   amount = minAda + genNonNegative(amount - minAda);
       // } else {
-        amount = genPositive(amount);
+      amount = genPositive(amount);
       // }
       value.initAmountOf(asset, amount);
     });
-    const minAda = lockedAdaDirac(assets.size + 1n) + feesLovelace; // ...and adding back the lockedAda and fees for the first dirac (assets.size + 1 to account for ADA)
-    console.log(`assets: ${assets.size + 1n}, minAda: ${minAda}, availableAda: ${availableAda}`)
-    value.initAmountOf(Asset.ADA, minAda + genNonNegative(availableAda - minAda));
-    return value;
+    const numAssets = assets.size + 1n; // +1 for ADA
+    const minVirtuals = max(0n, 2n - numAssets);
+    const maxVirtuals = maxAssets - numAssets;
+    const numVirtuals = minVirtuals + genNonNegative(maxVirtuals - minVirtuals);
+    const allAssets = numAssets + numVirtuals;
+    availableAda -= lockedAdaParam(allAssets) + feesLovelace; // removing lockedAda and fees for param from availableAda
+    const minAda = lockedAdaDirac(allAssets) + feesLovelace; // requiring lockedAda and fees for at least one dirac
+    console.log(
+      `assets: ${
+        assets.size + 1n
+      }, minAda: ${minAda}, availableAda: ${availableAda}`,
+    );
+    value.initAmountOf(
+      Asset.ADA,
+      minAda + genNonNegative(availableAda - minAda),
+    );
+    return [value, numVirtuals];
   };
 
   public plus = (other: PositiveValue): PositiveValue => {

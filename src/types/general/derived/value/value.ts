@@ -16,9 +16,8 @@ export const ccysTknsAmnts = new AssocMap<Currency, AssocMap<Token, bigint>>(
 );
 export const tknsAmnts = new AssocMap<Token, bigint>((tkn) => tkn.show());
 
-const showAmnt = (amnt: bigint): string => 
+const showAmnt = (amnt: bigint): string =>
   `${amnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "_")} (${amnt})`;
-
 
 export class Value {
   constructor(

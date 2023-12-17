@@ -66,6 +66,7 @@ Deno.test("emulator", async () => {
       //   }),
       // );
       // console.log(`users: ${users.length}`);
+      let prevActionType = "";
       try {
         // for (const user of users) {
         const hashes = await user
@@ -74,7 +75,7 @@ Deno.test("emulator", async () => {
             const hashes_: string[] = [];
             for (const action of actions) {
               const type = action.type;
-
+              prevActionType = type;
               // corruption-tests
               if (type === "Swapping") {
                 const swapping = action as Swapping;
@@ -116,6 +117,7 @@ Deno.test("emulator", async () => {
             while (user.wantsToRetry) {
               console.warn(`wantsToRetry`);
               emulator.awaitBlock(1); // TODO this does not take into account the possibility that others do or attempt stuff in the meantime
+              await user.update(); // NOTE late night edit, not sure. Just for logging I think
               const results = await user.newBlock();
               results.forEach((r) => hashes_.push(...r.txHashes)); // TODO do this automatically in user.update() - requires checking blocks, however
             }
@@ -125,12 +127,26 @@ Deno.test("emulator", async () => {
         traces.push(...hashes.flat());
         // }
       } catch (e) {
+        assert(
+          prevActionType !== "",
+          `prevActionType not set, caught: ${e.toString()}`,
+        );
         if (
-          // false
-          //e.toString().includes("Not enough ADA leftover to cover minADA") //||
-          // e.toString().includes("Insufficient collateral balance") ||
-          // e.toString().includes("Over budget") // TODO FIXME
-          e.toString().includes("Max collateral inputs reached") // TODO FIXME
+          prevActionType === "Opening" && (
+            // false
+            e.toString().includes("Not enough ADA leftover to cover minADA") || // TODO hard to fix bullshit
+            // NOTE I think below might be due to collateral-utxos having to be different ones; setting fees super high does not solve it.
+            // see tx_builder.rs in lucid/CML
+            e.toString().includes("Insufficient collateral balance") || // TODO hard to fix bullshit
+            // e.toString().includes("Over budget") // TODO FIXME
+            e.toString().includes("Max collateral inputs reached") // TODO FIXME
+          )
+        ) {
+          console.error("caught:", e);
+        } else if (
+          prevActionType === "Closing" && (
+            e.toString().includes("Over budget") // TODO FIXME
+          )
         ) {
           console.error("caught:", e);
         } else {
