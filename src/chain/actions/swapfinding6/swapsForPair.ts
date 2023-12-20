@@ -13,7 +13,7 @@ import { maxSmallInteger } from "../../../types/euclid/smallValue.ts";
 import { Param } from "../../../types/euclid/param.ts";
 import { f, t } from "../../../types/general/fundamental/type.ts";
 
-const logging = true;
+const logging = false;
 
 export const genWildAssetParams = (maxInteger: bigint) => {
   const jumpSize = genPositive(maxSmallInteger);
@@ -659,7 +659,7 @@ export class PairOptions {
             }
           }
         }
-        if (logging) console.log("improvement feasible over", bestPriceOption);
+        // if (logging) console.log("improvement feasible over", bestPriceOption);
         return true;
       };
 

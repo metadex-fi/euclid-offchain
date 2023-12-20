@@ -29,6 +29,8 @@ Deno.test("emulator", async () => {
   // console.log(parameters);
 
   // return;
+  const nativeUplc = true; // TODO check the impact of this
+
   let trials = 5;
   const actionCounts_ = new Map<string, number>();
   // const errors = [];
@@ -38,7 +40,7 @@ Deno.test("emulator", async () => {
     let generationTries = 100; // TODO consider fixing this
     while (!allUsers) {
       try {
-        allUsers = await User.genSeveral(genPositive(10n), genPositive(10n)); // TODO more
+        allUsers = await User.genSeveral(nativeUplc, genPositive(10n), genPositive(10n)); // TODO more
       } catch (e) {
         if (generationTries-- <= 0) throw e;
       }
@@ -54,9 +56,12 @@ Deno.test("emulator", async () => {
         `\ntrials left: ${trials} - iteration: ${i} - block: ${emulator.blockHeight}`, // - errors: ${errors.length}`,
       );
       const lucid = await Lucid.Lucid.new(emulator);
+      const contract = new Contract(lucid);
       const user = await User.fromPrivateKey(
         lucid,
+        nativeUplc,
         randomChoice(allUsers).privateKey!,
+        contract,
       );
       // TODO multiple parallel users and actions (requires logging of spent contract utxos or error handling)
       // const users = await Promise.all(

@@ -57,6 +57,7 @@ export class User {
     public readonly lucid: Lucid.Lucid,
     public readonly contract: Contract, // TODO having this public might lead to oversight-bugs in webapp
     // public readonly protocolParameters: Lucid.ProtocolParameters,
+    public readonly nativeUplc: boolean,
     public readonly privateKey?: string, // for emulation
     public readonly address?: Lucid.Address,
     paymentKeyHash?: KeyHash,
@@ -282,12 +283,19 @@ export class User {
     action?: Action,
   ): Promise<TxResult> => {
     try {
-      const txCompleted = await tx.complete();
+      const txCompleted = await tx.complete(
+        {
+          nativeUplc: this.nativeUplc // TODO check if this does fix the exbudget-error and revert if not. Also, what does it do in the first place?
+        }
+      );
 
       // begin logging
       const txBody = txCompleted.txComplete.body();
       const txHash_ = Lucid.C.hash_transaction(txBody);
       const txOuts = txBody.outputs();
+
+      console.log("txComplete (json):", txCompleted.txComplete.to_json());
+      console.log("txComplete (js):", txCompleted.txComplete.to_js_value());
 
       // NOTE there's also an assert here
       let numAssets: bigint | null = null;
@@ -404,27 +412,30 @@ export class User {
 
   static async fromWalletApi(
     lucid: Lucid.Lucid,
+    nativeUplc: boolean,
     api: Lucid.WalletApi,
     contract: Contract,
   ): Promise<User> {
     const address = await lucid.selectWallet(api).wallet.address();
     // const protocolParameters = await lucid.provider.getProtocolParameters();
-    return new User(lucid, contract, undefined, address, undefined, api);
+    return new User(lucid, contract, nativeUplc, undefined, address, undefined, api);
   }
 
   static async fromPrivateKey(
     lucid: Lucid.Lucid,
+    nativeUplc: boolean,
     privateKey: string,
     contract: Contract,
   ): Promise<User> {
     const address = await lucid.selectWalletFromPrivateKey(privateKey).wallet
       .address();
     // const protocolParameters = await lucid.provider.getProtocolParameters();
-    return new User(lucid, contract, privateKey, address);
+    return new User(lucid, contract, nativeUplc, privateKey, address);
   }
 
   static async generateWith(
     lucid: Lucid.Lucid,
+    nativeUplc: boolean,
     allAssets: Assets,
   ): Promise<User> {
     const privateKey = Lucid.generatePrivateKey();
@@ -432,7 +443,7 @@ export class User {
       .address();
     // const protocolParameters = await lucid.provider.getProtocolParameters();
     const contract = new Contract(lucid);
-    const user = new User(lucid, contract, privateKey, address);
+    const user = new User(lucid, contract, nativeUplc, privateKey, address);
     user.balance = PositiveValue.genOfAssets(
       allAssets.boundedSubset(1n),
     ).normedPlus(forFeesEtc)
@@ -444,20 +455,21 @@ export class User {
   }
 
   // for propertytesting
-  static generateDummy(): User {
+  static generateDummy(nativeUplc: boolean): User {
     const lucid = new Lucid.Lucid();
     lucid.utils = new Lucid.Utils(lucid);
     const privateKey = Lucid.generatePrivateKey();
     const paymentKeyHash = PKeyHash.ptype.genData();
     // const protocolParameters = Lucid.PROTOCOL_PARAMETERS_DEFAULT;
     const contract = new Contract(lucid);
-    const user = new User(lucid, contract, privateKey, undefined, paymentKeyHash);
+    const user = new User(lucid, contract, nativeUplc, privateKey, undefined, paymentKeyHash);
     const assets = Assets.generate(2n);
     user.balance = PositiveValue.genOfAssets(assets);
     return user;
   }
 
   static async genSeveral(
+    nativeUplc: boolean,
     numUsers: bigint,
     numAssets: bigint,
   ): Promise<User[]> {
@@ -468,7 +480,7 @@ export class User {
 
     const addresses = new Array<Lucid.Address>();
     while (users.length < numUsers) {
-      const user = await User.generateWith(lucid, allAssets);
+      const user = await User.generateWith(lucid, nativeUplc, allAssets);
       assert(user.address, `user.address is undefined`);
       if (!addresses.includes(user.address)) {
         addresses.push(user.address);
