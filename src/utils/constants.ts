@@ -15,14 +15,14 @@ export const webappExpLimit = 11; // our empirically determined expLimit in the 
 export const handleInvalidPools = false; // in prod we might get invalid pools because of spammers/attackers, but in dev we want to get an error. TODO adjust accordingly
 
 export const lovelacePerAda = 1000000n;
-export const feesLovelace = 5n * lovelacePerAda; // costs in lovelace for fees TODO excessive and probably different for different actions
+export const feesLovelace = 10n * lovelacePerAda; // costs in lovelace for fees TODO excessive and probably different for different actions
 export const closingFees = feesLovelace / 2n; // in case all ADA was put into a pool, we want avoid losing the minimum needed to close it again
 
 // TODO still estimates (see math/lockedAda)
 export const lockedAdaDiracBase = lovelacePerAda * 3n / 2n;
-export const lockedAdaParamBase = 25n * lovelacePerAda;
+export const lockedAdaParamBase = 29n * lovelacePerAda;
 export const lockedAdaPerAssetDirac = lovelacePerAda * 3n / 4n;
-export const lockedAdaPerAssetParam = lovelacePerAda * 3n / 4n;
+export const lockedAdaPerAssetParam = lovelacePerAda; //* 3n / 4n;
 
 // this one is actually required per the contract
 export const lockedAdaDirac = (numAssets: bigint): bigint =>

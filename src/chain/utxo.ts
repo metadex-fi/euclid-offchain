@@ -246,22 +246,29 @@ ${tt})`;
       swapping.diracUtxo.dirac.concise() === this.dirac.concise(),
       `dirac mismatch:\n${swapping.diracUtxo.dirac.concise()}\n!==\n${this.dirac.concise()}`,
     );
-    return new DiracUtxo(
-      this.peuclidDatum,
-      swapping.posteriorDirac,
-      this.funds
+    let funds = this.funds;
+    swapping.subSwaps.forEach((subSwap) => {
+      funds = funds
         .normedPlus(
           PositiveValue.singleton(
-            swapping.sellingAsset,
-            swapping.option.deltaSelling,
+            swapping.sellingAsset, // deliberately not using subswap here to entice errors if mismatch - TODO assert this instead in the right place
+            subSwap.option.deltaSelling,
           ),
         )
         .normedMinus(
           PositiveValue.singleton(
-            swapping.buyingAsset,
-            swapping.option.deltaBuying,
+            swapping.buyingAsset, // deliberately not using subswap here to entice errors if mismatch - TODO assert this instead in the right place
+            subSwap.option.deltaBuying,
           ),
-        ),
+        );
+    });
+    const lastSubSwap = swapping.subSwaps.at(-1);
+    assert(lastSubSwap, `applySwapping(): less than one subSwap`);
+
+    return new DiracUtxo(
+      this.peuclidDatum,
+      lastSubSwap.posteriorDirac,
+      funds,
       //TODO note that the utxo is missing, this should result from the tx, which we don't have yet
     );
   };
@@ -349,7 +356,7 @@ ${tt})`;
         const option = pairOptions.bestAdheringOption;
         if (option === null) return;
 
-        swappings.push(Swapping.boundary(
+        const swapping = Swapping.boundary(
           user,
           paramUtxo,
           this,
@@ -359,7 +366,9 @@ ${tt})`;
           pairOptions.maxIntegerImpacted,
           minExpMults,
           maxExpMults,
-        ));
+        );
+
+        swappings.push(swapping);
       });
     });
     return swappings;

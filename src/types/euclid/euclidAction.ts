@@ -13,7 +13,7 @@ class PSwapRedeemer extends PObject<SwapRedeemer> {
   private constructor() {
     super(
       new PRecord({
-        "swap": PSwap.ptype,
+        "swap": new PSwap(),
       }),
       SwapRedeemer,
     );

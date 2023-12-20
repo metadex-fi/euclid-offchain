@@ -24,6 +24,7 @@ import { Assets } from "../../types/general/derived/asset/assets.ts";
 import { Dirac } from "../../types/euclid/dirac.ts";
 import {
   compareVariants,
+  gMaxLength,
   maxInteger,
   webappExpLimit,
 } from "../../utils/constants.ts";
@@ -31,8 +32,10 @@ import {
   bestMultsAhead,
   countMults,
   PairOption,
+  PairOptions,
   SwapfindingVariant,
 } from "./swapfinding6/swapsForPair.ts";
+import { SubSwap } from "../../types/euclid/subSwap.ts";
 
 // const sellingADAtolerance = 0;
 
@@ -62,6 +65,7 @@ import {
 export class Swapping {
   public previous?: Swapping;
   public subsequent?: Swapping;
+  public subSwaps: Swapping[] = [this];
 
   private constructor(
     public readonly user: User | null, // webapp needs undefined iirc
@@ -74,73 +78,7 @@ export class Swapping {
     public readonly minExpMults: number,
     public readonly maxExpMults: number,
     public readonly corruptions: string[],
-    // runTests: boolean, // corruption-test-swappings don't run tests themselves.
-    // public readonly adhereMaxInteger: boolean,
-    // public readonly maxIntImpacted: boolean,
-    // public readonly maxExpMults: number | null,
-    // // public readonly expLimitImpacted: boolean,
-    // public readonly user: User | null, // webapp needs undefined iirc
-    // public readonly paramUtxo: ParamUtxo,
-    // public readonly diracUtxo: DiracUtxo,
-    // public readonly buyingAsset: Asset,
-    // public readonly sellingAsset: Asset,
-    // public readonly buyingAmnt: bigint,
-    // public readonly sellingAmnt: bigint,
-    // public readonly newAnchorBuying: bigint, // inverted
-    // public readonly newAnchorSelling: bigint, // inverted
-    // public readonly buyingExp: bigint,
-    // public readonly sellingExp: bigint,
-    // private availableBuying: bigint, // for corruption-tests (cannot be taken from dirac because of subSwaps)
-    // private readonly availableSelling: bigint | null, // for corruption-tests (cannot be left null or taken from user because of subSwaps). Null means no limit
-    // private readonly minBuying_: bigint,
-    // private readonly minSelling: bigint,
-    // private readonly tmpMinBuying: bigint | null, // for optimiziation. Need to store this to make corruption-tests pass
-    // runTests: boolean, // corruption-test-swappings don't run tests themselves.
   ) {
-    // assert(
-    //   buyingAmnt <= availableBuying,
-    //   `buyingAmnt must be less than or equal to availableBuying: ${this.show()}`,
-    // );
-    // assert(
-    //   availableSelling === null || sellingAmnt <= availableSelling,
-    //   `sellingAmnt must be less than or equal to availableSelling: ${this.show()}`,
-    // );
-    // assert(
-    //   buyingAmnt >= this.minBuying,
-    //   `buyingAmnt too low: ${this.show()}`,
-    // );
-    // assert(
-    //   sellingAmnt >= minSelling,
-    //   `sellingAmnt too low: ${this.show()}`,
-    // );
-    // assert(
-    //   newAnchorBuying > 0n,
-    //   `newAnchorBuying must be positive: ${this.show()}`,
-    // );
-    // assert(
-    //   newAnchorSelling > 0n,
-    //   `newAnchorSelling must be positive: ${this.show()}`,
-    // );
-    // assert(
-    //   (!adhereMaxInteger) || newAnchorBuying <= maxInteger,
-    //   `newAnchorBuying must be <= maxInteger: ${this.show()}`,
-    // );
-    // assert(
-    //   (!adhereMaxInteger) || newAnchorSelling <= maxInteger,
-    //   `newAnchorSelling must be <= maxInteger: ${this.show()}`,
-    // );
-    // assert(
-    //   minBuying_ > 0n,
-    //   `minBuying must be positive: ${this.show()}`,
-    // );
-    // assert(
-    //   tmpMinBuying === null || minBuying_ <= tmpMinBuying,
-    //   `tmpMinBuying must be <= minBuying: ${this.show()}`,
-    // );
-    // assert(
-    //   minSelling > 0n,
-    //   `minSelling must be positive: ${this.show()}`,
-    // );
     if (user) {
       assert(
         option.s.maxDelta !== "oo" &&
@@ -148,27 +86,7 @@ export class Swapping {
         `availableSelling must be less than or equal to the available balance: ${this.show()}`,
       );
     }
-    // if (maxExpMults !== null) {
-    //   const buyingMults = countMults(option.b.exp);
-    //   const sellingMults = countMults(option.s.exp);
-    //   assert(
-    //     buyingMults + sellingMults <= maxExpMults,
-    //     `exponents must have ${buyingMults} + ${sellingMults} <= ${maxExpMults} multiplications: ${this.show()}`,
-    //   );
-    // }
-
-    // if (runTests) {
-    //   // assert(
-    //   //   this.spotPrice <= this.effectivePrice,
-    //   //   `spotPrice > effectivePrice: ${this.show()}`,
-    //   // );
-    //   assert(this.validates(), `Swapping does not validate: ${this.show()}`);
-    // }
   }
-
-  // private get minBuying(): bigint {
-  //   return this.tmpMinBuying ?? this.minBuying_;
-  // }
 
   public get type(): string {
     return "Swapping";
@@ -197,28 +115,6 @@ export class Swapping {
       minExpMults,
       maxExpMults,
       [],
-      // true, // corruption-test-swappings don't run tests themselves.
-      // adhereMaxInteger,
-      // maxIntImpacted,
-      // maxExpMults,
-      // // expLimitImpacted,
-      // user,
-      // paramUtxo,
-      // diracUtxo,
-      // buyingAsset,
-      // sellingAsset,
-      // buyingAmnt,
-      // sellingAmnt,
-      // newAnchorBuying,
-      // newAnchorSelling,
-      // buyingExp,
-      // sellingExp,
-      // availableBuying, //diracUtxo.available.amountOf(buyingAsset),
-      // availableSelling === -1n ? null : availableSelling, //user ? user.availableBalance!.amountOf(sellingAsset) : null,
-      // minBuying,
-      // minSelling,
-      // tmpMinBuying,
-      // true,
     );
   }
 
@@ -251,15 +147,19 @@ export class Swapping {
     if (swappings.length < 1) return null;
     // console.log(`Swapping`);
     const choice = randomChoice(swappings);
-    // return choice; // TODO revert
-    if (Math.random() < 0.5) return choice;
-    else return choice.randomSubSwap();
+    if (Math.random() < 0.5) {
+      // choice.subsequents(Number(genPositive(gMaxLength))) // TODO test more maxSubsequents? (and test this at all at some point)
+      choice.calcSubSwaps(Number(genPositive(gMaxLength))); // TODO test more maxSubSwaps?
+      return choice;
+    }
+    return choice.randomSubSwap();
   }
 
   public show = (tabs = ""): string => {
     const tt = tabs + t;
     const ttf = tt + f;
     return `Swapping (
+${ttf}subSwaps: ${this.subSwaps.length}
 ${ttf}paramUtxo: ${this.paramUtxo.show(ttf)}
 ${ttf}diracUtxo: ${this.diracUtxo.show(ttf)}
 ${ttf}buyingAsset: ${this.buyingAsset.show()}
@@ -271,60 +171,6 @@ ${ttf}maxExpMults: ${this.maxExpMults}
 ${ttf}corruptions: ${this.corruptions.toString()}
   )`;
   };
-
-  // public toDataRow = (): string[] => {
-  //   return [
-  //     ...this.paramUtxo.toDataRow(),
-  //     ...this.diracUtxo.toDataRow(),
-  //     this.buyingAsset.show(),
-  //     this.sellingAsset.show(),
-  //     ...this.option.toDataRow(),
-  //     this.maxIntImpacted.toString(),
-  //     this.minExpMults.toString(),
-  //     this.maxExpMults.toString(),
-  //     this.corruptions.toString(),
-  //   ]
-  // }
-
-  // public equals = (
-  //   other: Swapping,
-  //   compareMinSoft: boolean,
-  //   ignore: string[],
-  // ): boolean => {
-  //   const as = this.show().split("\n");
-  //   const bs = other.show().split("\n");
-  //   let matches = true;
-
-  //   if (as.length !== bs.length) {
-  //     console.log(`mismatch in length: ${as.length} !== ${bs.length}`);
-  //     matches = false;
-  //   }
-  //   for (let i = 0; i < as.length; i++) {
-  //     const a = as[i];
-  //     const b = bs[i];
-  //     if ((!compareMinSoft) && a.includes("s.minDelta")) continue;
-
-  //     let skip = false;
-  //     for (const ign of ignore) {
-  //       if (a.includes(ign)) {
-  //         skip = true;
-  //         break;
-  //       }
-  //     }
-  //     if (skip) continue;
-  //     if (a !== b) {
-  //       console.log(`mismatch: ${a} !== ${b}`);
-  //       matches = false;
-  //     }
-  //   }
-  //   if (compareMinSoft && this.option.b.minDelta !== other.option.b.minDelta) {
-  //     console.log(
-  //       `mismatch in minBuying: ${this.option.b.minDelta} !== ${other.option.b.minDelta}`,
-  //     );
-  //     matches = false;
-  //   }
-  //   return matches;
-  // };
 
   public split = (): Swapping[] => {
     throw new Error("Swapping-split not implemented");
@@ -364,45 +210,43 @@ ${ttf}corruptions: ${this.corruptions.toString()}
       this.paramUtxo.utxo,
       `paramUtxo.utxo must be defined`,
     );
-    const oldDirac = this.diracUtxo.dirac;
-    const funds = this.diracUtxo.funds.clone; // TODO cloning probably not required here
-    // console.log(`funds before: ${funds.show()}`)
-    funds.addAmountOf(this.buyingAsset, -this.option.deltaBuying);
-    funds.addAmountOf(this.sellingAsset, this.option.deltaSelling);
-    // funds.setAmountOf(Asset.ADA, max(funds.amountOf(Asset.ADA), this.paramUtxo.param.minAda)) // TODO do we need this?
-    // console.log(`funds after: ${funds.show()}`)
-    const retour: Lucid.Assets = funds.toLucid;
-    retour[oldDirac.threadNFT.toLucid] = 1n;
-    // Object.entries(retour).forEach(([asset, amount]) => {
-    //   console.log(`\t${asset}: ${amount}`);
-    // });
+
+    let prevExpBuying = 0n;
+    let prevExpSelling = 0n;
 
     const swapRedeemer = PEuclidAction.ptype.pconstant(
       new SwapRedeemer(
         new Swap(
           this.buyingAsset,
           this.sellingAsset,
-          this.option.b.exp,
-          this.option.s.exp,
+          this.subSwaps.map((s) => {
+
+            const subSwap = new SubSwap(
+              s.option.deltaBuying,
+              s.option.deltaSelling,
+              s.option.b.exp - prevExpBuying,
+              s.option.s.exp - prevExpSelling,
+            )
+
+            prevExpBuying = s.option.b.exp;
+            prevExpSelling = s.option.s.exp;
+
+            return subSwap;
+          }
+          ),
         ),
       ),
     );
 
-    const newDirac = this.posteriorDirac;
+    const newDiracUtxo = this.diracUtxo.applySwapping(this);
+    const retour: Lucid.Assets = newDiracUtxo.funds.toLucid; // applySwapping should already clone it
+    retour[this.diracUtxo.dirac.threadNFT.toLucid] = 1n;
+
     const datum = this.diracUtxo.peuclidDatum.pconstant(
-      new DiracDatum(newDirac),
+      new DiracDatum(newDiracUtxo.dirac),
     );
     const datum_ = Data.to(datum);
     const redeemer = Data.to(swapRedeemer);
-    // console.log("datum:", datum_);
-    // console.log("redeemer:", redeemer);
-    // console.log("utxo.txHash:", this.diracUtxo.utxo.txHash);
-    // console.log("utxo.outputIndex:", this.diracUtxo.utxo.outputIndex);
-    // console.log("utxo.assets:", this.diracUtxo.utxo.assets);
-    // console.log("utxo.address:", this.diracUtxo.utxo.address);
-    // console.log("utxo.datumHash:", this.diracUtxo.utxo.datumHash);
-    // console.log("utxo.datum:", this.diracUtxo.utxo.datum);
-    // console.log("utxo.scriptRef:", this.diracUtxo.utxo.scriptRef);
 
     const tx_ = tx
       .readFrom([this.paramUtxo.utxo])
@@ -452,6 +296,44 @@ ${ttf}corruptions: ${this.corruptions.toString()}
   };
 
   public succeeded = this.setSubsequentUtxo;
+
+  public calcSubSwaps = (maxSubSwaps: number): Swapping[] => {
+    const subSwaps: Swapping[] = [this];
+    let option = this.option;
+    let sellingOption = option.s;
+    let buyingOption = option.b;
+    for (let i = 1; i < maxSubSwaps; i++) {
+      if (option.deltaSelling === option.s.maxDelta) break;
+      if (option.deltaBuying === option.b.maxDelta) break;
+      sellingOption = sellingOption.applyDelta(option.deltaSelling);
+      buyingOption = buyingOption.applyDelta(option.deltaBuying);
+      const pairOptions = new PairOptions(
+        buyingOption,
+        sellingOption,
+        this.minExpMults,
+        this.maxExpMults,
+        maxInteger,
+        false,
+        option.variant,
+      );
+      if (pairOptions.bestAdheringOption === null) break;
+      option = pairOptions.bestAdheringOption;
+      const subSwap = Swapping.boundary(
+        this.user,
+        this.paramUtxo,
+        this.diracUtxo, // TODO ?
+        this.buyingAsset,
+        this.sellingAsset,
+        option,
+        pairOptions.maxIntegerImpacted,
+        this.minExpMults,
+        this.maxExpMults,
+      );
+      subSwaps.push(subSwap);
+    }
+    this.subSwaps = subSwaps;
+    return subSwaps;
+  };
 
   public subsequents = (
     maxSubsequents?: number,
@@ -688,178 +570,8 @@ ${ttf}corruptions: ${this.corruptions.toString()}
     // return subSwap;
   };
 
-  // private static pricesFitDirac(
-  //   spotBuying: bigint,
-  //   spotSelling: bigint,
-  //   buyingLowest: bigint,
-  //   sellingLowest: bigint,
-  //   buyingJumpSize: bigint,
-  //   sellingJumpSize: bigint,
-  // ): boolean {
-  //   const fitBuying = (spotBuying - buyingLowest) % buyingJumpSize === 0n;
-  //   const fitSelling = (spotSelling - sellingLowest) % sellingJumpSize === 0n;
-  //   if (!fitBuying) {
-  //     console.log(
-  //       `pricesFitDirac:
-  //       buying ${spotBuying}
-  //       not fit for ${buyingLowest}
-  //       with jump ${buyingJumpSize}`,
-  //     );
-  //   }
-  //   if (!fitSelling) {
-  //     console.log(
-  //       `pricesFitDirac:
-  //       selling ${spotSelling}
-  //       not fit for ${sellingLowest}
-  //       with jump ${sellingJumpSize}`,
-  //     );
-  //   }
-  //   return fitBuying && fitSelling;
-  // }
-
-  // static exponentsYieldPrice(
-  //   anchor: bigint,
-  //   js: bigint,
-  //   exp: bigint,
-  //   spot: bigint,
-  //   buySell: string,
-  // ): boolean {
-  //   const spot_ = calcSpot(anchor, js)(exp);
-
-  //   if (spot !== spot_) {
-  //     console.error(
-  //       `exponentsYieldPrice (${buySell}):
-  //       spot ${spot} != ${spot_}
-  //       for anchor ${anchor}, js ${js}, exp ${exp}`,
-  //     );
-  //     return false;
-  //   }
-  //   return true;
-  // }
-
-  // static pricesFitAmm(
-  //   spotBuying: bigint,
-  //   spotSelling: bigint,
-  //   buyingAmm: bigint,
-  //   sellingAmm: bigint,
-  // ): boolean {
-  //   const fitsBuying = spotBuying <= buyingAmm;
-  //   const fitsSelling = sellingAmm <= spotSelling;
-  //   if (!fitsBuying) {
-  //     console.error(
-  //       `pricesFitAmm:
-  //       buyingAmm  ${buyingAmm} >
-  //       spotBuying ${spotBuying}`,
-  //     );
-  //     return false;
-  //   }
-  //   if (!fitsSelling) {
-  //     console.error(
-  //       `pricesFitAmm:
-  //       sellingAmm  ${sellingAmm} >
-  //       spotSelling ${spotSelling}`,
-  //     );
-  //     return false;
-  //   }
-  //   return true;
-  // }
-
-  // static valueEquation(
-  //   spotBuying: bigint,
-  //   spotSelling: bigint,
-  //   buyingAmount: bigint,
-  //   sellingAmount: bigint,
-  // ): boolean {
-  //   const addedBuyingA0 = buyingAmount * spotSelling;
-  //   const addedSellingA0 = sellingAmount * spotBuying;
-
-  //   if (addedBuyingA0 > addedSellingA0) {
-  //     console.error(
-  //       `valueEquation:
-  //       addedBuyingA0  ${addedBuyingA0} >
-  //       addedSellingA0 ${addedSellingA0}`,
-  //     );
-  //     return false;
-  //   }
-  //   return true;
-  // }
-
-  // public validates(): boolean {
-  //   return true; // TODO not updated to new version (it's in swapfinding6 now tho)
-  //   // public readonly user: User | undefined, // TODO why can this be undefined again?
-  //   // public readonly paramUtxo: ParamUtxo,
-  //   // public readonly diracUtxo: DiracUtxo,
-  //   // public readonly buyingAsset: Asset,
-  //   // public readonly sellingAsset: Asset,
-  //   // public readonly buyingAmnt: bigint,
-  //   // public readonly sellingAmnt: bigint,
-  //   // public readonly buyingSpot: bigint, // inverted
-  //   // public readonly sellingSpot: bigint, // inverted
-  //   // public readonly buyingExp: bigint,
-  //   // public readonly sellingExp: bigint,
-
-  //   // const param = this.paramUtxo.param;
-  //   // const buyingWeight = param.weights.amountOf(this.buyingAsset);
-  //   // const sellingWeight = param.weights.amountOf(this.sellingAsset);
-  //   // const jsBuying = param.jumpSizes.amountOf(this.buyingAsset);
-  //   // const jsSelling = param.jumpSizes.amountOf(this.sellingAsset);
-  //   // const virtualBuying = param.virtual.amountOf(this.buyingAsset);
-  //   // const virtualSelling = param.virtual.amountOf(this.sellingAsset);
-
-  //   // const dirac = this.diracUtxo.dirac;
-  //   // const anchorBuying = dirac.anchorPrices.amountOf(this.buyingAsset);
-  //   // const anchorSelling = dirac.anchorPrices.amountOf(this.sellingAsset);
-  //   // const balanceBuying = this.diracUtxo.funds.amountOf(this.buyingAsset, 0n);
-  //   // const balanceSelling = this.diracUtxo.funds.amountOf(this.sellingAsset, 0n);
-
-  //   // const buyingLiquidity = balanceBuying + virtualBuying;
-  //   // const sellingLiquidity = balanceSelling + virtualSelling;
-
-  //   // // const oldBuyingAmm = buyingWeight * buyingLiquidity;
-  //   // // const oldSellingAmm = sellingWeight * sellingLiquidity;
-
-  //   // const newBuyingAmm = buyingWeight * (buyingLiquidity - this.buyingAmnt);
-  //   // const newSellingAmm = sellingWeight * (sellingLiquidity + this.sellingAmnt);
-
-  //   // return true &&
-  //   //   // Swapping.pricesFitDirac(
-  //   //   //   spotBuying,
-  //   //   //   spotSelling,
-  //   //   //   buyingLowest,x
-  //   //   //   sellingLowest,
-  //   //   //   buyingJumpSize,
-  //   //   //   sellingJumpSize,
-  //   //   // ) &&
-  //   //   Swapping.exponentsYieldPrice(
-  //   //     anchorBuying,
-  //   //     jsBuying,
-  //   //     this.buyingExp,
-  //   //     this.newAnchorBuying,
-  //   //     "buying",
-  //   //   ) &&
-  //   //   Swapping.exponentsYieldPrice(
-  //   //     anchorSelling,
-  //   //     jsSelling,
-  //   //     this.sellingExp,
-  //   //     this.newAnchorSelling,
-  //   //     "selling",
-  //   //   ) &&
-  //   //   Swapping.pricesFitAmm(
-  //   //     this.buyingSpot,
-  //   //     this.sellingSpot,
-  //   //     newBuyingAmm,
-  //   //     newSellingAmm,
-  //   //   ) &&
-  //   //   Swapping.valueEquation(
-  //   //     this.buyingSpot,
-  //   //     this.sellingSpot,
-  //   //     this.buyingAmnt,
-  //   //     this.sellingAmnt,
-  //   //   );
-  //   // // TODO othersUnchanged - con: this is implicit
-  // }
-
   // try to make it wrong with minimal changes
+  // TODO adjust for the new version with inherent chaining
   public corruptAll = (): Swapping[] => {
     if (this.option.variant.accuracy !== "exact") return [];
     const corrupted_: (Swapping | null)[] = [];

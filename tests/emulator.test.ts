@@ -40,7 +40,11 @@ Deno.test("emulator", async () => {
     let generationTries = 100; // TODO consider fixing this
     while (!allUsers) {
       try {
-        allUsers = await User.genSeveral(nativeUplc, genPositive(10n), genPositive(10n)); // TODO more
+        allUsers = await User.genSeveral(
+          nativeUplc,
+          genPositive(10n),
+          genPositive(10n),
+        ); // TODO more
       } catch (e) {
         if (generationTries-- <= 0) throw e;
       }

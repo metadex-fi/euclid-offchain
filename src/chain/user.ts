@@ -285,8 +285,8 @@ export class User {
     try {
       const txCompleted = await tx.complete(
         {
-          nativeUplc: this.nativeUplc // TODO check if this does fix the exbudget-error and revert if not. Also, what does it do in the first place?
-        }
+          nativeUplc: this.nativeUplc, // TODO check if this does fix the exbudget-error and revert if not. Also, what does it do in the first place?
+        },
       );
 
       // begin logging
@@ -418,7 +418,15 @@ export class User {
   ): Promise<User> {
     const address = await lucid.selectWallet(api).wallet.address();
     // const protocolParameters = await lucid.provider.getProtocolParameters();
-    return new User(lucid, contract, nativeUplc, undefined, address, undefined, api);
+    return new User(
+      lucid,
+      contract,
+      nativeUplc,
+      undefined,
+      address,
+      undefined,
+      api,
+    );
   }
 
   static async fromPrivateKey(
@@ -462,7 +470,14 @@ export class User {
     const paymentKeyHash = PKeyHash.ptype.genData();
     // const protocolParameters = Lucid.PROTOCOL_PARAMETERS_DEFAULT;
     const contract = new Contract(lucid);
-    const user = new User(lucid, contract, nativeUplc, privateKey, undefined, paymentKeyHash);
+    const user = new User(
+      lucid,
+      contract,
+      nativeUplc,
+      privateKey,
+      undefined,
+      paymentKeyHash,
+    );
     const assets = Assets.generate(2n);
     user.balance = PositiveValue.genOfAssets(assets);
     return user;

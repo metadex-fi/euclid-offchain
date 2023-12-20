@@ -288,8 +288,12 @@ ${tt}}`; // .map((d) => d.show(ttf)).join(",\n" + ttf)}
     const balance = user?.availableBalance;
     console.log("pool.swappingsFor balance", balance?.concise());
     if (user && !balance) return [];
-    const sellableBalance = balance?.ofAssets(this.paramUtxo.param.assets).unsigned;
-    console.log("pool.swappingsFor sellableBalance", sellableBalance?.concise());
+    const sellableBalance = balance?.ofAssets(this.paramUtxo.param.assets)
+      .unsigned;
+    console.log(
+      "pool.swappingsFor sellableBalance",
+      sellableBalance?.concise(),
+    );
     if (user && !sellableBalance!.size) return [];
     return this.diracUtxos.flatMap((d) =>
       d.swappingsFor(

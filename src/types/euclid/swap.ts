@@ -1,32 +1,39 @@
+import { assert } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { gMaxLength } from "../../utils/constants.ts";
+import { genPositive } from "../../utils/generators.ts";
 import { Asset, PAsset } from "../general/derived/asset/asset.ts";
-import { PBounded } from "../general/derived/bounded/bounded.ts";
+import { PList } from "../general/fundamental/container/list.ts";
 import { PObject } from "../general/fundamental/container/object.ts";
 import { PRecord } from "../general/fundamental/container/record.ts";
+import { PSubSwap, SubSwap } from "./subSwap.ts";
 
 export class Swap {
   constructor(
     public readonly boughtAsset: Asset,
     public readonly soldAsset: Asset,
-    public readonly expBought: bigint,
-    public readonly expSold: bigint,
+    public readonly subswaps: SubSwap[],
   ) {}
 }
 
 export class PSwap extends PObject<Swap> {
-  constructor() {
+  constructor(
+    public readonly numSubSwaps?: bigint,
+  ) {
+    if (numSubSwaps !== undefined) {
+      assert(numSubSwaps > 0n, "PSwap: nonpositive number of subSwaps");
+    }
     super(
       new PRecord({
         boughtAsset: PAsset.ptype,
         soldAsset: PAsset.ptype,
-        expBought: new PBounded(0n),
-        expSold: new PBounded(0n),
+        subswaps: new PList(PSubSwap.ptype, numSubSwaps),
       }),
       Swap,
     );
   }
 
-  static ptype = new PSwap();
   static genPType(): PSwap {
-    return PSwap.ptype;
+    const numSubSwaps = genPositive(gMaxLength);
+    return new PSwap(numSubSwaps);
   }
 }
