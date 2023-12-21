@@ -246,22 +246,19 @@ ${tt})`;
       swapping.diracUtxo.dirac.concise() === this.dirac.concise(),
       `dirac mismatch:\n${swapping.diracUtxo.dirac.concise()}\n!==\n${this.dirac.concise()}`,
     );
-    let funds = this.funds;
-    swapping.subSwaps.forEach((subSwap) => {
-      funds = funds
-        .normedPlus(
+    const funds = this.funds.normedPlus(
           PositiveValue.singleton(
-            swapping.sellingAsset, // deliberately not using subswap here to entice errors if mismatch - TODO assert this instead in the right place
-            subSwap.option.deltaSelling,
+            swapping.sellingAsset,
+            swapping.totalDeltaSelling,
           ),
         )
         .normedMinus(
           PositiveValue.singleton(
-            swapping.buyingAsset, // deliberately not using subswap here to entice errors if mismatch - TODO assert this instead in the right place
-            subSwap.option.deltaBuying,
+            swapping.buyingAsset,
+            swapping.totalDeltaBuying,
           ),
         );
-    });
+
     const lastSubSwap = swapping.subSwaps.at(-1);
     assert(lastSubSwap, `applySwapping(): less than one subSwap`);
 

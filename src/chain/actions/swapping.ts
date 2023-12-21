@@ -37,35 +37,15 @@ import {
 } from "./swapfinding6/swapsForPair.ts";
 import { SubSwap } from "../../types/euclid/subSwap.ts";
 
-// const sellingADAtolerance = 0;
-
-// export interface SwappingArgs {
-//   readonly adhereMaxInteger: boolean,
-//   readonly maxIntImpacted: boolean,
-//   readonly maxExpMults: number | null,
-//   readonly expLimitImpacted: boolean,
-//   readonly user: User | null, // webapp needs undefined iirc
-//   readonly paramUtxo: ParamUtxo,
-//   readonly diracUtxo: DiracUtxo,
-//   readonly buyingAsset: Asset,
-//   readonly sellingAsset: Asset,
-//   readonly buyingAmnt: bigint,
-//   readonly sellingAmnt: bigint,
-//   readonly buyingSpot: bigint, // inverted
-//   readonly sellingSpot: bigint, // inverted
-//   readonly buyingExp: bigint,
-//   readonly sellingExp: bigint,
-//   readonly availableBuying: bigint, // for corruption-tests (cannot be taken from dirac because of subSwaps)
-//   readonly availableSelling: bigint | null, // for corruption-tests (cannot be left null or taken from user because of subSwaps). Null means no limit
-//   readonly minBuying_: bigint,
-//   readonly minSelling: bigint,
-//   readonly tmpMinBuying: bigint | null, // for optimiziation. Need to store this to make corruption-tests pass
-// }
-
 export class Swapping {
-  public previous?: Swapping;
-  public subsequent?: Swapping;
+  public previousSubSwap?: Swapping;
+  public subsequentSubSwap?: Swapping;
+  public previousChained?: Swapping;
+  public subsequentChained?: Swapping;
   public subSwaps: Swapping[] = [this];
+  public totalDeltaBuying: bigint;
+  public totalDeltaSelling: bigint;
+  public overallEffectivePrice: number;
 
   private constructor(
     public readonly user: User | null, // webapp needs undefined iirc
@@ -86,10 +66,18 @@ export class Swapping {
         `availableSelling must be less than or equal to the available balance: ${this.show()}`,
       );
     }
+
+    this.totalDeltaBuying = option.deltaBuying;
+    this.totalDeltaSelling = option.deltaSelling;
+    this.overallEffectivePrice = Number(this.totalDeltaSelling) / Number(this.totalDeltaBuying);
   }
 
   public get type(): string {
     return "Swapping";
+  }
+
+  public get firstSpotPrice(): number {
+    return this.option.spotPrice;
   }
 
   static boundary(
@@ -165,6 +153,9 @@ ${ttf}diracUtxo: ${this.diracUtxo.show(ttf)}
 ${ttf}buyingAsset: ${this.buyingAsset.show()}
 ${ttf}sellingAsset: ${this.sellingAsset.show()}
 ${ttf}option: ${this.option.show(ttf)}
+${ttf}totalDeltaBuying: ${this.totalDeltaBuying}
+${ttf}totalDeltaSelling: ${this.totalDeltaSelling}
+${ttf}overallEffectivePrice: ${this.overallEffectivePrice}
 ${ttf}maxIntImpacted: ${this.maxIntImpacted}
 ${ttf}minExpMults: ${this.minExpMults}
 ${ttf}maxExpMults: ${this.maxExpMults}
@@ -219,19 +210,21 @@ ${ttf}corruptions: ${this.corruptions.toString()}
         new Swap(
           this.buyingAsset,
           this.sellingAsset,
-          this.subSwaps.map((s) => {
+          this.subSwaps.map((subSwap) => {
 
-            const subSwap = new SubSwap(
-              s.option.deltaBuying,
-              s.option.deltaSelling,
-              s.option.b.exp - prevExpBuying,
-              s.option.s.exp - prevExpSelling,
+            const subSwap_ = new SubSwap(
+              subSwap.option.deltaBuying,
+              subSwap.option.deltaSelling,
+              subSwap.option.b.exp - prevExpBuying,
+              subSwap.option.s.exp - prevExpSelling,
             )
 
-            prevExpBuying = s.option.b.exp;
-            prevExpSelling = s.option.s.exp;
+            prevExpBuying = subSwap.option.b.exp;
+            prevExpSelling = subSwap.option.s.exp;
 
-            return subSwap;
+            console.log("expBuying:", subSwap.option.b.exp, "-", prevExpBuying, "expSelling:", subSwap.option.s.exp, "-", prevExpSelling)
+
+            return subSwap_;
           }
           ),
         ),
@@ -266,7 +259,9 @@ ${ttf}corruptions: ${this.corruptions.toString()}
   };
 
   private setSubsequentUtxo = (txCore: Lucid.C.Transaction) => {
-    if (this.subsequent) {
+    const lastSubSwap = this.subSwaps.at(-1);
+    assert(lastSubSwap, `setSubsequentUtxo(): no subSwaps`);
+    if (lastSubSwap.subsequentChained) {
       const txBody = txCore.body();
       const txHash = Lucid.C.hash_transaction(txBody);
       const txOuts = txBody.outputs();
@@ -283,11 +278,11 @@ ${ttf}corruptions: ${this.corruptions.toString()}
         );
         const utxo = Lucid.C.TransactionUnspentOutput.new(txIn, txOut);
         const utxo_ = Lucid.coreToUtxo(utxo);
-        this.subsequent.diracUtxo.utxo = utxo_;
+        lastSubSwap.subsequentChained.diracUtxo.utxo = utxo_;
         break;
       }
       assert(
-        this.subsequent.diracUtxo.utxo,
+        lastSubSwap.subsequentChained.diracUtxo.utxo,
         `failed to set subsequent's diracUtxo's utxo`,
       );
     } else {
@@ -297,11 +292,31 @@ ${ttf}corruptions: ${this.corruptions.toString()}
 
   public succeeded = this.setSubsequentUtxo;
 
+  public setSubSwaps = (subSwaps: Swapping[]): void => {
+    this.subSwaps = subSwaps;
+    this.totalDeltaBuying = subSwaps.reduce(
+      (acc, s) => acc + s.option.deltaBuying,
+      0n,
+    );
+    this.totalDeltaSelling = subSwaps.reduce(
+      (acc, s) => acc + s.option.deltaSelling,
+      0n,
+    );
+    this.overallEffectivePrice = Number(this.totalDeltaSelling) / Number(this.totalDeltaBuying);
+    for (let i = 0; i < subSwaps.length - 1; i++) {
+      subSwaps[i].subsequentSubSwap = subSwaps[i + 1];
+      subSwaps[i + 1].previousSubSwap = subSwaps[i];
+    }
+  };
+
+  // TODO rename to something less conflicting
   public calcSubSwaps = (maxSubSwaps: number): Swapping[] => {
     const subSwaps: Swapping[] = [this];
     let option = this.option;
     let sellingOption = option.s;
     let buyingOption = option.b;
+    let totalDeltaBuying = option.deltaBuying;
+    let totalDeltaSelling = option.deltaSelling;
     for (let i = 1; i < maxSubSwaps; i++) {
       if (option.deltaSelling === option.s.maxDelta) break;
       if (option.deltaBuying === option.b.maxDelta) break;
@@ -330,8 +345,10 @@ ${ttf}corruptions: ${this.corruptions.toString()}
         this.maxExpMults,
       );
       subSwaps.push(subSwap);
+      totalDeltaBuying += option.deltaBuying;
+      totalDeltaSelling += option.deltaSelling;
     }
-    this.subSwaps = subSwaps;
+    this.setSubSwaps(subSwaps);
     return subSwaps;
   };
 
@@ -380,8 +397,10 @@ ${ttf}corruptions: ${this.corruptions.toString()}
       }
       diracUtxo = diracUtxo.applySwapping(swapping);
 
-      previous.subsequent = swapping;
-      swapping.previous = previous;
+      const lastPrevious = previous.subSwaps.at(-1);
+      assert(lastPrevious, `subsequents(): no subSwaps in previous`);
+      lastPrevious.subsequentChained = swapping;
+      swapping.previousChained = lastPrevious;
       previous = swapping;
       swappings.push(swapping);
     }
@@ -404,22 +423,35 @@ ${ttf}corruptions: ${this.corruptions.toString()}
     applyMinAmounts = true, // TODO test false
   ): Swapping | null => {
     console.log(`subSwapA: ${amount} ${amntIsSold ? "sold" : "bought"}`);
+
+    const fullSubSwaps: Swapping[] = [];
+    let current: Swapping = this.subSwaps[0];
+    let currentIndex = 0;
+    while (true) {
+      const maxAmnt = amntIsSold ? current.option.deltaSelling : current.option.deltaBuying;
+      if (amount <= maxAmnt) break;
+      if (++currentIndex >= this.subSwaps.length) return null;
+      fullSubSwaps.push(current);
+      current = this.subSwaps[currentIndex];
+      amount -= maxAmnt;
+    }
+
     // console.log(`from: ${this.show()}`);
-    const swappings = this.diracUtxo.swappingsFor(
-      this.user,
-      this.paramUtxo,
-      this.option.variant,
-      applyMinAmounts ? this.option.b.minDelta : 1n,
-      applyMinAmounts ? this.option.s.minDelta : 1n,
-      this.minExpMults,
-      this.maxExpMults,
+    const swappings = current.diracUtxo.swappingsFor(
+      current.user,
+      current.paramUtxo,
+      current.option.variant,
+      applyMinAmounts ? this.option.b.minDelta : 1n, // NOTE leaving this here
+      applyMinAmounts ? this.option.s.minDelta : 1n, // NOTE leaving this here
+      current.minExpMults,
+      current.maxExpMults,
       Value.singleton(
-        this.sellingAsset,
-        amntIsSold ? amount : this.option.deltaSelling,
+        current.sellingAsset,
+        amntIsSold ? amount : current.option.deltaSelling,
       ),
       Assets.singleton(this.buyingAsset),
       // TODO what
-      amntIsSold ? this.option.deltaBuying : amount,
+      amntIsSold ? current.option.deltaBuying : amount,
       // adding minBalance here because we are removing it again in swappingsFor
       // (amntIsSold ? this.buyingAmnt : amount) +
       //   getMinBalance(this.buyingAsset),
@@ -430,7 +462,7 @@ ${ttf}corruptions: ${this.corruptions.toString()}
         swappings.map((s) => s.show()).join("\n")
       }`,
     );
-    const subSwapA = swappings.length > 0 ? swappings[0] : null;
+    const subSwapA = swappings.length > 0 ? swappings[0] : undefined;
     // if (subSwapA && !amntIsSold) {
     //   subSwapA.setAvailableBuying(amount); // per definition of a subSwap // should already be set via swappingsFor-args
     // }
@@ -457,7 +489,25 @@ ${ttf}corruptions: ${this.corruptions.toString()}
     //   return subSwapB; // NOTE this is because minBuying and available are different, subSwapB has the correct one TODO why? this a problem?
     // }
 
-    return subSwapA;
+    // TODO clean up this mess. And test it
+    if (subSwapA) {
+      subSwapA.previousSubSwap = current.previousSubSwap;
+      subSwapA.previousChained = current.previousChained;
+    }
+    // if(current.previousSubSwap) current.previousSubSwap.subsequentSubSwap = subSwapA;
+    // if(current.previousChained) current.previousChained.subsequentChained = subSwapA;
+    // if(current.subsequentSubSwap) current.subsequentSubSwap.previousSubSwap = undefined;
+    // if(current.subsequentChained) current.subsequentChained.previousChained = undefined;
+
+    console.log("found", fullSubSwaps.length, "fullSubSwaps and", subSwapA ? 1 : 0, "partial subSwapA")
+    if (fullSubSwaps.length) {
+      const subSwap = fullSubSwaps[0];
+      if (subSwapA) fullSubSwaps.push(subSwapA); // TODO can/should this happen?
+      subSwap.setSubSwaps(fullSubSwaps);
+      return subSwap;
+    }
+
+    return subSwapA ?? null;
   };
 
   // not updated to new version

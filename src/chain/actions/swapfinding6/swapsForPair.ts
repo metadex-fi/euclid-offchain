@@ -13,7 +13,7 @@ import { maxSmallInteger } from "../../../types/euclid/smallValue.ts";
 import { Param } from "../../../types/euclid/param.ts";
 import { f, t } from "../../../types/general/fundamental/type.ts";
 
-const logging = true;
+const logging = false;
 
 export const genWildAssetParams = (maxInteger: bigint) => {
   const jumpSize = genPositive(maxSmallInteger);
@@ -153,19 +153,20 @@ export class AssetOption {
   };
 
   public applyDelta = (delta: bigint): AssetOption => {
+    const b = this.type === "buying" ? this.b - delta : this.b + delta;
+    const l = this.v + b;
+    const wl = l * this.w;
     return new AssetOption(
       this.type,
       this.v,
-      this.type === "buying" ? this.b - delta : this.b + delta,
+      b,
       this.w,
       this.a,
       this.js,
       1n,
-      this.type === "buying"
-        ? this.b - delta
-        : (this.maxDelta === "oo" ? "oo" : this.maxDelta - delta),
-      this.l,
-      this.wl,
+      this.maxDelta === "oo" ? "oo" : this.maxDelta - delta,
+      l,
+      wl,
       this.jspp,
       this.logJM,
       this.logAW,
