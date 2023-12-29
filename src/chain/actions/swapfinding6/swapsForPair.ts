@@ -152,7 +152,7 @@ export class AssetOption {
     );
   };
 
-  public applyDelta = (delta: bigint): AssetOption => {
+  public afterDelta = (delta: bigint): AssetOption => {
     const b = this.type === "buying" ? this.b - delta : this.b + delta;
     const l = this.v + b;
     const wl = l * this.w;
@@ -167,6 +167,31 @@ export class AssetOption {
       this.maxDelta === "oo" ? "oo" : this.maxDelta - delta,
       l,
       wl,
+      this.jspp,
+      this.logJM,
+      this.logAW,
+      this.exp,
+      this.jse,
+      this.jsppe,
+    );
+  };
+
+  public withLowerMaxDelta = (lowerMaxDelta: bigint): AssetOption => {
+    assert(
+      this.maxDelta === "oo" || lowerMaxDelta <= this.maxDelta,
+      `${this.type}: lowerMaxDelta ${lowerMaxDelta} > maxDelta ${this.maxDelta}`,
+    );
+    return new AssetOption(
+      this.type,
+      this.v,
+      this.b,
+      this.w,
+      this.a,
+      this.js,
+      this.minDelta,
+      lowerMaxDelta,
+      this.l,
+      this.wl,
       this.jspp,
       this.logJM,
       this.logAW,

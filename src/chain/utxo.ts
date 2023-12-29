@@ -30,6 +30,7 @@ import {
   PairOptions,
   SwapfindingVariant,
 } from "./actions/swapfinding6/swapsForPair.ts";
+import { SubSwapping } from "./actions/subSwapping.ts";
 
 export class ParamUtxo {
   private constructor(
@@ -246,25 +247,28 @@ ${tt})`;
       swapping.diracUtxo.dirac.concise() === this.dirac.concise(),
       `dirac mismatch:\n${swapping.diracUtxo.dirac.concise()}\n!==\n${this.dirac.concise()}`,
     );
-    const funds = this.funds.normedPlus(
-          PositiveValue.singleton(
-            swapping.sellingAsset,
-            swapping.totalDeltaSelling,
-          ),
-        )
-        .normedMinus(
-          PositiveValue.singleton(
-            swapping.buyingAsset,
-            swapping.totalDeltaBuying,
-          ),
-        );
 
-    const lastSubSwap = swapping.subSwaps.at(-1);
-    assert(lastSubSwap, `applySwapping(): less than one subSwap`);
+    const [totalDeltaSelling, totalDeltaBuying] = swapping.totalDeltas;
+
+    const funds = this.funds.normedPlus(
+      PositiveValue.singleton(
+        swapping.sellingAsset,
+        totalDeltaSelling,
+      ),
+    )
+      .normedMinus(
+        PositiveValue.singleton(
+          swapping.buyingAsset,
+          totalDeltaBuying,
+        ),
+      );
+
+    const lastSubSwapping = swapping.subSwappings.at(-1);
+    assert(lastSubSwapping, `applySwapping(): less than one subSwapping`);
 
     return new DiracUtxo(
       this.peuclidDatum,
-      lastSubSwap.posteriorDirac,
+      lastSubSwapping.posteriorDirac,
       funds,
       //TODO note that the utxo is missing, this should result from the tx, which we don't have yet
     );
