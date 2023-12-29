@@ -140,7 +140,7 @@ export class Swapping {
       choice.calcSubSwaps(Number(genPositive(gMaxLength))); // TODO test more maxSubSwaps?
       return choice;
     }
-    return choice.randomSubSwap();
+    return choice.randomFractionalSwap();
   }
 
   public show = (tabs = ""): string => {
@@ -417,12 +417,12 @@ ${ttf}corruptions: ${this.corruptions.toString()}
   // ~~> update: as we're not touching buyingExps in the swappingsFor loop anymore, only diff in maxBuying
   // TODO maybe investigate further, and compare performances. Note that the other variant is correct, this one wrong, regarding maxBuying
   // TODO granularity
-  private subSwapA = (
+  private fractionalSwapA = (
     amount: bigint,
     amntIsSold: boolean,
     applyMinAmounts = true, // TODO test false
   ): Swapping | null => {
-    console.log(`subSwapA: ${amount} ${amntIsSold ? "sold" : "bought"}`);
+    console.log(`fractionalSwapA: ${amount} ${amntIsSold ? "sold" : "bought"}`);
 
     const fullSubSwaps: Swapping[] = [];
     let current: Swapping = this.subSwaps[0];
@@ -462,61 +462,61 @@ ${ttf}corruptions: ${this.corruptions.toString()}
         swappings.map((s) => s.show()).join("\n")
       }`,
     );
-    const subSwapA = swappings.length > 0 ? swappings[0] : undefined;
-    // if (subSwapA && !amntIsSold) {
-    //   subSwapA.setAvailableBuying(amount); // per definition of a subSwap // should already be set via swappingsFor-args
+    const fractionalSwapA = swappings.length > 0 ? swappings[0] : undefined;
+    // if (fractionalSwapA && !amntIsSold) {
+    //   fractionalSwapA.setAvailableBuying(amount); // per definition of a fractionalSwap // should already be set via swappingsFor-args
     // }
-    // console.log(`to (A): ${subSwapA?.show()}`);
-    // const compareSubSwaps = compareVariants; // subswapB not updated to new version
+    // console.log(`to (A): ${fractionalSwapA?.show()}`);
+    // const compareSubSwaps = compareVariants; // fractionalSwapB not updated to new version
     // if (compareSubSwaps) {
-    //   const subSwapB = this.subSwapB(amount, amntIsSold);
-    //   if (subSwapA) {
-    //     assert(subSwapB, `subSwapB must be defined, but got null`);
+    //   const fractionalSwapB = this.fractionalSwapB(amount, amntIsSold);
+    //   if (fractionalSwapA) {
+    //     assert(fractionalSwapB, `fractionalSwapB must be defined, but got null`);
     //     assert(
-    //       subSwapA.equals(subSwapB, true, [
+    //       fractionalSwapA.equals(fractionalSwapB, true, [
     //         "available",
     //         "inBuying",
     //         "minSelling",
     //       ]),
-    //       `found difference in subSwap-functions:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`,
+    //       `found difference in fractionalSwap-functions:\n${fractionalSwapA.show()}\nvs.\n${fractionalSwapB.show()}`,
     //     );
-    //     // assert(subSwapA.show() === subSwapB.show(), `SUCCESS! ... but only show()-difference:\n${subSwapA.show()}\nvs.\n${subSwapB.show()}`);
+    //     // assert(fractionalSwapA.show() === fractionalSwapB.show(), `SUCCESS! ... but only show()-difference:\n${fractionalSwapA.show()}\nvs.\n${fractionalSwapB.show()}`);
     //     // the above detects only a difference in maxBuying, so we're not using it. TODO/NOTE the other variant is correct, this one wrong
     //   } else {assert(
-    //       subSwapB === null,
-    //       `subSwapB must be null, but got:\n${subSwapB?.show()}`,
+    //       fractionalSwapB === null,
+    //       `fractionalSwapB must be null, but got:\n${fractionalSwapB?.show()}`,
     //     );}
-    //   return subSwapB; // NOTE this is because minBuying and available are different, subSwapB has the correct one TODO why? this a problem?
+    //   return fractionalSwapB; // NOTE this is because minBuying and available are different, fractionalSwapB has the correct one TODO why? this a problem?
     // }
 
     // TODO clean up this mess. And test it
-    if (subSwapA) {
-      subSwapA.previousSubSwap = current.previousSubSwap;
-      subSwapA.previousChained = current.previousChained;
+    if (fractionalSwapA) {
+      fractionalSwapA.previousSubSwap = current.previousSubSwap;
+      fractionalSwapA.previousChained = current.previousChained;
     }
-    // if(current.previousSubSwap) current.previousSubSwap.subsequentSubSwap = subSwapA;
-    // if(current.previousChained) current.previousChained.subsequentChained = subSwapA;
+    // if(current.previousSubSwap) current.previousSubSwap.subsequentSubSwap = fractionalSwapA;
+    // if(current.previousChained) current.previousChained.subsequentChained = fractionalSwapA;
     // if(current.subsequentSubSwap) current.subsequentSubSwap.previousSubSwap = undefined;
     // if(current.subsequentChained) current.subsequentChained.previousChained = undefined;
 
-    console.log("found", fullSubSwaps.length, "fullSubSwaps and", subSwapA ? 1 : 0, "partial subSwapA")
+    console.log("found", fullSubSwaps.length, "fullSubSwaps and", fractionalSwapA ? 1 : 0, "partial fractionalSwapA")
     if (fullSubSwaps.length) {
       const subSwap = fullSubSwaps[0];
-      if (subSwapA) fullSubSwaps.push(subSwapA); // TODO can/should this happen?
+      if (fractionalSwapA) fullSubSwaps.push(fractionalSwapA); // TODO can/should this happen?
       subSwap.setSubSwaps(fullSubSwaps);
       return subSwap;
     }
 
-    return subSwapA ?? null;
+    return fractionalSwapA ?? null;
   };
 
   // not updated to new version
-  // private subSwapB = (
+  // private fractionalSwapB = (
   //   amount: bigint,
   //   amntIsSold: boolean,
   //   applyMinAmounts = true, // TODO test false
   // ): Swapping | null => {
-  //   console.log(`subSwapB: ${amount} ${amntIsSold ? "sold" : "bought"}`);
+  //   console.log(`fractionalSwapB: ${amount} ${amntIsSold ? "sold" : "bought"}`);
 
   //   const maxBuying = amntIsSold ? this.buyingAmnt : amount;
   //   const maxSelling = amntIsSold ? amount : this.sellingAmnt;
@@ -553,7 +553,7 @@ ${ttf}corruptions: ${this.corruptions.toString()}
   //     `buyingAmnt cannot increase: ${buyingAmnt} > ${this.buyingAmnt}`,
   //   );
 
-  //   const subSwap = new Swapping(
+  //   const fractionalSwap = new Swapping(
   //     this.adhereMaxInteger,
   //     this.maxIntImpacted,
   //     this.maxExpMults,
@@ -569,22 +569,22 @@ ${ttf}corruptions: ${this.corruptions.toString()}
   //     this.sellingSpot,
   //     this.buyingExp,
   //     this.sellingExp,
-  //     amntIsSold ? this.availableBuying : amount, // per definition of a subSwap
-  //     amntIsSold ? amount : this.availableSelling, // per definition of a subSwap
+  //     amntIsSold ? this.availableBuying : amount, // per definition of a fractionalSwap
+  //     amntIsSold ? amount : this.availableSelling, // per definition of a fractionalSwap
   //     applyMinAmounts ? this.minBuying_ : 1n,
   //     applyMinAmounts ? this.minSelling : 1n,
   //     this.tmpMinBuying,
   //     true,
   //   );
 
-  //   // console.log(`to (B): ${subSwap.show()}`);
-  //   return subSwap;
+  //   // console.log(`to (B): ${fractionalSwap.show()}`);
+  //   return fractionalSwap;
   // };
 
-  // NOTE subSwapA is only wrong regarding maxBuying
-  public subSwap = this.subSwapA; //compareVariants ? this.subSwapA : this.subSwapB; // TODO profile both and pick the better one (later)
+  // NOTE fractionalSwapA is only wrong regarding maxBuying
+  public fractionalSwap = this.fractionalSwapA; //compareVariants ? this.fractionalSwapA : this.fractionalSwapB; // TODO profile both and pick the better one (later)
 
-  private randomSubSwap = (): Swapping => {
+  private randomFractionalSwap = (): Swapping => {
     const maxSelling = this.option.deltaSelling - 1n;
     const maxBuying = this.option.deltaBuying - 1n;
     const sellingOption = maxSelling >= this.option.s.minDelta;
@@ -597,27 +597,27 @@ ${ttf}corruptions: ${this.corruptions.toString()}
           ? this.option.s.minDelta
           : this.option.b.minDelta;
         const amount = minAmnt + genNonNegative(maxAmnt - minAmnt);
-        const subSwap = this.subSwap(amount, amntIsSold);
-        if (subSwap) return subSwap;
+        const fractionalSwap = this.fractionalSwap(amount, amntIsSold);
+        if (fractionalSwap) return fractionalSwap;
       }
     }
     console.log(
-      `randomSubSwap(): failed to find a smaller subSwap for ${this.show()}`,
+      `randomFractionalSwap(): failed to find a smaller fractional swap for ${this.show()}`,
     );
     return this; // TODO FIXME
-    // this is to test the subSwap-function
-    // const subSwap = Math.random() < 0.5
-    //   ? this.subSwap(this.option.deltaBuying, false)
-    //   : this.subSwap(this.option.deltaSelling, true);
+    // this is to test the fractionalSwap-function
+    // const fractionalSwap = Math.random() < 0.5
+    //   ? this.fractionalSwap(this.option.deltaBuying, false)
+    //   : this.fractionalSwap(this.option.deltaSelling, true);
     // assert(
-    //   subSwap,
-    //   `randomSubSwap(): failed to find a subSwap for ${this.show()}`,
+    //   fractionalSwap,
+    //   `randomSubSwap(): failed to find a fractionalSwap for ${this.show()}`,
     // );
     // assert(
-    //   this.equals(subSwap, true, ["maxDelta"]), // maxDelta changes per definition of a subSwap
-    //   `subSwap with unchanged amounts should result in same Swapping, but got:\n${subSwap.show()}\nfrom\n${this.show()}`,
+    //   this.equals(fractionalSwap, true, ["maxDelta"]), // maxDelta changes per definition of a fractionalSwap
+    //   `fractionalSwap with unchanged amounts should result in same Swapping, but got:\n${fractionalSwap.show()}\nfrom\n${this.show()}`,
     // );
-    // return subSwap;
+    // return fractionalSwap;
   };
 
   // try to make it wrong with minimal changes
