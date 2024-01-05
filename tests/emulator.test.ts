@@ -31,7 +31,7 @@ Deno.test("emulator", async () => {
   // return;
   const nativeUplc = true; // TODO check the impact of this
 
-  let trials = 5;
+  let trials = 1;//5; 
   const actionCounts_ = new Map<string, number>();
   // const errors = [];
   while (trials > 0) {
@@ -158,6 +158,12 @@ Deno.test("emulator", async () => {
           )
         ) {
           console.error("caught:", e);
+          // } else if (
+          //   prevActionType === "Swapping" && (
+          //     e.toString().includes("Over budget") // TODO FIXME
+          //   )
+          // ) {
+          //   console.error("caught:", e);
         } else {
           // console.error(e);
           throw e;

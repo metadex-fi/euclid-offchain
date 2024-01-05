@@ -12,7 +12,7 @@ import { genPositive } from "../../utils/generators.ts";
 export class SubSwapping {
   constructor(
     public readonly of: Swapping,
-    public readonly option: PairOption,
+    public option: PairOption,
   ) {
     if (of.user) {
       assert(
@@ -25,6 +25,10 @@ export class SubSwapping {
 
   public show(): string {
     return `SubSwapping ( ${this.option.show()} )`;
+  }
+
+  public concise(tabs = ""): string {
+    return `${tabs}variant: ${this.option.variant.accuracy}, ${this.option.variant.stopOnceNotImproving};\tdeltaBuying: ${this.option.deltaBuying}, deltaSelling: ${this.option.deltaSelling};\tb.exp: ${this.option.b.exp}, s.exp: ${this.option.s.exp}`;
   }
 
   public get posteriorDirac(): Dirac {
@@ -50,6 +54,10 @@ export class SubSwapping {
     );
   }
 
+  public absorb = (other: SubSwapping): void => {
+    this.option = this.option.mergeWith(other.option);
+  };
+
   public calcNextSubSwapping = (): SubSwapping | null => {
     if (this.option.deltaSelling === this.option.s.maxDelta) return null;
     if (this.option.deltaBuying === this.option.b.maxDelta) return null;
@@ -59,7 +67,7 @@ export class SubSwapping {
       buyingOption,
       sellingOption,
       this.of.minExpMults,
-      this.of.maxExpMults,
+      this.of.remainingExpMults,
       maxInteger,
       false,
       this.option.variant,
@@ -71,14 +79,20 @@ export class SubSwapping {
   };
 
   public fractional = (
+    of: Swapping,
     amount: bigint,
     amntIsSold: boolean,
   ): SubSwapping | null => {
+    console.log(
+      `SubSwapping.fractional(): ${amount} ${amntIsSold ? "sold" : "bought"}`,
+    );
     let sellingOption = this.option.s;
     let buyingOption = this.option.b;
     if (amntIsSold) {
+      if (amount < sellingOption.minDelta) return null; // TODO and then?
       sellingOption = sellingOption.withLowerMaxDelta(amount);
     } else {
+      if (amount < buyingOption.minDelta) return null; // TODO and then?
       buyingOption = buyingOption.withLowerMaxDelta(amount);
     }
     const pairOptions = new PairOptions(
@@ -91,15 +105,15 @@ export class SubSwapping {
       this.option.variant,
     );
     const fractionalOption = pairOptions.bestAdheringOption;
+    // assert(fractionalOption, `fractionalOption is null`); // TODO can/should this happen?
     if (fractionalOption === null) return null; // TODO can/should this happen?
-    return new SubSwapping(this.of, fractionalOption);
+    return new SubSwapping(of, fractionalOption);
   };
 
   // try to make it wrong with minimal changes
   // TODO adjust for the new version with inherent chaining
   // TODO include newAnchorPrices, and consider what else too
   public corruptAll = (): SubSwapping[] => {
-    if (this.option.variant.accuracy !== "exact") return [];
     const corrupted_: (SubSwapping | null)[] = [];
     for (const random of [false, true]) {
       let corrupted = [

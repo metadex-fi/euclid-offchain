@@ -11,9 +11,10 @@ export const gMaxLength = 10n;
 export const gMaxDiracs = 100n;
 export const gMaxDepth = 4n;
 export const compareVariants = false;
-export const webappExpLimit = 11; // our empirically determined expLimit in the webapp TODO outdated, measure again
+export const globalExpLimit = 300; // TODO better value (500 failed, 100 appears to work)
 export const handleInvalidPools = false; // in prod we might get invalid pools because of spammers/attackers, but in dev we want to get an error. TODO adjust accordingly
 
+// fees and minAda
 export const lovelacePerAda = 1000000n;
 export const feesLovelace = 10n * lovelacePerAda; // costs in lovelace for fees TODO excessive and probably different for different actions
 export const closingFees = feesLovelace / 2n; // in case all ADA was put into a pool, we want avoid losing the minimum needed to close it again

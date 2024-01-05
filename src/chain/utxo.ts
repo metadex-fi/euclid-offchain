@@ -248,27 +248,24 @@ ${tt})`;
       `dirac mismatch:\n${swapping.diracUtxo.dirac.concise()}\n!==\n${this.dirac.concise()}`,
     );
 
-    const [totalDeltaSelling, totalDeltaBuying] = swapping.totalDeltas;
+    const totalDeltas = swapping.totalDeltas;
 
     const funds = this.funds.normedPlus(
       PositiveValue.singleton(
         swapping.sellingAsset,
-        totalDeltaSelling,
+        totalDeltas.deltaSelling,
       ),
     )
       .normedMinus(
         PositiveValue.singleton(
           swapping.buyingAsset,
-          totalDeltaBuying,
+          totalDeltas.deltaBuying,
         ),
       );
 
-    const lastSubSwapping = swapping.subSwappings.at(-1);
-    assert(lastSubSwapping, `applySwapping(): less than one subSwapping`);
-
     return new DiracUtxo(
       this.peuclidDatum,
-      lastSubSwapping.posteriorDirac,
+      swapping.lastSubSwapping.posteriorDirac,
       funds,
       //TODO note that the utxo is missing, this should result from the tx, which we don't have yet
     );

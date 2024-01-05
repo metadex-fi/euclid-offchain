@@ -70,7 +70,13 @@ export class AssetOption {
     readonly exp: bigint,
     readonly jse: bigint,
     readonly jsppe: bigint,
-  ) {}
+  ) {
+    assert(
+      maxDelta === "oo" || minDelta <= maxDelta,
+      `${type}: minDelta = ${minDelta} > maxDelta = ${maxDelta}`,
+    );
+    assert(minDelta > 0n);
+  }
 
   static initial(
     type: "buying" | "selling",
@@ -82,11 +88,6 @@ export class AssetOption {
     minDelta: bigint,
     maxDelta: bigint | "oo",
   ): AssetOption {
-    assert(
-      maxDelta === "oo" || minDelta <= maxDelta,
-      `${type}: ${minDelta} > ${maxDelta}`,
-    );
-    assert(minDelta > 0n);
     const l = v + b;
     const wl = l * w;
     const jspp = js + 1n;
@@ -163,7 +164,7 @@ export class AssetOption {
       this.w,
       this.a,
       this.js,
-      1n,
+      1n, // This is 1 because the user-defined minDelta is assumed to already having been serviced by the first subSwapping
       this.maxDelta === "oo" ? "oo" : this.maxDelta - delta,
       l,
       wl,
@@ -201,13 +202,31 @@ export class AssetOption {
     );
   };
 
+  public equalExceptAfterDelta = (other: AssetOption): boolean =>
+    this.type === other.type &&
+    this.v === other.v &&
+    // this.b === other.b &&
+    this.w === other.w &&
+    this.a === other.a &&
+    this.js === other.js &&
+    // this.minDelta === other.minDelta &&
+    // this.maxDelta === other.maxDelta &&
+    // this.l === other.l &&
+    // this.wl === other.wl &&
+    this.jspp === other.jspp &&
+    this.logJM === other.logJM &&
+    this.logAW === other.logAW &&
+    this.exp === other.exp &&
+    this.jse === other.jse &&
+    this.jsppe === other.jsppe;
+
   public minExpForDelta = (delta: bigint): bigint => {
     const numerator = this.type === "buying"
       ? this.logAW - log(this.l - delta)
       : log(this.l + delta) - this.logAW;
 
     const exp = BigInt(Math.ceil(numerator / this.logJM)) - 1n; // TODO fix -1n to start below limit, for good measure/rounding errors (sometimes seems to take too long in frontend)
-    if (exp < 0n) return 0n;
+    if (exp < this.exp) return this.exp; // was 0 before, using this.exp instead because of subSwappings, which can't have decreasing exps as of now (TODO consider changing this)
     return exp;
   };
 
@@ -240,9 +259,32 @@ export class AssetOption {
     return this.multsCache;
   }
 
-  public show = (tabs = ""): string => {
+  public show = (tabs = "", verbose = false): string => {
     const tt = tabs + t;
     const ttf = tt + f;
+    if (verbose) {
+      return `AssetOption (
+${ttf}type: ${this.type}
+${ttf}v: ${this.v}
+${ttf}b: ${this.b}
+${ttf}w: ${this.w}
+${ttf}a: ${this.a}
+${ttf}js: ${this.js}
+${ttf}minDelta: ${this.minDelta}
+${ttf}maxDelta: ${this.maxDelta}
+${ttf}l: ${this.l}
+${ttf}wl: ${this.wl}
+${ttf}jspp: ${this.jspp}
+${ttf}logJM: ${this.logJM}
+${ttf}logAW: ${this.logAW}
+${ttf}exp: ${this.exp}
+${ttf}jse: ${this.jse}
+${ttf}jsppe: ${this.jsppe}
+${ttf}newAnchor: ${this.newAnchor}
+${ttf}mults: ${this.mults}
+${tt})`;
+    }
+
     return `AssetOption (
 ${ttf}type: ${this.type}
 ${ttf}v: ${this.v}
@@ -256,26 +298,6 @@ ${ttf}exp: ${this.exp}
 ${ttf}newAnchor: ${this.newAnchor}
 ${ttf}mults: ${this.mults}
 ${tt})`;
-    //     return `AssetOption (
-    // ${ttf}type: ${this.type}
-    // ${ttf}v: ${this.v}
-    // ${ttf}b: ${this.b}
-    // ${ttf}w: ${this.w}
-    // ${ttf}a: ${this.a}
-    // ${ttf}js: ${this.js}
-    // ${ttf}minDelta: ${this.minDelta}
-    // ${ttf}maxDelta: ${this.maxDelta}
-    // ${ttf}l: ${this.l}
-    // ${ttf}wl: ${this.wl}
-    // ${ttf}jspp: ${this.jspp}
-    // ${ttf}logJM: ${this.logJM}
-    // ${ttf}logAW: ${this.logAW}
-    // ${ttf}exp: ${this.exp}
-    // ${ttf}jse: ${this.jse}
-    // ${ttf}jsppe: ${this.jsppe}
-    // ${ttf}newAnchor: ${this.newAnchor}
-    // ${ttf}mults: ${this.mults}
-    // ${tt})`;
   };
 }
 
@@ -298,7 +320,6 @@ export class PairOption {
     readonly s: AssetOption,
     readonly deltaBuying: bigint,
     readonly deltaSelling: bigint,
-    // readonly effectivePrice: number,
     readonly perfect: boolean,
     readonly adhereMaxInteger: boolean,
     readonly minExpMults: number, // for testing
@@ -324,9 +345,7 @@ export class PairOption {
       s.maxDelta === "oo" || deltaSelling <= s.maxDelta,
       `deltaSelling > s.maxDelta: ${deltaSelling} > ${s.maxDelta}`,
     );
-    // assert(
     this.effectivePrice = Number(this.deltaSelling) / Number(this.deltaBuying);
-    // );
   }
 
   static new = (
@@ -334,7 +353,6 @@ export class PairOption {
     s: AssetOption,
     deltaBuying: bigint,
     deltaSelling: bigint,
-    // effectivePrice: number,
     perfect: boolean,
     adhereMaxInteger: boolean,
     minExpMults: number,
@@ -347,7 +365,6 @@ export class PairOption {
       s,
       deltaBuying,
       deltaSelling,
-      // effectivePrice,
       perfect,
       adhereMaxInteger,
       minExpMults,
@@ -359,6 +376,47 @@ export class PairOption {
       `new option should pass offchain validation: ${option.show()}`,
     );
     return option;
+  };
+
+  public mergeWith = (other: PairOption): PairOption => {
+    // assert(this.effectivePrice === other.effectivePrice, `effectivePrice: ${this.effectivePrice} !== ${other.effectivePrice}`); // TODO mere guess, because wondering why we're getting subSwappings with same exps in the first place. Also fails lol
+    assert(
+      this.b.equalExceptAfterDelta(other.b),
+      `buying not equal: ${this.b.show(undefined, true)} !== ${
+        other.b.show(undefined, true)
+      }`,
+    );
+    assert(
+      this.s.equalExceptAfterDelta(other.s),
+      `selling not equal: ${this.s.show(undefined, true)} !== ${
+        other.s.show(undefined, true)
+      }`,
+    );
+    assert(
+      this.adhereMaxInteger === other.adhereMaxInteger,
+      `adhereMaxInteger: ${this.adhereMaxInteger} !== ${other.adhereMaxInteger}`,
+    );
+    assert(
+      this.minExpMults === other.minExpMults,
+      `minExpMults: ${this.minExpMults} !== ${other.minExpMults}`,
+    );
+    // assert(this.maxExpMults === other.maxExpMults, `maxExpMults: ${this.maxExpMults} !== ${other.maxExpMults}`);
+    assert(
+      this.variant === other.variant,
+      `variant: ${this.variant} !== ${other.variant}`,
+    );
+
+    return new PairOption(
+      this.b, // TODO not entirely certain about those
+      this.s, // TODO not entirely certain about those
+      this.deltaBuying + other.deltaBuying,
+      this.deltaSelling + other.deltaSelling,
+      this.perfect && other.perfect, // TODO check if those ever mismatch (curiosity mostly)
+      this.adhereMaxInteger,
+      this.minExpMults,
+      this.maxExpMults,
+      this.variant,
+    );
   };
 
   private validates = (maxInteger: bigint): boolean => {

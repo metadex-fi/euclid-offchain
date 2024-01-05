@@ -294,8 +294,8 @@ export class User {
       const txHash_ = Lucid.C.hash_transaction(txBody);
       const txOuts = txBody.outputs();
 
-      console.log("txComplete (json):", txCompleted.txComplete.to_json());
-      console.log("txComplete (js):", txCompleted.txComplete.to_js_value());
+      // console.log("txComplete (json):", txCompleted.txComplete.to_json());
+      // console.log("txComplete (js):", txCompleted.txComplete.to_js_value());
 
       // NOTE there's also an assert here
       let numAssets: bigint | null = null;
@@ -381,6 +381,7 @@ export class User {
     } catch (e) {
       const e_ = e.toString();
       if (e_.includes("Maximum transaction size")) {
+        console.warn(e_);
         console.log("splitting action...");
         const actions: Action[] = action.split();
         const results: TxResult[] = [];
