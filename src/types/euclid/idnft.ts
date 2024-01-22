@@ -79,6 +79,10 @@ export class IdNFT {
     return { [this.toLucid]: 1n };
   }
 
+  public get toBurningLucidNFT(): Lucid.Assets {
+    return { [this.toLucid]: -1n };
+  }
+
   static fromLucid(hexAsset: string): IdNFT {
     try {
       if (hexAsset === "lovelace") throw new Error("lovelace is not an id-NFT");

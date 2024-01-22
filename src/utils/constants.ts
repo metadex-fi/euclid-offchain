@@ -12,7 +12,8 @@ export const gMaxDiracs = 100n;
 export const gMaxDepth = 4n;
 export const compareVariants = false;
 export const globalExpLimit = 300; // TODO better value (500 failed, 100 appears to work)
-export const handleInvalidPools = false; // in prod we might get invalid pools because of spammers/attackers, but in dev we want to get an error. TODO adjust accordingly
+export const handleInvalidPools = true; // in prod we might get invalid pools because of spammers/attackers, but in dev we want to get an error. TODO adjust accordingly
+// TODO the above can happen even if emulator in case of closing-split, consider catching that accordingly deactivating the above
 
 // fees and minAda
 export const lovelacePerAda = 1000000n;

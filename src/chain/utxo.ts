@@ -31,6 +31,7 @@ import {
   SwapfindingVariant,
 } from "./actions/swapfinding6/swapsForPair.ts";
 import { SubSwapping } from "./actions/subSwapping.ts";
+import { AdminRedeemer, PEuclidAction } from "../types/euclid/euclidAction.ts";
 
 export class ParamUtxo {
   private constructor(
@@ -87,6 +88,32 @@ export class ParamUtxo {
         );
     } else {
       return tx.attachMintingPolicy(contract.mintingPolicy);
+    }
+  };
+
+  public closingTx = (
+    tx: Lucid.Tx,
+    contract: Contract,
+    redeemer: string,
+    paramContainingSplit: boolean,
+  ): Lucid.Tx => {
+    if (paramContainingSplit) {
+      assert(this.utxo, `ParamUtxo.closingTx(): utxo missing`);
+      const paramNFT = this.paramNFT.toBurningLucidNFT;
+      // console.log("paramNFT:", paramNFT);
+      // console.log("owner:", this.param.owner.toString());
+
+      return tx
+        .attachMintingPolicy(contract.mintingPolicy)
+        .mintAssets(paramNFT, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+        .collectFrom(
+          [this.utxo],
+          redeemer,
+        );
+    } else {
+      return tx
+        .attachMintingPolicy(contract.mintingPolicy)
+        .attachSpendingValidator(contract.validator);
     }
   };
 
@@ -239,6 +266,17 @@ ${tt})`;
           inline: Data.to(diracDatum),
         },
         funds,
+      );
+  };
+
+  public closingTx = (tx: Lucid.Tx, redeemer: string): Lucid.Tx => {
+    assert(this.utxo, `DiracUtxo.closingTx(): utxo missing`);
+    const threadNFT = this.dirac.threadNFT.toBurningLucidNFT;
+    return tx
+      .mintAssets(threadNFT, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+      .collectFrom(
+        [this.utxo],
+        redeemer,
       );
   };
 

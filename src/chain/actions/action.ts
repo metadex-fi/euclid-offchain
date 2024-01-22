@@ -6,8 +6,8 @@ import { Swapping } from "./swapping.ts";
 import { Switching } from "./switching.ts";
 
 export type Action = Closing | Opening | Swapping | Switching;
-export const allActions = [Closing, Opening, Swapping, Switching];
-// export const allActions = [Opening];
+// export const allActions = [Closing, Opening, Swapping, Switching];
+export const allActions = [Opening, Closing];
 
 export class UserAction {
   constructor(

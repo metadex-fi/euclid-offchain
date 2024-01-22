@@ -96,9 +96,9 @@ export class Swapping {
 
   public get remainingExpMults(): number {
     if (this.remainingExpMults_ === null) {
-      
       const fstOption = this.subSwappings[0].option;
-      this.remainingExpMults_ = this.maxExpMults - fstOption.b.mults - fstOption.s.mults;
+      this.remainingExpMults_ = this.maxExpMults - fstOption.b.mults -
+        fstOption.s.mults;
 
       let prevExpBuying = fstOption.b.exp;
       let prevExpSelling = fstOption.s.exp;
@@ -113,7 +113,7 @@ export class Swapping {
 
         prevExpBuying = ithOption.b.exp;
         prevExpSelling = ithOption.s.exp;
-      };
+      }
     }
     assert(
       this.remainingExpMults_! >= 0,
@@ -439,7 +439,9 @@ ${ttf}absorbed: ${this.absorbed}
       countMults(nextSubSwapping.option.s.exp - lastSubSwapping.option.s.exp) +
       2; // +2 because we need to at least mutliply the new stuff with the old in the fold. TODO could probably come up with some slightly more elegant solutions here
     if (this.remainingExpMults_! < usedMults) {
-      console.log(`calcNextSubSwapping(): remainingExpMults = ${this.remainingExpMults} < usedMults = ${usedMults}`);
+      console.log(
+        `calcNextSubSwapping(): remainingExpMults = ${this.remainingExpMults} < usedMults = ${usedMults}`,
+      );
       this.calculatedAllSubSwappings = true;
       return null;
     }
@@ -588,9 +590,11 @@ ${ttf}absorbed: ${this.absorbed}
       this.maxExpMults,
       // this.corruptions,
     );
-    swapping.subSwappings.push(...subSwappings.map((s) => new SubSwapping(swapping, s.option)));
+    swapping.subSwappings.push(
+      ...subSwappings.map((s) => new SubSwapping(swapping, s.option)),
+    );
     return swapping;
-  }
+  };
 
   public corruptAll = (): Swapping[] => {
     if (this.absorbed) return [];

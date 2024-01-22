@@ -278,10 +278,10 @@ export class User {
     }
   };
 
-  private signAndSubmit = async (
+  private complete = async (
     tx: Lucid.Tx,
     action?: Action,
-  ): Promise<TxResult> => {
+  ): Promise<Lucid.TxComplete | Error> => {
     try {
       const txCompleted = await tx.complete(
         {
@@ -293,6 +293,12 @@ export class User {
       const txBody = txCompleted.txComplete.body();
       const txHash_ = Lucid.C.hash_transaction(txBody);
       const txOuts = txBody.outputs();
+
+      const txMints = txBody.mint();
+      if (txMints) {
+        console.log("txMints (json):", txMints.to_json());
+        console.log("txMints (js):", txMints.to_js_value());
+      }
 
       // console.log("txComplete (json):", txCompleted.txComplete.to_json());
       // console.log("txComplete (js):", txCompleted.txComplete.to_js_value());
@@ -348,20 +354,17 @@ export class User {
       }
       // end logging
 
-      const txSigned = await txCompleted.sign().complete();
-      const txHash = await txSigned.submit();
-      const txCore = txSigned.txSigned;
-      this.updateMempool(txCore);
-      return { txHash, txCore };
-    } catch (e) {
+      return txCompleted;
+    } catch (e) { // this happens here instead of in signAndSubmit because we want to confirm the assumption that we can can do this without bothering the user for a signature or requiring feedback from the chain
+      const e_ = e.toString();
       if (
         this.usedSplitting &&
-        (e.toString().includes("Insufficient input in transaction") ||
-          e.toString().includes("Insufficient collateral balance") ||
-          e.toString().includes("InputsExhaustedError"))
+        (e_.includes("Insufficient input in transaction") ||
+          e_.includes("Insufficient collateral balance") ||
+          e_.includes("InputsExhaustedError"))
       ) {
         console.warn(
-          `catching ${e} in user.signAndSubmit() after splitting`,
+          `catching ${e} in user.complete() after splitting`,
         );
         return new Error(e.toString());
       } else {
@@ -370,17 +373,33 @@ export class User {
     }
   };
 
+  private signAndSubmit = async (
+    txCompleted: Lucid.TxComplete | Error,
+  ): Promise<TxResult> => {
+    if (txCompleted instanceof Error) return txCompleted;
+
+    const txSigned = await txCompleted.sign().complete();
+    const txHash = await txSigned.submit();
+    const txCore = txSigned.txSigned;
+    this.updateMempool(txCore);
+    return { txHash, txCore };
+  };
+
   private execute_ = async (action: Action): Promise<TxResult[]> => {
     const tx = action.tx(this.lucid.newTx());
     console.log("execute_() - balance:", this.balance?.concise());
     try {
-      const result = await this.signAndSubmit(tx, action);
+      const txCompleted = await this.complete(tx, action);
+      const result = await this.signAndSubmit(txCompleted);
       if (result instanceof Error) this.retrying.push(action); // means mempool-related issue right now
       else action.succeeded(result.txCore);
       return [result];
     } catch (e) {
       const e_ = e.toString();
-      if (e_.includes("Maximum transaction size")) {
+      if (
+        e_.includes("Maximum transaction size") ||
+        e_.includes("Over budget")
+      ) {
         console.warn(e_);
         console.log("splitting action...");
         const actions: Action[] = action.split();

@@ -123,9 +123,13 @@ export class Pool {
     private readonly paramContainingSplit = true,
   ) {}
 
-  public get utxos(): Lucid.UTxO[] {
-    return [this.paramUtxo.utxo!, ...this.diracUtxos.map((d) => d.utxo!)];
-  }
+  // public get utxos(): Lucid.UTxO[] {
+  //   assert(this.paramUtxo.utxo, "pool.utxos(): paramUtxo.utxo is undefined");
+  //   return [
+  //     ...(this.paramContainingSplit ? [this.paramUtxo.utxo] : []),
+  //     ...this.diracUtxos.map((d) => d.utxo!)
+  //   ];
+  // }
 
   public get idNFT(): IdNFT {
     return this.paramUtxo.paramNFT;
@@ -192,8 +196,8 @@ export class Pool {
     const tt = tabs + t;
     const ttf = tt + f;
     return `Pool {
-${ttf}paramUtxo: ${this.paramUtxo?.show(ttf)}
 ${ttf}diracUtxos: ${this.diracUtxos.length}
+${ttf}paramUtxo: ${this.paramUtxo?.show(ttf)}
 ${ttf}first diracUtxo: ${this.diracUtxos[0]?.show(ttf)}
 ${tt}}`; // .map((d) => d.show(ttf)).join(",\n" + ttf)}
   };
@@ -211,11 +215,7 @@ ${tt}}`; // .map((d) => d.show(ttf)).join(",\n" + ttf)}
   };
 
   public openingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
-    console.log(
-      `Bulding opening-tx pool with ${this.diracUtxos.length} dirac utxos and ${
-        this.paramContainingSplit ? 1 : 0
-      } param utxos for pool: ${this.show()}`,
-    );
+    console.log("Building opening-tx for pool:", this.show());
     // this.diracUtxos.forEach((diracUtxo) => console.log(diracUtxo.show()));
     let tx_ = this.paramUtxo.openingTx(tx, contract, this.paramContainingSplit);
     // let remaining = this.diracUtxos.slice(0, 100); TODO this is for splitting larger txes
@@ -230,25 +230,47 @@ ${tt}}`; // .map((d) => d.show(ttf)).join(",\n" + ttf)}
     const adminRedeemer = PEuclidAction.ptype.pconstant(
       new AdminRedeemer(),
     );
+    const redeemer = Data.to(adminRedeemer);
 
-    const burningNFTs: Lucid.Assets = {};
-    for (
-      const nft of [
-        this.paramUtxo.paramNFT,
-        ...this.diracUtxos.map((d) => d.dirac.threadNFT),
-      ]
-    ) {
-      burningNFTs[nft.toLucid] = -1n;
-    }
-
-    return tx // TODO read script?
-      .attachMintingPolicy(contract.mintingPolicy)
-      .mintAssets(burningNFTs, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
-      .collectFrom(
-        this.utxos,
-        Data.to(adminRedeemer),
-      );
+    // this.diracUtxos.forEach((diracUtxo) => console.log(diracUtxo.show()));
+    let tx_ = this.paramUtxo.closingTx(
+      tx,
+      contract,
+      redeemer,
+      this.paramContainingSplit,
+    );
+    // let remaining = this.diracUtxos.slice(0, 100); TODO this is for splitting larger txes
+    this.diracUtxos.forEach((diracUtxo) =>
+      tx_ = diracUtxo.closingTx(tx_, redeemer)
+    );
+    return tx_;
   };
+
+  // public closingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
+  //   console.log("Building closing-tx for pool:", this.show());
+  //   const adminRedeemer = PEuclidAction.ptype.pconstant(
+  //     new AdminRedeemer(),
+  //   );
+  //   const redeemer = Data.to(adminRedeemer);
+
+  //   const burningNFTs: Lucid.Assets = {};
+  //   for (
+  //     const nft of [
+  //       ...(this.paramContainingSplit ? [this.paramUtxo.paramNFT] : []),
+  //       ...this.diracUtxos.map((d) => d.dirac.threadNFT),
+  //     ]
+  //   ) {
+  //     burningNFTs[nft.toLucid] = -1n;
+  //   }
+
+  //   return tx // TODO read script?
+  //     .attachMintingPolicy(contract.mintingPolicy)
+  //     .mintAssets(burningNFTs, Lucid.Data.void()) // NOTE the Lucid.Data.void() redeemer is crucial
+  //     .collectFrom(
+  //       this.utxos,
+  //       redeemer,
+  //     );
+  // };
 
   public switchingTx = (tx: Lucid.Tx, contract: Contract): Lucid.Tx => {
     console.log("Building switching-tx for pool:", this.show());

@@ -15,8 +15,19 @@ export class Closing {
     return "Closing";
   }
 
+  // public split = (): Closing[] => {
+  //   throw new Error("Closing-split not implemented");
+  // };
+
   public split = (): Closing[] => {
-    throw new Error("Closing-split not implemented");
+    console.log(`splitting closing`);
+    const pools = this.pool.split();
+    return pools.map((p) => {
+      return new Closing(
+        this.user,
+        p,
+      );
+    });
   };
 
   public tx = (tx: Lucid.Tx): Lucid.Tx => {
