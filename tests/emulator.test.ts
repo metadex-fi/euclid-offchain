@@ -153,12 +153,6 @@ Deno.test("emulator", async () => {
         ) {
           console.error("caught:", e);
           // } else if (
-          //   prevActionType === "Closing" && (
-          //     e.toString().includes("Over budget") // TODO FIXME
-          //   )
-          // ) {
-          //   console.error("caught:", e);
-          // } else if (
           //   prevActionType === "Swapping" && (
           //     e.toString().includes("Over budget") // TODO FIXME
           //   )
